@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import logoFCSH from '../assets/logoFCSH.png'
 import { Icon } from '@iconify/react';
+import { Link } from 'react-router-dom';
 
 interface NavbarProps {
     currentSection: string;
@@ -17,7 +18,7 @@ const Navbar = ({ currentSection, setCurrentSection }: NavbarProps) => {
     
   
       return (
-        <nav className="bg-white">
+        <nav className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex-shrink-0">
@@ -43,27 +44,27 @@ const Navbar = ({ currentSection, setCurrentSection }: NavbarProps) => {
     
               <div className="hidden lg:flex flex-grow justify-center">
                 <div className="flex items-baseline space-x-4">
-                  <a
-                    href="#"
+                  <Link
+                    to={"/equipos"}
                     onClick={() => handleNavClick('Equipos')}
                     className={`px-3 py-2 text-base font-medium ${currentSection === 'Equipos' ? 'text-darkgray' : 'text-skygray hover:text-darkgray'}`}
                   >
                     Equipos
-                  </a>
-                  <a
-                    href="#"
+                  </Link>
+                  <Link
+                    to={"/usuarios"}
                     onClick={() => handleNavClick('Usuarios')}
                     className={`px-3 py-2 text-base font-medium ${currentSection === 'Usuarios' ? 'text-darkgray' : 'text-skygray hover:text-darkgray'}`}
                   >
                     Usuarios
-                  </a>
-                  <a
-                    href="#"
+                  </Link>
+                  <Link
+                    to={"/admin"}
                     onClick={() => handleNavClick('Admin')}
                     className={`px-3 py-2 text-base font-medium ${currentSection === 'Admin' ? 'text-darkgray' : 'text-skygray hover:text-darkgray'}`}
                   >
                     Admin
-                  </a>
+                  </Link>
                 </div>
               </div>
     
@@ -80,21 +81,21 @@ const Navbar = ({ currentSection, setCurrentSection }: NavbarProps) => {
                 <a
                   href="#"
                   onClick={() => handleNavClick('Equipos')}
-                  className={`block px-3 py-2 text-base font-medium ${currentSection === 'Equipos' ? 'text-blue-500' : 'text-darkgray hover:text-blue-500'}`}
+                  className={`block px-3 py-2 text-base font-medium ${currentSection === 'Equipos' ? 'text-darkgray' : 'text-skygray hover:text-darkgray'}`}
                 >
                   Equipos
                 </a>
                 <a
                   href="#"
                   onClick={() => handleNavClick('Usuarios')}
-                  className={`block px-3 py-2 text-base font-medium ${currentSection === 'Usuarios' ? 'text-blue-500' : 'text-darkgray hover:text-blue-500'}`}
+                  className={`block px-3 py-2 text-base font-medium ${currentSection === 'Usuarios' ? 'text-darkgray' : 'text-skygray hover:text-darkgray'}`}
                 >
                   Usuarios
                 </a>
                 <a
                   href="#"
                   onClick={() => handleNavClick('Admin')}
-                  className={`block px-3 py-2 text-base font-medium ${currentSection === 'Admin' ? 'text-blue-500' : 'text-darkgray hover:text-blue-500'}`}
+                  className={`block px-3 py-2 text-base font-medium ${currentSection === 'Admin' ? 'text-darkgray' : 'text-skygray hover:text-darkgray'}`}
                 >
                   Admin
                 </a>
