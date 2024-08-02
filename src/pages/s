@@ -1,7 +1,8 @@
 import { Autocomplete, TextField } from '@mui/material';
 import { Icon } from '@iconify/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
+// Definición de interfaces
 interface Item {
   id: string;
   name: string;
@@ -19,6 +20,7 @@ interface Equipo {
   ubicacion: string;
 }
 
+// Datos iniciales
 const equipos: Equipo[] = [
   {
     id: '1',
@@ -132,6 +134,7 @@ const equipos: Equipo[] = [
   }
 ];
 
+// Datos relacionados
 const perifericos: Item[] = [
   { id: '1', name: 'Computadora' },
   { id: '2', name: 'Laptop' }
@@ -156,37 +159,49 @@ const series: Item[] = [
   { id: '3', name: '9343' }
 ];
 
-const filas: Item[] = [
-  { id: '1', name: '10' },
-  { id: '2', name: '20' },
-  { id: '3', name: '30' },
-  { id: '4', name: '50' },
-  { id: '5', name: '100' }
-];
-
-
-
+// Relación entre marcas, modelos y series
+const relaciones: Record<string, Record<string, { modelos: string[], series: string[] }>> = {
+  Computadora: {
+    Lenovo: { modelos: ['Ideapad'], series: ['3000', '2832'] },
+    Dell: { modelos: ['Lexus'], series: ['2832'] },
+    Asus: { modelos: ['Ideapad'], series: ['3000'] },
+    HP: { modelos: ['Lexus'], series: ['2832'] }
+  },
+  Laptop: {
+    Asus: { modelos: ['Ideapad', 'Lexus'], series: ['9343', '3000'] },
+    HP: { modelos: ['Lexus'], series: ['3000', '2832'] },
+    Dell: { modelos: ['Lexus'], series: ['9343'] }
+  }
+};
 
 const Activos = () => {
+  const [periferico, setPeriferico] = useState<string | null>(null);
+  const [marca, setMarca] = useState<string | null>(null);
+  const [modelo, setModelo] = useState<string | null>(null);
+  const [serie, setSerie] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
+  const marcasFiltradas = periferico ? Object.keys(relaciones[periferico] || {}) : [];
+  const modelosFiltrados = periferico && marca ? relaciones[periferico][marca]?.modelos : [];
+  const seriesFiltradas = periferico && marca ? relaciones[periferico][marca]?.series : [];
+
+  useEffect(() => {
+    if (modelo && !modelosFiltrados?.includes(modelo)) {
+      setModelo(null);
+    }
+    if (serie && !seriesFiltradas?.includes(serie)) {
+      setSerie(null);
+    }
+  }, [marca, modelosFiltrados, seriesFiltradas]);
+
   const handleCheckboxChange = (id: string) => {
-    setSelectedItems((prevSelectedItems) => {
-      if (prevSelectedItems.includes(id)) {
-        return prevSelectedItems.filter(itemId => itemId !== id);
-      } else {
-        return [...prevSelectedItems, id];
-      }
-    });
+    setSelectedItems((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
   };
 
   const handleSelectAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const isChecked = event.target.checked;
-    if (isChecked) {
-      setSelectedItems(equipos.map(equipo => equipo.id));
-    } else {
-      setSelectedItems([]);
-    }
+    setSelectedItems(event.target.checked ? equipos.map((item) => item.id) : []);
   };
 
   return (
@@ -199,6 +214,7 @@ const Activos = () => {
             disablePortal
             options={perifericos}
             getOptionLabel={(option) => option.name}
+            onChange={(event, newValue) => setPeriferico(newValue?.name || null)}
             renderInput={(params) => (
               <TextField {...params} label="Periférico" variant="outlined" />
             )}
@@ -207,8 +223,9 @@ const Activos = () => {
           <Autocomplete
             size="small"
             disablePortal
-            options={marcas}
+            options={marcas.filter(m => marcasFiltradas.includes(m.name))}
             getOptionLabel={(option) => option.name}
+            onChange={(event, newValue) => setMarca(newValue?.name || null)}
             renderInput={(params) => (
               <TextField {...params} label="Marca" variant="outlined" />
             )}
@@ -217,8 +234,9 @@ const Activos = () => {
           <Autocomplete
             size="small"
             disablePortal
-            options={modelos}
+            options={modelos.filter(m => modelosFiltrados?.includes(m.name) || false)}
             getOptionLabel={(option) => option.name}
+            onChange={(event, newValue) => setModelo(newValue?.name || null)}
             renderInput={(params) => (
               <TextField {...params} label="Modelo" variant="outlined" />
             )}
@@ -227,23 +245,19 @@ const Activos = () => {
           <Autocomplete
             size="small"
             disablePortal
-            options={series}
+            options={series.filter(s => seriesFiltradas?.includes(s.name) || false)}
             getOptionLabel={(option) => option.name}
+            onChange={(event, newValue) => setSerie(newValue?.name || null)}
             renderInput={(params) => (
               <TextField {...params} label="Serie" variant="outlined" />
             )}
             className="w-full md:w-1/6"
           />
-          <div className="flex flex-col w-full md:w-1/4 md:flex-row gap-4 md:gap-2 md:ml-2">
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={filas}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
-                <TextField {...params} label="Filas" variant="outlined" />
-              )}
-              className="w-full md:w-1/2"
+          <div className="flex flex-col md:flex-row gap-4 w-full md:w-1/2">
+            <input
+              type="text"
+              placeholder="Buscar..."
+              className="w-full md:w-1/2 p-2 border border-gray-300 rounded"
             />
             <button className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/2">
               Agregar

@@ -42,7 +42,7 @@ const Equipos = () => {
         </button>
       </div>
       
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-5xl">
         {renderComponent()}
       </div>
     </div>

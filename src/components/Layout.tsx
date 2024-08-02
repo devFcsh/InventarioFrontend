@@ -11,9 +11,9 @@ const Layout: React.FC<LayoutProps> = ({ children, currentSection, setCurrentSec
   return (
     <>
       <Navbar currentSection={currentSection} setCurrentSection={setCurrentSection} />
-      <div className="mt-5">
+      <>
         {children}
-      </div>
+      </>
     </>
   );
 };

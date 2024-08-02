@@ -11,6 +11,7 @@ export default {
         'darkgray': '#374151', 
         'bluebtn': '#005099',
         'bluebtnh': '#1e40af', 
+        'skybluebtn': '#007EF2',
       },
     },
   },
