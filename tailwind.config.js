@@ -13,6 +13,9 @@ export default {
         'bluebtnh': '#1e40af', 
         'skybluebtn': '#007EF2',
       },
+      width: {
+        'cmbox': '14%',  
+      },
     },
   },
   plugins: [],

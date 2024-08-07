@@ -192,7 +192,10 @@ const Activos = () => {
   return (
     <div className="flex flex-col p-4">
       <div className="mb-4">
-        <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>
+        <div className='flex gap-4 items-center'>
+          <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>
+          <Icon icon="gridicons:add" width="30" height="30" className='text-green-700'/>
+        </div>
         <div className="flex flex-wrap gap-4 my-10">
           <Autocomplete
             size="small"
@@ -202,7 +205,7 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Periférico" variant="outlined" />
             )}
-            className="w-full md:w-1/6"
+            className="w-full md:w-cmbox"
           />
           <Autocomplete
             size="small"
@@ -212,7 +215,7 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Marca" variant="outlined" />
             )}
-            className="w-full md:w-1/6"
+            className="w-full md:w-cmbox"
           />
           <Autocomplete
             size="small"
@@ -222,7 +225,7 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Modelo" variant="outlined" />
             )}
-            className="w-full md:w-1/6"
+            className="w-full md:w-cmbox"
           />
           <Autocomplete
             size="small"
@@ -232,21 +235,31 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Serie" variant="outlined" />
             )}
-            className="w-full md:w-1/6"
+            className="w-full md:w-cmbox"
           />
-          <div className="flex flex-col w-full md:w-1/4 md:flex-row gap-4 md:gap-2 md:ml-2">
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={filas}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
-                <TextField {...params} label="Filas" variant="outlined" />
-              )}
-              className="w-full md:w-1/2"
-            />
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={series}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => (
+              <TextField {...params} label="Inventario" variant="outlined" />
+            )}
+            className="w-full md:w-cmbox"
+          />
+          <div className="flex flex-col w-full md:w-1/5 md:flex-row gap-4 md:gap-2 lg:ml-2">
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={filas}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => (
+              <TextField {...params} label="Filas" variant="outlined" />
+            )}
+            className="w-full md:w-1/2"
+          />
             <button className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/2">
-              Agregar
+              Buscar
             </button>
           </div>
         </div>

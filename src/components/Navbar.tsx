@@ -93,7 +93,7 @@ const Navbar = ({ currentSection, setCurrentSection }: NavbarProps) => {
         <div className="lg:hidden" id="mobile-menu">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <Link
-              to={"/admin"}
+              to={"/equipos"}
               onClick={() => handleNavClick("Equipos")}
               className={`block px-3 py-2 text-base font-medium ${
                 currentSection === "Equipos"
@@ -104,7 +104,7 @@ const Navbar = ({ currentSection, setCurrentSection }: NavbarProps) => {
               Equipos
             </Link>
             <Link
-              to={"/admin"}
+              to={"/usuarios"}
               onClick={() => handleNavClick("Usuarios")}
               className={`block px-3 py-2 text-base font-medium ${
                 currentSection === "Usuarios"

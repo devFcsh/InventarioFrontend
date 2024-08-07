@@ -1,9 +1,346 @@
-import React from 'react'
+import { Autocomplete, TextField } from '@mui/material';
+import { Icon } from '@iconify/react';
+import { useState } from 'react';
 
-const Bodega = () => {
-  return (
-    <div>Bodega</div>
-  )
+interface Item {
+  id: string;
+  name: string;
 }
 
-export default Bodega
+interface Equipo {
+  id: string;
+  periferico: string;
+  marca: string;
+  modelo: string;
+  serie: string;
+  inventario: string;
+  usuario: string;
+  uso: string;
+  ubicacion: string;
+}
+
+const equipos: Equipo[] = [
+  {
+    id: '1',
+    periferico: 'Computadora',
+    marca: 'Lenovo',
+    modelo: 'Ideapad',
+    serie: '3000',
+    inventario: 'INV001',
+    usuario: 'Juan Pérez',
+    uso: 'Oficina',
+    ubicacion: 'Sala 1'
+  },
+  {
+    id: '2',
+    periferico: 'Computadora',
+    marca: 'Dell',
+    modelo: 'Lexus',
+    serie: '2832',
+    inventario: 'INV002',
+    usuario: 'Ana Gómez',
+    uso: 'Diseño',
+    ubicacion: 'Sala 2'
+  },
+  {
+    id: '3',
+    periferico: 'Laptop',
+    marca: 'Asus',
+    modelo: 'Ideapad',
+    serie: '9343',
+    inventario: 'INV003',
+    usuario: 'Carlos Díaz',
+    uso: 'Trabajo remoto',
+    ubicacion: 'Oficina en casa'
+  },
+  {
+    id: '4',
+    periferico: 'Laptop',
+    marca: 'HP',
+    modelo: 'Lexus',
+    serie: '3000',
+    inventario: 'INV004',
+    usuario: 'María López',
+    uso: 'Administración',
+    ubicacion: 'Sala 3'
+  },
+  {
+    id: '5',
+    periferico: 'Computadora',
+    marca: 'Lenovo',
+    modelo: 'Ideapad',
+    serie: '2832',
+    inventario: 'INV005',
+    usuario: 'José Martínez',
+    uso: 'Desarrollo',
+    ubicacion: 'Sala 4'
+  },
+  {
+    id: '6',
+    periferico: 'Laptop',
+    marca: 'Dell',
+    modelo: 'Lexus',
+    serie: '9343',
+    inventario: 'INV006',
+    usuario: 'Laura Fernández',
+    uso: 'Investigación',
+    ubicacion: 'Sala 5'
+  },
+  {
+    id: '7',
+    periferico: 'Computadora',
+    marca: 'Asus',
+    modelo: 'Ideapad',
+    serie: '3000',
+    inventario: 'INV007',
+    usuario: 'Roberto Silva',
+    uso: 'Soporte técnico',
+    ubicacion: 'Sala 6'
+  },
+  {
+    id: '8',
+    periferico: 'Laptop',
+    marca: 'HP',
+    modelo: 'Lexus',
+    serie: '2832',
+    inventario: 'INV008',
+    usuario: 'Patricia Morales',
+    uso: 'Gerencia',
+    ubicacion: 'Sala 7'
+  },
+  {
+    id: '9',
+    periferico: 'Computadora',
+    marca: 'Lenovo',
+    modelo: 'Ideapad',
+    serie: '9343',
+    inventario: 'INV009',
+    usuario: 'Luis Sánchez',
+    uso: 'Contabilidad',
+    ubicacion: 'Sala 8'
+  },
+  {
+    id: '10',
+    periferico: 'Laptop',
+    marca: 'Asus',
+    modelo: 'Lexus',
+    serie: '3000',
+    inventario: 'INV010',
+    usuario: 'Elena Torres',
+    uso: 'Marketing',
+    ubicacion: 'Sala 9'
+  }
+];
+
+const perifericos: Item[] = [
+  { id: '1', name: 'Computadora' },
+  { id: '2', name: 'Laptop' }
+];
+
+const marcas: Item[] = [
+  { id: '1', name: 'Lenovo' },
+  { id: '2', name: 'Dell' },
+  { id: '3', name: 'Asus' },
+  { id: '4', name: 'HP' }
+];
+
+const modelos: Item[] = [
+  { id: '1', name: 'Ideapad' },
+  { id: '2', name: 'Lexus' },
+  { id: '3', name: 'Vostro' }
+];
+
+const series: Item[] = [
+  { id: '1', name: '3000' },
+  { id: '2', name: '2832' },
+  { id: '3', name: '9343' }
+];
+
+const filas: Item[] = [
+  { id: '1', name: '10' },
+  { id: '2', name: '20' },
+  { id: '3', name: '30' },
+  { id: '4', name: '50' },
+  { id: '5', name: '100' }
+];
+
+
+
+
+const Bodega = () => {
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
+  const handleCheckboxChange = (id: string) => {
+    setSelectedItems((prevSelectedItems) => {
+      if (prevSelectedItems.includes(id)) {
+        return prevSelectedItems.filter(itemId => itemId !== id);
+      } else {
+        return [...prevSelectedItems, id];
+      }
+    });
+  };
+
+  const handleSelectAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = event.target.checked;
+    if (isChecked) {
+      setSelectedItems(equipos.map(equipo => equipo.id));
+    } else {
+      setSelectedItems([]);
+    }
+  };
+
+  return (
+    <div className="flex flex-col p-4">
+      <div className="mb-4">
+        <div className='flex gap-4 items-center'>
+          <h1 className="text-2xl font-bold my-5">Consulta de Equipos en Bodega</h1>
+          <Icon icon="gridicons:add" width="30" height="30" className='text-green-700'/>
+        </div>
+        <div className="flex flex-wrap gap-4 my-10">
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={perifericos}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => (
+              <TextField {...params} label="Periférico" variant="outlined" />
+            )}
+            className="w-full md:w-cmbox"
+          />
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={marcas}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => (
+              <TextField {...params} label="Marca" variant="outlined" />
+            )}
+            className="w-full md:w-cmbox"
+          />
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={modelos}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => (
+              <TextField {...params} label="Modelo" variant="outlined" />
+            )}
+            className="w-full md:w-cmbox"
+          />
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={series}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => (
+              <TextField {...params} label="Serie" variant="outlined" />
+            )}
+            className="w-full md:w-cmbox"
+          />
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={series}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => (
+              <TextField {...params} label="Inventario" variant="outlined" />
+            )}
+            className="w-full md:w-cmbox"
+          />
+          <div className="flex flex-col w-full md:w-1/5 md:flex-row gap-4 md:gap-2 lg:ml-2">
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={filas}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => (
+              <TextField {...params} label="Filas" variant="outlined" />
+            )}
+            className="w-full md:w-1/2"
+          />
+            <button className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/2">
+              Buscar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <table className="w-full text-sm text-left text-gray-500">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+              <th scope="col" className="px-4 py-4">
+                <input
+                  type="checkbox"
+                  onChange={handleSelectAllChange}
+                />
+              </th>
+              <th scope="col" className="px-4 py-3">Periférico</th>
+              <th scope="col" className="px-4 py-3">Marca</th>
+              <th scope="col" className="px-4 py-3">Modelo</th>
+              <th scope="col" className="px-4 py-3">Serie</th>
+              <th scope="col" className="px-4 py-3">Inventario</th>
+              <th scope="col" className="px-4 py-3">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {equipos.map((item) => (
+              <tr key={item.id} className="border-b">
+                <td className="px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.includes(item.id)}
+                    onChange={() => handleCheckboxChange(item.id)}
+                  />
+                </td>
+                <td className="px-4 py-3">{item.periferico}</td>
+                <td className="px-4 py-3">{item.marca}</td>
+                <td className="px-4 py-3">{item.modelo}</td>
+                <td className="px-4 py-3">{item.serie}</td>
+                <td className="px-4 py-3 max-w-[12rem] truncate">{item.inventario}</td>
+                <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
+                  <Icon icon="ph:arrow-fat-down-light" width="25" height="25" />
+                  <Icon icon="weui:delete-outlined" width="25" height="25" />
+                  <Icon icon="mage:edit" width="25" height="25" />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <nav className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4" aria-label="Table navigation">
+        <span className="text-sm font-normal text-gray-500">
+          Mostrando
+          <span className="font-semibold text-gray-900"> 10 </span>
+          de
+          <span className="font-semibold text-gray-900"> 1000 </span>
+        </span>
+        <ul className="inline-flex items-stretch -space-x-px">
+          <li>
+            <a href="#" className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700">
+              <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
+            </a>
+          </li>
+          <li>
+            <a href="#" className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">1</a>
+          </li>
+          <li>
+            <a href="#" className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">2</a>
+          </li>
+          <li>
+            <a href="#" aria-current="page" className="flex items-center justify-center text-sm z-10 py-2 px-3 leading-tight text-primary-600 bg-primary-50 border border-primary-300 hover:bg-primary-100 hover:text-primary-700">3</a>
+          </li>
+          <li>
+            <a href="#" className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700">
+              <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
+            </a>
+          </li>
+        </ul>
+        <Icon icon="ph:export" width="20" height="20" />
+      </nav>
+    </div>
+  );
+};
+
+export default Bodega;
