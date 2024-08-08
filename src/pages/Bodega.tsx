@@ -337,7 +337,6 @@ const Bodega = () => {
             </a>
           </li>
         </ul>
-        <Icon icon="ph:export" width="20" height="20" />
       </nav>
     </div>
   );
