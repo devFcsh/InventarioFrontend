@@ -45,13 +45,12 @@ const filas: Item[] = [
   { id: '5', name: '100' }
 ];
 
-
 const Activos = () => {
   const [selectedPeriferico, setSelectedPeriferico] = useState<Item | null>(null);
   const [selectedMarca, setSelectedMarca] = useState<Item | null>(null);
   const [selectedModelo, setSelectedModelo] = useState<Item | null>(null);
   const [selectedSerie, setSelectedSerie] = useState<Item | null>(null);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [filteredEquipos, setFilteredEquipos] = useState<Equipo[]>(equipos);
 
   const marcas = useMemo(() => {
     if (!selectedPeriferico) return [];
@@ -107,32 +106,34 @@ const Activos = () => {
     setSelectedSerie(newValue);
   };
 
-  const handleCheckboxChange = (id: string) => {
-    setSelectedItems((prevSelectedItems) => {
-      if (prevSelectedItems.includes(id)) {
-        return prevSelectedItems.filter(itemId => itemId !== id);
-      } else {
-        return [...prevSelectedItems, id];
-      }
+  const handleBuscar = () => {
+    const filtered = equipos.filter(equipo => {
+      return (
+        (selectedPeriferico ? equipo.periferico === selectedPeriferico.name : true) &&
+        (selectedMarca ? equipo.marca === selectedMarca.name : true) &&
+        (selectedModelo ? equipo.modelo === selectedModelo.name : true) &&
+        (selectedSerie ? equipo.serie === selectedSerie.name : true)
+      );
     });
+    setFilteredEquipos(filtered);
   };
 
   const handleSelectAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
     if (isChecked) {
-      setSelectedItems(equipos.map(equipo => equipo.id));
+      console.log("checked");
     } else {
-      setSelectedItems([]);
+      console.log("not checked");
     }
   };
 
   return (
     <div className="flex flex-col p-4">
       <div className="mb-4">
-      <div className='flex gap-2 items-center'>
-      <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>
-      <Icon icon="gridicons:add" width="30" height="30" className='text-green-900 hover:text-green-950'/>
-    </div>
+        <div className='flex gap-2 items-center'>
+          <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>
+          <Icon icon="gridicons:add" width="30" height="30" className='text-green-900 hover:text-green-950'/>
+        </div>
         <div className="flex flex-wrap gap-4 my-10">
           <Autocomplete
             size="small"
@@ -214,7 +215,10 @@ const Activos = () => {
               defaultValue={filas[0]}
               className="w-full md:w-1/2"
             />
-            <button className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/2">
+            <button
+              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/2"
+              onClick={handleBuscar}
+            >
               Buscar
             </button>
           </div>
@@ -228,7 +232,6 @@ const Activos = () => {
                 <input
                   type="checkbox"
                   onChange={handleSelectAllChange}
-                  checked={selectedItems.length === equipos.length}
                 />
               </th>
               <th scope="col" className="px-4 py-3">Periférico</th>
@@ -239,71 +242,27 @@ const Activos = () => {
               <th scope="col" className="px-4 py-3">Usuario</th>
               <th scope="col" className="px-4 py-3">Uso</th>
               <th scope="col" className="px-4 py-3">Ubicación</th>
-              <th scope="col" className="px-4 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {equipos.map((item) => (
-              <tr key={item.id} className="border-b">
-                <td className="px-4 py-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedItems.includes(item.id)}
-                    onChange={() => handleCheckboxChange(item.id)}
-                  />
+            {filteredEquipos.map(equipo => (
+              <tr key={equipo.id} className="bg-white border-b hover:bg-gray-50">
+                <td className="px-4 py-2">
+                  <input type="checkbox" />
                 </td>
-                <td className="px-4 py-3">{item.periferico}</td>
-                <td className="px-4 py-3">{item.marca}</td>
-                <td className="px-4 py-3">{item.modelo}</td>
-                <td className="px-4 py-3">{item.serie}</td>
-                <td className="px-4 py-3 max-w-[12rem] truncate">{item.inventario}</td>
-                <td className="px-4 py-3">{item.usuario}</td>
-                <td className="px-4 py-3">{item.uso}</td>
-                <td className="px-4 py-3">{item.ubicacion}</td>
-                <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
-                  <Icon icon="ph:arrow-fat-down-light" width="25" height="25" />
-                  <Icon icon="weui:delete-outlined" width="25" height="25" />
-                  <Icon icon="mage:edit" width="25" height="25" />
-                </td>
+                <td className="px-4 py-2">{equipo.periferico}</td>
+                <td className="px-4 py-2">{equipo.marca}</td>
+                <td className="px-4 py-2">{equipo.modelo}</td>
+                <td className="px-4 py-2">{equipo.serie}</td>
+                <td className="px-4 py-2">{equipo.inventario}</td>
+                <td className="px-4 py-2">{equipo.usuario}</td>
+                <td className="px-4 py-2">{equipo.uso}</td>
+                <td className="px-4 py-2">{equipo.ubicacion}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <nav className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4" aria-label="Table navigation">
-        <span className="text-sm font-normal text-gray-500">
-          Mostrando
-          <span className="font-semibold text-gray-900"> 10 </span>
-          de
-          <span className="font-semibold text-gray-900"> 1000 </span>
-        </span>
-        <ul className="inline-flex items-stretch -space-x-px">
-          <li>
-            <a href="#" className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700">
-              <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
-            </a>
-          </li>
-          <li>
-            <a href="#" className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">1</a>
-          </li>
-          <li>
-            <a href="#" className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700">2</a>
-          </li>
-          <li>
-            <a href="#" aria-current="page" className="flex items-center justify-center text-sm z-10 py-2 px-3 leading-tight text-primary-600 bg-primary-50 border border-primary-300 hover:bg-primary-100 hover:text-primary-700">3</a>
-          </li>
-          <li>
-            <a href="#" className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700">
-              <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
-            </a>
-          </li>
-          <li>
-          <a href="#" className="flex items-center justify-center h-full py-1.5 px-3 leading-tight ml-5 text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black">
-            <Icon icon="ph:export" width="20" height="20" />
-          </a>
-          </li>
-        </ul>
-      </nav>
     </div>
   );
 };
