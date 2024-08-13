@@ -29,7 +29,37 @@ const equipos: Equipo[] = [
   { id: '7', periferico: 'Computadora', marca: 'Asus', modelo: 'Ideapad', serie: '3000', inventario: 'INV007', usuario: 'Roberto Silva', uso: 'Soporte técnico', ubicacion: 'Sala 6' },
   { id: '8', periferico: 'Laptop', marca: 'HP', modelo: 'Lexus', serie: '2832', inventario: 'INV008', usuario: 'Patricia Morales', uso: 'Gerencia', ubicacion: 'Sala 7' },
   { id: '9', periferico: 'Computadora', marca: 'Lenovo', modelo: 'Ideapad', serie: '9343', inventario: 'INV009', usuario: 'Luis Sánchez', uso: 'Contabilidad', ubicacion: 'Sala 8' },
-  { id: '10', periferico: 'Laptop', marca: 'Asus', modelo: 'Lexus', serie: '3000', inventario: 'INV010', usuario: 'Elena Torres', uso: 'Marketing', ubicacion: 'Sala 9' }
+  { id: '10', periferico: 'Laptop', marca: 'Asus', modelo: 'Lexus', serie: '3000', inventario: 'INV010', usuario: 'Elena Torres', uso: 'Marketing', ubicacion: 'Sala 9' },
+  { id: '11', periferico: 'Computadora', marca: 'Lenovo', modelo: 'Ideapad', serie: '3000', inventario: 'INV001', usuario: 'Juan Pérez', uso: 'Oficina', ubicacion: 'Sala 1' },
+  { id: '12', periferico: 'Computadora', marca: 'Dell', modelo: 'Lexus', serie: '2832', inventario: 'INV002', usuario: 'Ana Gómez', uso: 'Diseño', ubicacion: 'Sala 2' },
+  { id: '13', periferico: 'Laptop', marca: 'Asus', modelo: 'Ideapad', serie: '9343', inventario: 'INV003', usuario: 'Carlos Díaz', uso: 'Trabajo remoto', ubicacion: 'Oficina en casa' },
+  { id: '14', periferico: 'Laptop', marca: 'HP', modelo: 'Lexus', serie: '3000', inventario: 'INV004', usuario: 'María López', uso: 'Administración', ubicacion: 'Sala 3' },
+  { id: '15', periferico: 'Computadora', marca: 'Lenovo', modelo: 'Ideapad', serie: '2832', inventario: 'INV005', usuario: 'José Martínez', uso: 'Desarrollo', ubicacion: 'Sala 4' },
+  { id: '16', periferico: 'Laptop', marca: 'Dell', modelo: 'Lexus', serie: '9343', inventario: 'INV006', usuario: 'Laura Fernández', uso: 'Investigación', ubicacion: 'Sala 5' },
+  { id: '17', periferico: 'Computadora', marca: 'Asus', modelo: 'Ideapad', serie: '3000', inventario: 'INV007', usuario: 'Roberto Silva', uso: 'Soporte técnico', ubicacion: 'Sala 6' },
+  { id: '18', periferico: 'Laptop', marca: 'HP', modelo: 'Lexus', serie: '2832', inventario: 'INV008', usuario: 'Patricia Morales', uso: 'Gerencia', ubicacion: 'Sala 7' },
+  { id: '19', periferico: 'Computadora', marca: 'Lenovo', modelo: 'Ideapad', serie: '9343', inventario: 'INV009', usuario: 'Luis Sánchez', uso: 'Contabilidad', ubicacion: 'Sala 8' },
+  { id: '20', periferico: 'Laptop', marca: 'Asus', modelo: 'Lexus', serie: '3000', inventario: 'INV010', usuario: 'Elena Torres', uso: 'Marketing', ubicacion: 'Sala 9' },
+  { id: '1', periferico: 'Computadora', marca: 'Lenovo', modelo: 'Ideapad', serie: '3000', inventario: 'INV001', usuario: 'Juan Pérez', uso: 'Oficina', ubicacion: 'Sala 1' },
+  { id: '2', periferico: 'Computadora', marca: 'Dell', modelo: 'Lexus', serie: '2832', inventario: 'INV002', usuario: 'Ana Gómez', uso: 'Diseño', ubicacion: 'Sala 2' },
+  { id: '3', periferico: 'Laptop', marca: 'Asus', modelo: 'Ideapad', serie: '9343', inventario: 'INV003', usuario: 'Carlos Díaz', uso: 'Trabajo remoto', ubicacion: 'Oficina en casa' },
+  { id: '4', periferico: 'Laptop', marca: 'HP', modelo: 'Lexus', serie: '3000', inventario: 'INV004', usuario: 'María López', uso: 'Administración', ubicacion: 'Sala 3' },
+  { id: '5', periferico: 'Computadora', marca: 'Lenovo', modelo: 'Ideapad', serie: '2832', inventario: 'INV005', usuario: 'José Martínez', uso: 'Desarrollo', ubicacion: 'Sala 4' },
+  { id: '6', periferico: 'Laptop', marca: 'Dell', modelo: 'Lexus', serie: '9343', inventario: 'INV006', usuario: 'Laura Fernández', uso: 'Investigación', ubicacion: 'Sala 5' },
+  { id: '7', periferico: 'Computadora', marca: 'Asus', modelo: 'Ideapad', serie: '3000', inventario: 'INV007', usuario: 'Roberto Silva', uso: 'Soporte técnico', ubicacion: 'Sala 6' },
+  { id: '8', periferico: 'Laptop', marca: 'HP', modelo: 'Lexus', serie: '2832', inventario: 'INV008', usuario: 'Patricia Morales', uso: 'Gerencia', ubicacion: 'Sala 7' },
+  { id: '9', periferico: 'Computadora', marca: 'Lenovo', modelo: 'Ideapad', serie: '9343', inventario: 'INV009', usuario: 'Luis Sánchez', uso: 'Contabilidad', ubicacion: 'Sala 8' },
+  { id: '10', periferico: 'Laptop', marca: 'Asus', modelo: 'Lexus', serie: '3000', inventario: 'INV010', usuario: 'Elena Torres', uso: 'Marketing', ubicacion: 'Sala 9' },
+  { id: '11', periferico: 'Computadora', marca: 'Lenovo', modelo: 'Ideapad', serie: '3000', inventario: 'INV001', usuario: 'Juan Pérez', uso: 'Oficina', ubicacion: 'Sala 1' },
+  { id: '12', periferico: 'Computadora', marca: 'Dell', modelo: 'Lexus', serie: '2832', inventario: 'INV002', usuario: 'Ana Gómez', uso: 'Diseño', ubicacion: 'Sala 2' },
+  { id: '13', periferico: 'Laptop', marca: 'Asus', modelo: 'Ideapad', serie: '9343', inventario: 'INV003', usuario: 'Carlos Díaz', uso: 'Trabajo remoto', ubicacion: 'Oficina en casa' },
+  { id: '14', periferico: 'Laptop', marca: 'HP', modelo: 'Lexus', serie: '3000', inventario: 'INV004', usuario: 'María López', uso: 'Administración', ubicacion: 'Sala 3' },
+  { id: '15', periferico: 'Computadora', marca: 'Lenovo', modelo: 'Ideapad', serie: '2832', inventario: 'INV005', usuario: 'José Martínez', uso: 'Desarrollo', ubicacion: 'Sala 4' },
+  { id: '16', periferico: 'Laptop', marca: 'Dell', modelo: 'Lexus', serie: '9343', inventario: 'INV006', usuario: 'Laura Fernández', uso: 'Investigación', ubicacion: 'Sala 5' },
+  { id: '17', periferico: 'Computadora', marca: 'Asus', modelo: 'Ideapad', serie: '3000', inventario: 'INV007', usuario: 'Roberto Silva', uso: 'Soporte técnico', ubicacion: 'Sala 6' },
+  { id: '18', periferico: 'Laptop', marca: 'HP', modelo: 'Lexus', serie: '2832', inventario: 'INV008', usuario: 'Patricia Morales', uso: 'Gerencia', ubicacion: 'Sala 7' },
+  { id: '19', periferico: 'Computadora', marca: 'Lenovo', modelo: 'Ideapad', serie: '9343', inventario: 'INV009', usuario: 'Luis Sánchez', uso: 'Contabilidad', ubicacion: 'Sala 8' },
+  { id: '20', periferico: 'Laptop', marca: 'Asus', modelo: 'Lexus', serie: '3000', inventario: 'INV010', usuario: 'Elena Torres', uso: 'Marketing', ubicacion: 'Sala 9' }
 ];
 
 const perifericos: Item[] = [
@@ -37,13 +67,12 @@ const perifericos: Item[] = [
   { id: '2', name: 'Laptop' }
 ];
 
-const filas: Item[] = [
-  { id: '1', name: '10' },
-  { id: '2', name: '20' },
-  { id: '3', name: '30' },
-  { id: '4', name: '50' },
-  { id: '5', name: '100' }
-];
+  const filas = [
+    { id: 10, name: '10' },
+    { id: 20, name: '20' },
+    { id: 50, name: '50' },
+    { id: 100, name: '100' }
+  ];
 
 const Activos = () => {
   const [selectedPeriferico, setSelectedPeriferico] = useState<Item | null>(null);
@@ -51,6 +80,9 @@ const Activos = () => {
   const [selectedModelo, setSelectedModelo] = useState<Item | null>(null);
   const [selectedSerie, setSelectedSerie] = useState<Item | null>(null);
   const [filteredEquipos, setFilteredEquipos] = useState<Equipo[]>(equipos);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const marcas = useMemo(() => {
     if (!selectedPeriferico) return [];
@@ -84,25 +116,25 @@ const Activos = () => {
     )).map(inventario => ({ id: inventario, name: inventario }));
   }, [selectedPeriferico, selectedMarca, selectedModelo, selectedSerie]);
 
-  const handlePerifericoChange = (event: React.ChangeEvent<{}>, newValue: Item | null) => {
+  const handlePerifericoChange = (_event: React.ChangeEvent<HTMLElement>, newValue: Item | null) => {
     setSelectedPeriferico(newValue);
     setSelectedMarca(null);
     setSelectedModelo(null);
     setSelectedSerie(null);
   };
 
-  const handleMarcaChange = (event: React.ChangeEvent<{}>, newValue: Item | null) => {
+  const handleMarcaChange = (_event: React.ChangeEvent<HTMLElement>, newValue: Item | null) => {
     setSelectedMarca(newValue);
     setSelectedModelo(null);
     setSelectedSerie(null);
   };
 
-  const handleModeloChange = (event: React.ChangeEvent<{}>, newValue: Item | null) => {
+  const handleModeloChange = (_event: React.ChangeEvent<HTMLElement>, newValue: Item | null) => {
     setSelectedModelo(newValue);
     setSelectedSerie(null);
   };
 
-  const handleSerieChange = (event: React.ChangeEvent<{}>, newValue: Item | null) => {
+  const handleSerieChange = (_event: React.ChangeEvent<HTMLElement>, newValue: Item | null) => {
     setSelectedSerie(newValue);
   };
 
@@ -116,16 +148,46 @@ const Activos = () => {
       );
     });
     setFilteredEquipos(filtered);
+    setCurrentPage(1);
+  };
+
+  const handleCheckboxChange = (id: string) => {
+    setSelectedItems((prevSelectedItems) => {
+      if (prevSelectedItems.includes(id)) {
+        return prevSelectedItems.filter(itemId => itemId !== id);
+      } else {
+        return [...prevSelectedItems, id];
+      }
+    });
   };
 
   const handleSelectAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
     if (isChecked) {
-      console.log("checked");
+      setSelectedItems(equipos.map(equipo => equipo.id));
     } else {
-      console.log("not checked");
+      setSelectedItems([]);
     }
   };
+
+  const handleRowsPerPageChange = (_event: React.ChangeEvent<HTMLElement>, newValue: Item | null) => {
+    const rows = parseInt(newValue?.name || '10', 10);
+    setRowsPerPage(rows);
+    setCurrentPage(1); 
+  };
+
+  const totalPages = Math.ceil(filteredEquipos.length / rowsPerPage);
+  const paginatedEquipos = filteredEquipos.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
 
   return (
     <div className="flex flex-col p-4">
@@ -198,7 +260,7 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Inventario" variant="outlined" />
             )}
-            value={null} // Restablece el valor si es necesario
+            value={null}
             isOptionEqualToValue={(option, value) => option.id === value?.id}
             className="w-full md:w-cmbox"
             disabled={!selectedSerie}
@@ -208,11 +270,12 @@ const Activos = () => {
               size="small"
               disablePortal
               options={filas}
+              onChange={handleRowsPerPageChange}
               getOptionLabel={(option) => option.name}
               renderInput={(params) => (
                 <TextField {...params} label="Filas" variant="outlined" />
               )}
-              defaultValue={filas[0]}
+              value={filas.find(option => option.id === rowsPerPage)} 
               className="w-full md:w-1/2"
             />
             <button
@@ -229,9 +292,10 @@ const Activos = () => {
           <thead className="text-xs uppercase bg-gray-50 text-gray-700">
             <tr>
               <th scope="col" className="px-4 py-3">
-                <input
+              <input
                   type="checkbox"
                   onChange={handleSelectAllChange}
+                  checked={selectedItems.length === equipos.length}
                 />
               </th>
               <th scope="col" className="px-4 py-3">Periférico</th>
@@ -242,13 +306,18 @@ const Activos = () => {
               <th scope="col" className="px-4 py-3">Usuario</th>
               <th scope="col" className="px-4 py-3">Uso</th>
               <th scope="col" className="px-4 py-3">Ubicación</th>
+              <th scope="col" className="px-4 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {filteredEquipos.map(equipo => (
+          {paginatedEquipos.map(equipo => (
               <tr key={equipo.id} className="bg-white border-b hover:bg-gray-50">
                 <td className="px-4 py-2">
-                  <input type="checkbox" />
+                <input
+                    type="checkbox"
+                    checked={selectedItems.includes(equipo.id)}
+                    onChange={() => handleCheckboxChange(equipo.id)}
+                  />
                 </td>
                 <td className="px-4 py-2">{equipo.periferico}</td>
                 <td className="px-4 py-2">{equipo.marca}</td>
@@ -258,11 +327,61 @@ const Activos = () => {
                 <td className="px-4 py-2">{equipo.usuario}</td>
                 <td className="px-4 py-2">{equipo.uso}</td>
                 <td className="px-4 py-2">{equipo.ubicacion}</td>
+                <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
+                  <Icon icon="ph:arrow-fat-down-light" width="25" height="25" />
+                  <Icon icon="weui:delete-outlined" width="25" height="25" />
+                  <Icon icon="mage:edit" width="25" height="25" />
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <nav className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4" aria-label="Table navigation">
+        <span className="text-sm font-normal text-gray-500">
+          Mostrando
+          <span className="font-semibold text-gray-900"> {paginatedEquipos.length} </span>
+          de
+          <span className="font-semibold text-gray-900"> {filteredEquipos.length} </span>
+        </span>
+        <ul className="inline-flex items-stretch -space-x-px">
+          <li>
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+            >
+              <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
+            </button>
+          </li>
+          {[...Array(totalPages).keys()].map((page) => (
+            <li key={page + 1}>
+              <button
+                onClick={() => handlePageChange(page + 1)}
+                className={`flex items-center justify-center text-sm py-2 px-3 leading-tight border border-gray-300 hover:bg-gray-100 hover:text-gray-700 ${
+                  currentPage === page + 1 ? 'z-10 text-blue-600 bg-blue-50 border-blue-300' : 'text-gray-500 bg-white'
+                }`}
+              >
+                {page + 1}
+              </button>
+            </li>
+          ))}
+          <li>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+            >
+              <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
+            </button>
+          </li>
+          <li>
+          <a href="#" className="flex items-center justify-center h-full py-1.5 px-3 leading-tight ml-5 text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black">
+            <Icon icon="ph:export" width="20" height="20" />
+          </a>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 };
