@@ -1,6 +1,8 @@
 import { Autocomplete, TextField } from '@mui/material';
 import { Icon } from '@iconify/react';
 import { useState, useMemo } from 'react';
+import * as XLSX from 'xlsx';
+import { Link } from 'react-router-dom';
 
 interface Item {
   id: string;
@@ -188,13 +190,32 @@ const Activos = () => {
     }
   };
 
+  const exportToExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(paginatedEquipos.map(({ id, periferico, marca, modelo, serie, inventario, usuario, uso, ubicacion }) => ({
+      Periférico: periferico,
+      Marca: marca,
+      Modelo: modelo,
+      Serie: serie,
+      Inventario: inventario,
+      Usuario: usuario,
+      Uso: uso,
+      Ubicación: ubicacion
+    })));
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Datos');
+
+    XLSX.writeFile(wb, 'datos_equipos.xlsx');
+  };
+
+
 
   return (
     <div className="flex flex-col p-4">
       <div className="mb-4">
         <div className='flex gap-2 items-center'>
           <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>
-          <Icon icon="gridicons:add" width="30" height="30" className='text-green-900 hover:text-green-950'/>
+          <Link to={"/agregarActivo"}><Icon icon="gridicons:add" width="30" height="30" className='text-green-900 hover:text-green-950'/></Link>
         </div>
         <div className="flex flex-wrap gap-4 my-10">
           <Autocomplete
@@ -354,18 +375,13 @@ const Activos = () => {
               <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
             </button>
           </li>
-          {[...Array(totalPages).keys()].map((page) => (
-            <li key={page + 1}>
-              <button
-                onClick={() => handlePageChange(page + 1)}
-                className={`flex items-center justify-center text-sm py-2 px-3 leading-tight border border-gray-300 hover:bg-gray-100 hover:text-gray-700 ${
-                  currentPage === page + 1 ? 'z-10 text-blue-600 bg-blue-50 border-blue-300' : 'text-gray-500 bg-white'
-                }`}
+            <li>
+              <div
+                className='flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-500 bg-white'
               >
-                {page + 1}
-              </button>
+                {currentPage}
+              </div>
             </li>
-          ))}
           <li>
             <button
               onClick={() => handlePageChange(currentPage + 1)}
@@ -376,9 +392,9 @@ const Activos = () => {
             </button>
           </li>
           <li>
-          <a href="#" className="flex items-center justify-center h-full py-1.5 px-3 leading-tight ml-5 text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black">
+          <button onClick={exportToExcel} className="flex items-center justify-center h-full py-1.5 px-3 leading-tight ml-5 text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black">
             <Icon icon="ph:export" width="20" height="20" />
-          </a>
+          </button>
           </li>
         </ul>
       </nav>
