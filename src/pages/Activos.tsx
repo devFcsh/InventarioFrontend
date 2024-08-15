@@ -921,7 +921,7 @@ const Activos = () => {
                     }
                     className="cursor-pointer"
                   />
-                  <Icon icon="mage:edit" width="25" height="25" />
+                  <Link to={"/editarActivo"} state={{ id: equipo.id }}><Icon icon="mage:edit" width="25" height="25" /></Link>
                 </td>
               </tr>
             ))}

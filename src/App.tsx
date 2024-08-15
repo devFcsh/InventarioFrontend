@@ -10,6 +10,7 @@ import Bodega from "./pages/Bodega";
 import Usuarios from "./pages/Usuarios";
 import Admin from "./pages/Admin";
 import AgregarActivo from "./pages/AgregarActivo";
+import EditarActivo from "./pages/EditarActivo";
 
 const App: React.FC = () => {
   const [currentSection, setCurrentSection] = useState<string>("Equipos");
@@ -92,6 +93,17 @@ const App: React.FC = () => {
               setCurrentSection={setCurrentSection}
             >
               <AgregarActivo />
+            </Layout>
+          }
+        />
+        <Route
+          path="/editarActivo"
+          element={
+            <Layout
+              currentSection={currentSection}
+              setCurrentSection={setCurrentSection}
+            >
+              <EditarActivo />
             </Layout>
           }
         />
