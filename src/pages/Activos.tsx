@@ -673,6 +673,32 @@ const Activos = () => {
     }
   };
 
+  const handleDelete = () => {
+    setModalContent({
+      title: "Eliminar Equipos",
+      message: "¿Estás seguro de que deseas eliminar los equipos seleccionados?",
+    });
+    setConfirmAction(() => () => {
+      console.log(selectedItems)
+      setSelectedItems([]);
+      setOpenModal(false);
+    });
+    setOpenModal(true);
+  };
+
+  const handleBaja = () => {
+    setModalContent({
+      title: "Dar de Baja Equipos",
+      message: "¿Estás seguro de que deseas dar de baja en los equipos seleccionados?",
+    });
+    setConfirmAction(() => () => {
+      console.log(selectedItems)
+      setSelectedItems([]);
+      setOpenModal(false);
+    });
+    setOpenModal(true);
+  };
+
   const handleRowsPerPageChange = (
     _event: React.ChangeEvent<HTMLElement>,
     newValue: Item | null
@@ -835,12 +861,33 @@ const Activos = () => {
         <table className="w-full text-left text-sm text-gray-500">
           <thead className="text-xs uppercase bg-gray-50 text-gray-700">
             <tr>
-              <th scope="col" className="px-4 py-3">
-                <input
-                  type="checkbox"
-                  onChange={handleSelectAllChange}
-                  checked={selectedItems.length === equipos.length}
-                />
+              <th scope="col" className="flex items-center gap-2 px-4 py-3">
+                 <input
+                type="checkbox"
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedItems(equipos.map((equipo) => equipo.id));
+                  } else {
+                    setSelectedItems([]);
+                  }
+                }}
+                checked={selectedItems.length === equipos.length}
+                className="mr-0"
+              />
+                      <Icon
+                    icon="weui:delete-outlined"
+                    width="20"
+                    height="20"
+                    onClick={handleDelete} 
+                    className="cursor-pointer"
+                  />
+                  <Icon
+                    icon="ph:arrow-fat-down-light"
+                    width="20"
+                    height="20"
+                    onClick={handleBaja} 
+                    className="cursor-pointer"
+                  />
               </th>
               <th scope="col" className="px-4 py-3">
                 Periférico
@@ -878,11 +925,11 @@ const Activos = () => {
                 className="bg-white border-b hover:bg-gray-50"
               >
                 <td className="px-4 py-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedItems.includes(equipo.id)}
-                    onChange={() => handleCheckboxChange(equipo.id)}
-                  />
+                <input
+                  type="checkbox"
+                  checked={selectedItems.includes(equipo.id)}
+                  onChange={() => handleCheckboxChange(equipo.id)}
+                />
                 </td>
                 <td className="px-4 py-2">{equipo.periferico}</td>
                 <td className="px-4 py-2">{equipo.marca}</td>
@@ -921,7 +968,7 @@ const Activos = () => {
                     }
                     className="cursor-pointer"
                   />
-                  <Link to={"/editarActivo"} state={{ id: equipo.id }}><Icon icon="mage:edit" width="25" height="25" /></Link>
+                  <Link to={"/editarActivo"} state={{ id: equipo.id }}><Icon icon="mage:edit" width="25" height="25" className="cursor-pointer"/></Link>
                 </td>
               </tr>
             ))}
