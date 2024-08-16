@@ -209,6 +209,9 @@ const Activos = () => {
       message: "¿Estás seguro de que deseas eliminar los equipos seleccionados?",
     });
     setConfirmAction(() => () => {
+      if(selectedItems.length === 0){
+        console.log("debe seleccionar un elemento");
+      }
       console.log(selectedItems)
       setSelectedItems([]);
       setOpenModal(false);
@@ -222,6 +225,9 @@ const Activos = () => {
       message: "¿Estás seguro de que deseas dar de baja en los equipos seleccionados?",
     });
     setConfirmAction(() => () => {
+      if(selectedItems.length === 0){
+        console.log("debe seleccionar un elemento");
+      }
       console.log(selectedItems)
       setSelectedItems([]);
       setOpenModal(false);
@@ -402,7 +408,7 @@ const Activos = () => {
                   }
                 }}
                 checked={selectedItems.length === equipos.length}
-                className="mr-0"
+                className="mr-1"
               />
                       <Icon
                     icon="weui:delete-outlined"
