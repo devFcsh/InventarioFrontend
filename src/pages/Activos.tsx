@@ -408,7 +408,7 @@ const Activos = () => {
                   }
                 }}
                 checked={selectedItems.length === equipos.length}
-                className="mr-1"
+                className="mr-2"
               />
                       <Icon
                     icon="weui:delete-outlined"
@@ -460,7 +460,7 @@ const Activos = () => {
                 key={equipo.id}
                 className="bg-white border-b hover:bg-gray-50"
               >
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 text-center">
                 <input
                   type="checkbox"
                   checked={selectedItems.includes(equipo.id)}
