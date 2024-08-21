@@ -5,43 +5,29 @@ import * as XLSX from "xlsx";
 import { Link } from "react-router-dom";
 import ModalConfirmation from "../components/ModalConfirmation";
 import { Equipo, Item } from "../types";
-import { equipos, perifericos, filas } from "../data";
+import { equipos, filas } from "../data";
+import usePerifericos from "../hooks/usePerifericos";
+import useMarcasPorPeriferico from "../hooks/useMarcasPorPeriferico";
 
 const Activos = () => {
-  const [selectedPeriferico, setSelectedPeriferico] = useState<Item | null>(
-    null
-  );
-  const [selectedMarca, setSelectedMarca] = useState<Item | null>(null);
-  const [selectedModelo, setSelectedModelo] = useState<Item | null>(null);
-  const [selectedSerie, setSelectedSerie] = useState<Item | null>(null);
+  const [selectedPeriferico, setSelectedPeriferico] = useState(null);
+  const [selectedMarca, setSelectedMarca] = useState(null);
+  const [selectedModelo, setSelectedModelo] = useState(null);
+  const [selectedSerie, setSelectedSerie] = useState(null);
   const [filteredEquipos, setFilteredEquipos] = useState<Equipo[]>(equipos);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
-
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null);
-  const [confirmAction, setConfirmAction] = useState<() => void>(
-    () => () => {}
-  );
-  const [modalContent, setModalContent] = useState<{
-    title: string;
-    message: string;
-  }>({
+  const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
+  const [modalContent, setModalContent] = useState<{ title: string; message: string; }>({
     title: "Confirmar",
     message: "¿Estás seguro de que deseas realizar esta acción?",
   });
 
-  const marcas = useMemo(() => {
-    if (!selectedPeriferico) return [];
-    return Array.from(
-      new Set(
-        equipos
-          .filter((equipo) => equipo.periferico === selectedPeriferico.name)
-          .map((equipo) => equipo.marca)
-      )
-    ).map((marca) => ({ id: marca, name: marca }));
-  }, [selectedPeriferico]);
+  const { perifericos } = usePerifericos();
+  const { marcas } = useMarcasPorPeriferico(selectedPeriferico?.id_periferico);
 
   const modelos = useMemo(() => {
     if (!selectedPeriferico || !selectedMarca) return [];
@@ -50,14 +36,14 @@ const Activos = () => {
         equipos
           .filter(
             (equipo) =>
-              equipo.periferico === selectedPeriferico.name &&
-              equipo.marca === selectedMarca.name
+              equipo.periferico === selectedPeriferico.nombre &&
+              equipo.marca === selectedMarca.nombre
           )
           .map((equipo) => equipo.modelo)
       )
     ).map((modelo) => ({ id: modelo, name: modelo }));
   }, [selectedPeriferico, selectedMarca]);
-
+  
   const series = useMemo(() => {
     if (!selectedPeriferico || !selectedMarca || !selectedModelo) return [];
     return Array.from(
@@ -65,14 +51,15 @@ const Activos = () => {
         equipos
           .filter(
             (equipo) =>
-              equipo.periferico === selectedPeriferico.name &&
-              equipo.marca === selectedMarca.name &&
+              equipo.periferico === selectedPeriferico.nombre &&
+              equipo.marca === selectedMarca.nombre &&
               equipo.modelo === selectedModelo.name
           )
           .map((equipo) => equipo.serie)
       )
     ).map((serie) => ({ id: serie, name: serie }));
   }, [selectedPeriferico, selectedMarca, selectedModelo]);
+  
 
   const inventarios = useMemo(() => {
     if (
@@ -303,33 +290,43 @@ const Activos = () => {
           </Link>
         </div>
         <div className="flex flex-wrap gap-4 my-10">
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={perifericos}
-            getOptionLabel={(option) => option.name}
-            onChange={handlePerifericoChange}
-            value={selectedPeriferico}
-            isOptionEqualToValue={(option, value) => option.id === value?.id}
-            renderInput={(params) => (
-              <TextField {...params} label="Periférico" variant="outlined" />
-            )}
-            className="w-full md:w-cmbox"
-          />
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={marcas}
-            getOptionLabel={(option) => option.name}
-            onChange={handleMarcaChange}
-            value={selectedMarca}
-            isOptionEqualToValue={(option, value) => option.id === value?.id}
-            renderInput={(params) => (
-              <TextField {...params} label="Marca" variant="outlined" />
-            )}
-            className="w-full md:w-cmbox"
-            disabled={!selectedPeriferico}
-          />
+        <Autocomplete
+  size="small"
+  disablePortal
+  options={perifericos}
+  getOptionLabel={(option) => option.nombre}
+  onChange={(event, newValue) => {
+    setSelectedPeriferico(newValue);
+    setSelectedMarca(null);
+    setSelectedModelo(null);
+    setSelectedSerie(null);
+  }}
+  value={selectedPeriferico}
+  isOptionEqualToValue={(option, value) => option.id_periferico === value?.id_periferico}
+  renderInput={(params) => (
+    <TextField {...params} label="Periférico" variant="outlined" />
+  )}
+  className="w-full md:w-cmbox"
+/>
+
+<Autocomplete
+  size="small"
+  disablePortal
+  options={marcas}
+  getOptionLabel={(option) => option.nombre}  // Asumiendo que cada marca tiene un atributo "nombre"
+  onChange={(event, newValue) => {
+    setSelectedMarca(newValue);
+    setSelectedModelo(null);
+    setSelectedSerie(null);
+  }}
+  value={selectedMarca}
+  isOptionEqualToValue={(option, value) => option.id_marca === value?.id_marca}
+  renderInput={(params) => (
+    <TextField {...params} label="Marca" variant="outlined" />
+  )}
+  className="w-full md:w-cmbox"
+  disabled={!selectedPeriferico}
+/>
           <Autocomplete
             size="small"
             disablePortal

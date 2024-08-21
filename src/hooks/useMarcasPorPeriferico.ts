@@ -14,7 +14,7 @@ const useMarcasPorPeriferico = (selectedPeriferico: number) => {
     const fetchMarcas = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`/api/marcas?periferico=${selectedPeriferico.id}`);
+        const response = await fetch(`/api/marcas/marcasPorPeriferico/${selectedPeriferico}`);
         const data = await response.json();
         setMarcas(data);
       } catch (err) {

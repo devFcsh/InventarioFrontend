@@ -8,7 +8,7 @@ const usePerifericos = () => {
   useEffect(() => {
     const fetchPerifericos = async () => {
       try {
-        const response = await fetch('/api/perifericos');
+        const response = await fetch('http://localhost:5000/api/perifericos');
         const data = await response.json();
         setPerifericos(data);
       } catch (err) {
