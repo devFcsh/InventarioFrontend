@@ -17,7 +17,6 @@ const useMarcasPorPeriferico = (selectedPeriferico: number) => {
         const response = await fetch(`http://localhost:5000/api/marcas/marcasPorPeriferico/${selectedPeriferico}`);
         const data = await response.json();
         console.log(data)
-        console.log("AQUIII")
         setMarcas(data);
       } catch (err) {
         setError(err);
