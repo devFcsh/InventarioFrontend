@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const usePerifericos = () => {
   const [perifericos, setPerifericos] = useState([]);
@@ -8,9 +9,8 @@ const usePerifericos = () => {
   useEffect(() => {
     const fetchPerifericos = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/perifericos');
-        const data = await response.json();
-        setPerifericos(data);
+        const response = await axios.get('http://localhost:5000/api/perifericos');
+        setPerifericos(response.data);
       } catch (err) {
         setError(err);
       } finally {
@@ -21,7 +21,7 @@ const usePerifericos = () => {
     fetchPerifericos();
   }, []);
 
-  return { perifericos };
+  return { perifericos, loading, error };
 };
 
 export default usePerifericos;
