@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const useMarcasPorPeriferico = (selectedPeriferico: number) => {
+const useMarcasPorPeriferico = (selectedPeriferico: string) => {
   const [marcas, setMarcas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

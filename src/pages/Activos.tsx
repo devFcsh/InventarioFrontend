@@ -1,88 +1,73 @@
 import { Autocomplete, TextField } from "@mui/material";
 import { Icon } from "@iconify/react";
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { Link } from "react-router-dom";
 import ModalConfirmation from "../components/ModalConfirmation";
-import { Equipo, Item } from "../types";
-import { equipos, filas } from "../data";
+import { Equipo, Periferico, Marca, Modelo, Serie, Inventario } from "../types";
+import { filas } from "../data";
 import usePerifericos from "../hooks/usePerifericos";
 import useMarcasPorPeriferico from "../hooks/useMarcasPorPeriferico";
+import { useModelosPorMarcaPeriferico } from "../hooks/useModelosPorMarcaPeriferico";
+import { useSeriesPorModelo } from "../hooks/useSeriesPorModelo";
+import { useInventariosPorSerie } from "../hooks/useInventariosPorSerie";
+import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 
 const Activos = () => {
-  const [selectedPeriferico, setSelectedPeriferico] = useState(null);
-  const [selectedMarca, setSelectedMarca] = useState(null);
-  const [selectedModelo, setSelectedModelo] = useState(null);
-  const [selectedSerie, setSelectedSerie] = useState(null);
-  const [filteredEquipos, setFilteredEquipos] = useState<Equipo[]>(equipos);
+  const [selectedPeriferico, setSelectedPeriferico] = useState<Periferico | null>(null);
+  const [selectedMarca, setSelectedMarca] = useState<Marca | null>(null);
+  const [selectedModelo, setSelectedModelo] = useState<Modelo | null>(null);
+  const [selectedSerie, setSelectedSerie] = useState<Serie | null>(null);
+  const [selectedInventario, setSelectedInventario] = useState<Inventario | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
-  const [modalContent, setModalContent] = useState<{ title: string; message: string; }>({
+  const [modalContent, setModalContent] = useState<{
+    title: string;
+    message: string;
+  }>({
     title: "Confirmar",
     message: "¿Estás seguro de que deseas realizar esta acción?",
   });
 
+  const [shouldFetch, setShouldFetch] = useState<boolean>(false); // Controla si debe realizar la consulta
+
   const { perifericos } = usePerifericos();
-  const { marcas } = useMarcasPorPeriferico(selectedPeriferico?.id_periferico);
+  const { marcas } = useMarcasPorPeriferico(selectedPeriferico?.id_periferico ?? "");
+  const { modelos } = useModelosPorMarcaPeriferico(
+    selectedMarca?.id_marca,
+    selectedPeriferico?.id_periferico
+  );
+  const { series } = useSeriesPorModelo(
+    selectedPeriferico?.id_periferico,
+    selectedMarca?.id_marca,
+    selectedModelo?.id_modelo
+  );
+  const { inventarios } = useInventariosPorSerie(
+    selectedPeriferico?.id_periferico,
+    selectedMarca?.id_marca,
+    selectedModelo?.id_modelo,
+    selectedSerie?.id_serie
+  );
 
-  const modelos = useMemo(() => {
-    if (!selectedPeriferico || !selectedMarca) return [];
-    return Array.from(
-      new Set(
-        equipos
-          .filter(
-            (equipo) =>
-              equipo.periferico === selectedPeriferico.nombre &&
-              equipo.marca === selectedMarca.nombre
-          )
-          .map((equipo) => equipo.modelo)
-      )
-    ).map((modelo) => ({ id: modelo, name: modelo }));
-  }, [selectedPeriferico, selectedMarca]);
-  
-  const series = useMemo(() => {
-    if (!selectedPeriferico || !selectedMarca || !selectedModelo) return [];
-    return Array.from(
-      new Set(
-        equipos
-          .filter(
-            (equipo) =>
-              equipo.periferico === selectedPeriferico.nombre &&
-              equipo.marca === selectedMarca.nombre &&
-              equipo.modelo === selectedModelo.name
-          )
-          .map((equipo) => equipo.serie)
-      )
-    ).map((serie) => ({ id: serie, name: serie }));
-  }, [selectedPeriferico, selectedMarca, selectedModelo]);
-  
+  const filtros = {
+    perifericoId: selectedPeriferico?.id_periferico,
+    marcaId: selectedMarca?.id_marca,
+    modeloId: selectedModelo?.id_modelo,
+    serieId: selectedSerie?.id_serie,
+    inventario: selectedInventario?.inventario,
+  };
 
-  const inventarios = useMemo(() => {
-    if (
-      !selectedPeriferico ||
-      !selectedMarca ||
-      !selectedModelo ||
-      !selectedSerie
-    )
-      return [];
-    return Array.from(
-      new Set(
-        equipos
-          .filter(
-            (equipo) =>
-              equipo.periferico === selectedPeriferico.name &&
-              equipo.marca === selectedMarca.name &&
-              equipo.modelo === selectedModelo.name &&
-              equipo.serie === selectedSerie.name
-          )
-          .map((equipo) => equipo.inventario)
-      )
-    ).map((inventario) => ({ id: inventario, name: inventario }));
-  }, [selectedPeriferico, selectedMarca, selectedModelo, selectedSerie]);
+  const { equipos, loading, error } = useEquiposFiltrados(filtros, currentPage, rowsPerPage, shouldFetch);
+
+  useEffect(() => {
+    if (shouldFetch) {
+      setShouldFetch(false); // Reinicia el estado para evitar consultas repetidas
+    }
+  }, [shouldFetch]);
 
   const handleOpenModal = (
     id: string,
@@ -102,13 +87,11 @@ const Activos = () => {
   };
 
   const handleConfirm = () => {
-    console.log("entrando a handleconfirm");
     confirmAction();
     handleCloseModal();
   };
 
   const deleteEquipo = () => {
-    console.log(`entrando a delete con id ${selectedEquipoId}`)
     if (selectedEquipoId) {
       console.log(`Equipo con ID ${selectedEquipoId} eliminado`);
     }
@@ -121,67 +104,61 @@ const Activos = () => {
   };
 
   const handlePerifericoChange = (
-    _event: React.ChangeEvent<HTMLElement>,
-    newValue: Item | null
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: Periferico | null
   ) => {
     setSelectedPeriferico(newValue);
     setSelectedMarca(null);
     setSelectedModelo(null);
     setSelectedSerie(null);
+    setSelectedInventario(null);
   };
 
   const handleMarcaChange = (
-    _event: React.ChangeEvent<HTMLElement>,
-    newValue: Item | null
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: Marca | null
   ) => {
     setSelectedMarca(newValue);
     setSelectedModelo(null);
     setSelectedSerie(null);
+    setSelectedInventario(null);
   };
 
   const handleModeloChange = (
-    _event: React.ChangeEvent<HTMLElement>,
-    newValue: Item | null
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: Modelo | null
   ) => {
     setSelectedModelo(newValue);
     setSelectedSerie(null);
+    setSelectedInventario(null);
   };
 
   const handleSerieChange = (
-    _event: React.ChangeEvent<HTMLElement>,
-    newValue: Item | null
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: Serie | null
   ) => {
     setSelectedSerie(newValue);
+    setSelectedInventario(null);
   };
 
   const handleBuscar = () => {
-    const filtered = equipos.filter((equipo) => {
-      return (
-        (selectedPeriferico
-          ? equipo.periferico === selectedPeriferico.name
-          : true) &&
-        (selectedMarca ? equipo.marca === selectedMarca.name : true) &&
-        (selectedModelo ? equipo.modelo === selectedModelo.name : true) &&
-        (selectedSerie ? equipo.serie === selectedSerie.name : true)
-      );
-    });
-    setFilteredEquipos(filtered);
     setCurrentPage(1);
+    setShouldFetch(true); // Activa la consulta cuando se hace clic en buscar
   };
 
   const handleCheckboxChange = (id: string) => {
     setSelectedItems((prevSelectedItems) => {
       if (prevSelectedItems.includes(id)) {
+        // Deseleccionar el ítem si ya estaba seleccionado
         return prevSelectedItems.filter((itemId) => itemId !== id);
       } else {
+        // Seleccionar el ítem si no estaba seleccionado
         return [...prevSelectedItems, id];
       }
     });
   };
 
-  const handleSelectAllChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleSelectAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
     if (isChecked) {
       setSelectedItems(equipos.map((equipo) => equipo.id));
@@ -196,10 +173,10 @@ const Activos = () => {
       message: "¿Estás seguro de que deseas eliminar los equipos seleccionados?",
     });
     setConfirmAction(() => () => {
-      if(selectedItems.length === 0){
+      if (selectedItems.length === 0) {
         console.log("debe seleccionar un elemento");
       }
-      console.log(selectedItems)
+      console.log(selectedItems);
       setSelectedItems([]);
       setOpenModal(false);
     });
@@ -212,10 +189,10 @@ const Activos = () => {
       message: "¿Estás seguro de que deseas dar de baja en los equipos seleccionados?",
     });
     setConfirmAction(() => () => {
-      if(selectedItems.length === 0){
+      if (selectedItems.length === 0) {
         console.log("debe seleccionar un elemento");
       }
-      console.log(selectedItems)
+      console.log(selectedItems);
       setSelectedItems([]);
       setOpenModal(false);
     });
@@ -223,16 +200,16 @@ const Activos = () => {
   };
 
   const handleRowsPerPageChange = (
-    _event: React.ChangeEvent<HTMLElement>,
-    newValue: Item | null
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: { id: number; name: string } | null
   ) => {
     const rows = parseInt(newValue?.name || "10", 10);
     setRowsPerPage(rows);
     setCurrentPage(1);
   };
 
-  const totalPages = Math.ceil(filteredEquipos.length / rowsPerPage);
-  const paginatedEquipos = filteredEquipos.slice(
+  const totalPages = Math.ceil(equipos.length / rowsPerPage);
+  const paginatedEquipos = equipos.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
@@ -240,6 +217,7 @@ const Activos = () => {
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
+      setShouldFetch(true); // Refresca la consulta al cambiar de página
     }
   };
 
@@ -290,65 +268,65 @@ const Activos = () => {
           </Link>
         </div>
         <div className="flex flex-wrap gap-4 my-10">
-        <Autocomplete
-  size="small"
-  disablePortal
-  options={perifericos}
-  getOptionLabel={(option) => option.nombre}
-  onChange={(event, newValue) => {
-    setSelectedPeriferico(newValue);
-    setSelectedMarca(null);
-    setSelectedModelo(null);
-    setSelectedSerie(null);
-  }}
-  value={selectedPeriferico}
-  isOptionEqualToValue={(option, value) => option.id_periferico === value?.id_periferico}
-  renderInput={(params) => (
-    <TextField {...params} label="Periférico" variant="outlined" />
-  )}
-  className="w-full md:w-cmbox"
-/>
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={perifericos}
+            getOptionLabel={(option) => option.nombre}
+            onChange={handlePerifericoChange}
+            value={selectedPeriferico}
+            isOptionEqualToValue={(option, value) =>
+              option.id_periferico === value?.id_periferico
+            }
+            renderInput={(params) => (
+              <TextField {...params} label="Periférico" variant="outlined" />
+            )}
+            className="w-full md:w-cmbox"
+          />
 
-<Autocomplete
-  size="small"
-  disablePortal
-  options={marcas}
-  getOptionLabel={(option) => option.nombre}  // Asumiendo que cada marca tiene un atributo "nombre"
-  onChange={(event, newValue) => {
-    setSelectedMarca(newValue);
-    setSelectedModelo(null);
-    setSelectedSerie(null);
-  }}
-  value={selectedMarca}
-  isOptionEqualToValue={(option, value) => option.id_marca === value?.id_marca}
-  renderInput={(params) => (
-    <TextField {...params} label="Marca" variant="outlined" />
-  )}
-  className="w-full md:w-cmbox"
-  disabled={!selectedPeriferico}
-/>
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={marcas}
+            getOptionLabel={(option) => option.nombre}
+            onChange={handleMarcaChange}
+            value={selectedMarca}
+            isOptionEqualToValue={(option, value) =>
+              option.id_marca === value?.id_marca
+            }
+            renderInput={(params) => (
+              <TextField {...params} label="Marca" variant="outlined" />
+            )}
+            className="w-full md:w-cmbox"
+            disabled={!selectedPeriferico}
+          />
           <Autocomplete
             size="small"
             disablePortal
             options={modelos}
-            getOptionLabel={(option) => option.name}
+            getOptionLabel={(option) => option.nombre}
             onChange={handleModeloChange}
             value={selectedModelo}
-            isOptionEqualToValue={(option, value) => option.id === value?.id}
+            isOptionEqualToValue={(option, value) =>
+              option.id_modelo === value?.id_modelo
+            }
             renderInput={(params) => (
               <TextField {...params} label="Modelo" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
             disabled={!selectedMarca}
           />
+
           <Autocomplete
             size="small"
             disablePortal
             options={series}
-            getOptionLabel={(option) => option.name}
+            getOptionLabel={(option) => option.nombre || ""}
             onChange={handleSerieChange}
             value={selectedSerie}
-            isOptionEqualToValue={(option, value) => option.id === value?.id}
+            isOptionEqualToValue={(option, value) =>
+              option.id_serie === value?.id_serie
+            }
             renderInput={(params) => (
               <TextField {...params} label="Serie" variant="outlined" />
             )}
@@ -359,15 +337,17 @@ const Activos = () => {
             size="small"
             disablePortal
             options={inventarios}
-            getOptionLabel={(option) => option.name}
+            getOptionLabel={(option) => option.inventario || ''}
+            onChange={(event, newValue) => setSelectedInventario(newValue)}
+            value={selectedInventario}
+            isOptionEqualToValue={(option, value) => option.inventario === value?.inventario}
             renderInput={(params) => (
               <TextField {...params} label="Inventario" variant="outlined" />
             )}
-            value={null}
-            isOptionEqualToValue={(option, value) => option.id === value?.id}
             className="w-full md:w-cmbox"
             disabled={!selectedSerie}
           />
+
           <div className="flex flex-col w-full md:w-1/5 md:flex-row gap-4 md:gap-2 lg:ml-2">
             <Autocomplete
               size="small"
@@ -391,122 +371,129 @@ const Activos = () => {
         </div>
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-        <table className="w-full text-left text-sm text-gray-500">
-          <thead className="text-xs uppercase bg-gray-50 text-gray-700">
-            <tr>
-              <th scope="col" className="flex items-center gap-2 px-4 py-3">
-                 <input
-                type="checkbox"
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setSelectedItems(equipos.map((equipo) => equipo.id));
-                  } else {
-                    setSelectedItems([]);
-                  }
-                }}
-                checked={selectedItems.length === equipos.length}
-                className="mr-2"
-              />
-                      <Icon
+        {loading ? (
+          <p>Cargando equipos...</p>
+        ) : error ? (
+          <p>Error al cargar los equipos</p>
+        ) : (
+          <table className="w-full text-left text-sm text-gray-500">
+            <thead className="text-xs uppercase bg-gray-50 text-gray-700">
+              <tr>
+                <th scope="col" className="flex items-center gap-2 px-4 py-3">
+                  <input
+                    type="checkbox"
+                    onChange={handleSelectAllChange}
+                    checked={selectedItems.length === equipos.length}
+                    className="mr-2"
+                  />
+                  <Icon
                     icon="weui:delete-outlined"
                     width="20"
                     height="20"
-                    onClick={handleDelete} 
+                    onClick={handleDelete}
                     className="cursor-pointer"
                   />
                   <Icon
                     icon="ph:arrow-fat-down-light"
                     width="20"
                     height="20"
-                    onClick={handleBaja} 
+                    onClick={handleBaja}
                     className="cursor-pointer"
                   />
-              </th>
-              <th scope="col" className="px-4 py-3">
-                Periférico
-              </th>
-              <th scope="col" className="px-4 py-3">
-                Marca
-              </th>
-              <th scope="col" className="px-4 py-3">
-                Modelo
-              </th>
-              <th scope="col" className="px-4 py-3">
-                Serie
-              </th>
-              <th scope="col" className="px-4 py-3">
-                Inventario
-              </th>
-              <th scope="col" className="px-4 py-3">
-                Usuario
-              </th>
-              <th scope="col" className="px-4 py-3">
-                Uso
-              </th>
-              <th scope="col" className="px-4 py-3">
-                Ubicación
-              </th>
-              <th scope="col" className="px-4 py-3">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedEquipos.map((equipo) => (
-              <tr
-                key={equipo.id}
-                className="bg-white border-b hover:bg-gray-50"
-              >
-                <td className="px-4 py-2 text-center">
-                <input
-                  type="checkbox"
-                  checked={selectedItems.includes(equipo.id)}
-                  onChange={() => handleCheckboxChange(equipo.id)}
-                />
-                </td>
-                <td className="px-4 py-2">{equipo.periferico}</td>
-                <td className="px-4 py-2">{equipo.marca}</td>
-                <td className="px-4 py-2">{equipo.modelo}</td>
-                <td className="px-4 py-2">{equipo.serie}</td>
-                <td className="px-4 py-2">{equipo.inventario}</td>
-                <td className="px-4 py-2">{equipo.usuario}</td>
-                <td className="px-4 py-2">{equipo.uso}</td>
-                <td className="px-4 py-2">{equipo.ubicacion}</td>
-                <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
-                  <Icon
-                    icon="ph:arrow-fat-down-light"
-                    width="25"
-                    height="25"
-                    onClick={() =>
-                      handleOpenModal(
-                        equipo.id,
-                        "Dar de baja equipo",
-                        `¿Estás seguro de que deseas dar de baja el equipo ${equipo.id}?`,
-                        bajaEquipo
-                      )
-                    }
-                    className="cursor-pointer"
-                  />
-                  <Icon
-                    icon="weui:delete-outlined"
-                    width="25"
-                    height="25"
-                    onClick={() =>
-                      handleOpenModal(
-                        equipo.id,
-                        "Eliminar equipo",
-                        `¿Estás seguro de que deseas eliminar el equipo ${equipo.id}?`,
-                        deleteEquipo
-                      )
-                    }
-                    className="cursor-pointer"
-                  />
-                  <Link to={"/editarActivo"} state={{ id: equipo.id }}><Icon icon="mage:edit" width="25" height="25" className="cursor-pointer"/></Link>
-                </td>
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Periférico
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Marca
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Modelo
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Serie
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Inventario
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Usuario
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Uso
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Ubicación
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Acciones
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {paginatedEquipos.map((equipo) => (
+                <tr
+                  key={equipo.id}
+                  className="bg-white border-b hover:bg-gray-50"
+                >
+                  <td className="px-4 py-2 text-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.includes(equipo.id)}
+                      onChange={() => handleCheckboxChange(equipo.id)}
+                    />
+                  </td>
+                  <td className="px-4 py-2">{equipo.periferico}</td>
+                  <td className="px-4 py-2">{equipo.marca}</td>
+                  <td className="px-4 py-2">{equipo.modelo}</td>
+                  <td className="px-4 py-2">{equipo.serie}</td>
+                  <td className="px-4 py-2">{equipo.inventario}</td>
+                  <td className="px-4 py-2">{equipo.usuario}</td>
+                  <td className="px-4 py-2">{equipo.uso}</td>
+                  <td className="px-4 py-2">{equipo.ubicacion}</td>
+                  <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
+                    <Icon
+                      icon="ph:arrow-fat-down-light"
+                      width="25"
+                      height="25"
+                      onClick={() =>
+                        handleOpenModal(
+                          equipo.id,
+                          "Dar de baja equipo",
+                          `¿Estás seguro de que deseas dar de baja el equipo ${equipo.id}?`,
+                          bajaEquipo
+                        )
+                      }
+                      className="cursor-pointer"
+                    />
+                    <Icon
+                      icon="weui:delete-outlined"
+                      width="25"
+                      height="25"
+                      onClick={() =>
+                        handleOpenModal(
+                          equipo.id,
+                          "Eliminar equipo",
+                          `¿Estás seguro de que deseas eliminar el equipo ${equipo.id}?`,
+                          deleteEquipo
+                        )
+                      }
+                      className="cursor-pointer"
+                    />
+                    <Link to={"/editarActivo"} state={{ id: equipo.id }}>
+                      <Icon
+                        icon="mage:edit"
+                        width="25"
+                        height="25"
+                        className="cursor-pointer"
+                      />
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
       <nav
         className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
@@ -521,7 +508,7 @@ const Activos = () => {
           de
           <span className="font-semibold text-gray-900">
             {" "}
-            {filteredEquipos.length}{" "}
+            {equipos.length}{" "}
           </span>
         </span>
         <ul className="inline-flex items-stretch -space-x-px">

@@ -1,4 +1,4 @@
-import { Equipo, Item } from "../types";
+import { Equipo } from "../types";
 
 const equipos: Equipo[] = [
     {
@@ -443,11 +443,6 @@ const equipos: Equipo[] = [
     },
   ];
   
-  const perifericos: Item[] = [
-    { id: "1", name: "Computadora" },
-    { id: "2", name: "Laptop" },
-  ];
-  
   const filas = [
     { id: 10, name: "10" },
     { id: 20, name: "20" },
@@ -456,5 +451,5 @@ const equipos: Equipo[] = [
   ];
   
 export {
-    equipos, perifericos, filas
+    equipos, filas
 }
