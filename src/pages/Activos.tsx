@@ -12,6 +12,7 @@ import { useSeriesPorModelo } from "../hooks/useSeriesPorModelo";
 import { useInventariosPorSerie } from "../hooks/useInventariosPorSerie";
 import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../data";
+import { useEliminarEquipo } from "../hooks/useEliminarActivos";
 
 const Activos = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
@@ -25,8 +26,8 @@ const Activos = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null);
-  const [confirmAction, setConfirmAction] = useState<() => void>(
+  const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null); // Mantenemos este estado
+    const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
   const [modalContent, setModalContent] = useState<{
@@ -59,6 +60,8 @@ const Activos = () => {
     selectedSerie?.id_serie
   );
 
+  const { eliminarEquipo } = useEliminarEquipo(selectedEquipoId);
+
   const filtros = {
     perifericoId: selectedPeriferico?.id_periferico,
     marcaId: selectedMarca?.id_marca,
@@ -86,7 +89,7 @@ const Activos = () => {
     message: string,
     action: () => void
   ) => {
-    setSelectedEquipoId(id);
+    setSelectedEquipoId(id); // Establece el ID del equipo en el estado
     setModalContent({ title, message });
     setConfirmAction(() => action);
     setOpenModal(true);
@@ -94,17 +97,31 @@ const Activos = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setSelectedEquipoId(null);
+    // Aquí no reseteamos selectedEquipoId
   };
 
-  const handleConfirm = () => {
-    confirmAction();
-    handleCloseModal();
-  };
-
-  const deleteEquipo = () => {
+  const handleConfirm = async () => {
     if (selectedEquipoId) {
-      console.log(`Equipo con ID ${selectedEquipoId} eliminado`);
+      try {
+        await confirmAction(); // Ejecuta la acción de confirmación
+        console.log("Acción completada");
+      } catch (error) {
+        console.error("Error en la acción", error);
+      }
+    }
+    handleCloseModal(); // Cierra el modal después de ejecutar la acción
+  };
+
+  const deleteEquipo = async () => {
+    console.log("sjdhsjdsh")
+    if (selectedEquipoId) {
+      try {
+        console.log("entrando a eliminar");
+        await eliminarEquipo();
+        console.log("eliminado");
+      } catch (error) {
+        console.log("error", error);
+      }
     }
   };
 
@@ -112,6 +129,45 @@ const Activos = () => {
     if (selectedEquipoId) {
       console.log(`Equipo con ID ${selectedEquipoId} dado de baja`);
     }
+  };
+
+  const handleDelete = () => {
+    setModalContent({
+      title: "Eliminar Equipos",
+      message: "¿Estás seguro de que deseas eliminar los equipos seleccionados?",
+    });
+    setConfirmAction(() => async () => {
+      if (selectedItems.length === 0) {
+        console.log("debe seleccionar un elemento");
+        return;
+      }
+      // Ejecuta la eliminación para cada equipo seleccionado
+      for (const itemId of selectedItems) {
+        setSelectedEquipoId(itemId); // Actualiza el ID del equipo a eliminar
+        await deleteEquipo(); // Elimina uno por uno o realiza una operación en lote
+      }
+      setSelectedItems([]);
+      setOpenModal(false);
+    });
+    setOpenModal(true);
+  };
+
+  const handleBaja = () => {
+    setModalContent({
+      title: "Dar de Baja Equipos",
+      message: "¿Estás seguro de que deseas dar de baja en los equipos seleccionados?",
+    });
+    setConfirmAction(() => async () => {
+      if (selectedItems.length === 0) {
+        console.log("debe seleccionar un elemento");
+        return;
+      }
+      console.log(selectedItems);
+      setSelectedItems([]);
+      setOpenModal(false);
+      // Llama a la función de baja si es necesario
+    });
+    setOpenModal(true);
   };
 
   const handlePerifericoChange = (
@@ -178,40 +234,6 @@ const Activos = () => {
     }
   };
 
-  const handleDelete = () => {
-    setModalContent({
-      title: "Eliminar Equipos",
-      message:
-        "¿Estás seguro de que deseas eliminar los equipos seleccionados?",
-    });
-    setConfirmAction(() => () => {
-      if (selectedItems.length === 0) {
-        console.log("debe seleccionar un elemento");
-      }
-      console.log(selectedItems);
-      setSelectedItems([]);
-      setOpenModal(false);
-    });
-    setOpenModal(true);
-  };
-
-  const handleBaja = () => {
-    setModalContent({
-      title: "Dar de Baja Equipos",
-      message:
-        "¿Estás seguro de que deseas dar de baja en los equipos seleccionados?",
-    });
-    setConfirmAction(() => () => {
-      if (selectedItems.length === 0) {
-        console.log("debe seleccionar un elemento");
-      }
-      console.log(selectedItems);
-      setSelectedItems([]);
-      setOpenModal(false);
-    });
-    setOpenModal(true);
-  };
-
   const handleRowsPerPageChange = (
     _event: React.SyntheticEvent<Element, Event>,
     newValue: { id: number; name: string } | null
@@ -245,7 +267,7 @@ const Activos = () => {
           inventario,
           usuario,
           uso,
-          ubicacion,
+          edificio,
         }) => ({
           Periférico: periferico,
           Marca: marca,
@@ -254,7 +276,7 @@ const Activos = () => {
           Inventario: inventario,
           Usuario: usuario,
           Uso: uso,
-          Ubicación: ubicacion,
+          Ubicación: edificio,
         })
       )
     );
@@ -420,7 +442,7 @@ const Activos = () => {
                   )}
                 </th>
                 <th scope="col" className="px-4 py-3">
-                  Periférico
+                  Equipo
                 </th>
                 <th scope="col" className="px-4 py-3">
                   Marca
@@ -468,7 +490,7 @@ const Activos = () => {
                   <td className="px-4 py-2">{equipo.inventario}</td>
                   <td className="px-4 py-2">{equipo.usuario}</td>
                   <td className="px-4 py-2">{equipo.uso}</td>
-                  <td className="px-4 py-2">{equipo.ubicacion}</td>
+                  <td className="px-4 py-2">{equipo.edificio}</td>
                   <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
                     <Icon
                       icon="ph:arrow-fat-down-light"

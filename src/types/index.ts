@@ -32,5 +32,5 @@ export type Equipo = {
   inventario: string;
   usuario: string;
   uso: string;
-  ubicacion: string;
+  edificio: string;
 };
