@@ -22,12 +22,12 @@ export const useEquiposFiltrados = (
 
   useEffect(() => {
     const fetchEquipos = async () => {
-      if (!shouldFetch) return; // No ejecutar la consulta si shouldFetch es falso
-
+      if (!shouldFetch) return; 
       setLoading(true);
       setError(null);
 
       try {
+        console.log("fetching en equipos");
         const { data } = await axios.get("http://localhost:5000/api/equipos", {
           params: {
             ...filtros,

@@ -4,27 +4,31 @@ import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { Link } from "react-router-dom";
 import ModalConfirmation from "../components/ModalConfirmation";
-import { Equipo, Periferico, Marca, Modelo, Serie, Inventario } from "../types";
-import { filas } from "../data";
+import { Periferico, Marca, Modelo, Serie, Inventario } from "../types";
 import usePerifericos from "../hooks/usePerifericos";
 import useMarcasPorPeriferico from "../hooks/useMarcasPorPeriferico";
 import { useModelosPorMarcaPeriferico } from "../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../hooks/useSeriesPorModelo";
 import { useInventariosPorSerie } from "../hooks/useInventariosPorSerie";
 import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
+import { filas } from "../data";
 
 const Activos = () => {
-  const [selectedPeriferico, setSelectedPeriferico] = useState<Periferico | null>(null);
+  const [selectedPeriferico, setSelectedPeriferico] =
+    useState<Periferico | null>(null);
   const [selectedMarca, setSelectedMarca] = useState<Marca | null>(null);
   const [selectedModelo, setSelectedModelo] = useState<Modelo | null>(null);
   const [selectedSerie, setSelectedSerie] = useState<Serie | null>(null);
-  const [selectedInventario, setSelectedInventario] = useState<Inventario | null>(null);
+  const [selectedInventario, setSelectedInventario] =
+    useState<Inventario | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null);
-  const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
+  const [confirmAction, setConfirmAction] = useState<() => void>(
+    () => () => {}
+  );
   const [modalContent, setModalContent] = useState<{
     title: string;
     message: string;
@@ -33,13 +37,15 @@ const Activos = () => {
     message: "¿Estás seguro de que deseas realizar esta acción?",
   });
 
-  const [shouldFetch, setShouldFetch] = useState<boolean>(false); // Controla si debe realizar la consulta
+  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
 
   const { perifericos } = usePerifericos();
-  const { marcas } = useMarcasPorPeriferico(selectedPeriferico?.id_periferico ?? "");
+  const { marcas } = useMarcasPorPeriferico(
+    selectedPeriferico?.id_periferico ?? ""
+  );
   const { modelos } = useModelosPorMarcaPeriferico(
-    selectedMarca?.id_marca,
-    selectedPeriferico?.id_periferico
+    selectedMarca?.id_marca ?? "",
+    selectedPeriferico?.id_periferico ?? ""
   );
   const { series } = useSeriesPorModelo(
     selectedPeriferico?.id_periferico,
@@ -61,11 +67,16 @@ const Activos = () => {
     inventario: selectedInventario?.inventario,
   };
 
-  const { equipos, loading, error } = useEquiposFiltrados(filtros, currentPage, rowsPerPage, shouldFetch);
+  const { equipos, loading, error } = useEquiposFiltrados(
+    filtros,
+    currentPage,
+    rowsPerPage,
+    shouldFetch
+  );
 
   useEffect(() => {
     if (shouldFetch) {
-      setShouldFetch(false); // Reinicia el estado para evitar consultas repetidas
+      setShouldFetch(false);
     }
   }, [shouldFetch]);
 
@@ -143,25 +154,25 @@ const Activos = () => {
 
   const handleBuscar = () => {
     setCurrentPage(1);
-    setShouldFetch(true); // Activa la consulta cuando se hace clic en buscar
+    setShouldFetch(true);
   };
 
   const handleCheckboxChange = (id: string) => {
     setSelectedItems((prevSelectedItems) => {
       if (prevSelectedItems.includes(id)) {
-        // Deseleccionar el ítem si ya estaba seleccionado
         return prevSelectedItems.filter((itemId) => itemId !== id);
       } else {
-        // Seleccionar el ítem si no estaba seleccionado
         return [...prevSelectedItems, id];
       }
     });
   };
 
-  const handleSelectAllChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectAllChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const isChecked = event.target.checked;
     if (isChecked) {
-      setSelectedItems(equipos.map((equipo) => equipo.id));
+      setSelectedItems(equipos.map((equipo) => equipo.id_equipo));
     } else {
       setSelectedItems([]);
     }
@@ -170,7 +181,8 @@ const Activos = () => {
   const handleDelete = () => {
     setModalContent({
       title: "Eliminar Equipos",
-      message: "¿Estás seguro de que deseas eliminar los equipos seleccionados?",
+      message:
+        "¿Estás seguro de que deseas eliminar los equipos seleccionados?",
     });
     setConfirmAction(() => () => {
       if (selectedItems.length === 0) {
@@ -186,7 +198,8 @@ const Activos = () => {
   const handleBaja = () => {
     setModalContent({
       title: "Dar de Baja Equipos",
-      message: "¿Estás seguro de que deseas dar de baja en los equipos seleccionados?",
+      message:
+        "¿Estás seguro de que deseas dar de baja en los equipos seleccionados?",
     });
     setConfirmAction(() => () => {
       if (selectedItems.length === 0) {
@@ -217,7 +230,7 @@ const Activos = () => {
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
-      setShouldFetch(true); // Refresca la consulta al cambiar de página
+      setShouldFetch(true);
     }
   };
 
@@ -225,7 +238,6 @@ const Activos = () => {
     const ws = XLSX.utils.json_to_sheet(
       paginatedEquipos.map(
         ({
-          id,
           periferico,
           marca,
           modelo,
@@ -337,10 +349,12 @@ const Activos = () => {
             size="small"
             disablePortal
             options={inventarios}
-            getOptionLabel={(option) => option.inventario || ''}
+            getOptionLabel={(option) => option.inventario || ""}
             onChange={(event, newValue) => setSelectedInventario(newValue)}
             value={selectedInventario}
-            isOptionEqualToValue={(option, value) => option.inventario === value?.inventario}
+            isOptionEqualToValue={(option, value) =>
+              option.inventario === value?.inventario
+            }
             renderInput={(params) => (
               <TextField {...params} label="Inventario" variant="outlined" />
             )}
@@ -386,20 +400,24 @@ const Activos = () => {
                     checked={selectedItems.length === equipos.length}
                     className="mr-2"
                   />
-                  <Icon
-                    icon="weui:delete-outlined"
-                    width="20"
-                    height="20"
-                    onClick={handleDelete}
-                    className="cursor-pointer"
-                  />
-                  <Icon
-                    icon="ph:arrow-fat-down-light"
-                    width="20"
-                    height="20"
-                    onClick={handleBaja}
-                    className="cursor-pointer"
-                  />
+                  {selectedItems.length > 0 && (
+                    <>
+                      <Icon
+                        icon="weui:delete-outlined"
+                        width="20"
+                        height="20"
+                        onClick={handleDelete}
+                        className="cursor-pointer"
+                      />
+                      <Icon
+                        icon="ph:arrow-fat-down-light"
+                        width="20"
+                        height="20"
+                        onClick={handleBaja}
+                        className="cursor-pointer"
+                      />
+                    </>
+                  )}
                 </th>
                 <th scope="col" className="px-4 py-3">
                   Periférico
@@ -433,14 +451,14 @@ const Activos = () => {
             <tbody>
               {paginatedEquipos.map((equipo) => (
                 <tr
-                  key={equipo.id}
+                  key={equipo.id_equipo}
                   className="bg-white border-b hover:bg-gray-50"
                 >
-                  <td className="px-4 py-2 text-center">
+                  <td className="px-4 py-2">
                     <input
                       type="checkbox"
-                      checked={selectedItems.includes(equipo.id)}
-                      onChange={() => handleCheckboxChange(equipo.id)}
+                      checked={selectedItems.includes(equipo.id_equipo)}
+                      onChange={() => handleCheckboxChange(equipo.id_equipo)}
                     />
                   </td>
                   <td className="px-4 py-2">{equipo.periferico}</td>
@@ -458,9 +476,9 @@ const Activos = () => {
                       height="25"
                       onClick={() =>
                         handleOpenModal(
-                          equipo.id,
+                          equipo.id_equipo,
                           "Dar de baja equipo",
-                          `¿Estás seguro de que deseas dar de baja el equipo ${equipo.id}?`,
+                          `¿Estás seguro de que deseas dar de baja el equipo ${equipo.id_equipo}?`,
                           bajaEquipo
                         )
                       }
@@ -472,15 +490,15 @@ const Activos = () => {
                       height="25"
                       onClick={() =>
                         handleOpenModal(
-                          equipo.id,
+                          equipo.id_equipo,
                           "Eliminar equipo",
-                          `¿Estás seguro de que deseas eliminar el equipo ${equipo.id}?`,
+                          `¿Estás seguro de que deseas eliminar el equipo ${equipo.id_equipo}?`,
                           deleteEquipo
                         )
                       }
                       className="cursor-pointer"
                     />
-                    <Link to={"/editarActivo"} state={{ id: equipo.id }}>
+                    <Link to={"/editarActivo"} state={{ id: equipo.id_equipo }}>
                       <Icon
                         icon="mage:edit"
                         width="25"

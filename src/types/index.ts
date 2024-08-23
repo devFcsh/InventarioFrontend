@@ -24,7 +24,7 @@ export type Inventario = {
 
 
 export type Equipo = {
-  id: string;
+  id_equipo: string;
   periferico: string;
   marca: string;
   modelo: string;
