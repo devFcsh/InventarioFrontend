@@ -415,13 +415,13 @@ const Activos = () => {
         </div>
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-        {loading ? (
+      {loading ? (
           <p>Cargando equipos...</p>
         ) : error ? (
           <p>Error al cargar los equipos</p>
         ) : (
-          <table className="w-full text-left text-sm text-gray-500">
-            <thead className="text-xs uppercase bg-gray-50 text-gray-700">
+  <table className="w-full text-left text-sm text-gray-500">
+    <thead className="text-xs uppercase bg-gray-50 text-gray-700">
               <tr>
                 <th scope="col" className="flex items-center gap-2 px-4 py-3">
                   <input
@@ -543,47 +543,45 @@ const Activos = () => {
           </table>
         )}
       </div>
-      <nav
-        className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
-        aria-label="Table navigation"
-      >
-        <span className="text-sm font-normal text-gray-500">
+      <nav className="flex flex-col md:flex-row justify-between items-center p-4" aria-label="Table navigation">
+  <span className="text-sm font-normal text-gray-500">
+    {/* Texto adicional si es necesario */}
+  </span>
+  <div className="flex flex-col md:flex-row items-center gap-2">
+    <ul className="inline-flex items-center -space-x-px">
+      <li>
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+        >
+          <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
+        </button>
+      </li>
+      <li>
+        <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
+          Página {currentPage} de {totalPages}
+        </div>
+      </li>
+      <li>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+        >
+          <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
+        </button>
+      </li>
+    </ul>
+    <button
+      onClick={exportToExcel}
+      className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+    >
+      <Icon icon="ph:export" width="20" height="20" />
+    </button>
+  </div>
+</nav>
 
-        </span>
-        <ul className="inline-flex items-stretch -space-x-px">
-          <li>
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-            >
-              <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
-            </button>
-          </li>
-          <li>
-            <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
-              Página {currentPage} de {totalPages}
-            </div>
-          </li>
-          <li>
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-            >
-              <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={exportToExcel}
-              className="flex items-center justify-center h-full py-1.5 px-3 leading-tight ml-5 text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-            >
-              <Icon icon="ph:export" width="20" height="20" />
-            </button>
-          </li>
-        </ul>
-      </nav>
       <ModalConfirmation
         open={openModal}
         onClose={handleCloseModal}
