@@ -10,13 +10,11 @@ type Filtros = {
   inventario?: string;
 };
 
-export const useEquiposFiltrados = (
+export const useTotalEquipos = (
   filtros: Filtros,
-  currentPage: number,
-  rowsPerPage: number,
   shouldFetch: boolean
 ) => {
-  const [equipos, setEquipos] = useState<Equipo[]>([]);
+  const [totalEquipos, setTotalEquipos] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,16 +25,13 @@ export const useEquiposFiltrados = (
       setError(null);
 
       try {
-        console.log("fetching en equipos con filtros:"+filtros.perifericoId+" currentPage: "+currentPage+" rows: "+rowsPerPage+" shouldFetch: "+shouldFetch);
-        const { data } = await axios.get("http://localhost:5000/api/equipos", {
+        const { data } = await axios.get("http://localhost:5000/api/equipos/totalEquipos", {
           params: {
             ...filtros,
-            limit: rowsPerPage,
-            offset: (currentPage - 1) * rowsPerPage,
           },
         });
         console.log(data)
-        setEquipos(data);
+        setTotalEquipos(data[0].total);
       } catch (err) {
         setError("Error al cargar los equipos");
       } finally {
@@ -45,7 +40,7 @@ export const useEquiposFiltrados = (
     };
 
     fetchEquipos();
-  }, [filtros, currentPage, rowsPerPage, shouldFetch]);
+  }, [filtros, shouldFetch]);
 
-  return { equipos, loading, error };
+  return { totalEquipos };
 };

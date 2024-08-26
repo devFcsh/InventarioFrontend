@@ -13,6 +13,7 @@ import { useInventariosPorSerie } from "../hooks/useInventariosPorSerie";
 import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../data";
 import { useEliminarEquipo } from "../hooks/useEliminarActivos";
+import { useTotalEquipos } from "../hooks/useTotalEquipos";
 
 const Activos = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
@@ -26,10 +27,11 @@ const Activos = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null); // Mantenemos este estado
+  const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null); 
     const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [modalContent, setModalContent] = useState<{
     title: string;
     message: string;
@@ -77,6 +79,21 @@ const Activos = () => {
     shouldFetch
   );
 
+  const { totalEquipos } = useTotalEquipos(
+    filtros,
+    shouldFetch
+  );
+
+  useEffect(() => {
+    if (totalEquipos > 0 && rowsPerPage > 0) {
+      setTotalPages(Math.ceil(totalEquipos / rowsPerPage));
+    } else {
+      setTotalPages(1); 
+    }
+  }, [totalEquipos, rowsPerPage]);
+  
+
+
   useEffect(() => {
     if (shouldFetch) {
       setShouldFetch(false);
@@ -89,7 +106,7 @@ const Activos = () => {
     message: string,
     action: () => void
   ) => {
-    setSelectedEquipoId(id); // Establece el ID del equipo en el estado
+    setSelectedEquipoId(id);
     setModalContent({ title, message });
     setConfirmAction(() => action);
     setOpenModal(true);
@@ -97,23 +114,21 @@ const Activos = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    // Aquí no reseteamos selectedEquipoId
   };
 
   const handleConfirm = async () => {
     if (selectedEquipoId) {
       try {
-        await confirmAction(); // Ejecuta la acción de confirmación
+        await confirmAction(); 
         console.log("Acción completada");
       } catch (error) {
         console.error("Error en la acción", error);
       }
     }
-    handleCloseModal(); // Cierra el modal después de ejecutar la acción
+    handleCloseModal();
   };
 
   const deleteEquipo = async () => {
-    console.log("sjdhsjdsh")
     if (selectedEquipoId) {
       try {
         console.log("entrando a eliminar");
@@ -141,10 +156,9 @@ const Activos = () => {
         console.log("debe seleccionar un elemento");
         return;
       }
-      // Ejecuta la eliminación para cada equipo seleccionado
       for (const itemId of selectedItems) {
-        setSelectedEquipoId(itemId); // Actualiza el ID del equipo a eliminar
-        await deleteEquipo(); // Elimina uno por uno o realiza una operación en lote
+        setSelectedEquipoId(itemId); 
+        await deleteEquipo(); 
       }
       setSelectedItems([]);
       setOpenModal(false);
@@ -165,7 +179,6 @@ const Activos = () => {
       console.log(selectedItems);
       setSelectedItems([]);
       setOpenModal(false);
-      // Llama a la función de baja si es necesario
     });
     setOpenModal(true);
   };
@@ -243,11 +256,6 @@ const Activos = () => {
     setCurrentPage(1);
   };
 
-  const totalPages = Math.ceil(equipos.length / rowsPerPage);
-  const paginatedEquipos = equipos.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -258,7 +266,7 @@ const Activos = () => {
 
   const exportToExcel = () => {
     const ws = XLSX.utils.json_to_sheet(
-      paginatedEquipos.map(
+      equipos.map(
         ({
           periferico,
           marca,
@@ -471,7 +479,7 @@ const Activos = () => {
               </tr>
             </thead>
             <tbody>
-              {paginatedEquipos.map((equipo) => (
+              {equipos.map((equipo) => (
                 <tr
                   key={equipo.id_equipo}
                   className="bg-white border-b hover:bg-gray-50"
@@ -540,16 +548,7 @@ const Activos = () => {
         aria-label="Table navigation"
       >
         <span className="text-sm font-normal text-gray-500">
-          Mostrando
-          <span className="font-semibold text-gray-900">
-            {" "}
-            {paginatedEquipos.length}{" "}
-          </span>
-          de
-          <span className="font-semibold text-gray-900">
-            {" "}
-            {equipos.length}{" "}
-          </span>
+
         </span>
         <ul className="inline-flex items-stretch -space-x-px">
           <li>
@@ -562,8 +561,8 @@ const Activos = () => {
             </button>
           </li>
           <li>
-            <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-500 bg-white">
-              {currentPage}
+            <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
+              Página {currentPage} de {totalPages}
             </div>
           </li>
           <li>
