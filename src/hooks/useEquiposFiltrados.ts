@@ -35,7 +35,6 @@ export const useEquiposFiltrados = (
             offset: (currentPage - 1) * rowsPerPage,
           },
         });
-        console.log(data)
         setEquipos(data);
       } catch (err) {
         setError("Error al cargar los equipos");

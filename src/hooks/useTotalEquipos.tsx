@@ -30,7 +30,6 @@ export const useTotalEquipos = (
             ...filtros,
           },
         });
-        console.log(data)
         setTotalEquipos(data[0].total);
       } catch (err) {
         setError("Error al cargar los equipos");

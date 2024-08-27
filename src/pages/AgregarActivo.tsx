@@ -68,14 +68,19 @@ const AgregarActivo = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<{ name?: string; value: unknown }>) => {
-    const { name, value } = e.target;
-    if (name) {
-      setNuevoComponente((prev) => ({
-        ...prev,
-        [name]: value as string
-      }));
-    }
+  const handleChange = (e: React.ChangeEvent<{ name?: string; value: unknown }>, field: keyof Componente) => {
+    const { value } = e.target;
+    setNuevoComponente((prev) => ({
+      ...prev,
+      [field]: value as string
+    }));
+  };
+
+  const handleAutocompleteChange = (event: any, newValue: Item | null, field: keyof Componente) => {
+    setNuevoComponente((prev) => ({
+      ...prev,
+      [field]: newValue ? newValue.name : ''
+    }));
   };
 
   const agregarComponente = () => {
@@ -90,136 +95,177 @@ const AgregarActivo = () => {
   };
 
   return (
-    <div className='w-full max-w-7xl mx-auto p-4'>
-      <h1 className="text-2xl font-bold mb-5">Registro de Activo</h1>
-
-      <div className="flex flex-col gap-4 mb-14">
-        <div className="mb-4">
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={perifericos}
-            getOptionLabel={(option) => option.name}
-            renderInput={(params) => (
-              <TextField {...params} label="Periférico" variant="outlined" fullWidth />
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={marcas}
-            getOptionLabel={(option) => option.name}
-            renderInput={(params) => (
-              <TextField {...params} label="Uso" variant="outlined" fullWidth />
-            )}
-          />
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={marcas}
-            getOptionLabel={(option) => option.name}
-            renderInput={(params) => (
-              <TextField {...params} label="Usuario" variant="outlined" fullWidth />
-            )}
-          />
-        </div>
-
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold mb-5">Información General</h2>
-          <div className="grid grid-cols-2 gap-4">
+      <div className='w-full max-w-7xl mx-auto p-4'>
+        <h1 className="text-2xl font-bold mb-5">Registro de Activo</h1>
+  
+        <div className="flex flex-col gap-4 mb-14">
+          <div className="mb-4">
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={perifericos}
+              getOptionLabel={(option) => option.name}
+              renderInput={(params) => (
+                <TextField {...params} label="Periférico" variant="outlined" fullWidth />
+              )}
+            />
+          </div>
+  
+          <div className="grid grid-cols-2 gap-4 mb-4">
             <Autocomplete
               size="small"
               disablePortal
               options={marcas}
               getOptionLabel={(option) => option.name}
               renderInput={(params) => (
-                <TextField {...params} label="Sistema Operativo" variant="outlined" fullWidth />
+                <TextField {...params} label="Uso" variant="outlined" fullWidth />
               )}
             />
             <Autocomplete
               size="small"
               disablePortal
-              options={modelos}
+              options={marcas}
               getOptionLabel={(option) => option.name}
               renderInput={(params) => (
-                <TextField {...params} label="Versión Sistema Operativo" variant="outlined" fullWidth />
-              )}
-            />
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={series}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
-                <TextField {...params} label="Antivirus" variant="outlined" fullWidth />
-              )}
-            />
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={filas}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
-                <TextField {...params} label="Versión Office" variant="outlined" fullWidth />
-              )}
-            />
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={filas}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
-                <TextField {...params} label="Cantidad RAM" variant="outlined" fullWidth />
-              )}
-            />
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={filas}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
-                <TextField {...params} label="Tipo RAM" variant="outlined" fullWidth />
-              )}
-            />
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={filas}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
-                <TextField {...params} label="Protocolo" variant="outlined" fullWidth />
-              )}
-            />
-            <TextField
-              label="Dirección IP"
-              placeholder="Dirección IP"
-              variant="outlined"
-              fullWidth
-              size='small'
-            />
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={filas}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
-                <TextField {...params} label="Almacenamiento Disco" variant="outlined" fullWidth />
-              )}
-            />
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={filas}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
-                <TextField {...params} label="Dominio" variant="outlined" fullWidth />
+                <TextField {...params} label="Usuario" variant="outlined" fullWidth />
               )}
             />
           </div>
-        </div>
+  
+          <div className="mb-4">
+            <h2 className="text-xl font-semibold mb-5">Información de Inventario</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <Autocomplete
+                size="small"
+                disablePortal
+                options={marcas}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Marca" variant="outlined" fullWidth />
+                )}
+              />
+              <Autocomplete
+                size="small"
+                disablePortal
+                options={modelos}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Modelo" variant="outlined" fullWidth />
+                )}
+              />
+              <Autocomplete
+                size="small"
+                disablePortal
+                options={series}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Serie" variant="outlined" fullWidth />
+                )}
+              />
+              <TextField
+                label="Inventario"
+                placeholder="Inventario"
+                variant="outlined"
+                fullWidth
+                size='small'
+              />
+              
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <h2 className="text-xl font-semibold mb-5">Información General</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <Autocomplete
+                size="small"
+                disablePortal
+                options={marcas}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Sistema Operativo" variant="outlined" fullWidth />
+                )}
+              />
+              <Autocomplete
+                size="small"
+                disablePortal
+                options={modelos}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Versión Sistema Operativo" variant="outlined" fullWidth />
+                )}
+              />
+              <Autocomplete
+                size="small"
+                disablePortal
+                options={series}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Antivirus" variant="outlined" fullWidth />
+                )}
+              />
+              <Autocomplete
+                size="small"
+                disablePortal
+                options={filas}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Versión Office" variant="outlined" fullWidth />
+                )}
+              />
+              <Autocomplete
+                size="small"
+                disablePortal
+                options={filas}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Cantidad RAM" variant="outlined" fullWidth />
+                )}
+              />
+              <Autocomplete
+                size="small"
+                disablePortal
+                options={filas}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Tipo RAM" variant="outlined" fullWidth />
+                )}
+              />
+              <Autocomplete
+                size="small"
+                disablePortal
+                options={filas}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Protocolo" variant="outlined" fullWidth />
+                )}
+              />
+              <TextField
+                label="Dirección IP"
+                placeholder="Dirección IP"
+                variant="outlined"
+                fullWidth
+                size='small'
+              />
+              <Autocomplete
+                size="small"
+                disablePortal
+                options={filas}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Almacenamiento Disco" variant="outlined" fullWidth />
+                )}
+              />
+              <Autocomplete
+                size="small"
+                disablePortal
+                options={filas}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Dominio" variant="outlined" fullWidth />
+                )}
+              />
+            </div>
+          </div>
 
         <div className="mb-4">
           <h2 className="text-xl font-semibold mb-5">Cargar Imagen</h2>
@@ -274,15 +320,14 @@ const AgregarActivo = () => {
                   disablePortal
                   options={perifericos}
                   getOptionLabel={(option) => option.name}
+                  value={perifericos.find(p => p.name === nuevoComponente.periferico) || null}
+                  onChange={(event, newValue) => handleAutocompleteChange(event, newValue, 'periferico')}
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       label="Periférico"
                       variant="outlined"
                       fullWidth
-                      name="periferico"
-                      value={nuevoComponente.periferico}
-                      onChange={handleChange}
                     />
                   )}
                 />
@@ -291,15 +336,14 @@ const AgregarActivo = () => {
                   disablePortal
                   options={marcas}
                   getOptionLabel={(option) => option.name}
+                  value={marcas.find(m => m.name === nuevoComponente.marca) || null}
+                  onChange={(event, newValue) => handleAutocompleteChange(event, newValue, 'marca')}
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       label="Marca"
                       variant="outlined"
                       fullWidth
-                      name="marca"
-                      value={nuevoComponente.marca}
-                      onChange={handleChange}
                     />
                   )}
                 />
@@ -308,15 +352,14 @@ const AgregarActivo = () => {
                   disablePortal
                   options={modelos}
                   getOptionLabel={(option) => option.name}
+                  value={modelos.find(m => m.name === nuevoComponente.modelo) || null}
+                  onChange={(event, newValue) => handleAutocompleteChange(event, newValue, 'modelo')}
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       label="Modelo"
                       variant="outlined"
                       fullWidth
-                      name="modelo"
-                      value={nuevoComponente.modelo}
-                      onChange={handleChange}
                     />
                   )}
                 />
@@ -325,34 +368,25 @@ const AgregarActivo = () => {
                   disablePortal
                   options={series}
                   getOptionLabel={(option) => option.name}
+                  value={series.find(s => s.name === nuevoComponente.serie) || null}
+                  onChange={(event, newValue) => handleAutocompleteChange(event, newValue, 'serie')}
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       label="Serie"
                       variant="outlined"
                       fullWidth
-                      name="serie"
-                      value={nuevoComponente.serie}
-                      onChange={handleChange}
                     />
                   )}
                 />
-                <Autocomplete
-                  size="small"
-                  disablePortal
-                  options={filas}
-                  getOptionLabel={(option) => option.name}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Inventario"
-                      variant="outlined"
-                      fullWidth
-                      name="inventario"
-                      value={nuevoComponente.inventario}
-                      onChange={handleChange}
-                    />
-                  )}
+                <TextField
+                  label="Inventario"
+                  placeholder="Inventario"
+                  variant="outlined"
+                  fullWidth
+                  size='small'
+                  value={nuevoComponente.inventario}
+                  onChange={(e) => handleChange(e, 'inventario')}
                 />
                 <Button
                   variant="contained"
@@ -368,23 +402,23 @@ const AgregarActivo = () => {
         </div>
       </div>
       <div className="flex gap-4">
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {}}
-            fullWidth
-          >
-            Agregar Equipo
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={() => {}}
-            fullWidth
-          >
-            Cancelar
-          </Button>
-        </div>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {}}
+          fullWidth
+        >
+          Agregar Equipo
+        </Button>
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={() => {}}
+          fullWidth
+        >
+          Cancelar
+        </Button>
+      </div>
     </div>
   );
 };
