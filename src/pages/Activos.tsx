@@ -131,9 +131,7 @@ const Activos = () => {
   const deleteEquipo = async () => {
     if (selectedEquipoId) {
       try {
-        console.log("entrando a eliminar");
-        await eliminarEquipo();
-        console.log("eliminado");
+        console.log("eliminado "+selectedEquipoId);
       } catch (error) {
         console.log("error", error);
       }
@@ -158,7 +156,7 @@ const Activos = () => {
       }
       for (const itemId of selectedItems) {
         setSelectedEquipoId(itemId); 
-        await deleteEquipo(); 
+        console.log(itemId) 
       }
       setSelectedItems([]);
       setOpenModal(false);
