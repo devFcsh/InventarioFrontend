@@ -528,7 +528,7 @@ const Activos = () => {
                       }
                       className="cursor-pointer"
                     />
-                    <Link to={"/editarActivo"} state={{ id: equipo.id_equipo }}>
+                    <Link to={"/editarActivo"} state={{ equipo: equipo }}>
                       <Icon
                         icon="mage:edit"
                         width="25"
@@ -545,7 +545,6 @@ const Activos = () => {
       </div>
       <nav className="flex flex-col md:flex-row justify-between items-center p-4" aria-label="Table navigation">
   <span className="text-sm font-normal text-gray-500">
-    {/* Texto adicional si es necesario */}
   </span>
   <div className="flex flex-col md:flex-row items-center gap-2">
     <ul className="inline-flex items-center -space-x-px">

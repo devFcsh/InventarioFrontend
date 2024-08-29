@@ -21,7 +21,9 @@ const Navbar = ({ currentSection, setCurrentSection }: NavbarProps) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0">
-            <img className="h-15 w-60" src={logoFCSH} alt="Workflow" />
+            <Link to={"/equipos"} onClick={() => handleNavClick("Equipos")}>
+              <img className="h-15 w-60" src={logoFCSH} alt="LogoFCSH" />
+            </Link>
           </div>
 
           <div className="-mr-2 flex lg:hidden">
@@ -84,8 +86,9 @@ const Navbar = ({ currentSection, setCurrentSection }: NavbarProps) => {
               Jorge Navarrete
             </p>
             <Link to={"/"}>
-                <Icon icon="pepicons-pop:leave" width="20" height="20" />
-              </Link>          </div>
+              <Icon icon="pepicons-pop:leave" width="20" height="20" />
+            </Link>{" "}
+          </div>
         </div>
       </div>
 
