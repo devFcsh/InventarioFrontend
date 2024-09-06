@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Serie } from '../types';
 
 export const useSeriesPorModelo = (perifericoId, marcaId, modeloId) => {
-  const [series, setSeries] = useState([]);
+  const [series, setSeries] = useState<Serie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 

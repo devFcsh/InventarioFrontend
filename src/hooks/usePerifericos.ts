@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Periferico } from '../types';
 
 const usePerifericos = () => {
-  const [perifericos, setPerifericos] = useState([]);
+  const [perifericos, setPerifericos] = useState<Periferico[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 

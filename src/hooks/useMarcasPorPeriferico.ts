@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Marca } from "../types";
 
 const useMarcasPorPeriferico = (selectedPeriferico: string) => {
-  const [marcas, setMarcas] = useState([]);
+  const [marcas, setMarcas] = useState<Marca[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 

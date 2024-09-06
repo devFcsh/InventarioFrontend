@@ -1,29 +1,37 @@
-import { Autocomplete, TextField, Button } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import { useState } from 'react';
 import AgregarComputadoraActivo from '../components/AgregarComputadoraActivo';
 import AgregarOtroActivo from '../components/AgregarOtroActivo';
-
-interface Item {
-  id: string;
-  name: string;
-}
-
-const perifericos: Item[] = [
-  { id: '1', name: 'Computadora' },
-  { id: '2', name: 'Laptop' },
-  { id: '3', name: 'Proyector' },
-  { id: '4', name: 'Teclado' }
-];
+import { useLocation } from "react-router-dom";
+import { Periferico, Uso, Usuario } from '../types';
+import useUsos from '../hooks/useUsos';
+import useUsuariosPorUso from '../hooks/useUsuariosPorUso';
 
 const computadores: string[] = [
-  "1", 
-  "2"
+  "Laptop", 
+  "Computadora"
 ];
 
-
 const AgregarActivo = () => {
-  
-  const [periferico, setPeriferico] = useState<Item | null>(null);
+  const [perifericoId, setPerifericoId] = useState<string | null>(null);
+  const [selectedUsoId, setSelectedUsoId] = useState<string | null>(null);
+  const [selectedUsuarioId, setSelectedUsuarioId] = useState<string | null>(null);  
+
+  const location = useLocation();
+  const { perifericos }: { perifericos: Periferico[] } = location.state || {}; 
+  const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
+  const { usuarios, loading: loadingUsuarios, error: errorUsuarios } = useUsuariosPorUso(selectedUsoId || '');
+
+  const selectedPeriferico = perifericos.find(p => p.id_periferico === perifericoId);
+
+  const handleUsoChange = (event: any, newValue: Uso | null) => {
+    if (newValue) {
+      setSelectedUsoId(newValue.id_uso);
+    } else {
+      setSelectedUsoId(null);
+      setSelectedUsuarioId(null); 
+    }
+  };
 
   return (
     <div className='w-full max-w-7xl mx-auto p-4'>
@@ -35,27 +43,73 @@ const AgregarActivo = () => {
             size="small"
             disablePortal
             options={perifericos}
-            value={periferico ? periferico : null}
-            onChange={(event, newValue) => setPeriferico(newValue ? newValue : null)}
-            getOptionLabel={(option) => option.name}
+            value={selectedPeriferico ?? null}
+            onChange={(event, newValue) => setPerifericoId(newValue ? newValue.id_periferico : null)}
+            getOptionLabel={(option) => option.nombre}
             renderInput={(params) => (
               <TextField {...params} label="Periférico" variant="outlined" fullWidth />
             )}
           />
         </div>
-            {computadores.includes(periferico?.id) ? 
-            
-            <AgregarComputadoraActivo 
-            periferico={periferico}
-            /> :
 
-            <AgregarOtroActivo 
-            periferico={periferico}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={usos}
+            loading={loadingUsos}
+            value={selectedUsoId ? usos.find(u => u.id_uso === selectedUsoId) ?? null : null}
+            onChange={handleUsoChange} 
+            getOptionLabel={(option) => option.nombre}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Uso"
+                variant="outlined"
+                error={!!errorUsos}
+                helperText={errorUsos ? 'Error al cargar los usos' : ''}
+                fullWidth
+              />
+            )}
+          />
+
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={usuarios}
+              loading={loadingUsuarios}
+              value={usuarios.find(u => u.id_usuario === selectedUsuarioId) ?? null} 
+              onChange={(event, newValue: Usuario | null) => setSelectedUsuarioId(newValue ? newValue.id_usuario : null)}
+              getOptionLabel={(option) => option.nombre}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Usuario"
+                  variant="outlined"
+                  error={!!errorUsuarios}
+                  helperText={errorUsuarios ? 'Error al cargar los usuarios' : ''}
+                  fullWidth
+                />
+              )}
             />
-          
-            }
-        
         </div>
+
+        {perifericoId && computadores.includes(selectedPeriferico?.nombre ?? "") ? (
+          <AgregarComputadoraActivo 
+            periferico={perifericoId} 
+            idUso={selectedUsoId}   
+            idUsuario={selectedUsuarioId}  
+          />
+        ) : (
+          perifericoId && (
+            <AgregarOtroActivo 
+              periferico={perifericoId} 
+              idUso={selectedUsoId}   
+              idUsuario={selectedUsuarioId}  
+            />
+          )
+        )}
+      </div>
     </div>
   );
 };

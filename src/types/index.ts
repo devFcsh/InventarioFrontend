@@ -34,3 +34,21 @@ export type Equipo = {
   uso: string;
   edificio: string;
 };
+
+export type Uso = {
+  id_uso: string;
+  nombre: string;
+};
+
+export type Usuario = {
+  id_usuario: string;
+  nombre: string;
+};
+
+export type Componente = {
+  periferico: string;
+  marca: string;
+  modelo: string;
+  serie: string;
+  inventario: string;
+};

@@ -298,7 +298,13 @@ const Activos = () => {
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>
-          <Link to={"/agregarActivo"}>
+          <Link
+  to={{
+    pathname: "/agregarActivo",
+  }}
+  state={{ perifericos }} 
+>
+
             <Icon
               icon="gridicons:add"
               width="30"

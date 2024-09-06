@@ -26,10 +26,12 @@ interface Item {
   ];
   
   interface AgregarOtroActivoProps {
-    periferico: Item;
+    periferico: string;
+    idUso: string | null;
+    idUsuario: string | null;
   }
-
-const AgregarOtroActivo = ({ periferico }: AgregarOtroActivoProps) => {
+  
+  const AgregarOtroActivo = ({ periferico, idUso, idUsuario }: AgregarOtroActivoProps) => {
     const [image, setImage] = useState<string | ArrayBuffer | null>(null);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,33 +47,11 @@ const AgregarOtroActivo = ({ periferico }: AgregarOtroActivoProps) => {
 
     
       const handleAgregarEquipo = () => {
-        console.log('Periferico:', periferico?.name)
         console.log('Imagen:', image);
       };
 
     return (
         <>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={marcas}
-            getOptionLabel={(option) => option.name}
-            renderInput={(params) => (
-              <TextField {...params} label="Uso" variant="outlined" fullWidth />
-            )}
-          />
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={marcas}
-            getOptionLabel={(option) => option.name}
-            renderInput={(params) => (
-              <TextField {...params} label="Usuario" variant="outlined" fullWidth />
-            )}
-          />
-        </div>
-
         <div className="mb-4">
           <h2 className="text-xl font-semibold mb-5">Información de Inventario</h2>
           <div className="grid grid-cols-2 gap-4">

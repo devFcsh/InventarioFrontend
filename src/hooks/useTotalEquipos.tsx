@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Equipo } from "../types";
 
 type Filtros = {
   perifericoId?: string;
