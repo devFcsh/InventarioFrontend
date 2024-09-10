@@ -51,18 +51,16 @@ const Activos = () => {
     selectedPeriferico?.id_periferico ?? ""
   );
   const { series } = useSeriesPorModelo(
-    selectedPeriferico?.id_periferico,
-    selectedMarca?.id_marca,
-    selectedModelo?.id_modelo
+    selectedPeriferico?.id_periferico ?? "",
+    selectedMarca?.id_marca ?? "",
+    selectedModelo?.id_modelo ?? ""
   );
   const { inventarios } = useInventariosPorSerie(
-    selectedPeriferico?.id_periferico,
-    selectedMarca?.id_marca,
-    selectedModelo?.id_modelo,
-    selectedSerie?.id_serie
+    selectedPeriferico?.id_periferico ?? "",
+    selectedMarca?.id_marca ?? "",
+    selectedModelo?.id_modelo ?? "",
+    selectedSerie?.id_serie ?? ""
   );
-
-  const { eliminarEquipo } = useEliminarEquipo(selectedEquipoId);
 
   const filtros = {
     perifericoId: selectedPeriferico?.id_periferico,
@@ -318,11 +316,11 @@ const Activos = () => {
             size="small"
             disablePortal
             options={perifericos}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option?.nombre || ""}
             onChange={handlePerifericoChange}
             value={selectedPeriferico}
             isOptionEqualToValue={(option, value) =>
-              option.id_periferico === value?.id_periferico
+              option?.id_periferico === value?.id_periferico
             }
             renderInput={(params) => (
               <TextField {...params} label="Periférico" variant="outlined" />
@@ -334,11 +332,11 @@ const Activos = () => {
             size="small"
             disablePortal
             options={marcas}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option?.nombre || ""}
             onChange={handleMarcaChange}
             value={selectedMarca}
             isOptionEqualToValue={(option, value) =>
-              option.id_marca === value?.id_marca
+              option?.id_marca === value?.id_marca
             }
             renderInput={(params) => (
               <TextField {...params} label="Marca" variant="outlined" />
@@ -350,11 +348,11 @@ const Activos = () => {
             size="small"
             disablePortal
             options={modelos}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option?.nombre || ""}
             onChange={handleModeloChange}
             value={selectedModelo}
             isOptionEqualToValue={(option, value) =>
-              option.id_modelo === value?.id_modelo
+              option?.id_modelo === value?.id_modelo
             }
             renderInput={(params) => (
               <TextField {...params} label="Modelo" variant="outlined" />
@@ -367,11 +365,11 @@ const Activos = () => {
             size="small"
             disablePortal
             options={series}
-            getOptionLabel={(option) => option.nombre || ""}
+            getOptionLabel={(option) => option?.nombre || ""}
             onChange={handleSerieChange}
             value={selectedSerie}
             isOptionEqualToValue={(option, value) =>
-              option.id_serie === value?.id_serie
+              option?.id_serie === value?.id_serie
             }
             renderInput={(params) => (
               <TextField {...params} label="Serie" variant="outlined" />

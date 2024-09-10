@@ -27,7 +27,6 @@ export const useEquiposFiltrados = (
       setError(null);
 
       try {
-        console.log("fetching en equipos con filtros:"+filtros.perifericoId+" currentPage: "+currentPage+" rows: "+rowsPerPage+" shouldFetch: "+shouldFetch);
         const { data } = await axios.get("http://localhost:5000/api/equipos", {
           params: {
             ...filtros,

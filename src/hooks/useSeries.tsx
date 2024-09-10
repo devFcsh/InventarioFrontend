@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Serie } from '../types';
 
-export const useSeriesPorModelo = (perifericoId: string, marcaId:string, modeloId:string) => {
+const useSeries = () => {
   const [series, setSeries] = useState<Serie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);  
@@ -10,10 +10,7 @@ export const useSeriesPorModelo = (perifericoId: string, marcaId:string, modeloI
   useEffect(() => {
     const fetchSeries = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/series/seriesPorModelo', {
-          params: { perifericoId, marcaId, modeloId },
-        });
-        console.log(response.data)
+        const response = await axios.get('http://localhost:5000/api/series');
         setSeries(response.data);
       } catch (err: any) {
         setError(err);
@@ -22,13 +19,10 @@ export const useSeriesPorModelo = (perifericoId: string, marcaId:string, modeloI
       }
     };
 
-    if (perifericoId && marcaId && modeloId) {
-      fetchSeries();
-    } else {
-      setSeries([]);
-      setLoading(false);
-    }
-  }, [perifericoId, marcaId, modeloId]);
+    fetchSeries();
+  }, []);
 
   return { series, loading, error };
 };
+
+export default useSeries;

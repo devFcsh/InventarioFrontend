@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-export const useInventariosPorSerie = (perifericoId, marcaId, modeloId, serieId) => {
+export const useInventariosPorSerie = (perifericoId: string, marcaId: string, modeloId: string, serieId: string) => {
   const [inventarios, setInventarios] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<Error | null>(null); 
 
   useEffect(() => {
     const fetchInventarios = async () => {
@@ -13,7 +13,7 @@ export const useInventariosPorSerie = (perifericoId, marcaId, modeloId, serieId)
           params: { perifericoId, marcaId, modeloId, serieId },
         });
         setInventarios(response.data);
-      } catch (err) {
+      } catch (err: any) {
         setError(err);
       } finally {
         setLoading(false);

@@ -1,22 +1,22 @@
 export type Periferico = {
   id_periferico: string;
   nombre: string;
-};
+} | null;
 
 export type Marca = {
   id_marca: string;
   nombre: string;
-};
+} | null;
 
 export type Modelo = {
-  id_modelo: string;  
-  nombre: string;     
-};
+  id_modelo: string;
+  nombre: string;
+} | null;
 
 export type Serie = {
   id_serie: string;
   nombre: string;
-};
+} | null;
 
 export type Inventario = {
   inventario: string;
@@ -46,9 +46,9 @@ export type Usuario = {
 };
 
 export type Componente = {
-  periferico: string;
-  marca: string;
-  modelo: string;
-  serie: string;
+  periferico: Periferico;
+  marca: Marca;
+  modelo: Modelo;
+  serie: Serie;
   inventario: string;
 };

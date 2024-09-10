@@ -1,10 +1,10 @@
-import { Autocomplete, TextField, Button } from '@mui/material';
-import { useState } from 'react';
-import { useModelosPorMarcaPeriferico } from '../hooks/useModelosPorMarcaPeriferico';
-import { useSeriesPorModelo } from '../hooks/useSeriesPorModelo';
-import { Marca, Modelo, Serie, Componente, Periferico } from '../types';
-import useMarcasPorPeriferico from '../hooks/useMarcasPorPeriferico';
-import usePerifericos from '../hooks/usePerifericos';
+import { Autocomplete, TextField, Button } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useModelosPorMarcaPeriferico } from "../hooks/useModelosPorMarcaPeriferico";
+import { useSeriesPorModelo } from "../hooks/useSeriesPorModelo";
+import { Marca, Modelo, Serie, Componente, Periferico } from "../types";
+import useMarcasPorPeriferico from "../hooks/useMarcasPorPeriferico";
+import usePerifericos from "../hooks/usePerifericos";
 
 interface AgregarComputadoraActivoProps {
   periferico: string;
@@ -12,28 +12,56 @@ interface AgregarComputadoraActivoProps {
   idUsuario: string | null;
 }
 
-const AgregarComputadoraActivo = ({ periferico, idUso, idUsuario }: AgregarComputadoraActivoProps) => {
+const AgregarComputadoraActivo = ({
+  periferico,
+  idUso,
+  idUsuario,
+}: AgregarComputadoraActivoProps) => {
   const [image, setImage] = useState<string | ArrayBuffer | null>(null);
+  const [selectedInventarioMarca, setSelectedInventarioMarca] = useState<Marca | null>(null);
+  const [selectedInventarioModelo, setSelectedInventarioModelo] = useState<Modelo | null>(null);
+  const [selectedInventarioSerie, setSelectedInventarioSerie] = useState<Serie | null>(null);
+  
   const [nuevoComponente, setNuevoComponente] = useState<Componente>({
-    periferico: '',
-    marca: '',
-    modelo: '',
-    serie: '',
-    inventario: ''
+    periferico: null,
+    marca: null,
+    modelo: null,
+    serie: null,
+    inventario: "",
   });
   const [componentes, setComponentes] = useState<Componente[]>([]);
   const [protocolo, setProtocolo] = useState<string | null>(null);
-  const [direccionIP, setDireccionIP] = useState<string>('');
-
-  const [selectedMarca, setSelectedMarca] = useState<Marca | null>(null);
-  const [selectedModelo, setSelectedModelo] = useState<Modelo | null>(null);
-  const [selectedSerie, setSelectedSerie] = useState<Serie | null>(null);
+  const [direccionIP, setDireccionIP] = useState<string>("");
 
   const { marcas } = useMarcasPorPeriferico(periferico);
-  const { modelos } = useModelosPorMarcaPeriferico(selectedMarca?.id_marca ?? '', periferico);
-  const { series } = useSeriesPorModelo(periferico, selectedMarca?.id_marca ?? '', selectedModelo?.id_modelo ?? '');
-  
-  const { perifericos } = usePerifericos(); 
+  const { modelos } = useModelosPorMarcaPeriferico(
+    selectedInventarioMarca?.id_marca ?? "",
+    periferico
+  );
+  const { series } = useSeriesPorModelo(
+    periferico,
+    selectedInventarioMarca?.id_marca ?? "",
+    selectedInventarioModelo?.id_modelo ?? ""
+  );
+
+  const { perifericos } = usePerifericos();
+  const filteredPerifericos = perifericos.filter(
+    (p) =>
+      p?.nombre.toLowerCase() !== "computadora" &&
+      p?.nombre.toLowerCase() !== "laptop"
+  );
+  const { marcas: marcasComponente } = useMarcasPorPeriferico(
+    nuevoComponente.periferico?.id_periferico ?? ""
+  );
+  const { modelos: modelosComponente } = useModelosPorMarcaPeriferico(
+    nuevoComponente.marca?.id_marca ?? "",
+    nuevoComponente.periferico?.id_periferico ?? ""
+  );
+  const { series: seriesComponente } = useSeriesPorModelo(
+    nuevoComponente.periferico?.id_periferico ?? "",
+    nuevoComponente.marca?.id_marca ?? "",
+    nuevoComponente.modelo?.id_modelo ?? ""
+  );
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -46,36 +74,123 @@ const AgregarComputadoraActivo = ({ periferico, idUso, idUsuario }: AgregarCompu
     }
   };
 
-  const agregarComponente = () => {
-    setComponentes([...componentes, nuevoComponente]);
+
+  const limpiarCamposDependientesComponente = () => {
     setNuevoComponente({
-      periferico: '',
-      marca: '',
-      modelo: '',
-      serie: '',
-      inventario: ''
+      ...nuevoComponente,
+      periferico: null,
+      marca: null,
+      modelo: null,
+      serie: null,
     });
   };
 
+  const agregarComponente = () => {
+    if (
+      nuevoComponente.periferico &&
+      nuevoComponente.marca &&
+      nuevoComponente.modelo &&
+      nuevoComponente.serie &&
+      nuevoComponente.inventario !== ""
+    ) {
+      setComponentes([...componentes, nuevoComponente]);
+      setNuevoComponente({
+        periferico: {} as Periferico,
+        marca: {} as Marca,
+        modelo: {} as Modelo,
+        serie: {} as Serie,
+        inventario: "",
+      });
+      limpiarCamposDependientesComponente();
+    } else {
+      alert("Por favor, complete todos los campos del componente.");
+    }
+  };
+
   const handleAgregarEquipo = () => {
-    console.log('Componentes:', componentes);
-    console.log('Protocolo:', protocolo);
-    console.log('Dirección IP:', direccionIP);
-    console.log('Imagen:', image);
+    if (componentes.length > 0 && protocolo && direccionIP !== "") {
+      console.log("Componentes:", componentes);
+      console.log("Protocolo:", protocolo);
+      console.log("Dirección IP:", direccionIP);
+      console.log("Imagen:", image);
+    } else {
+      alert("Por favor, complete todos los campos del equipo.");
+    }
+  };
+
+  useEffect(() => {
+    setSelectedInventarioMarca(null);
+    setSelectedInventarioModelo(null);
+    setSelectedInventarioSerie(null);
+  }, [periferico])
+
+  const handleMarcaChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: Marca | null
+  ) => {
+    setSelectedInventarioMarca(newValue);
+    setSelectedInventarioModelo(null);
+    setSelectedInventarioSerie(null);
+  };
+
+  const handleModeloChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: Modelo | null
+  ) => {
+    setSelectedInventarioModelo(newValue);
+    setSelectedInventarioSerie(null);
+  };
+
+  const handleSerieChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: Serie | null
+  ) => {
+    setSelectedInventarioSerie(newValue);
+  };
+
+  const handlePerifericoComponenteChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: Periferico | null
+  ) => {
+    setNuevoComponente({ ...nuevoComponente, periferico: newValue, marca: null, modelo: null, serie: null});
+  };
+
+  const handleMarcaComponenteChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: Marca | null
+  ) => {
+    setNuevoComponente({ ...nuevoComponente, marca: newValue, modelo: null, serie: null });
+
+  };
+
+  const handleModeloComponenteChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: Modelo | null
+  ) => {
+    setNuevoComponente({ ...nuevoComponente, modelo: newValue, serie: null });
+  };
+
+  const handleSerieComponenteChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: Serie | null
+  ) => {
+    setNuevoComponente({ ...nuevoComponente, serie: newValue });
   };
 
   return (
     <>
       <div className="mb-4">
-        <h2 className="text-xl font-semibold mb-5">Información de Inventario</h2>
+        <h2 className="text-xl font-semibold mb-5">
+          Información de Inventario
+        </h2>
         <div className="grid grid-cols-2 gap-4">
           <Autocomplete
             size="small"
             disablePortal
             options={marcas}
-            getOptionLabel={(option: Marca) => option.nombre}
-            onChange={(event, newValue) => setSelectedMarca(newValue)}
-            value={selectedMarca}
+            getOptionLabel={(option: Marca) => option?.nombre || ""}
+            onChange={handleMarcaChange}
+            value={selectedInventarioMarca}
             renderInput={(params) => (
               <TextField {...params} label="Marca" variant="outlined" fullWidth />
             )}
@@ -84,25 +199,25 @@ const AgregarComputadoraActivo = ({ periferico, idUso, idUsuario }: AgregarCompu
             size="small"
             disablePortal
             options={modelos}
-            getOptionLabel={(option: Modelo) => option.nombre}
-            onChange={(event, newValue) => setSelectedModelo(newValue)}
-            value={selectedModelo}
+            getOptionLabel={(option: Modelo) => option?.nombre || ""}
+            onChange={handleModeloChange}
+            value={selectedInventarioModelo}
             renderInput={(params) => (
               <TextField {...params} label="Modelo" variant="outlined" fullWidth />
             )}
-            disabled={!selectedMarca}
+            disabled={!selectedInventarioMarca}
           />
           <Autocomplete
             size="small"
             disablePortal
             options={series}
-            getOptionLabel={(option: Serie) => option.nombre || ''}
-            onChange={(event, newValue) => setSelectedSerie(newValue)}
-            value={selectedSerie}
+            getOptionLabel={(option: Serie) => option?.nombre || ""}
+            onChange={handleSerieChange}
+            value={selectedInventarioSerie}
             renderInput={(params) => (
               <TextField {...params} label="Serie" variant="outlined" fullWidth />
             )}
-            disabled={!selectedModelo}
+            disabled={!selectedInventarioModelo}
           />
           <TextField
             label="Inventario"
@@ -111,7 +226,12 @@ const AgregarComputadoraActivo = ({ periferico, idUso, idUsuario }: AgregarCompu
             fullWidth
             size="small"
             value={nuevoComponente.inventario}
-            onChange={(e) => setNuevoComponente({ ...nuevoComponente, inventario: e.target.value })}
+            onChange={(e) =>
+              setNuevoComponente({
+                ...nuevoComponente,
+                inventario: e.target.value,
+              })
+            }
           />
         </div>
       </div>
@@ -122,57 +242,107 @@ const AgregarComputadoraActivo = ({ periferico, idUso, idUsuario }: AgregarCompu
           <Autocomplete
             size="small"
             disablePortal
-            options={[{ id: '1', nombre: 'Windows' }, { id: '2', nombre: 'Linux' }]}
+            options={[
+              { id: "1", nombre: "Windows" },
+              { id: "2", nombre: "Linux" },
+            ]}
             getOptionLabel={(option) => option.nombre}
             renderInput={(params) => (
-              <TextField {...params} label="Sistema Operativo" variant="outlined" fullWidth />
+              <TextField
+                {...params}
+                label="Sistema Operativo"
+                variant="outlined"
+                fullWidth
+              />
             )}
           />
           <Autocomplete
             size="small"
             disablePortal
-            options={[{ id: '1', nombre: 'Office 2019' }, { id: '2', nombre: 'Office 365' }]}
+            options={[
+              { id: "1", nombre: "Office 2019" },
+              { id: "2", nombre: "Office 365" },
+            ]}
             getOptionLabel={(option) => option.nombre}
             renderInput={(params) => (
-              <TextField {...params} label="Versión Sistema Operativo" variant="outlined" fullWidth />
+              <TextField
+                {...params}
+                label="Versión Sistema Operativo"
+                variant="outlined"
+                fullWidth
+              />
             )}
           />
           <Autocomplete
             size="small"
             disablePortal
-            options={[{ id: '1', nombre: 'Antivirus A' }, { id: '2', nombre: 'Antivirus B' }]}
+            options={[
+              { id: "1", nombre: "Antivirus A" },
+              { id: "2", nombre: "Antivirus B" },
+            ]}
             getOptionLabel={(option) => option.nombre}
             renderInput={(params) => (
-              <TextField {...params} label="Antivirus" variant="outlined" fullWidth />
+              <TextField
+                {...params}
+                label="Antivirus"
+                variant="outlined"
+                fullWidth
+              />
             )}
           />
           <Autocomplete
             size="small"
             disablePortal
-            options={[{ id: '1', nombre: '8GB' }, { id: '2', nombre: '16GB' }]}
+            options={[
+              { id: "1", nombre: "8GB" },
+              { id: "2", nombre: "16GB" },
+            ]}
             getOptionLabel={(option) => option.nombre}
             renderInput={(params) => (
-              <TextField {...params} label="Cantidad RAM" variant="outlined" fullWidth />
+              <TextField
+                {...params}
+                label="Cantidad RAM"
+                variant="outlined"
+                fullWidth
+              />
             )}
           />
           <Autocomplete
             size="small"
             disablePortal
-            options={[{ id: '1', nombre: 'DDR4' }, { id: '2', nombre: 'DDR5' }]}
+            options={[
+              { id: "1", nombre: "DDR4" },
+              { id: "2", nombre: "DDR5" },
+            ]}
             getOptionLabel={(option) => option.nombre}
             renderInput={(params) => (
-              <TextField {...params} label="Tipo RAM" variant="outlined" fullWidth />
+              <TextField
+                {...params}
+                label="Tipo RAM"
+                variant="outlined"
+                fullWidth
+              />
             )}
           />
           <Autocomplete
             size="small"
             disablePortal
-            options={[{ id: '1', nombre: 'Estático' }, { id: '2', nombre: 'Dinámico' }]}
+            options={[
+              { id: "1", nombre: "Estático" },
+              { id: "2", nombre: "Dinámico" },
+            ]}
             getOptionLabel={(option) => option.nombre}
             value={protocolo ? { nombre: protocolo } : null}
-            onChange={(event, newValue) => setProtocolo(newValue ? newValue.nombre : '')}
+            onChange={(event, newValue) =>
+              setProtocolo(newValue ? newValue.nombre : "")
+            }
             renderInput={(params) => (
-              <TextField {...params} label="Protocolo" variant="outlined" fullWidth />
+              <TextField
+                {...params}
+                label="Protocolo"
+                variant="outlined"
+                fullWidth
+              />
             )}
           />
           <TextField
@@ -183,15 +353,23 @@ const AgregarComputadoraActivo = ({ periferico, idUso, idUsuario }: AgregarCompu
             size="small"
             value={direccionIP}
             onChange={(e) => setDireccionIP(e.target.value)}
-            disabled={protocolo !== 'Estático'}
+            disabled={protocolo !== "Estático"}
           />
           <Autocomplete
             size="small"
             disablePortal
-            options={[{ id: '1', nombre: '500GB' }, { id: '2', nombre: '1TB' }]}
+            options={[
+              { id: "1", nombre: "500GB" },
+              { id: "2", nombre: "1TB" },
+            ]}
             getOptionLabel={(option) => option.nombre}
             renderInput={(params) => (
-              <TextField {...params} label="Almacenamiento Disco" variant="outlined" fullWidth />
+              <TextField
+                {...params}
+                label="Almacenamiento Disco"
+                variant="outlined"
+                fullWidth
+              />
             )}
           />
           <TextField
@@ -215,7 +393,7 @@ const AgregarComputadoraActivo = ({ periferico, idUso, idUsuario }: AgregarCompu
           />
           <div className="w-full flex justify-center">
             <img
-              src={image ? image.toString() : 'https://via.placeholder.com/150'}
+              src={image ? image.toString() : "https://via.placeholder.com/150"}
               alt="Vista previa"
               className="w-full max-w-xs h-auto object-cover border border-gray-300"
             />
@@ -238,25 +416,28 @@ const AgregarComputadoraActivo = ({ periferico, idUso, idUsuario }: AgregarCompu
                 </tr>
               </thead>
               <tbody>
-                {componentes.map((comp, index) => (
-                  <tr key={index}>
-                    <td className="py-2 px-4 border">{comp.periferico}</td>
-                    <td className="py-2 px-4 border">{comp.marca}</td>
-                    <td className="py-2 px-4 border">{comp.modelo}</td>
-                    <td className="py-2 px-4 border">{comp.serie}</td>
-                    <td className="py-2 px-4 border">{comp.inventario}</td>
-                  </tr>
-                ))}
-              </tbody>
+              {componentes.map((comp, index) => (
+                <tr key={index}>
+                  <td className="py-2 px-4 border">
+                    {comp.periferico?.nombre}
+                  </td>
+                  <td className="py-2 px-4 border">{comp.marca?.nombre}</td>
+                  <td className="py-2 px-4 border">{comp.modelo?.nombre}</td>
+                  <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
+                  <td className="py-2 px-4 border">{comp.inventario}</td>
+                </tr>
+              ))}
+            </tbody>
             </table>
           </div>
           <div className="flex-1 space-y-4">
-            <Autocomplete
+          <Autocomplete
               size="small"
               disablePortal
-              options={perifericos} 
-              getOptionLabel={(option: Periferico) => option.nombre}
-              onChange={(event, newValue) => setNuevoComponente({ ...nuevoComponente, periferico: newValue?.nombre || '' })}
+              options={filteredPerifericos}
+              getOptionLabel={(option: Periferico) => option?.nombre || ""}
+              onChange={handlePerifericoComponenteChange}
+              value={nuevoComponente.periferico}
               renderInput={(params) => (
                 <TextField {...params} label="Periférico" variant="outlined" fullWidth />
               )}
@@ -264,32 +445,38 @@ const AgregarComputadoraActivo = ({ periferico, idUso, idUsuario }: AgregarCompu
             <Autocomplete
               size="small"
               disablePortal
-              options={marcas}
-              getOptionLabel={(option: Marca) => option.nombre}
-              onChange={(event, newValue) => setNuevoComponente({ ...nuevoComponente, marca: newValue?.nombre || '' })}
+              options={marcasComponente}
+              getOptionLabel={(option: Marca) => option?.nombre || ""}
+              onChange={handleMarcaComponenteChange}
+              value={nuevoComponente.marca}
               renderInput={(params) => (
                 <TextField {...params} label="Marca" variant="outlined" fullWidth />
               )}
+              disabled={!nuevoComponente.periferico}
             />
             <Autocomplete
               size="small"
               disablePortal
-              options={modelos}
-              getOptionLabel={(option: Modelo) => option.nombre}
-              onChange={(event, newValue) => setNuevoComponente({ ...nuevoComponente, modelo: newValue?.nombre || '' })}
+              options={modelosComponente}
+              getOptionLabel={(option: Modelo) => option?.nombre || ""}
+              onChange={handleModeloComponenteChange}
+              value={nuevoComponente.modelo}
               renderInput={(params) => (
                 <TextField {...params} label="Modelo" variant="outlined" fullWidth />
               )}
+              disabled={!nuevoComponente.marca}
             />
             <Autocomplete
               size="small"
               disablePortal
-              options={series}
-              getOptionLabel={(option: Serie) => option.nombre || ''}
-              onChange={(event, newValue) => setNuevoComponente({ ...nuevoComponente, serie: newValue?.nombre || '' })}
+              options={seriesComponente}
+              getOptionLabel={(option: Serie) => option?.nombre || ""}
+              onChange={handleSerieComponenteChange}
+              value={nuevoComponente.serie}
               renderInput={(params) => (
                 <TextField {...params} label="Serie" variant="outlined" fullWidth />
               )}
+              disabled={!nuevoComponente.modelo}
             />
             <TextField
               label="Inventario"
@@ -298,7 +485,9 @@ const AgregarComputadoraActivo = ({ periferico, idUso, idUsuario }: AgregarCompu
               fullWidth
               size="small"
               value={nuevoComponente.inventario}
-              onChange={(e) => setNuevoComponente({ ...nuevoComponente, inventario: e.target.value })}
+              onChange={(e) =>
+                setNuevoComponente({ ...nuevoComponente, inventario: e.target.value })
+              }
             />
             <Button
               variant="contained"
@@ -313,7 +502,7 @@ const AgregarComputadoraActivo = ({ periferico, idUso, idUsuario }: AgregarCompu
       </div>
 
       <div className="flex gap-4">
-        <Button
+      <Button
           variant="contained"
           color="primary"
           onClick={handleAgregarEquipo}
@@ -321,11 +510,7 @@ const AgregarComputadoraActivo = ({ periferico, idUso, idUsuario }: AgregarCompu
         >
           Agregar Equipo
         </Button>
-        <Button
-          variant="outlined"
-          color="primary"
-          fullWidth
-        >
+        <Button variant="outlined" color="primary" fullWidth>
           Cancelar
         </Button>
       </div>

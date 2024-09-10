@@ -4,7 +4,7 @@ import { Usuario } from '../types';
 const useUsuariosPorUso = (idUso: string) => {
     const [usuarios, setUsuarios] = useState<Usuario[]>([]);  
     const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+    const [error, setError] = useState<Error | null>(null);  
 
   useEffect(() => {
     if (!idUso) {
@@ -19,7 +19,7 @@ const useUsuariosPorUso = (idUso: string) => {
         const data = await response.json();
         console.log(data)
         setUsuarios(data);
-      } catch (err) {
+      } catch (err: any) {
         setError(err);
       } finally {
         setLoading(false);

@@ -5,7 +5,7 @@ import { Modelo } from '../types';
 export const useModelosPorMarcaPeriferico = (marcaId: string, perifericoId: string) => {
     const [modelos, setModelos] = useState<Modelo[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<Error | null>(null);  
 
     useEffect(() => {
         if (marcaId && perifericoId) {
@@ -19,7 +19,7 @@ export const useModelosPorMarcaPeriferico = (marcaId: string, perifericoId: stri
                     });
                     console.log(response.data)
                     setModelos(response.data);
-                } catch (err) {
+                } catch (err: any) {
                     setError(err);
                 } finally {
                     setLoading(false);

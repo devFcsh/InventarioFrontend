@@ -40,5 +40,5 @@ export const useTotalEquipos = (
     fetchEquipos();
   }, [filtros, shouldFetch]);
 
-  return { totalEquipos };
+  return { totalEquipos, loading, error };
 };

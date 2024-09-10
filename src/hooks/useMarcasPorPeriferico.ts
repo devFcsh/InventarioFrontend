@@ -4,7 +4,7 @@ import { Marca } from "../types";
 const useMarcasPorPeriferico = (selectedPeriferico: string) => {
   const [marcas, setMarcas] = useState<Marca[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<Error | null>(null);  
 
   useEffect(() => {
     if (!selectedPeriferico) {
@@ -18,7 +18,7 @@ const useMarcasPorPeriferico = (selectedPeriferico: string) => {
         const response = await fetch(`http://localhost:5000/api/marcas/marcasPorPeriferico/${selectedPeriferico}`);
         const data = await response.json();
         setMarcas(data);
-      } catch (err) {
+      } catch (err: any) {
         setError(err);
       } finally {
         setLoading(false);
@@ -28,7 +28,7 @@ const useMarcasPorPeriferico = (selectedPeriferico: string) => {
     fetchMarcas();
   }, [selectedPeriferico]);
 
-  return { marcas };
+  return { marcas, loading, error };
 };
 
 export default useMarcasPorPeriferico;
