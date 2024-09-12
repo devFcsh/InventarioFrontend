@@ -22,7 +22,7 @@ const AgregarActivo = () => {
   const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
   const { usuarios, loading: loadingUsuarios, error: errorUsuarios } = useUsuariosPorUso(selectedUsoId || '');
 
-  const selectedPeriferico = perifericos.find(p => p.id_periferico === perifericoId);
+  const selectedPeriferico = perifericos.find(p => p?.id_periferico === perifericoId);
 
   const handleUsoChange = (event: any, newValue: Uso | null) => {
     if (newValue) {
@@ -45,7 +45,7 @@ const AgregarActivo = () => {
             options={perifericos}
             value={selectedPeriferico ?? null}
             onChange={(event, newValue) => setPerifericoId(newValue ? newValue.id_periferico : null)}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option?.nombre || ""}
             renderInput={(params) => (
               <TextField {...params} label="Periférico" variant="outlined" fullWidth />
             )}

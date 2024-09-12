@@ -12,8 +12,8 @@ import { useSeriesPorModelo } from "../hooks/useSeriesPorModelo";
 import { useInventariosPorSerie } from "../hooks/useInventariosPorSerie";
 import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../data";
-import { useEliminarEquipo } from "../hooks/useEliminarActivos";
 import { useTotalEquipos } from "../hooks/useTotalEquipos";
+import { useEliminarComputadoraActivo } from "../hooks/useEliminarComputadoraActivo";
 
 const Activos = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
@@ -61,6 +61,8 @@ const Activos = () => {
     selectedModelo?.id_modelo ?? "",
     selectedSerie?.id_serie ?? ""
   );
+
+  const { eliminarEquipo } = useEliminarComputadoraActivo(selectedEquipoId);
 
   const filtros = {
     perifericoId: selectedPeriferico?.id_periferico,
@@ -127,13 +129,7 @@ const Activos = () => {
   };
 
   const deleteEquipo = async () => {
-    if (selectedEquipoId) {
-      try {
-        console.log("eliminado "+selectedEquipoId);
-      } catch (error) {
-        console.log("error", error);
-      }
-    }
+    await eliminarEquipo(); 
   };
 
   const bajaEquipo = () => {
@@ -517,19 +513,19 @@ const Activos = () => {
                       className="cursor-pointer"
                     />
                     <Icon
-                      icon="weui:delete-outlined"
-                      width="25"
-                      height="25"
-                      onClick={() =>
-                        handleOpenModal(
-                          equipo.id_equipo,
-                          "Eliminar equipo",
-                          `¿Estás seguro de que deseas eliminar el equipo ${equipo.id_equipo}?`,
-                          deleteEquipo
-                        )
-                      }
-                      className="cursor-pointer"
-                    />
+                  icon="weui:delete-outlined"
+                  width="25"
+                  height="25"
+                  onClick={() =>
+                    handleOpenModal(
+                      equipo.id_equipo,
+                      "Eliminar equipo",
+                      `¿Estás seguro de que deseas eliminar el equipo ${equipo.id_equipo}?`,
+                      deleteEquipo 
+                    )
+                  }
+                  className="cursor-pointer"
+                />
                     <Link to={"/editarActivo"} state={{ equipo: equipo }}>
                       <Icon
                         icon="mage:edit"

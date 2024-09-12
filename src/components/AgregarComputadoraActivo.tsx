@@ -2,9 +2,27 @@ import { Autocomplete, TextField, Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useModelosPorMarcaPeriferico } from "../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../hooks/useSeriesPorModelo";
-import { Marca, Modelo, Serie, Componente, Periferico } from "../types";
+import {
+  Marca,
+  Modelo,
+  Serie,
+  Componente,
+  Periferico,
+  SistemaOperativo,
+  VersionSO,
+  RAM,
+  Disco,
+  Dominio,
+} from "../types";
 import useMarcasPorPeriferico from "../hooks/useMarcasPorPeriferico";
 import usePerifericos from "../hooks/usePerifericos";
+import useDiscos from "../hooks/useDiscos";
+import useDominios from "../hooks/useDominios";
+import useRam from "../hooks/useRam";
+import useSistemasOperativos from "../hooks/useSistemasOperativos";
+import useVersionesSO from "../hooks/useVersionesSO";
+import { protocolos } from "../data";
+import { Icon } from "@iconify/react";
 
 interface AgregarComputadoraActivoProps {
   periferico: string;
@@ -18,10 +36,22 @@ const AgregarComputadoraActivo = ({
   idUsuario,
 }: AgregarComputadoraActivoProps) => {
   const [image, setImage] = useState<string | ArrayBuffer | null>(null);
-  const [selectedInventarioMarca, setSelectedInventarioMarca] = useState<Marca | null>(null);
-  const [selectedInventarioModelo, setSelectedInventarioModelo] = useState<Modelo | null>(null);
-  const [selectedInventarioSerie, setSelectedInventarioSerie] = useState<Serie | null>(null);
-  
+  const [selectedInventarioMarca, setSelectedInventarioMarca] =
+    useState<Marca | null>(null);
+  const [selectedInventarioModelo, setSelectedInventarioModelo] =
+    useState<Modelo | null>(null);
+  const [selectedInventarioSerie, setSelectedInventarioSerie] =
+    useState<Serie | null>(null);
+  const [selectedSO, setSelectedSO] = useState<SistemaOperativo | null>(null);
+  const [selectedVersionSO, setSelectedVersionSO] = useState<VersionSO | null>(
+    null
+  );
+  const [selectedRAM, setSelectedRAM] = useState<RAM | null>(null);
+  const [selectedDisco, setSelectedDisco] = useState<Disco | null>(null);
+  const [selectedDominio, setSelectedDominio] = useState<Dominio | null>(null);
+  const [protocolo, setProtocolo] = useState<string | null>(null);
+  const [direccionIP, setDireccionIP] = useState<string>("");
+
   const [nuevoComponente, setNuevoComponente] = useState<Componente>({
     periferico: null,
     marca: null,
@@ -30,8 +60,6 @@ const AgregarComputadoraActivo = ({
     inventario: "",
   });
   const [componentes, setComponentes] = useState<Componente[]>([]);
-  const [protocolo, setProtocolo] = useState<string | null>(null);
-  const [direccionIP, setDireccionIP] = useState<string>("");
 
   const { marcas } = useMarcasPorPeriferico(periferico);
   const { modelos } = useModelosPorMarcaPeriferico(
@@ -63,6 +91,12 @@ const AgregarComputadoraActivo = ({
     nuevoComponente.modelo?.id_modelo ?? ""
   );
 
+  const { discos } = useDiscos();
+  const { dominios } = useDominios();
+  const { ram } = useRam();
+  const { sistemasOperativos } = useSistemasOperativos();
+  const { versionesSO } = useVersionesSO(selectedSO?.id_sistemaoperativo ?? "");
+
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -74,7 +108,6 @@ const AgregarComputadoraActivo = ({
     }
   };
 
-
   const limpiarCamposDependientesComponente = () => {
     setNuevoComponente({
       ...nuevoComponente,
@@ -82,6 +115,7 @@ const AgregarComputadoraActivo = ({
       marca: null,
       modelo: null,
       serie: null,
+      inventario: "",
     });
   };
 
@@ -108,21 +142,61 @@ const AgregarComputadoraActivo = ({
   };
 
   const handleAgregarEquipo = () => {
-    if (componentes.length > 0 && protocolo && direccionIP !== "") {
-      console.log("Componentes:", componentes);
-      console.log("Protocolo:", protocolo);
-      console.log("Dirección IP:", direccionIP);
-      console.log("Imagen:", image);
-    } else {
-      alert("Por favor, complete todos los campos del equipo.");
+    if (!idUso && !idUsuario) {
+      alert("Por favor, selecciona un Usuario.");
+      return;
     }
+    if (!selectedSO) {
+      alert("Por favor, selecciona un sistema operativo.");
+      return;
+    }
+    if (!selectedVersionSO) {
+      alert("Por favor, selecciona una versión del sistema operativo.");
+      return;
+    }
+    if (!selectedRAM) {
+      alert("Por favor, selecciona la cantidad de RAM.");
+      return;
+    }
+    if (!selectedDisco) {
+      alert("Por favor, selecciona la capacidad del disco.");
+      return;
+    }
+    if (!selectedDominio) {
+      alert("Por favor, selecciona un dominio.");
+      return;
+    }
+    if (!protocolo) {
+      alert("Por favor, selecciona un protocolo.");
+      return;
+    }
+
+    if (protocolo === "0" && !direccionIP) {
+      alert("Por favor, ingresa una dirección IP para el protocolo estático.");
+      return;
+    }
+
+    if (componentes.length === 0) {
+      alert("Por favor, agrega al menos un componente.");
+      return;
+    }
+
+    console.log("Componentes:", componentes);
+    console.log("Protocolo:", protocolo);
+    console.log("Dirección IP:", direccionIP);
+    console.log("Imagen:", image);
+    console.log("Sistema Operativo:", selectedSO.nombre);
+    console.log("Versión SO:", selectedVersionSO.nombre);
+    console.log("RAM:", selectedRAM.capacidad);
+    console.log("Disco:", selectedDisco.capacidad);
+    console.log("Dominio:", selectedDominio.nombre);
   };
 
   useEffect(() => {
     setSelectedInventarioMarca(null);
     setSelectedInventarioModelo(null);
     setSelectedInventarioSerie(null);
-  }, [periferico])
+  }, [periferico]);
 
   const handleMarcaChange = (
     _event: React.SyntheticEvent<Element, Event>,
@@ -152,15 +226,25 @@ const AgregarComputadoraActivo = ({
     _event: React.SyntheticEvent<Element, Event>,
     newValue: Periferico | null
   ) => {
-    setNuevoComponente({ ...nuevoComponente, periferico: newValue, marca: null, modelo: null, serie: null});
+    setNuevoComponente({
+      ...nuevoComponente,
+      periferico: newValue,
+      marca: null,
+      modelo: null,
+      serie: null,
+    });
   };
 
   const handleMarcaComponenteChange = (
     _event: React.SyntheticEvent<Element, Event>,
     newValue: Marca | null
   ) => {
-    setNuevoComponente({ ...nuevoComponente, marca: newValue, modelo: null, serie: null });
-
+    setNuevoComponente({
+      ...nuevoComponente,
+      marca: newValue,
+      modelo: null,
+      serie: null,
+    });
   };
 
   const handleModeloComponenteChange = (
@@ -175,6 +259,10 @@ const AgregarComputadoraActivo = ({
     newValue: Serie | null
   ) => {
     setNuevoComponente({ ...nuevoComponente, serie: newValue });
+  };
+
+  const eliminarComponente = (index: number) => {
+    setComponentes(componentes.filter((_, i) => i !== index));
   };
 
   return (
@@ -192,7 +280,12 @@ const AgregarComputadoraActivo = ({
             onChange={handleMarcaChange}
             value={selectedInventarioMarca}
             renderInput={(params) => (
-              <TextField {...params} label="Marca" variant="outlined" fullWidth />
+              <TextField
+                {...params}
+                label="Marca"
+                variant="outlined"
+                fullWidth
+              />
             )}
           />
           <Autocomplete
@@ -203,7 +296,12 @@ const AgregarComputadoraActivo = ({
             onChange={handleModeloChange}
             value={selectedInventarioModelo}
             renderInput={(params) => (
-              <TextField {...params} label="Modelo" variant="outlined" fullWidth />
+              <TextField
+                {...params}
+                label="Modelo"
+                variant="outlined"
+                fullWidth
+              />
             )}
             disabled={!selectedInventarioMarca}
           />
@@ -215,7 +313,12 @@ const AgregarComputadoraActivo = ({
             onChange={handleSerieChange}
             value={selectedInventarioSerie}
             renderInput={(params) => (
-              <TextField {...params} label="Serie" variant="outlined" fullWidth />
+              <TextField
+                {...params}
+                label="Serie"
+                variant="outlined"
+                fullWidth
+              />
             )}
             disabled={!selectedInventarioModelo}
           />
@@ -242,11 +345,10 @@ const AgregarComputadoraActivo = ({
           <Autocomplete
             size="small"
             disablePortal
-            options={[
-              { id: "1", nombre: "Windows" },
-              { id: "2", nombre: "Linux" },
-            ]}
+            options={sistemasOperativos}
             getOptionLabel={(option) => option.nombre}
+            value={selectedSO}
+            onChange={(_, newValue) => setSelectedSO(newValue)}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -259,15 +361,14 @@ const AgregarComputadoraActivo = ({
           <Autocomplete
             size="small"
             disablePortal
-            options={[
-              { id: "1", nombre: "Office 2019" },
-              { id: "2", nombre: "Office 365" },
-            ]}
+            options={versionesSO}
             getOptionLabel={(option) => option.nombre}
+            value={selectedVersionSO}
+            onChange={(_, newValue) => setSelectedVersionSO(newValue)}
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Versión Sistema Operativo"
+                label="Versión SO"
                 variant="outlined"
                 fullWidth
               />
@@ -277,8 +378,8 @@ const AgregarComputadoraActivo = ({
             size="small"
             disablePortal
             options={[
-              { id: "1", nombre: "Antivirus A" },
-              { id: "2", nombre: "Antivirus B" },
+              { id: "0", nombre: "Activado" },
+              { id: "1", nombre: "Desactivado" },
             ]}
             getOptionLabel={(option) => option.nombre}
             renderInput={(params) => (
@@ -293,49 +394,29 @@ const AgregarComputadoraActivo = ({
           <Autocomplete
             size="small"
             disablePortal
-            options={[
-              { id: "1", nombre: "8GB" },
-              { id: "2", nombre: "16GB" },
-            ]}
-            getOptionLabel={(option) => option.nombre}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Cantidad RAM"
-                variant="outlined"
-                fullWidth
-              />
-            )}
-          />
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={[
-              { id: "1", nombre: "DDR4" },
-              { id: "2", nombre: "DDR5" },
-            ]}
-            getOptionLabel={(option) => option.nombre}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Tipo RAM"
-                variant="outlined"
-                fullWidth
-              />
-            )}
-          />
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={[
-              { id: "1", nombre: "Estático" },
-              { id: "2", nombre: "Dinámico" },
-            ]}
-            getOptionLabel={(option) => option.nombre}
-            value={protocolo ? { nombre: protocolo } : null}
-            onChange={(event, newValue) =>
-              setProtocolo(newValue ? newValue.nombre : "")
+            options={ram}
+            getOptionLabel={(option: RAM) =>
+              `${option.capacidad} - ${option.tipo}`
             }
+            value={selectedRAM}
+            onChange={(_, newValue) => setSelectedRAM(newValue)}
+            renderInput={(params) => (
+              <TextField {...params} label="RAM" variant="outlined" fullWidth />
+            )}
+          />
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={protocolos}
+            getOptionLabel={(option) => option.nombre}
+            value={protocolos.find((p) => p.id === protocolo) || null}
+            onChange={(event, newValue) => {
+              if (newValue) {
+                setProtocolo(newValue.id);
+              } else {
+                setProtocolo("1");
+              }
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -353,31 +434,39 @@ const AgregarComputadoraActivo = ({
             size="small"
             value={direccionIP}
             onChange={(e) => setDireccionIP(e.target.value)}
-            disabled={protocolo !== "Estático"}
+            disabled={protocolo !== "0"}
           />
           <Autocomplete
             size="small"
             disablePortal
-            options={[
-              { id: "1", nombre: "500GB" },
-              { id: "2", nombre: "1TB" },
-            ]}
-            getOptionLabel={(option) => option.nombre}
+            options={discos}
+            getOptionLabel={(option) => option.capacidad}
+            value={selectedDisco}
+            onChange={(_, newValue) => setSelectedDisco(newValue)}
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Almacenamiento Disco"
+                label="Disco"
                 variant="outlined"
                 fullWidth
               />
             )}
           />
-          <TextField
-            label="Dominio"
-            placeholder="Dominio"
-            variant="outlined"
-            fullWidth
+          <Autocomplete
             size="small"
+            disablePortal
+            options={dominios}
+            getOptionLabel={(option) => option.nombre}
+            value={selectedDominio}
+            onChange={(_, newValue) => setSelectedDominio(newValue)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Dominio"
+                variant="outlined"
+                fullWidth
+              />
+            )}
           />
         </div>
       </div>
@@ -402,7 +491,7 @@ const AgregarComputadoraActivo = ({
       </div>
 
       <div className="mb-4">
-        <h2 className="text-xl font-semibold mb-5">Componentes</h2>
+        <h2 className="text-xl font-semibold mb-10">Componentes</h2>
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 overflow-x-auto">
             <table className="min-w-full border-collapse border border-gray-300">
@@ -413,25 +502,35 @@ const AgregarComputadoraActivo = ({
                   <th className="py-2 px-4 border">Modelo</th>
                   <th className="py-2 px-4 border">Serie</th>
                   <th className="py-2 px-4 border">Inventario</th>
+                  <th className="py-2 px-1 border">Acciones</th>
                 </tr>
               </thead>
               <tbody>
-              {componentes.map((comp, index) => (
-                <tr key={index}>
-                  <td className="py-2 px-4 border">
-                    {comp.periferico?.nombre}
-                  </td>
-                  <td className="py-2 px-4 border">{comp.marca?.nombre}</td>
-                  <td className="py-2 px-4 border">{comp.modelo?.nombre}</td>
-                  <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
-                  <td className="py-2 px-4 border">{comp.inventario}</td>
-                </tr>
-              ))}
-            </tbody>
+                {componentes.map((comp, index) => (
+                  <tr key={index}>
+                    <td className="py-2 px-4 border">
+                      {comp.periferico?.nombre}
+                    </td>
+                    <td className="py-2 px-4 border">{comp.marca?.nombre}</td>
+                    <td className="py-2 px-4 border">{comp.modelo?.nombre}</td>
+                    <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
+                    <td className="py-2 px-4 border">{comp.inventario}</td>
+                    <td className="py-2 px-1 border">
+                      <Icon
+                        icon="weui:delete-outlined"
+                        width="25"
+                        height="25"
+                        onClick={() => eliminarComponente(index)}
+                        className="cursor-pointer mx-auto"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </div>
           <div className="flex-1 space-y-4">
-          <Autocomplete
+            <Autocomplete
               size="small"
               disablePortal
               options={filteredPerifericos}
@@ -439,7 +538,12 @@ const AgregarComputadoraActivo = ({
               onChange={handlePerifericoComponenteChange}
               value={nuevoComponente.periferico}
               renderInput={(params) => (
-                <TextField {...params} label="Periférico" variant="outlined" fullWidth />
+                <TextField
+                  {...params}
+                  label="Periférico"
+                  variant="outlined"
+                  fullWidth
+                />
               )}
             />
             <Autocomplete
@@ -450,7 +554,12 @@ const AgregarComputadoraActivo = ({
               onChange={handleMarcaComponenteChange}
               value={nuevoComponente.marca}
               renderInput={(params) => (
-                <TextField {...params} label="Marca" variant="outlined" fullWidth />
+                <TextField
+                  {...params}
+                  label="Marca"
+                  variant="outlined"
+                  fullWidth
+                />
               )}
               disabled={!nuevoComponente.periferico}
             />
@@ -462,7 +571,12 @@ const AgregarComputadoraActivo = ({
               onChange={handleModeloComponenteChange}
               value={nuevoComponente.modelo}
               renderInput={(params) => (
-                <TextField {...params} label="Modelo" variant="outlined" fullWidth />
+                <TextField
+                  {...params}
+                  label="Modelo"
+                  variant="outlined"
+                  fullWidth
+                />
               )}
               disabled={!nuevoComponente.marca}
             />
@@ -474,7 +588,12 @@ const AgregarComputadoraActivo = ({
               onChange={handleSerieComponenteChange}
               value={nuevoComponente.serie}
               renderInput={(params) => (
-                <TextField {...params} label="Serie" variant="outlined" fullWidth />
+                <TextField
+                  {...params}
+                  label="Serie"
+                  variant="outlined"
+                  fullWidth
+                />
               )}
               disabled={!nuevoComponente.modelo}
             />
@@ -486,7 +605,10 @@ const AgregarComputadoraActivo = ({
               size="small"
               value={nuevoComponente.inventario}
               onChange={(e) =>
-                setNuevoComponente({ ...nuevoComponente, inventario: e.target.value })
+                setNuevoComponente({
+                  ...nuevoComponente,
+                  inventario: e.target.value,
+                })
               }
             />
             <Button
@@ -501,8 +623,8 @@ const AgregarComputadoraActivo = ({
         </div>
       </div>
 
-      <div className="flex gap-4">
-      <Button
+      <div className="flex gap-4 mt-10">
+        <Button
           variant="contained"
           color="primary"
           onClick={handleAgregarEquipo}

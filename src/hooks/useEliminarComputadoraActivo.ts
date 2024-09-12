@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-export const useEliminarEquipo = (idEquipo: string | null) => {
+export const useEliminarComputadoraActivo = (idEquipo: string | null) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
@@ -17,7 +17,7 @@ export const useEliminarEquipo = (idEquipo: string | null) => {
     setSuccess(null);
 
     try {
-      await axios.delete(`http://localhost:5000/api/equipos/eliminar/${idEquipo}`);
+      await axios.delete(`http://localhost:5000/api/equipos/eliminarActivoComputadora/${idEquipo}`);
       setSuccess(true);
     } catch (err) {
       setError("Error al eliminar el equipo");

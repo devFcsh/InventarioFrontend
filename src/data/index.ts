@@ -4,7 +4,13 @@ const filas = [
     { id: 50, name: "50" },
     { id: 100, name: "100" },
   ];
+
+const protocolos = [
+    { id: "0", nombre: "Estático" },
+    { id: "1", nombre: "Dinámico" },
+  ];
   
 export {
-    filas
+    filas,
+    protocolos
 }
