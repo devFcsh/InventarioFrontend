@@ -81,7 +81,7 @@ export type Disco = {
 
 export type Antivirus = {
   id_antivirus: string;
-  estado: 'Activado' | 'Desactivado';
+  nombre: string;
 };
 
 export type Dominio = {
@@ -116,4 +116,14 @@ export type Imagen = {
 export type EquipoImagen = {
   id_equipo: string;
   id_imagen: string;
+};
+
+export type Edificio = {
+  id_edificio: string;
+  nombre: string;
+};
+
+export type Aula = {
+  id_aula: string;
+  nombre: string;
 };

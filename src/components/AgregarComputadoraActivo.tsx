@@ -1,7 +1,14 @@
-import { Autocomplete, TextField, Button } from "@mui/material";
-import { useEffect, useState } from "react";
+import {
+  Autocomplete,
+  TextField,
+  Button,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { useEffect, useState, useRef } from "react";
 import { useModelosPorMarcaPeriferico } from "../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../hooks/useSeriesPorModelo";
+import axios from "axios";
 import {
   Marca,
   Modelo,
@@ -13,6 +20,10 @@ import {
   RAM,
   Disco,
   Dominio,
+  VersionOffice,
+  Aula,
+  Edificio,
+  Antivirus,
 } from "../types";
 import useMarcasPorPeriferico from "../hooks/useMarcasPorPeriferico";
 import usePerifericos from "../hooks/usePerifericos";
@@ -21,8 +32,15 @@ import useDominios from "../hooks/useDominios";
 import useRam from "../hooks/useRam";
 import useSistemasOperativos from "../hooks/useSistemasOperativos";
 import useVersionesSO from "../hooks/useVersionesSO";
-import { protocolos } from "../data";
+import { antivirus, protocolos } from "../data";
 import { Icon } from "@iconify/react";
+import useVersionesOffice from "../hooks/useVersionesOffice";
+import useEdificios from "../hooks/useEdificios";
+import useAulas from "../hooks/useAulas";
+import { useAgregarComputadoraActivo } from "../hooks/useAgregarComputadoraActivo";
+import { useAgregarComponentes } from "../hooks/useAgregarComponentes";
+import ModalConfirmation from "./ModalConfirmation";
+import { useNavigate } from "react-router-dom";
 
 interface AgregarComputadoraActivoProps {
   periferico: string;
@@ -35,13 +53,16 @@ const AgregarComputadoraActivo = ({
   idUso,
   idUsuario,
 }: AgregarComputadoraActivoProps) => {
-  const [image, setImage] = useState<string | ArrayBuffer | null>(null);
+  const [image, setImage] = useState<File | null>(null);
   const [selectedInventarioMarca, setSelectedInventarioMarca] =
     useState<Marca | null>(null);
   const [selectedInventarioModelo, setSelectedInventarioModelo] =
     useState<Modelo | null>(null);
   const [selectedInventarioSerie, setSelectedInventarioSerie] =
     useState<Serie | null>(null);
+  const [selectedInventarioInv, setSelectedInventarioInv] = useState<
+    string | null
+  >("");
   const [selectedSO, setSelectedSO] = useState<SistemaOperativo | null>(null);
   const [selectedVersionSO, setSelectedVersionSO] = useState<VersionSO | null>(
     null
@@ -49,6 +70,17 @@ const AgregarComputadoraActivo = ({
   const [selectedRAM, setSelectedRAM] = useState<RAM | null>(null);
   const [selectedDisco, setSelectedDisco] = useState<Disco | null>(null);
   const [selectedDominio, setSelectedDominio] = useState<Dominio | null>(null);
+  const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
+    null
+  );
+  const [selectedAula, setSelectedAula] = useState<Aula | null>(null);
+  const [selectedVersionOffice, setSelectedVersionOffice] =
+    useState<VersionOffice | null>(null);
+  const [selectedAntivirus, setSelectedAntivirus] = useState<Antivirus | null>(
+    null
+  );
+
+  const [nombreEquipo, setNombreEquipo] = useState<string | null>(null);
   const [protocolo, setProtocolo] = useState<string | null>(null);
   const [direccionIP, setDireccionIP] = useState<string>("");
 
@@ -60,7 +92,18 @@ const AgregarComputadoraActivo = ({
     inventario: "",
   });
   const [componentes, setComponentes] = useState<Componente[]>([]);
+  const [errorMensajeComponente, setErrorMensajeComponente] = useState<
+    string | null
+  >(null);
+  const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(
+    null
+  );
+  const [openModalAgregar, setOpenModalAgregar] = useState(false);
+  const [openModalCancelar, setOpenModalCancelar] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
+  const { agregarComputadoraActivo } = useAgregarComputadoraActivo();
+  const { agregarComponentes } = useAgregarComponentes();
   const { marcas } = useMarcasPorPeriferico(periferico);
   const { modelos } = useModelosPorMarcaPeriferico(
     selectedInventarioMarca?.id_marca ?? "",
@@ -91,22 +134,14 @@ const AgregarComputadoraActivo = ({
     nuevoComponente.modelo?.id_modelo ?? ""
   );
 
+  const { versionesOffice } = useVersionesOffice();
+  const { edificios } = useEdificios();
+  const { aulas } = useAulas(selectedEdificio?.id_edificio ?? "");
   const { discos } = useDiscos();
   const { dominios } = useDominios();
   const { ram } = useRam();
   const { sistemasOperativos } = useSistemasOperativos();
   const { versionesSO } = useVersionesSO(selectedSO?.id_sistemaoperativo ?? "");
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   const limpiarCamposDependientesComponente = () => {
     setNuevoComponente({
@@ -136,60 +171,126 @@ const AgregarComputadoraActivo = ({
         inventario: "",
       });
       limpiarCamposDependientesComponente();
+      setErrorMensajeComponente(null);
     } else {
-      alert("Por favor, complete todos los campos del componente.");
+      setErrorMensajeComponente(
+        "Por favor, complete todos los campos del componente."
+      );
     }
   };
 
-  const handleAgregarEquipo = () => {
-    if (!idUso && !idUsuario) {
-      alert("Por favor, selecciona un Usuario.");
-      return;
-    }
-    if (!selectedSO) {
-      alert("Por favor, selecciona un sistema operativo.");
-      return;
-    }
-    if (!selectedVersionSO) {
-      alert("Por favor, selecciona una versión del sistema operativo.");
-      return;
-    }
-    if (!selectedRAM) {
-      alert("Por favor, selecciona la cantidad de RAM.");
-      return;
-    }
-    if (!selectedDisco) {
-      alert("Por favor, selecciona la capacidad del disco.");
-      return;
-    }
-    if (!selectedDominio) {
-      alert("Por favor, selecciona un dominio.");
-      return;
-    }
-    if (!protocolo) {
-      alert("Por favor, selecciona un protocolo.");
+  const handleAgregarEquipo = async () => {
+    if (!idUso || !idUsuario) {
+      setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return;
     }
 
-    if (protocolo === "0" && !direccionIP) {
-      alert("Por favor, ingresa una dirección IP para el protocolo estático.");
+    let imagePath = "";
+    if (image) {
+      const formData = new FormData();
+      formData.append("image", image);
+
+      try {
+        const { data } = await axios.post(
+          "http:localhost:5000/api/equipos/upload",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        imagePath = data.imagePath;
+      } catch (error) {
+        console.error("Error al cargar la imagen:", error);
+        alert("Error al cargar la imagen.");
+        return;
+      }
+    }
+
+    if (!selectedInventarioInv) {
+      alert("El campo de inventario no puede estar vacío.");
       return;
     }
 
-    if (componentes.length === 0) {
-      alert("Por favor, agrega al menos un componente.");
-      return;
-    }
+    const equipoData = {
+      tipo: "activo",
+      inventario: selectedInventarioInv || "",
+      serie: Number(selectedInventarioSerie?.id_serie) ?? 0,
+      nombreEquipo: nombreEquipo || "",
+      direccionIp: direccionIP,
+      versionso: Number(selectedVersionSO?.id_versionso) ?? 0,
+      versionoffice: Number(selectedVersionOffice?.id_versionoffice) ?? 0,
+      ram: Number(selectedRAM?.id_ram) ?? 0,
+      disco: Number(selectedDisco?.id_disco) ?? 0,
+      antivirus: Number(selectedAntivirus?.id_antivirus) ?? 0,
+      dominio: Number(selectedDominio?.id_dominio) ?? 0,
+      idAula: Number(selectedAula?.id_aula) ?? 0,
+      idUsuario: parseInt(idUsuario, 10),
+      imagenRuta: imagePath,
+    };
 
-    console.log("Componentes:", componentes);
-    console.log("Protocolo:", protocolo);
-    console.log("Dirección IP:", direccionIP);
-    console.log("Imagen:", image);
-    console.log("Sistema Operativo:", selectedSO.nombre);
-    console.log("Versión SO:", selectedVersionSO.nombre);
-    console.log("RAM:", selectedRAM.capacidad);
-    console.log("Disco:", selectedDisco.capacidad);
-    console.log("Dominio:", selectedDominio.nombre);
+    try {
+      const equipoId = await agregarComputadoraActivo(equipoData);
+
+      if (componentes.length > 0 && equipoId) {
+        await agregarComponentes({
+          equipoId: equipoId,
+          componentes: componentes.map((comp) => ({
+            inventario: comp.inventario,
+            serieId: Number(comp.serie?.id_serie) ?? 0,
+          })),
+          aulaId: Number(selectedAula?.id_aula) ?? 0,
+          usuarioId: parseInt(idUsuario, 10),
+          imagenRuta: imagePath,
+        });
+      }
+
+      setShowSuccessMessage(true);
+      limpiarCampos();
+      navigate("/equipos", { state: { equipoAgregado: true } });
+    } catch (error) {
+      console.error("Error al agregar el equipo y componentes:", error);
+      alert("Error al agregar el equipo y componentes.");
+    }
+  };
+
+  const navigate = useNavigate();
+
+  const handleCancelar = () => {
+    limpiarCampos();
+    setOpenModalCancelar(false);
+    navigate("/equipos");
+  };
+
+  const limpiarCampos = () => {
+    setSelectedInventarioMarca(null);
+    setSelectedInventarioModelo(null);
+    setSelectedInventarioSerie(null);
+    setSelectedInventarioInv("");
+    setSelectedSO(null);
+    setSelectedVersionSO(null);
+    setSelectedRAM(null);
+    setSelectedDisco(null);
+    setSelectedDominio(null);
+    setSelectedEdificio(null);
+    setSelectedAntivirus(null);
+    setSelectedAula(null);
+    setSelectedVersionOffice(null);
+    setNombreEquipo("");
+    setProtocolo(null);
+    setDireccionIP("");
+    setNuevoComponente({
+      periferico: null,
+      marca: null,
+      modelo: null,
+      serie: null,
+      inventario: "",
+    });
+    setComponentes([]);
+    setImage(null);
+    setErrorMensajeEquipo(null);
+    setErrorMensajeComponente(null);
   };
 
   useEffect(() => {
@@ -265,8 +366,80 @@ const AgregarComputadoraActivo = ({
     setComponentes(componentes.filter((_, i) => i !== index));
   };
 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImage(file);
+    }
+  };
+
+  const handleImageClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleConfirmAgregarEquipo = () => {
+    if (validarCamposEquipo()) {
+      setOpenModalAgregar(true);
+    }
+  };
+
+  const handleConfirmCancelar = () => {
+    setOpenModalCancelar(true);
+  };
+
+  const handleModalConfirmAgregar = async () => {
+    setOpenModalAgregar(false);
+    await handleAgregarEquipo();
+  };
+
+  const validarCamposEquipo = () => {
+    if (
+      !selectedInventarioInv ||
+      !selectedInventarioSerie ||
+      !nombreEquipo ||
+      !selectedVersionSO ||
+      !selectedVersionOffice ||
+      !selectedRAM ||
+      !selectedDisco ||
+      !selectedDominio ||
+      !selectedAula
+    ) {
+      setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
+      return false;
+    }
+    setErrorMensajeEquipo(null);
+    return true;
+  };
+
   return (
     <>
+      <ModalConfirmation
+        open={openModalAgregar}
+        onClose={() => setOpenModalAgregar(false)}
+        onConfirm={handleModalConfirmAgregar}
+        title="Confirmar Agregar Equipo"
+        message="¿Está seguro de que desea agregar este equipo?"
+      />
+
+      <ModalConfirmation
+        open={openModalCancelar}
+        onClose={() => setOpenModalCancelar(false)}
+        onConfirm={handleCancelar}
+        title="Confirmar Cancelar"
+        message="¿Está seguro de que desea cancelar? Todos los cambios no guardados se perderán."
+      />
+
+      <Snackbar
+        open={showSuccessMessage}
+        autoHideDuration={3000}
+        onClose={() => setShowSuccessMessage(false)}
+      >
+        <Alert severity="success">Equipo agregado exitosamente</Alert>
+      </Snackbar>
       <div className="mb-4">
         <h2 className="text-xl font-semibold mb-5">
           Información de Inventario
@@ -328,13 +501,8 @@ const AgregarComputadoraActivo = ({
             variant="outlined"
             fullWidth
             size="small"
-            value={nuevoComponente.inventario}
-            onChange={(e) =>
-              setNuevoComponente({
-                ...nuevoComponente,
-                inventario: e.target.value,
-              })
-            }
+            value={selectedInventarioInv}
+            onChange={(e) => setSelectedInventarioInv(e.target.value)}
           />
         </div>
       </div>
@@ -377,15 +545,30 @@ const AgregarComputadoraActivo = ({
           <Autocomplete
             size="small"
             disablePortal
-            options={[
-              { id: "0", nombre: "Activado" },
-              { id: "1", nombre: "Desactivado" },
-            ]}
+            options={antivirus}
             getOptionLabel={(option) => option.nombre}
+            value={selectedAntivirus}
+            onChange={(_, newValue) => setSelectedAntivirus(newValue)}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Antivirus"
+                variant="outlined"
+                fullWidth
+              />
+            )}
+          />
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={versionesOffice}
+            getOptionLabel={(option) => option.nombre}
+            value={selectedVersionOffice}
+            onChange={(_, newValue) => setSelectedVersionOffice(newValue)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Versión Office"
                 variant="outlined"
                 fullWidth
               />
@@ -402,6 +585,22 @@ const AgregarComputadoraActivo = ({
             onChange={(_, newValue) => setSelectedRAM(newValue)}
             renderInput={(params) => (
               <TextField {...params} label="RAM" variant="outlined" fullWidth />
+            )}
+          />
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={discos}
+            getOptionLabel={(option) => option.capacidad}
+            value={selectedDisco}
+            onChange={(_, newValue) => setSelectedDisco(newValue)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Disco"
+                variant="outlined"
+                fullWidth
+              />
             )}
           />
           <Autocomplete
@@ -436,21 +635,14 @@ const AgregarComputadoraActivo = ({
             onChange={(e) => setDireccionIP(e.target.value)}
             disabled={protocolo !== "0"}
           />
-          <Autocomplete
+          <TextField
+            label="Nombre Equipo"
+            placeholder="Nombre Equipo"
+            variant="outlined"
+            fullWidth
             size="small"
-            disablePortal
-            options={discos}
-            getOptionLabel={(option) => option.capacidad}
-            value={selectedDisco}
-            onChange={(_, newValue) => setSelectedDisco(newValue)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Disco"
-                variant="outlined"
-                fullWidth
-              />
-            )}
+            value={nombreEquipo}
+            onChange={(e) => setNombreEquipo(e.target.value)}
           />
           <Autocomplete
             size="small"
@@ -468,6 +660,39 @@ const AgregarComputadoraActivo = ({
               />
             )}
           />
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={edificios}
+            getOptionLabel={(option) => option.nombre}
+            value={selectedEdificio}
+            onChange={(_, newValue) => setSelectedEdificio(newValue)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Edificio"
+                variant="outlined"
+                fullWidth
+              />
+            )}
+          />
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={aulas}
+            getOptionLabel={(option) => option.nombre}
+            value={selectedAula}
+            onChange={(_, newValue) => setSelectedAula(newValue)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Aula"
+                variant="outlined"
+                fullWidth
+              />
+            )}
+            disabled={!selectedEdificio}
+          />
         </div>
       </div>
 
@@ -478,14 +703,22 @@ const AgregarComputadoraActivo = ({
             type="file"
             accept="image/*"
             onChange={handleImageChange}
-            className="mb-4"
+            ref={fileInputRef}
+            style={{ display: "none" }}
           />
-          <div className="w-full flex justify-center">
-            <img
-              src={image ? image.toString() : "https://via.placeholder.com/150"}
-              alt="Vista previa"
-              className="w-full max-w-xs h-auto object-cover border border-gray-300"
-            />
+          <div
+            onClick={handleImageClick}
+            className="w-full max-w-sm h-48 border border-dashed border-gray-300 flex items-center justify-center cursor-pointer"
+          >
+            {image ? (
+              <img
+                src={URL.createObjectURL(image)}
+                alt="Vista previa"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <p className="text-gray-500">Haz clic para cargar una imagen</p>
+            )}
           </div>
         </div>
       </div>
@@ -619,6 +852,9 @@ const AgregarComputadoraActivo = ({
             >
               Agregar Componente
             </Button>
+            {errorMensajeComponente && (
+              <div className="text-red-500 mb-4">{errorMensajeComponente}</div>
+            )}
           </div>
         </div>
       </div>
@@ -627,15 +863,23 @@ const AgregarComputadoraActivo = ({
         <Button
           variant="contained"
           color="primary"
-          onClick={handleAgregarEquipo}
+          onClick={handleConfirmAgregarEquipo}
           fullWidth
         >
           Agregar Equipo
         </Button>
-        <Button variant="outlined" color="primary" fullWidth>
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={handleConfirmCancelar}
+          fullWidth
+        >
           Cancelar
         </Button>
       </div>
+      {errorMensajeEquipo && (
+        <div className="text-red-500 mt-2">{errorMensajeEquipo}</div>
+      )}
     </>
   );
 };

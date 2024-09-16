@@ -9,8 +9,14 @@ const protocolos = [
     { id: "0", nombre: "Estático" },
     { id: "1", nombre: "Dinámico" },
   ];
+
+const antivirus = [
+    { id_antivirus: "1", nombre: "Activado" },
+    { id_antivirus: "2", nombre: "Desactivado" },
+  ]
   
 export {
     filas,
+    antivirus,
     protocolos
 }

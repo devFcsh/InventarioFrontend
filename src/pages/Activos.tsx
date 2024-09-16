@@ -1,8 +1,8 @@
-import { Autocomplete, TextField } from "@mui/material";
+import { Alert, Autocomplete, Snackbar, TextField } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import ModalConfirmation from "../components/ModalConfirmation";
 import { Periferico, Marca, Modelo, Serie, Inventario } from "../types";
 import usePerifericos from "../hooks/usePerifericos";
@@ -287,8 +287,31 @@ const Activos = () => {
     XLSX.writeFile(wb, "datos_equipos.xlsx");
   };
 
+  const location = useLocation();
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+
+    useEffect(() => {
+        if (location.state && location.state.equipoAgregado) {
+            setOpenSnackbar(true);
+        }
+    }, [location.state]);
+
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    };
+
   return (
     <div className="flex flex-col p-4">
+      <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+                    ¡Equipo agregado con éxito!
+                </Alert>
+            </Snackbar>
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>
