@@ -79,7 +79,6 @@ const AgregarComputadoraActivo = ({
   const [selectedAntivirus, setSelectedAntivirus] = useState<Antivirus | null>(
     null
   );
-
   const [nombreEquipo, setNombreEquipo] = useState<string | null>(null);
   const [protocolo, setProtocolo] = useState<string | null>(null);
   const [direccionIP, setDireccionIP] = useState<string>("");
@@ -192,7 +191,7 @@ const AgregarComputadoraActivo = ({
 
       try {
         const { data } = await axios.post(
-          "http:localhost:5000/api/equipos/upload",
+          "http://localhost:5000/api/equipos/upload",
           formData,
           {
             headers: {

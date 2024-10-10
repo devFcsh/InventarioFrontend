@@ -1,5 +1,11 @@
-import React from 'react';
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
+import React from "react";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+} from "@mui/material";
 
 interface ModalConfirmationProps {
   open: boolean;
@@ -9,9 +15,15 @@ interface ModalConfirmationProps {
   message?: string;
 }
 
-const ModalConfirmation: React.FC<ModalConfirmationProps> = ({ open, onClose, onConfirm, title = 'Confirmar', message = '¿Estás seguro?' }) => {
+const ModalConfirmation: React.FC<ModalConfirmationProps> = ({
+  open,
+  onClose,
+  onConfirm,
+  title = "Confirmar",
+  message = "¿Estás seguro?",
+}) => {
   return (
-    <Dialog open={open} onClose={onClose} >
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <p>{message}</p>

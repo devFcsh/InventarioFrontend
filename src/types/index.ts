@@ -35,6 +35,14 @@ export type Equipo = {
   edificio: string;
 };
 
+export type EquipoEdit = {
+  id_equipo: string;
+  id_periferico: string;
+  inventario: string;
+  id_usuario: string;
+  id_uso: string;
+};
+
 export type Uso = {
   id_uso: string;
   nombre: string;
@@ -46,6 +54,7 @@ export type Usuario = {
 };
 
 export type Componente = {
+  id_componente?: string
   periferico: Periferico;
   marca: Marca;
   modelo: Modelo;
@@ -127,3 +136,41 @@ export type Aula = {
   id_aula: string;
   nombre: string;
 };
+
+export type ComponenteData = {
+  equipoId: number;
+  componentes: {
+    inventario: string;
+    serieId: number;
+  }[];
+  aulaId: number;
+  usuarioId: number;
+  imagenRuta: string;
+};
+
+
+export type EquipoData = {
+  tipo: string;
+  inventario: string;
+  serie: number;
+  nombreEquipo?: string; 
+  direccionIp?: string; 
+  versionso?: number;    
+  versionoffice?: number; 
+  ram?: number;          
+  disco?: number;       
+  antivirus?: number;   
+  dominio?: number;      
+  idAula: number;
+  idUsuario: number;
+  imagenRuta: string;
+};
+
+export type Filtros = {
+  perifericoId?: string;
+  marcaId?: string;
+  modeloId?: string;
+  serieId?: string;
+  inventario?: string;
+};
+

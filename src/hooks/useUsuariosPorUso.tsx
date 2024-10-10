@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Usuario } from '../types';
 
 const useUsuariosPorUso = (idUso: string) => {
-    const [usuarios, setUsuarios] = useState<Usuario[]>([]);  
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<Error | null>(null);  
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);  
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);  
 
   useEffect(() => {
     if (!idUso) {
@@ -15,10 +16,8 @@ const useUsuariosPorUso = (idUso: string) => {
     const fetchUsuarios = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:5000/api/usuarios/usuariosPorUso/${idUso}`);
-        const data = await response.json();
-        console.log(data)
-        setUsuarios(data);
+        const response = await axios.get(`http://localhost:5000/api/usuarios/usuariosPorUso/${idUso}`);
+        setUsuarios(response.data);
       } catch (err: any) {
         setError(err);
       } finally {

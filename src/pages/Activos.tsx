@@ -14,6 +14,7 @@ import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../data";
 import { useTotalEquipos } from "../hooks/useTotalEquipos";
 import { useEliminarComputadoraActivo } from "../hooks/useEliminarComputadoraActivo";
+import { useDarDeBajaEquipo } from "../hooks/useDarDeBajaEquipo";
 
 const Activos = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
@@ -27,8 +28,7 @@ const Activos = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null); 
-    const [confirmAction, setConfirmAction] = useState<() => void>(
+  const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -41,6 +41,8 @@ const Activos = () => {
   });
 
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const { perifericos } = usePerifericos();
   const { marcas } = useMarcasPorPeriferico(
@@ -62,8 +64,7 @@ const Activos = () => {
     selectedSerie?.id_serie ?? ""
   );
 
-  const { eliminarEquipo } = useEliminarComputadoraActivo(selectedEquipoId);
-
+  const location = useLocation();
   const filtros = {
     perifericoId: selectedPeriferico?.id_periferico,
     marcaId: selectedMarca?.id_marca,
@@ -72,27 +73,23 @@ const Activos = () => {
     inventario: selectedInventario?.inventario,
   };
 
+  const { eliminarEquipo } = useEliminarComputadoraActivo();
+  const { darDeBajaEquipo } = useDarDeBajaEquipo();
   const { equipos, loading, error } = useEquiposFiltrados(
     filtros,
     currentPage,
     rowsPerPage,
     shouldFetch
   );
-
-  const { totalEquipos } = useTotalEquipos(
-    filtros,
-    shouldFetch
-  );
+  const { totalEquipos } = useTotalEquipos(filtros, shouldFetch);
 
   useEffect(() => {
     if (totalEquipos > 0 && rowsPerPage > 0) {
       setTotalPages(Math.ceil(totalEquipos / rowsPerPage));
     } else {
-      setTotalPages(1); 
+      setTotalPages(1);
     }
   }, [totalEquipos, rowsPerPage]);
-  
-
 
   useEffect(() => {
     if (shouldFetch) {
@@ -100,76 +97,116 @@ const Activos = () => {
     }
   }, [shouldFetch]);
 
-  const handleOpenModal = (
-    id: string,
-    title: string,
-    message: string,
-    action: () => void
-  ) => {
-    setSelectedEquipoId(id);
-    setModalContent({ title, message });
-    setConfirmAction(() => action);
-    setOpenModal(true);
-  };
-
   const handleCloseModal = () => {
     setOpenModal(false);
   };
 
+  useEffect(() => {
+    if (location.state && location.state.equipoAgregado) {
+      setSnackbarMessage("¡Equipo agregado con éxito!");
+      setOpenSnackbar(true);
+    }
+  }, [location.state]);
+
   const handleConfirm = async () => {
-    if (selectedEquipoId) {
-      try {
-        await confirmAction(); 
-        console.log("Acción completada");
-      } catch (error) {
-        console.error("Error en la acción", error);
-      }
+    try {
+      await confirmAction();
+      setSnackbarMessage("Operación completada con éxito.");
+      setOpenSnackbar(true);
+    } catch (error) {
+      console.error("Error en la acción", error);
     }
     handleCloseModal();
   };
 
-  const deleteEquipo = async () => {
-    await eliminarEquipo(); 
+  const deleteEquipo = async (equipoId: string) => {
+    if (equipoId) {
+      await eliminarEquipo(equipoId);
+      setShouldFetch(true);
+    }
   };
 
-  const bajaEquipo = () => {
-    if (selectedEquipoId) {
-      console.log(`Equipo con ID ${selectedEquipoId} dado de baja`);
+  const deleteEquipos = async (equipoIds: string[]) => {
+    try {
+      for (const id of equipoIds) {
+        await eliminarEquipo(id);
+      }
+      setShouldFetch(true);
+      setSelectedItems([]);
+    } catch (error) {
+      console.error("Error al eliminar los equipos", error);
+    }
+  };
+
+  const bajaEquipo = async (equipoId: string) => {
+    if (equipoId) {
+      try {
+        await darDeBajaEquipo(equipoId);
+        console.log(`Equipo con ID ${equipoId} dado de baja`);
+        setShouldFetch(true);
+      } catch (error) {
+        console.error("Error al dar de baja el equipo", error);
+      }
+    }
+  };
+
+  const bajaEquipos = async (equipoIds: string[]) => {
+    try {
+      for (const id of equipoIds) {
+        await darDeBajaEquipo(id);
+      }
+      setShouldFetch(true);
+      setSelectedItems([]);
+    } catch (error) {
+      console.error("Error al dar de baja los equipos", error);
     }
   };
 
   const handleDelete = () => {
+    if (selectedItems.length === 0) {
+      console.log("Debe seleccionar al menos un elemento");
+      return;
+    }
+
     setModalContent({
       title: "Eliminar Equipos",
-      message: "¿Estás seguro de que deseas eliminar los equipos seleccionados?",
+      message:
+        "¿Estás seguro de que deseas eliminar los equipos seleccionados?",
     });
+
     setConfirmAction(() => async () => {
-      if (selectedItems.length === 0) {
-        console.log("debe seleccionar un elemento");
-        return;
-      }
-      for (const itemId of selectedItems) {
-        setSelectedEquipoId(itemId); 
-        console.log(itemId) 
-      }
-      setSelectedItems([]);
+      await deleteEquipos(selectedItems);
       setOpenModal(false);
     });
+
+    setOpenModal(true);
+  };
+
+  const handleOpenModal = (
+    id: string,
+    title: string,
+    message: string,
+    action: (id: string) => Promise<void>
+  ) => {
+    setModalContent({ title, message });
+    setConfirmAction(() => () => action(id));
     setOpenModal(true);
   };
 
   const handleBaja = () => {
     setModalContent({
       title: "Dar de Baja Equipos",
-      message: "¿Estás seguro de que deseas dar de baja en los equipos seleccionados?",
+      message:
+        "¿Estás seguro de que deseas dar de baja los equipos seleccionados?",
     });
     setConfirmAction(() => async () => {
       if (selectedItems.length === 0) {
-        console.log("debe seleccionar un elemento");
+        console.log("Debe seleccionar al menos un elemento");
         return;
       }
-      console.log(selectedItems);
-      setSelectedItems([]);
+      await bajaEquipos(selectedItems);
+      setSnackbarMessage("¡Equipos dados de baja con éxito!");
+      setOpenSnackbar(true);
       setOpenModal(false);
     });
     setOpenModal(true);
@@ -248,7 +285,6 @@ const Activos = () => {
     setCurrentPage(1);
   };
 
-
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
@@ -287,41 +323,30 @@ const Activos = () => {
     XLSX.writeFile(wb, "datos_equipos.xlsx");
   };
 
-  const location = useLocation();
-    const [openSnackbar, setOpenSnackbar] = useState(false);
-
-    useEffect(() => {
-        if (location.state && location.state.equipoAgregado) {
-            setOpenSnackbar(true);
-        }
-    }, [location.state]);
-
-    const handleCloseSnackbar = () => {
-        setOpenSnackbar(false);
-    };
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   return (
     <div className="flex flex-col p-4">
       <Snackbar
-                open={openSnackbar}
-                autoHideDuration={6000}
-                onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
-                <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
-                    ¡Equipo agregado con éxito!
-                </Alert>
-            </Snackbar>
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>
-          <Link
-  to={{
-    pathname: "/agregarActivo",
-  }}
-  state={{ perifericos }} 
->
-
+          <Link to={{ pathname: "/agregarActivo" }} state={{ perifericos }}>
             <Icon
               icon="gridicons:add"
               width="30"
@@ -436,13 +461,13 @@ const Activos = () => {
         </div>
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-      {loading ? (
+        {loading ? (
           <p>Cargando equipos...</p>
         ) : error ? (
           <p>Error al cargar los equipos</p>
         ) : (
-  <table className="w-full text-left text-sm text-gray-500">
-    <thead className="text-xs uppercase bg-gray-50 text-gray-700">
+          <table className="w-full text-left text-sm text-gray-500">
+            <thead className="text-xs uppercase bg-gray-50 text-gray-700">
               <tr>
                 <th scope="col" className="flex items-center gap-2 px-4 py-3">
                   <input
@@ -536,20 +561,23 @@ const Activos = () => {
                       className="cursor-pointer"
                     />
                     <Icon
-                  icon="weui:delete-outlined"
-                  width="25"
-                  height="25"
-                  onClick={() =>
-                    handleOpenModal(
-                      equipo.id_equipo,
-                      "Eliminar equipo",
-                      `¿Estás seguro de que deseas eliminar el equipo ${equipo.id_equipo}?`,
-                      deleteEquipo 
-                    )
-                  }
-                  className="cursor-pointer"
-                />
-                    <Link to={"/editarActivo"} state={{ equipo: equipo }}>
+                      icon="weui:delete-outlined"
+                      width="25"
+                      height="25"
+                      onClick={() =>
+                        handleOpenModal(
+                          equipo.id_equipo,
+                          "Eliminar equipo",
+                          `¿Estás seguro de que deseas eliminar el equipo ${equipo.id_equipo}?`,
+                          deleteEquipo
+                        )
+                      }
+                      className="cursor-pointer"
+                    />
+                    <Link
+                      to="/editarActivo"
+                      state={{ equipoId: equipo.id_equipo, perifericos }}
+                    >
                       <Icon
                         icon="mage:edit"
                         width="25"
@@ -564,44 +592,45 @@ const Activos = () => {
           </table>
         )}
       </div>
-      <nav className="flex flex-col md:flex-row justify-between items-center p-4" aria-label="Table navigation">
-  <span className="text-sm font-normal text-gray-500">
-  </span>
-  <div className="flex flex-col md:flex-row items-center gap-2">
-    <ul className="inline-flex items-center -space-x-px">
-      <li>
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-        >
-          <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
-        </button>
-      </li>
-      <li>
-        <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
-          Página {currentPage} de {totalPages}
+      <nav
+        className="flex flex-col md:flex-row justify-between items-center p-4"
+        aria-label="Table navigation"
+      >
+        <span className="text-sm font-normal text-gray-500"></span>
+        <div className="flex flex-col md:flex-row items-center gap-2">
+          <ul className="inline-flex items-center -space-x-px">
+            <li>
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+              >
+                <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
+              </button>
+            </li>
+            <li>
+              <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
+                Página {currentPage} de {totalPages}
+              </div>
+            </li>
+            <li>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+              >
+                <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
+              </button>
+            </li>
+          </ul>
+          <button
+            onClick={exportToExcel}
+            className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+          >
+            <Icon icon="ph:export" width="20" height="20" />
+          </button>
         </div>
-      </li>
-      <li>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-        >
-          <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
-        </button>
-      </li>
-    </ul>
-    <button
-      onClick={exportToExcel}
-      className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-    >
-      <Icon icon="ph:export" width="20" height="20" />
-    </button>
-  </div>
-</nav>
-
+      </nav>
       <ModalConfirmation
         open={openModal}
         onClose={handleCloseModal}

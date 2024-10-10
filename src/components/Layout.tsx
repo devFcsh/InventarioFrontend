@@ -1,5 +1,5 @@
-import React from 'react';
-import Navbar from './Navbar';
+import React from "react";
+import Navbar from "./Navbar";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -7,13 +7,18 @@ interface LayoutProps {
   setCurrentSection: (section: string) => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, currentSection, setCurrentSection }) => {
+const Layout: React.FC<LayoutProps> = ({
+  children,
+  currentSection,
+  setCurrentSection,
+}) => {
   return (
     <>
-      <Navbar currentSection={currentSection} setCurrentSection={setCurrentSection} />
-      <>
-        {children}
-      </>
+      <Navbar
+        currentSection={currentSection}
+        setCurrentSection={setCurrentSection}
+      />
+      <>{children}</>
     </>
   );
 };

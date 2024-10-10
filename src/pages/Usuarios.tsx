@@ -1,10 +1,5 @@
-
 const Usuarios = () => {
-  return (
-    <div>
-      Usuarios
-    </div>
-  )
-}
+  return <div>Usuarios</div>;
+};
 
-export default Usuarios
+export default Usuarios;

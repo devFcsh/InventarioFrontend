@@ -1,13 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { Filtros } from '../types';
 
-type Filtros = {
-  perifericoId?: string;
-  marcaId?: string;
-  modeloId?: string;
-  serieId?: string;
-  inventario?: string;
-};
 
 export const useTotalEquipos = (
   filtros: Filtros,
