@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import NotFound from "./pages/NotFound";
-import Equipos from "./pages/Equipos";
-import Activos from "./pages/Activos";
-import Bajas from "./pages/Bajas";
+import Equipos from "./features/Equipos/Homepage/Equipos";
+import Activos from "./features/Equipos/Activos/Homepage/Activos";
+import Bajas from "./features/Equipos/Baja/Homepage/Bajas";
 import Login from "./pages/Login";
 import Layout from "./components/Layout";
-import Bodega from "./pages/Bodega";
+import Bodega from "./features/Equipos/Bodega/Homepage/Bodega";
 import Usuarios from "./pages/Usuarios";
-import Admin from "./pages/Admin";
+import Admin from "./features/Administrador/Homepage/Admin";
 import AgregarActivo from "./pages/AgregarActivo";
 import EditarActivo from "./pages/EditarActivo";
 

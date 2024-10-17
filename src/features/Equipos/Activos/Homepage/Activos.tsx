@@ -3,18 +3,18 @@ import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { Link, useLocation } from "react-router-dom";
-import ModalConfirmation from "../components/ModalConfirmation";
-import { Periferico, Marca, Modelo, Serie, Inventario } from "../types";
-import usePerifericos from "../hooks/usePerifericos";
-import useMarcasPorPeriferico from "../hooks/useMarcasPorPeriferico";
-import { useModelosPorMarcaPeriferico } from "../hooks/useModelosPorMarcaPeriferico";
-import { useSeriesPorModelo } from "../hooks/useSeriesPorModelo";
-import { useInventariosPorSerie } from "../hooks/useInventariosPorSerie";
-import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
-import { filas } from "../data";
-import { useTotalEquipos } from "../hooks/useTotalEquipos";
-import { useEliminarComputadoraActivo } from "../hooks/useEliminarComputadoraActivo";
-import { useDarDeBajaEquipo } from "../hooks/useDarDeBajaEquipo";
+import ModalConfirmation from "../../../../components/ModalConfirmation";
+import { Periferico, Marca, Modelo, Serie, Inventario } from "../../../../types";
+import usePerifericos from "../../../../hooks/usePerifericos";
+import useMarcasPorPeriferico from "../../../../hooks/useMarcasPorPeriferico";
+import { useModelosPorMarcaPeriferico } from "../../../../hooks/useModelosPorMarcaPeriferico";
+import { useSeriesPorModelo } from "../../../../hooks/useSeriesPorModelo";
+import { useInventariosPorSerie } from "../../../../hooks/useInventariosPorSerie";
+import { useEquiposFiltrados } from "../../../../hooks/useEquiposFiltrados";
+import { filas } from "../../../../data";
+import { useTotalEquipos } from "../../../../hooks/useTotalEquipos";
+import { useEliminarComputadoraActivo } from "../../../../hooks/useEliminarComputadoraActivo";
+import { useDarDeBajaEquipo } from "../../../../hooks/useDarDeBajaEquipo";
 
 const Activos = () => {
   const [selectedPeriferico, setSelectedPeriferico] =

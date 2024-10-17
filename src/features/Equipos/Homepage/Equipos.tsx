@@ -1,7 +1,7 @@
 import { useState } from "react";
-import Bajas from "./Bajas";
-import Bodega from "./Bodega";
-import Activos from "./Activos";
+import Bajas from "../Baja/Homepage/Bajas";
+import Bodega from "../Bodega/Homepage/Bodega";
+import Activos from "../Activos/Homepage/Activos";
 
 const Equipos = () => {
   const [selectedComponent, setSelectedComponent] = useState<string>("Activos");
