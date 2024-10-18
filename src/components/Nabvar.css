@@ -1,0 +1,12 @@
+.nav_fcsh{
+    background-color:#FED41D;
+}
+.element_nav{
+    padding: 20px;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 4rem;
+}
+
