@@ -5,7 +5,7 @@ import clienteAxios from './index';
 const useDiscos = () => {
   const [discos, setDiscos] = useState<Disco[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDiscos = async () => {
@@ -13,9 +13,9 @@ const useDiscos = () => {
       try {
         const response = await clienteAxios.get('/discos/');
         setDiscos(response.data);
-      } catch (err: any) {
-        setError(err);
-      } finally {
+      } catch (err) {
+        setError("Error al obtener discos" + err);
+            } finally {
         setLoading(false);
       }
     };

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { VersionSO } from '../types';
+import clienteAxios from '.';
 
 const useVersionesSO = (id_sistemaoperativo: string) => {
     const [versionesSO, setVersionesSO] = useState<VersionSO[]>([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<Error | null>(null);  
+    const [error, setError] = useState<string | null>(null);  
 
     useEffect(() => {
       if (!id_sistemaoperativo) return; 
@@ -12,11 +13,11 @@ const useVersionesSO = (id_sistemaoperativo: string) => {
       const fetchVersionesSO = async () => {
         setLoading(true);
         try {
-          const response = await fetch(`http://localhost:5000/api/versionesSO/${id_sistemaoperativo}`);
-          const data = await response.json();
-          setVersionesSO(data);
-        } catch (err: any) {
-          setError(err);
+          const response = await clienteAxios.get(`/versionesSO/${id_sistemaoperativo}`);
+
+          setVersionesSO(response.data);
+        } catch (err) {
+          setError("Error al obtener versiones de SO" + err);
         } finally {
           setLoading(false);
         }

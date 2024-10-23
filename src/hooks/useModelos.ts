@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Modelo } from '../types';
+import clienteAxios from '.';
 
 const useModelos = () => {
   const [modelos, setModelos] = useState<Modelo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);  
+  const [error, setError] = useState<string | null>(null);  
 
   useEffect(() => {
     const fetchModelos = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/modelos');
+        const response = await clienteAxios.get('/modelos/');        
         setModelos(response.data);
-      } catch (err: any) {
-        setError(err);
+      } catch (err) {
+        setError("Error al obtener modelos" + err);
       } finally {
         setLoading(false);
       }

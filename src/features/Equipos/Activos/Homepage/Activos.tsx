@@ -10,11 +10,11 @@ import useMarcasPorPeriferico from "../../../../hooks/useMarcasPorPeriferico";
 import { useModelosPorMarcaPeriferico } from "../../../../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../../../../hooks/useSeriesPorModelo";
 import { useInventariosPorSerie } from "../../../../hooks/useInventariosPorSerie";
-import { useEquiposFiltrados } from "../../../../hooks/useEquiposFiltrados";
+import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../../../../data";
-import { useTotalEquipos } from "../../../../hooks/useTotalEquipos";
-import { useEliminarComputadoraActivo } from "../../../../hooks/useEliminarComputadoraActivo";
-import { useDarDeBajaEquipo } from "../../../../hooks/useDarDeBajaEquipo";
+import { useTotalEquipos } from "../hooks/useTotalEquipos";
+import { useEliminarComputadoraActivo } from "../hooks/useEliminarComputadoraActivo";
+import { useDarDeBajaEquipo } from "../hooks/useDarDeBajaEquipo";
 
 const Activos = () => {
   const [selectedPeriferico, setSelectedPeriferico] =

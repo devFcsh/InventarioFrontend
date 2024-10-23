@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Marca } from '../types';
+import clienteAxios from '.';
 
 const useMarcas = () => {
   const [marcas, setMarcas] = useState<Marca[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);  
+  const [error, setError] = useState<string | null>(null);  
 
   useEffect(() => {
     const fetchMarcas = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/marcas');
+        const response = await clienteAxios.get('/marcas/')        
         setMarcas(response.data);
-      } catch (err: any) {
-        setError(err);
+      } catch (err) {
+        setError("Error al obtener marcas "+ err);
       } finally {
         setLoading(false);
       }

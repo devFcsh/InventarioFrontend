@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Modelo } from '../types';
+import clienteAxios from '.';
 
 export const useModelosPorMarcaPeriferico = (marcaId: string, perifericoId: string) => {
     const [modelos, setModelos] = useState<Modelo[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);  
+    const [error, setError] = useState<string | null>(null);  
 
     useEffect(() => {
         if (marcaId && perifericoId) {
             const fetchModelos = async () => {
                 try {
-                    const response = await axios.get('http://localhost:5000/api/modelos/modelosPorMarcaPeriferico', {
+                    const response = await clienteAxios.get('/modelos/', {
                         params: {
                             marcaId,
                             perifericoId
@@ -19,8 +19,8 @@ export const useModelosPorMarcaPeriferico = (marcaId: string, perifericoId: stri
                     });
                     console.log(response.data)
                     setModelos(response.data);
-                } catch (err: any) {
-                    setError(err);
+                } catch (err) {
+                    setError("Error al obtener modelos por marca periferico" + err);
                 } finally {
                     setLoading(false);
                 }

@@ -7,7 +7,7 @@ import Bajas from "./features/Equipos/Baja/Homepage/Bajas";
 import Login from "./pages/Login";
 import Layout from "./components/Layout";
 import Bodega from "./features/Equipos/Bodega/Homepage/Bodega";
-//import Usuarios from "./pages/Usuarios";
+import Usuarios from "./features/Usuarios/Homepage/Usuarios";
 import Admin from "./features/Administrador/Homepage/Admin";
 import AgregarActivo from "./pages/AgregarActivo";
 import EditarActivo from "./pages/EditarActivo";
@@ -37,7 +37,7 @@ const App: React.FC = () => {
               currentSection={currentSection}
               setCurrentSection={setCurrentSection}
             >
-
+              <Usuarios />
             </Layout>
           }
         />

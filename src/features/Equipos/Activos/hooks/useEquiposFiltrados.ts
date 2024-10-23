@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
-import { Equipo, Filtros } from "../types";
-
-
+import { Equipo, Filtros } from "../../../../types";
+import clienteAxios from "../../../../hooks";
 
 export const useEquiposFiltrados = (
   filtros: Filtros,
@@ -21,17 +19,16 @@ export const useEquiposFiltrados = (
       setError(null);
 
       try {
-        const { data } = await axios.get("http://localhost:5000/api/equipos", {
+        const { data } = await clienteAxios.get('/equipos/', {
           params: {
             ...filtros,
             limit: rowsPerPage,
             offset: (currentPage - 1) * rowsPerPage,
           },
         });
-        console.log(data)
         setEquipos(data);
       } catch (err) {
-        setError("Error al cargar los equipos");
+        setError("Error al cargar los equipos "+err);
       } finally {
         setLoading(false);
       }

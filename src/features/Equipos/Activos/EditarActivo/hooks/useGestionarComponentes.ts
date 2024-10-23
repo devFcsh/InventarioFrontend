@@ -1,8 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
-import { ComponenteData } from "../types";
-
-
+import { ComponenteData } from "../../../../../types";
+import clienteAxios from "../../../../../hooks";
 
 export const useGestionarComponentes = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -14,7 +12,7 @@ export const useGestionarComponentes = () => {
     setError(null);
 
     try {
-      const { data } = await axios.post("http://localhost:5000/api/equipos/gestionarComponentes", componenteData);
+      const { data } = await clienteAxios.post("/equipos/gestionarComponentes", componenteData);
       setMessage(data.message);
     } catch (err) {
       setError("Error al agregar los componentes");

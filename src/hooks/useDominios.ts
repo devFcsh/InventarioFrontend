@@ -1,20 +1,19 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Dominio } from '../types';
-
+import clienteAxios from '.';
 const useDominios = () => {
   const [dominios, setDominios] = useState<Dominio[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDominios = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:5000/api/dominios/');
+        const response = await clienteAxios.get('/dominios/');
         setDominios(response.data);
-      } catch (err: any) {
-        setError(err);
+      } catch (err) {
+        setError("Error al obtener dominios" + err);
       } finally {
         setLoading(false);
       }

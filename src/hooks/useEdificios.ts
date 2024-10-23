@@ -1,20 +1,19 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Edificio } from '../types';
-
+import clienteAxios from '.';
 const useEdificios = () => {
   const [edificios, setEdificios] = useState<Edificio[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchEdificios = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:5000/api/edificios/');
+        const response = await clienteAxios.get('/edificios/');
         setEdificios(response.data);
-      } catch (err: any) {
-        setError(err);
+      } catch (err) {
+        setError("Error al obtener edificios" + err);
       } finally {
         setLoading(false);
       }

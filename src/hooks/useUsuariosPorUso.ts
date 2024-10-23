@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Usuario } from '../types';
+import clienteAxios from '.';
 
 const useUsuariosPorUso = (idUso: string) => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);  
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);  
+  const [error, setError] = useState<string | null>(null);  
 
   useEffect(() => {
     if (!idUso) {
@@ -16,10 +16,10 @@ const useUsuariosPorUso = (idUso: string) => {
     const fetchUsuarios = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:5000/api/usuarios/usuariosPorUso/${idUso}`);
+        const response = await clienteAxios.get(`/usuarios/usuariosPorUso/${idUso}`);
         setUsuarios(response.data);
-      } catch (err: any) {
-        setError(err);
+      } catch (err) {
+        setError("Error al botener usuarios por uso" + err);
       } finally {
         setLoading(false);
       }

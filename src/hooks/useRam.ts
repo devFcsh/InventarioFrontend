@@ -1,20 +1,19 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { RAM } from '../types';
-
+import clienteAxios from '.';
 const useRam = () => {
   const [ram, setRam] = useState<RAM[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);  
+  const [error, setError] = useState<string | null>(null);  
 
   useEffect(() => {
     const fetchRam = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:5000/api/ram/');
+        const response = await clienteAxios.get('/ram/');
         setRam(response.data);
-      } catch (err: any) {
-        setError(err);
+      } catch (err) {
+        setError("Error al obtener RAM" + err);
       } finally {
         setLoading(false);
       }

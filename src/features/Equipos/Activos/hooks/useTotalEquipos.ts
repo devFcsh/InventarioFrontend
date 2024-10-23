@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
-import { Filtros } from '../types';
-
+import { Filtros } from '../../../../types';
+import clienteAxios from "../../../../hooks";
 
 export const useTotalEquipos = (
   filtros: Filtros,
@@ -18,7 +17,7 @@ export const useTotalEquipos = (
       setError(null);
 
       try {
-        const { data } = await axios.get("http://localhost:5000/api/equipos/totalEquipos", {
+        const { data } = await clienteAxios.get('/equipos/totalEquipos', {
           params: {
             ...filtros,
           },

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import clienteAxios from "../../../../hooks";
 
 export const useEliminarComputadoraActivo = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -17,10 +17,10 @@ export const useEliminarComputadoraActivo = () => {
     setSuccess(null);
 
     try {
-      await axios.delete(`http://localhost:5000/api/equipos/computadora/${idEquipo}`);
+      await clienteAxios.delete(`/equipos/computadora/${idEquipo}`)
       setSuccess(true);
     } catch (err) {
-      setError("Error al eliminar el equipo");
+      setError("Error al eliminar el equipo" + err);
     } finally {
       setLoading(false);
     }

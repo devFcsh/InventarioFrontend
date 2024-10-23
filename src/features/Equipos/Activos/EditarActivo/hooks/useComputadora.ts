@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Componente, EquipoEdit } from '../types';
+import { Componente, EquipoEdit } from '../../../../../types';
+import clienteAxios from '../../../../../hooks';
 
 
 export const useObtenerComputadora = (id: string) => {
   const [equipo, setEquipo] = useState<EquipoEdit | null>(null);
   const [componentes, setComponentes] = useState<Componente[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const obtenerComputadora = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/equipos/computadora/${id}`);
+        const response = await clienteAxios.get(`/equipos/computadora/${id}`);
         setEquipo(response.data.equipo);
         setComponentes(response.data.componentes.map((comp: any) => ({
           periferico: { nombre: comp.periferico },
@@ -22,8 +22,8 @@ export const useObtenerComputadora = (id: string) => {
           inventario: comp.inventario,
           id_componente: comp.id_componente || null,
         })));
-      } catch (err: any) {
-        setError(err);
+      } catch (err) {
+        setError("Error al obtener computadora" + err);
       } finally {
         setLoading(false);
       }

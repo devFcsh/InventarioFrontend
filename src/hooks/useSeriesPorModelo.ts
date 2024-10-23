@@ -1,22 +1,21 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Serie } from '../types';
+import clienteAxios from '.';
 
 export const useSeriesPorModelo = (perifericoId: string, marcaId:string, modeloId:string) => {
   const [series, setSeries] = useState<Serie[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);  
+  const [error, setError] = useState<string | null>(null);  
 
   useEffect(() => {
     const fetchSeries = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/series/seriesPorModelo', {
+        const response = await clienteAxios.get('/series/seriesPorModelo', {
           params: { perifericoId, marcaId, modeloId },
         });
-        console.log(response.data)
         setSeries(response.data);
-      } catch (err: any) {
-        setError(err);
+      } catch (err) {
+        setError("Error al obtener series por modelo " + err);
       } finally {
         setLoading(false);
       }

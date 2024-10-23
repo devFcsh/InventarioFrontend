@@ -14,23 +14,23 @@ import {
   Edificio,
   Antivirus,
   Componente,
-} from "../types";
-import useMarcasPorPeriferico from "../hooks/useMarcasPorPeriferico";
-import useDiscos from "../hooks/useDiscos";
-import useDominios from "../hooks/useDominios";
-import useRam from "../hooks/useRam";
-import useSistemasOperativos from "../hooks/useSistemasOperativos";
-import useVersionesSO from "../hooks/useVersionesSO";
-import useVersionesOffice from "../hooks/useVersionesOffice";
-import useEdificios from "../hooks/useEdificios";
-import useAulas from "../hooks/useAulas";
-import { antivirus, protocolos } from "../data";
+} from "../../../../../types";
+import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
+import useDiscos from "../../../../../hooks/useDiscos";
+import useDominios from "../../../../../hooks/useDominios";
+import useRam from "../../../../../hooks/useRam";
+import useSistemasOperativos from "../../../../../hooks/useSistemasOperativos";
+import useVersionesSO from "../../../../../hooks/useVersionesSO";
+import useVersionesOffice from "../../../../../hooks/useVersionesOffice";
+import useEdificios from "../../../../../hooks/useEdificios";
+import useAulas from "../../../../../hooks/useAulas";
+import { antivirus, protocolos } from "../../../../../data";
 import { Icon } from "@iconify/react";
-import { useModelosPorMarcaPeriferico } from "../hooks/useModelosPorMarcaPeriferico";
-import { useSeriesPorModelo } from "../hooks/useSeriesPorModelo";
-import usePerifericos from "../hooks/usePerifericos";
+import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
+import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
+import usePerifericos from "../../../../../hooks/usePerifericos";
+import useSubirImagen from "../../../../../hooks/useSubirImagen";
 import useEditarActivo from "../hooks/useEditarActivo";
-import axios from "axios";
 import { useGestionarComponentes } from "../hooks/useGestionarComponentes";
 
 interface EditarComputadoraActivoProps {
@@ -84,6 +84,7 @@ const EditarComputadoraActivo = ({
     inventario: "",
   });
 
+  const { uploadImage } = useSubirImagen();
   const { marcas } = useMarcasPorPeriferico(equipo?.id_periferico ?? "");
   const { modelos } = useModelosPorMarcaPeriferico(
     selectedInventarioMarca?.id_marca ?? "",
@@ -227,25 +228,13 @@ const EditarComputadoraActivo = ({
   };
 
   const handleEditEquipo = async () => {
-    let nuevaImagen = currentImagePath; 
+    let nuevaImagen = currentImagePath;
+    
     if (image) {
-      const formData = new FormData();
-      formData.append("image", image);
       try {
-        const { data } = await axios.post(
-          "http://localhost:5000/api/equipos/upload",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        nuevaImagen = data.imagePath;
-        setCurrentImagePath(nuevaImagen);
+        nuevaImagen = await uploadImage(image);
       } catch (error) {
-        console.error("Error al cargar la imagen:", error);
-        alert("Error al cargar la imagen.");
+        alert('Error al cargar la imagen.');
         return;
       }
     }

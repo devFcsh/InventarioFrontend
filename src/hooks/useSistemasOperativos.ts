@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { SistemaOperativo } from '../types';
+import clienteAxios from '.';
 
 const useSistemasOperativos = () => {
   const [sistemasOperativos, setSistemasOperativos] = useState<SistemaOperativo[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);  
+  const [error, setError] = useState<string | null>(null);  
 
   useEffect(() => {
     const fetchSistemaOperativo = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:5000/api/sistemasoperativos/');
+        const response = await clienteAxios.get('/sistemasoperativos/');
         setSistemasOperativos(response.data);
-      } catch (err: any) {
-        setError(err);
+      } catch (err) {
+        setError("Error el obtener sistemas operativos" + err);
       } finally {
         setLoading(false);
       }

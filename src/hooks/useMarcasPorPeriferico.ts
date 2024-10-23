@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Marca } from "../types";
+import clienteAxios from '.';
 
 const useMarcasPorPeriferico = (selectedPeriferico: string) => {
   const [marcas, setMarcas] = useState<Marca[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!selectedPeriferico) {
@@ -16,10 +16,10 @@ const useMarcasPorPeriferico = (selectedPeriferico: string) => {
     const fetchMarcas = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:5000/api/marcas/marcasPorPeriferico/${selectedPeriferico}`);
+        const response = await clienteAxios.get(`/marcas/marcasPorPeriferico/${selectedPeriferico}`);        
         setMarcas(response.data);
-      } catch (err: any) {
-        setError(err);
+      } catch (err) {
+        setError("Error al obtener marcas por periferico" + err);
       } finally {
         setLoading(false);
       }

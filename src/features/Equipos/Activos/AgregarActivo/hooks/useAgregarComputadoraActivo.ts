@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
-import { EquipoData } from '../types';
+import { EquipoData } from '../../../../../types';
+import clienteAxios from "../../../../../hooks";
 
 export const useAgregarComputadoraActivo = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -12,11 +12,11 @@ export const useAgregarComputadoraActivo = () => {
     setError(null);
 
     try {
-      const { data } = await axios.post("http://localhost:5000/api/equipos/agregarActivoComputadora", equipoData);
+      const { data } = await clienteAxios.post("/equipos/agregarActivoComputadora", equipoData);
       setMessage(data.message);
       return data.equipoId; 
     } catch (err) {
-      setError("Error al agregar el equipo");
+      setError("Error al agregar el equipo "+err);
       throw err;
     } finally {
       setLoading(false);

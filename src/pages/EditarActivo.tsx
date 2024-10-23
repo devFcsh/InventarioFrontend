@@ -1,11 +1,11 @@
 import { Autocomplete, TextField, CircularProgress } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import EditarComputadoraActivo from "../components/EditarComputadoraActivo";
+import EditarComputadoraActivo from "../features/Equipos/Activos/EditarActivo/pages/EditarComputadoraActivo";
 import { Periferico, Uso, Usuario } from "../types";
 import useUsos from "../hooks/useUsos";
 import useUsuariosPorUso from "../hooks/useUsuariosPorUso";
-import { useObtenerComputadora } from "../hooks/useComputadora";
+import { useObtenerComputadora } from "../features/Equipos/Activos/EditarActivo/hooks/useComputadora";
 
 const computadores: string[] = ["Laptop", "Computadora"];
 

@@ -1,6 +1,6 @@
 import { Autocomplete, TextField } from "@mui/material";
 import { useState } from "react";
-import AgregarComputadoraActivo from "../components/AgregarComputadoraActivo";
+import AgregarComputadoraActivo from "../features/Equipos/Activos/AgregarActivo/pages/AgregarComputadoraActivo";
 import { useLocation } from "react-router-dom";
 import { Periferico, Uso, Usuario } from "../types";
 import useUsos from "../hooks/useUsos";

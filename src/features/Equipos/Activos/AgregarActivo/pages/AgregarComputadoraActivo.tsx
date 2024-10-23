@@ -6,9 +6,8 @@ import {
   Alert,
 } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
-import { useModelosPorMarcaPeriferico } from "../hooks/useModelosPorMarcaPeriferico";
-import { useSeriesPorModelo } from "../hooks/useSeriesPorModelo";
-import axios from "axios";
+import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
+import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
 import {
   Marca,
   Modelo,
@@ -24,23 +23,24 @@ import {
   Aula,
   Edificio,
   Antivirus,
-} from "../types";
-import useMarcasPorPeriferico from "../hooks/useMarcasPorPeriferico";
-import usePerifericos from "../hooks/usePerifericos";
-import useDiscos from "../hooks/useDiscos";
-import useDominios from "../hooks/useDominios";
-import useRam from "../hooks/useRam";
-import useSistemasOperativos from "../hooks/useSistemasOperativos";
-import useVersionesSO from "../hooks/useVersionesSO";
-import { antivirus, protocolos } from "../data";
+} from "../../../../../types";
+import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
+import usePerifericos from "../../../../../hooks/usePerifericos";
+import useDiscos from "../../../../../hooks/useDiscos";
+import useDominios from "../../../../../hooks/useDominios";
+import useRam from "../../../../../hooks/useRam";
+import useSistemasOperativos from "../../../../../hooks/useSistemasOperativos";
+import useVersionesSO from "../../../../../hooks/useVersionesSO";
+import { antivirus, protocolos } from "../../../../../data";
 import { Icon } from "@iconify/react";
-import useVersionesOffice from "../hooks/useVersionesOffice";
-import useEdificios from "../hooks/useEdificios";
-import useAulas from "../hooks/useAulas";
+import useVersionesOffice from "../../../../../hooks/useVersionesOffice";
+import useEdificios from "../../../../../hooks/useEdificios";
+import useAulas from "../../../../../hooks/useAulas";
+import ModalConfirmation from "../../../../../components/ModalConfirmation";
+import { useNavigate } from "react-router-dom";
+import useSubirImagen from "../../../../../hooks/useSubirImagen";
 import { useAgregarComputadoraActivo } from "../hooks/useAgregarComputadoraActivo";
 import { useAgregarComponentes } from "../hooks/useAgregarComponentes";
-import ModalConfirmation from "./ModalConfirmation";
-import { useNavigate } from "react-router-dom";
 
 interface AgregarComputadoraActivoProps {
   periferico: string;
@@ -133,6 +133,7 @@ const AgregarComputadoraActivo = ({
     nuevoComponente.modelo?.id_modelo ?? ""
   );
 
+  const { uploadImage } = useSubirImagen();
   const { versionesOffice } = useVersionesOffice();
   const { edificios } = useEdificios();
   const { aulas } = useAulas(selectedEdificio?.id_edificio ?? "");
@@ -186,22 +187,9 @@ const AgregarComputadoraActivo = ({
 
     let imagePath = "";
     if (image) {
-      const formData = new FormData();
-      formData.append("image", image);
-
       try {
-        const { data } = await axios.post(
-          "http://localhost:5000/api/equipos/upload",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-        imagePath = data.imagePath;
+        imagePath = await uploadImage(image);
       } catch (error) {
-        console.error("Error al cargar la imagen:", error);
         alert("Error al cargar la imagen.");
         return;
       }
