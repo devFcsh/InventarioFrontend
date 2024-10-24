@@ -105,6 +105,9 @@ const Activos = () => {
     if (location.state && location.state.equipoAgregado) {
       setSnackbarMessage("¡Equipo agregado con éxito!");
       setOpenSnackbar(true);
+    } else if (location.state && location.state.equipoEditado) {
+      setSnackbarMessage("¡Equipo editado con éxito!");
+      setOpenSnackbar(true);
     }
   }, [location.state]);
 

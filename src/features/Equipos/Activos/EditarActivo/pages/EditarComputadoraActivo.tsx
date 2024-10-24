@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Autocomplete, TextField, Button } from "@mui/material";
+import { Autocomplete, TextField, Button, Snackbar, Alert } from "@mui/material";
 import {
   Marca,
   Modelo,
@@ -32,6 +32,8 @@ import usePerifericos from "../../../../../hooks/usePerifericos";
 import useSubirImagen from "../../../../../hooks/useSubirImagen";
 import useEditarActivo from "../hooks/useEditarActivo";
 import { useGestionarComponentes } from "../hooks/useGestionarComponentes";
+import ModalConfirmation from "../../../../../components/ModalConfirmation";
+import { useNavigate } from "react-router-dom";
 
 interface EditarComputadoraActivoProps {
   equipo: any;
@@ -57,6 +59,12 @@ const EditarComputadoraActivo = ({
   const [selectedVersionSO, setSelectedVersionSO] = useState<VersionSO | null>(
     null
   );
+  const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(null);
+  const [openModalEditar, setOpenModalEditar] = useState(false);
+  const [openModalCancelar, setOpenModalCancelar] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  const navigate = useNavigate();
   const [selectedRAM, setSelectedRAM] = useState<RAM | null>(null);
   const [selectedDisco, setSelectedDisco] = useState<Disco | null>(null);
   const [selectedDominio, setSelectedDominio] = useState<Dominio | null>(null);
@@ -269,15 +277,75 @@ const EditarComputadoraActivo = ({
           usuarioId: parseInt(idUsuario ?? "", 10),
           imagenRuta: nuevaImagen ?? "",
         });
-        alert("Equipo actualizado con éxito");
+        setShowSuccessMessage(true);
+        navigate("/equipos", { state: { equipoEditado: true } });
       }
     } catch (error) {
       console.error("Error al actualizar equipo:", error);
     }
   };
 
+  const handleConfirmEditarEquipo = () => {
+    if (validarCamposEquipo()) {
+      setOpenModalEditar(true);
+    }
+  };
+
+  const handleModalConfirmEditar = async () => {
+    setOpenModalEditar(false);
+    await handleEditEquipo();
+  };
+
+  const handleCancelar = () => {
+    setOpenModalCancelar(false);
+    navigate("/equipos");
+  };
+
+  const handleConfirmCancelar = () => {
+    setOpenModalCancelar(true);
+  };
+  const validarCamposEquipo = () => {
+    if (
+      !selectedInventarioInv ||
+      !selectedInventarioSerie ||
+      !nombreEquipo ||
+      !selectedVersionSO ||
+      !selectedVersionOffice ||
+      !selectedRAM ||
+      !selectedDisco ||
+      !selectedDominio ||
+      !selectedAula
+    ) {
+      setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
+      return false;
+    }
+    setErrorMensajeEquipo(null);
+    return true;
+  };
+
   return (
     <div>
+      <ModalConfirmation
+        open={openModalEditar}
+        onClose={() => setOpenModalEditar(false)}
+        onConfirm={handleModalConfirmEditar}
+        title="Confirmar Editar Equipo"
+        message="¿Está seguro de que desea editar este equipo?"
+      />
+       <ModalConfirmation
+        open={openModalCancelar}
+        onClose={() => setOpenModalCancelar(false)}
+        onConfirm={handleCancelar}
+        title="Confirmar Cancelar"
+        message="¿Está seguro de que desea cancelar? Todos los cambios no guardados se perderán."
+      />
+      <Snackbar
+        open={showSuccessMessage}
+        autoHideDuration={3000}
+        onClose={() => setShowSuccessMessage(false)}
+      >
+        <Alert severity="success">Equipo agregado exitosamente</Alert>
+      </Snackbar>
       <h2 className="text-xl font-semibold mb-5">Información de Inventario</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <Autocomplete
@@ -685,15 +753,18 @@ const EditarComputadoraActivo = ({
         <Button
           variant="contained"
           color="primary"
-          onClick={handleEditEquipo}
+          onClick={handleConfirmEditarEquipo}
           fullWidth
         >
           Editar Activo
         </Button>
-        <Button variant="outlined" color="primary" onClick={() => {}} fullWidth>
+        <Button variant="outlined" color="primary" onClick={handleConfirmCancelar} fullWidth>
           Cancelar
-        </Button>
+        </Button>   
       </div>
+      {errorMensajeEquipo && (
+        <div className="text-red-500 mt-2">{errorMensajeEquipo}</div>
+      )}
     </div>
   );
 };
