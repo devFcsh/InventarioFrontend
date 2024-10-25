@@ -235,7 +235,7 @@ const AgregarComputadoraActivo = ({
 
       setShowSuccessMessage(true);
       limpiarCampos();
-      navigate("/equipos", { state: { equipoAgregado: true } });
+      navigate("/activos", { state: { equipoAgregado: true } });
     } catch (error) {
       console.error("Error al agregar el equipo y componentes:", error);
       alert("Error al agregar el equipo y componentes.");
@@ -247,7 +247,7 @@ const AgregarComputadoraActivo = ({
   const handleCancelar = () => {
     limpiarCampos();
     setOpenModalCancelar(false);
-    navigate("/equipos");
+    navigate("/activos");
   };
 
   const limpiarCampos = () => {

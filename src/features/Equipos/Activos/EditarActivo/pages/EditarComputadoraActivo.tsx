@@ -278,7 +278,7 @@ const EditarComputadoraActivo = ({
           imagenRuta: nuevaImagen ?? "",
         });
         setShowSuccessMessage(true);
-        navigate("/equipos", { state: { equipoEditado: true } });
+        navigate("/activos", { state: { equipoEditado: true } });
       }
     } catch (error) {
       console.error("Error al actualizar equipo:", error);
@@ -298,7 +298,7 @@ const EditarComputadoraActivo = ({
 
   const handleCancelar = () => {
     setOpenModalCancelar(false);
-    navigate("/equipos");
+    navigate("/activos");
   };
 
   const handleConfirmCancelar = () => {
