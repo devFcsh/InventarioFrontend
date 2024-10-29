@@ -4,7 +4,7 @@ const Login = () => {
   return (
     <>
       <div>Login</div>
-      <Link to={"/equipos"} className="bg-bluebtn text-white">
+      <Link to={"/activos"} className="bg-bluebtn text-white">
         Ingresar
       </Link>
     </>
