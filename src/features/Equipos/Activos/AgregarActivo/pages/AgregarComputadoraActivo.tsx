@@ -12,7 +12,6 @@ import {
   Marca,
   Modelo,
   Serie,
-  Componente,
   Periferico,
   SistemaOperativo,
   VersionSO,
@@ -24,6 +23,7 @@ import {
   Edificio,
   Antivirus,
 } from "../../../../../types";
+import { Componente } from "../../../../../types/Activo/Componente";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import usePerifericos from "@hooks/usePerifericos";
 import useDiscos from "@hooks/useDiscos";

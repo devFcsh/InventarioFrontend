@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Componente, EquipoEdit } from '../../../../../types';
+import { Componente } from '../../../../../types/Activo/Componente';
+import { ActivoComputadoraEdit } from '../../../../../types/Activo';
+
 import clienteAxios from '../../../../../hooks';
 
 
 export const useObtenerComputadora = (id: string) => {
-  const [equipo, setEquipo] = useState<EquipoEdit | null>(null);
+  const [equipo, setEquipo] = useState<ActivoComputadoraEdit | null>(null);
   const [componentes, setComponentes] = useState<Componente[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +16,7 @@ export const useObtenerComputadora = (id: string) => {
       try {
         const response = await clienteAxios.get(`/equipos/computadora/${id}`);
         setEquipo(response.data.equipo);
-        setComponentes(response.data.componentes.map((comp: any) => ({
+        setComponentes(response.data.componentes.map((comp: Componente) => ({
           periferico: { nombre: comp.periferico },
           marca: { nombre: comp.marca },
           modelo: { nombre: comp.modelo },

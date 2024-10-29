@@ -5,7 +5,7 @@ const useEditarActivo = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const editarActivo = async (equipoId: number, payload: any) => {
+  const editarActivo = async (equipoId: string, payload: any) => {
     setLoading(true);
     try {
       const response = await clienteAxios.put(`/equipos/editarEquipo/${equipoId}`, payload, {

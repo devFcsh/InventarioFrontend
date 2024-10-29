@@ -8,6 +8,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { NavBarItems } from "./NavBarItems";
 import { Drawer as MuiDrawer } from '@mui/material';
 import { NavBarProps } from "../PropsInterface";
+import { Link } from "react-router-dom";
 
 export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSection }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -19,8 +20,10 @@ export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSectio
           <IconButton onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
             <MenuIcon />
           </IconButton>
-          <div className="w-40 h-auto overflow-hidden">
-            <img className="w-full h-full object-cover" src={logoFCSH} alt="LogoFCSH" />
+          <div className="w-60 h-auto overflow-hidden">
+            <Link to={"/activos"}>
+            < img className="w-full h-full object-cover" src={logoFCSH} alt="LogoFCSH" />
+            </Link>
           </div>
         </div>
         <div className="flex items-center gap-8 text-sm font-medium text-black">
@@ -29,7 +32,9 @@ export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSectio
             <p>Jorge Navarrete</p>
           </div>
           <div className="flex items-center gap-1 cursor-pointer">
-            <LogoutIcon />
+            <Link to={"/"}>
+              <LogoutIcon />
+            </Link>
             <p>Salir</p>
           </div>
         </div>

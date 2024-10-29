@@ -22,27 +22,6 @@ export type Inventario = {
   inventario: string;
 };
 
-
-export type Equipo = {
-  id_equipo: string;
-  periferico: string;
-  marca: string;
-  modelo: string;
-  serie: string;
-  inventario: string;
-  usuario: string;
-  uso: string;
-  edificio: string;
-};
-
-export type EquipoEdit = {
-  id_equipo: string;
-  id_periferico: string;
-  inventario: string;
-  id_usuario: string;
-  id_uso: string;
-};
-
 export type Uso = {
   id_uso: string;
   nombre: string;
@@ -51,15 +30,6 @@ export type Uso = {
 export type Usuario = {
   id_usuario: string;
   nombre: string;
-};
-
-export type Componente = {
-  id_componente?: string
-  periferico: Periferico;
-  marca: Marca;
-  modelo: Modelo;
-  serie: Serie;
-  inventario: string;
 };
 
 export type SistemaOperativo = {
@@ -102,13 +72,6 @@ export type Clasificacion = {
   id_clasificacion: string;
 };
 
-export type EquipoActivo = {
-  id_activo: string;
-  edificio: string;
-  aula: string;
-  id_usuario: string;
-};
-
 export type EquipoBodega = {
   id_eqbodega: string;
 };
@@ -135,35 +98,6 @@ export type Edificio = {
 export type Aula = {
   id_aula: string;
   nombre: string;
-};
-
-export type ComponenteData = {
-  equipoId: number;
-  componentes: {
-    inventario: string;
-    serieId: number;
-  }[];
-  aulaId: number;
-  usuarioId: number;
-  imagenRuta: string;
-};
-
-
-export type EquipoData = {
-  tipo: string;
-  inventario: string;
-  serie: number;
-  nombreEquipo?: string; 
-  direccionIp?: string; 
-  versionso?: number;    
-  versionoffice?: number; 
-  ram?: number;          
-  disco?: number;       
-  antivirus?: number;   
-  dominio?: number;      
-  idAula: number;
-  idUsuario: number;
-  imagenRuta: string;
 };
 
 export type Filtros = {

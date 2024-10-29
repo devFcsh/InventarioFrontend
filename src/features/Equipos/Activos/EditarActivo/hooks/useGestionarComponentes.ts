@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ComponenteData } from "../../../../../types";
+import { ComponenteData } from "../../../../../types/Activo/Componente";
 import clienteAxios from "../../../../../hooks";
 
 export const useGestionarComponentes = () => {

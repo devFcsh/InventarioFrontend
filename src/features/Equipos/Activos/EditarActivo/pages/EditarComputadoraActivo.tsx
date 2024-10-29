@@ -13,8 +13,9 @@ import {
   Aula,
   Edificio,
   Antivirus,
-  Componente,
 } from "../../../../../types";
+import { ActivoComputadoraEdit } from "../../../../../types/Activo";
+import { Componente } from "../../../../../types/Activo/Componente";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
 import useDiscos from "../../../../../hooks/useDiscos";
 import useDominios from "../../../../../hooks/useDominios";
@@ -36,7 +37,7 @@ import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 
 interface EditarComputadoraActivoProps {
-  equipo: any;
+  equipo: ActivoComputadoraEdit;
   idUsuario: string | null;
   componentes: Componente[];
 }
@@ -267,7 +268,7 @@ const EditarComputadoraActivo = ({
 
       if (componentesState.length > 0 && equipo.id_equipo) {
         await gestionarComponentes({
-          equipoId: equipo.id_equipo,
+          equipoId: Number(equipo.id_equipo),
           componentes: componentesState.map((comp) => ({
             id_componente: comp.id_componente,
             inventario: comp.inventario,

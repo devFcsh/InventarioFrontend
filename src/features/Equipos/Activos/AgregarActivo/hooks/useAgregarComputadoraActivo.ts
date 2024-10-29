@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { EquipoData } from '../../../../../types';
+import { ActivoComputadoraData } from '../../../../../types/Activo';
 import clienteAxios from "../../../../../hooks";
 
 export const useAgregarComputadoraActivo = () => {
@@ -7,7 +7,7 @@ export const useAgregarComputadoraActivo = () => {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const agregarComputadoraActivo = async (equipoData: EquipoData): Promise<number | undefined> => {
+  const agregarComputadoraActivo = async (equipoData: ActivoComputadoraData): Promise<number | undefined> => {
     setLoading(true);
     setError(null);
 
