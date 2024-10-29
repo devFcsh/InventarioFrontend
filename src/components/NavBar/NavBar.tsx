@@ -7,10 +7,10 @@ import { IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { NavBarItems } from "./NavBarItems";
 import { Drawer as MuiDrawer } from '@mui/material';
+import { NavBarProps } from "../PropsInterface";
 
-export const NavBar = () => {
+export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSection }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [currentSection, setCurrentSection] = useState("");
 
   return (
     <div>
@@ -46,7 +46,11 @@ export const NavBar = () => {
           }
         }}
       >
-        <NavBarItems currentSection={currentSection} setCurrentSection={setCurrentSection} isDrawerOpen={isDrawerOpen} setIsDrawerOpen={setIsDrawerOpen} />
+        <NavBarItems 
+          currentSection={currentSection} 
+          setCurrentSection={setCurrentSection} 
+          setIsDrawerOpen={setIsDrawerOpen} 
+        />
       </MuiDrawer>
     </div>
   );

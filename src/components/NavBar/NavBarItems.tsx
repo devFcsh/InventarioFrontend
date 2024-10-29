@@ -6,7 +6,7 @@ import ComputerIcon from '@mui/icons-material/Computer';
 import PersonIcon from '@mui/icons-material/Person';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import {NavBarPropsInterface}from './NavBarPropsInterface';
+import { NavBarItemsProps } from "../PropsInterface";
 
 const sections = [
     { name: 'Equipos', icon: <ComputerIcon />, subtypes: [
@@ -19,7 +19,7 @@ const sections = [
 ];
 
 
-export const NavBarItems = ({ currentSection, setCurrentSection, setIsDrawerOpen}:NavBarPropsInterface) => {
+export const NavBarItems: React.FC<NavBarItemsProps> = ({ currentSection, setCurrentSection, setIsDrawerOpen }) => {
     const [openEquipos, setOpenEquipos] = useState(false);
     const navigate = useNavigate();
     const handleNavClick = (section: string) => {

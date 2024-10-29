@@ -1,11 +1,7 @@
 import React from "react";
-import { NavBar } from "./NavBar/Navbar";
+import { NavBar } from "./NavBar/NavBar.tsx";
+import { LayoutProps } from "./PropsInterface.ts";
 
-interface LayoutProps {
-  children: React.ReactNode;
-  currentSection: string;
-  setCurrentSection: (section: string) => void;
-}
 
 const Layout: React.FC<LayoutProps> = ({
   children,
