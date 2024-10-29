@@ -6,8 +6,8 @@ import {
   Alert,
 } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
-import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
-import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
+import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
+import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import {
   Marca,
   Modelo,
@@ -24,21 +24,21 @@ import {
   Edificio,
   Antivirus,
 } from "../../../../../types";
-import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
-import usePerifericos from "../../../../../hooks/usePerifericos";
-import useDiscos from "../../../../../hooks/useDiscos";
-import useDominios from "../../../../../hooks/useDominios";
-import useRam from "../../../../../hooks/useRam";
-import useSistemasOperativos from "../../../../../hooks/useSistemasOperativos";
-import useVersionesSO from "../../../../../hooks/useVersionesSO";
+import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
+import usePerifericos from "@hooks/usePerifericos";
+import useDiscos from "@hooks/useDiscos";
+import useDominios from "@hooks/useDominios";
+import useRam from "@hooks/useRam";
+import useSistemasOperativos from "@hooks/useSistemasOperativos";
+import useVersionesSO from "@hooks/useVersionesSO";
 import { antivirus, protocolos } from "../../../../../data";
 import { Icon } from "@iconify/react";
-import useVersionesOffice from "../../../../../hooks/useVersionesOffice";
-import useEdificios from "../../../../../hooks/useEdificios";
-import useAulas from "../../../../../hooks/useAulas";
+import useVersionesOffice from "@hooks/useVersionesOffice";
+import useEdificios from "@hooks/useEdificios";
+import useAulas from "@hooks/useAulas";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
-import useSubirImagen from "../../../../../hooks/useSubirImagen";
+import useSubirImagen from "@hooks/useSubirImagen";
 import { useAgregarComputadoraActivo } from "../hooks/useAgregarComputadoraActivo";
 import { useAgregarComponentes } from "../hooks/useAgregarComponentes";
 
