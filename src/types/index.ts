@@ -108,3 +108,8 @@ export type Filtros = {
   inventario?: string;
 };
 
+export type FiltrosUsuario = {
+  usoId?: string;
+  usuarioId?: string;
+};
+
