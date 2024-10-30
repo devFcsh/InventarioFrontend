@@ -23,7 +23,7 @@ import {
   Edificio,
   Antivirus,
 } from "../../../../../types";
-import { Componente } from "../../../../../types/Activo/Componente";
+import { Componente } from "../../../../../types/Activo/Componente/index.ts";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import usePerifericos from "@hooks/usePerifericos";
 import useDiscos from "@hooks/useDiscos";
