@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { Link, useLocation } from "react-router-dom";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
+import {ModalAgregarActivo} from "../../../../features/Equipos/Activos/AgregarActivo/pages/ModalAgregarActivo.tsx";
 import { Periferico, Marca, Modelo, Serie, Inventario } from "../../../../types";
 import usePerifericos from "../../../../hooks/usePerifericos";
 import useMarcasPorPeriferico from "../../../../hooks/useMarcasPorPeriferico";
@@ -28,6 +29,7 @@ const Activos = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openModal, setOpenModal] = useState<boolean>(false);
+  const [openModalActivos, setOpenModalActivos] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
@@ -38,6 +40,14 @@ const Activos = () => {
   }>({
     title: "Confirmar",
     message: "¿Estás seguro de que deseas realizar esta acción?",
+  });
+
+  const [modalContentActivos, setModalContentActivos] = useState<{
+    title: string;
+    message: string;
+  }>({
+    title: "Agregar Activos",
+    message: "Seleccione el periférico a registrar",
   });
 
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
@@ -195,6 +205,8 @@ const Activos = () => {
     setConfirmAction(() => () => action(id));
     setOpenModal(true);
   };
+  const handleOpenActivos = () => setOpenModalActivos(true);
+  const handleCloseActivos = () => setOpenModalActivos(false);
 
   const handleBaja = () => {
     setModalContent({
@@ -349,14 +361,22 @@ const Activos = () => {
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>
-          <Link to={{ pathname: "/agregarActivo" }} state={{ perifericos }}>
-            <Icon
-              icon="gridicons:add"
-              width="30"
-              height="30"
-              className="text-green-900 hover:text-green-950"
-            />
-          </Link>
+          
+          <Icon
+            icon="gridicons:add"
+            width="30"
+            height="30"
+            className="text-green-900 hover:text-green-950"
+            onClick={handleOpenActivos}
+          />
+          <ModalAgregarActivo
+            open={openModalActivos}
+            onClose={handleCloseActivos}
+            onConfirm={handleConfirm}
+            title={modalContentActivos.title}
+            message={modalContentActivos.message}
+          />
+
         </div>
         <div className="flex flex-wrap gap-4 my-10">
           <Autocomplete
