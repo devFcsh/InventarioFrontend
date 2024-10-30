@@ -1,46 +1,45 @@
 import { useState, useEffect } from "react";
 import { Filtros } from "../../../../types";
-import { EquipoBodega } from "../../../../types/Equipo";
+import { EquipoBaja } from "../../../../types/Equipo";
 
 import clienteAxios from "../../../../hooks";
 
-export const useEquiposBodegaFiltrados = (
+export const useEquiposBajaFiltrados = (
   filtros: Filtros,
   currentPage: number,
   rowsPerPage: number,
   shouldFetch: boolean
 ) => {
-  const [equiposBodega, setEquiposBodega] = useState<EquipoBodega[]>([]);
+  const [equiposBaja, setEquiposBaja] = useState<EquipoBaja[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState<number>(0);
 
   useEffect(() => {
-    const fetchEquiposBodega = async () => {
+    const fetchEquiposBaja = async () => {
       if (!shouldFetch) return; 
       setLoading(true);
       setError(null);
 
       try {
-        const { data } = await clienteAxios.get('/equipos/bodega/', {
+        const { data } = await clienteAxios.get('/equipos/baja/', {
           params: {
             ...filtros,
             limit: rowsPerPage,
             offset: (currentPage - 1) * rowsPerPage,
           },
         });
-        setEquiposBodega(data.equipos);
+        setEquiposBaja(data.equipos);
         setTotalCount(data.total); 
       } catch (err) {
-        setError("Error al cargar los equipos "+err);
+        setError("Error al cargar los equipos: " + err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchEquiposBodega();
+    fetchEquiposBaja();
   }, [filtros, currentPage, rowsPerPage, shouldFetch]);
 
-  return { equiposBodega, loading, error, totalCount };
-
+  return { equiposBaja, loading, error, totalCount };
 };

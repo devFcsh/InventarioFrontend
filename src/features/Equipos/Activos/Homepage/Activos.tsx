@@ -13,7 +13,6 @@ import { useSeriesPorModelo } from "../../../../hooks/useSeriesPorModelo";
 import { useInventariosPorSerie } from "../../../../hooks/useInventariosPorSerie";
 import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../../../../data";
-import { useTotalEquipos } from "../hooks/useTotalEquipos";
 import { useEliminarComputadoraActivo } from "../hooks/useEliminarComputadoraActivo";
 import { useDarDeBajaEquipo } from "../hooks/useDarDeBajaEquipo";
 
@@ -85,21 +84,20 @@ const Activos = () => {
 
   const { eliminarEquipo } = useEliminarComputadoraActivo();
   const { darDeBajaEquipo } = useDarDeBajaEquipo();
-  const { equipos, loading, error } = useEquiposFiltrados(
+  const { equipos, totalCount, loading, error } = useEquiposFiltrados(
     filtros,
     currentPage,
     rowsPerPage,
     shouldFetch
   );
-  const { totalEquipos } = useTotalEquipos(filtros, shouldFetch);
 
   useEffect(() => {
-    if (totalEquipos > 0 && rowsPerPage > 0) {
-      setTotalPages(Math.ceil(totalEquipos / rowsPerPage));
+    if (totalCount > 0 && rowsPerPage > 0) {
+      setTotalPages(Math.ceil(totalCount / rowsPerPage));
     } else {
       setTotalPages(1);
     }
-  }, [totalEquipos, rowsPerPage]);
+  }, [totalCount, rowsPerPage]);
 
   useEffect(() => {
     if (shouldFetch) {
