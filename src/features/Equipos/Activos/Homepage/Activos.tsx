@@ -15,6 +15,7 @@ import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../../../../data";
 import { useEliminarComputadoraActivo } from "../hooks/useEliminarComputadoraActivo";
 import { useDarDeBajaEquipo } from "../hooks/useDarDeBajaEquipo";
+import { Periferico } from '..';
 
 const Activos = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
@@ -372,7 +373,7 @@ const Activos = () => {
             onClose={handleCloseActivos}
             onConfirm={handleConfirm}
             title={modalContentActivos.title}
-            message={modalContentActivos.message}
+            perifericos={perifericos}
           />
 
         </div>
