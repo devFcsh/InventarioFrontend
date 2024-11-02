@@ -9,11 +9,11 @@ import {
 } from "@mui/material";
 import {Autocomplete, TextField, Box} from '@mui/material';
 import { Periferico } from "../../../../../types/index";
+import { useNavigate } from "react-router-dom";
 
 interface ModalConfirmationProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: () => void;
   title?: string;
   perifericos: Periferico[];
 }
@@ -21,27 +21,39 @@ interface ModalConfirmationProps {
 export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
   open,
   onClose,
-  onConfirm,
   title = "Agregar activo",
   perifericos = []
 }) => {
-  const [perifericoId, setPerifericoId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
+  const navigate = useNavigate();
   const hasPerifericos = Array.isArray(perifericos) && perifericos.length > 0;
   
-  const selectedPeriferico = perifericoId 
-    ? perifericos.find(p => p?.id_periferico === perifericoId)
-    : null;
-
-  const handleConfirm = () => {
-    if (!selectedPeriferico) {
-      setError("Por favor, selecciona un periférico antes de continuar");
-      return;
-    }
-    setError(null);
-    onConfirm();
+  const [selectedPeriferico, setSelectedPeriferico] =
+    useState<Periferico | null>(null);
+  
+  const handlePerifericoChange = (
+      _event: React.SyntheticEvent<Element, Event>,
+      newValue: Periferico | null
+    ) => {
+      setSelectedPeriferico(newValue);
   };
+
+    const handleConfirm = () => {
+      if (!selectedPeriferico) {
+        setError("Por favor, selecciona un periférico antes de continuar");
+        return;
+      }
+      setError(null);
+      console.log(selectedPeriferico.nombre)
+  
+      if (selectedPeriferico.nombre === 'Laptop' || selectedPeriferico.nombre === 'Computadora') {
+        navigate('/FormActivosLC');
+      } else if (['Proyector', 'Teclado', 'Mouse', 'Monitor'].includes(selectedPeriferico.nombre)) {
+        navigate('/FormActivosPMTM'); 
+      }
+      
+      onClose();
+    };
 
 
   return (
@@ -63,27 +75,14 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
             <Autocomplete
               size="small"
               disablePortal
-              sx={{ width: 500 , height:200}}
               options={perifericos}
-              value={selectedPeriferico}
-              onChange={(event, newValue) => {
-                setPerifericoId(newValue ? newValue.id_periferico : null);
-                setError(null); // Limpiar error cuando se selecciona algo
-              }}
               getOptionLabel={(option) => option?.nombre || ""}
+              sx={{ width: 500 , height:200}}
+              value={selectedPeriferico}
+              onChange={handlePerifericoChange}
               renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Periférico"
-                  variant="outlined"
-                  fullWidth
-                  error={!!error}
-                  helperText={error}
-                />
+                <TextField {...params} label="Periférico" variant="outlined" />
               )}
-              isOptionEqualToValue={(option, value) => 
-                option?.id_periferico === value?.id_periferico
-              }
               noOptionsText="No se encontraron periféricos"
               loadingText="Cargando periféricos..."
             />
@@ -95,6 +94,7 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
           </>
         )}
       </DialogContent>
+      
       <DialogActions sx={{ mt: '-10px' }}>
         <Box sx={{ 
           display: 'flex', 

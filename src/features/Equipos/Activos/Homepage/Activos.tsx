@@ -15,7 +15,7 @@ import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../../../../data";
 import { useEliminarComputadoraActivo } from "../hooks/useEliminarComputadoraActivo";
 import { useDarDeBajaEquipo } from "../hooks/useDarDeBajaEquipo";
-import { Periferico } from '..';
+
 
 const Activos = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
