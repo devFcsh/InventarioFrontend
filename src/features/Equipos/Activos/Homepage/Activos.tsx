@@ -371,7 +371,6 @@ const Activos = () => {
           <ModalAgregarActivo
             open={openModalActivos}
             onClose={handleCloseActivos}
-            onConfirm={handleConfirm}
             title={modalContentActivos.title}
             perifericos={perifericos}
           />
