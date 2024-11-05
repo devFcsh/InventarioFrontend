@@ -6,32 +6,29 @@ import { Icon } from "@iconify/react";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import useUsos from "@hooks/useUsos";
 import { useUsuariosFiltrados } from "../hooks/useUsuariosFiltrados";
-import { FiltrosUsuario } from "../../../types/index";
+import { FiltrosUsuario, Uso, Usuario } from "../../../types/index";
+import { filas } from "../../../data";
 
 const Usuarios = () => {
-  const [selectedUso, setSelectedUso] = useState<string>();
-  const [selectedUsuario, setSelectedUsuario] = useState<string>();
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [shouldFetch, setShouldFetch] = useState(false);
-  const [totalPages, setTotalPages] = useState(1);
+  const [selectedUso, setSelectedUso] = useState<string | null>(null);
+  const [selectedUsuario, setSelectedUsuario] = useState<string | null>(null);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>("");
+  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   const { usos } = useUsos();
   const { usuarios } = useUsuariosPorUso(selectedUso || "");
-  
+
   const filtros: FiltrosUsuario = {
     usoId: selectedUso,
     usuarioId: selectedUsuario,
   };
 
-  const { usuariosFiltrados, totalCount, loading, error } = useUsuariosFiltrados(
-    filtros,
-    currentPage,
-    rowsPerPage,
-    shouldFetch
-  );
+  const { usuariosFiltrados, totalCount, loading, error } =
+    useUsuariosFiltrados(filtros, currentPage, rowsPerPage, shouldFetch);
 
   useEffect(() => {
     if (totalCount > 0 && rowsPerPage > 0) {
@@ -47,13 +44,19 @@ const Usuarios = () => {
     }
   }, [shouldFetch]);
 
-  const handleUsoChange = (event, newValue) => {
-    setSelectedUso(newValue);
-    setSelectedUsuario(undefined); 
+  const handleUsoChange = (
+    event: React.SyntheticEvent<Element, Event>,
+    newValue: Uso | null
+  ) => {
+    setSelectedUso(newValue ? newValue.id_uso : null);
+    setSelectedUsuario(null); // Reset the usuario selection when the uso changes
   };
 
-  const handleUsuarioChange = (event, newValue) => {
-    setSelectedUsuario(newValue);
+  const handleUsuarioChange = (
+    event: React.SyntheticEvent<Element, Event>,
+    newValue: Usuario | null
+  ) => {
+    setSelectedUsuario(newValue ? newValue.id_usuario : null);
   };
 
   const handleBuscar = () => {
@@ -65,6 +68,22 @@ const Usuarios = () => {
     setOpenSnackbar(false);
   };
 
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      setShouldFetch(true);
+    }
+  };
+
+  const handleRowsPerPageChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: { id: number; name: string } | null
+  ) => {
+    const rows = parseInt(newValue?.name || "10", 10);
+    setRowsPerPage(rows);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="flex flex-col p-4">
       <Snackbar
@@ -73,7 +92,11 @@ const Usuarios = () => {
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: "100%" }}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
@@ -83,27 +106,45 @@ const Usuarios = () => {
           <Autocomplete
             size="small"
             options={usos}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option.nombre || ""}
             onChange={handleUsoChange}
-            value={selectedUso}
+            value={usos.find((uso) => uso.id_uso === selectedUso) || null}
             renderInput={(params) => (
               <TextField {...params} label="Uso" variant="outlined" />
             )}
+            className="w-full md:w-cmbox"
           />
 
           <Autocomplete
             size="small"
             options={usuarios}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option.nombre || ""}
             onChange={handleUsuarioChange}
-            value={selectedUsuario}
+            value={
+              usuarios.find(
+                (usuario) => usuario.id_usuario === selectedUsuario
+              ) || null
+            }
             renderInput={(params) => (
               <TextField {...params} label="Usuario" variant="outlined" />
             )}
+            className="w-full md:w-cmbox"
             disabled={!selectedUso}
           />
 
           <div className="flex flex-col w-full md:w-1/5 md:flex-row gap-4 md:gap-2 lg:ml-2">
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={filas}
+              onChange={handleRowsPerPageChange}
+              getOptionLabel={(option) => option.name}
+              renderInput={(params) => (
+                <TextField {...params} label="Filas" variant="outlined" />
+              )}
+              value={filas.find((option) => option.id === rowsPerPage)}
+              className="w-full md:w-1/2"
+            />
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/2"
               onClick={handleBuscar}
@@ -115,27 +156,53 @@ const Usuarios = () => {
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {loading ? (
-          <p>Cargando equipos...</p>
+          <p>Cargando usuarios...</p>
         ) : error ? (
-          <p>Error al cargar los equipos</p>
+          <p>Error al cargar los usuarios</p>
         ) : (
           <table className="w-full text-left text-sm text-gray-500">
             <thead className="text-xs uppercase bg-gray-50 text-gray-700">
               <tr>
-                <th scope="col" className="px-4 py-3">Uso</th>
-                <th scope="col" className="px-4 py-3">Usuario</th>
-                <th scope="col" className="px-4 py-3">Acciones</th>
+                <th scope="col" className="px-4 py-3">
+                  Uso
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Usuario
+                </th>
+                <th scope="col" className="px-4 py-3">
+                  Acciones
+                </th>
               </tr>
             </thead>
             <tbody>
               {usuariosFiltrados.map((usuario) => (
-                <tr key={usuario.id_usuario} className="bg-white border-b hover:bg-gray-50">
+                <tr
+                  key={usuario.id_usuario}
+                  className="bg-white border-b hover:bg-gray-50"
+                >
                   <td className="px-4 py-2">{usuario.uso}</td>
                   <td className="px-4 py-2">{usuario.nombre}</td>
                   <td className="px-4 py-3 flex items-center gap-2">
+                    <Icon
+                      icon="weui:delete-outlined"
+                      width="25"
+                      height="25"
+                      className="cursor-pointer"
+                    />
                     <Link to={`/editarActivo/${usuario.nombre}`}>
-                      <Icon icon="mage:edit" width="25" height="25" className="cursor-pointer" />
+                      <Icon
+                        icon="mage:edit" 
+                        width="25"
+                        height="25"
+                        className="cursor-pointer"
+                      />
                     </Link>
+                    <Icon
+                      icon="hugeicons:computer-add"
+                      width="25"
+                      height="25"
+                      className="cursor-pointer"
+                    />
                   </td>
                 </tr>
               ))}
@@ -143,6 +210,39 @@ const Usuarios = () => {
           </table>
         )}
       </div>
+      <nav
+        className="flex flex-col md:flex-row justify-between items-center p-4"
+        aria-label="Table navigation"
+      >
+        <span className="text-sm font-normal text-gray-500"></span>
+        <div className="flex flex-col md:flex-row items-center gap-2">
+          <ul className="inline-flex items-center -space-x-px">
+            <li>
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+              >
+                <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
+              </button>
+            </li>
+            <li>
+              <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
+                Página {currentPage} de {totalPages}
+              </div>
+            </li>
+            <li>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+              >
+                <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
+              </button>
+            </li>
+          </ul>
+        </div>
+      </nav>
     </div>
   );
 };
