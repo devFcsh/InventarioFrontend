@@ -11,6 +11,8 @@ import Usuarios from "./features/Usuarios/Homepage/Usuarios";
 import Admin from "./features/Administrador/Homepage/Admin";
 import AgregarActivo from "./pages/AgregarActivo";
 import EditarActivo from "./pages/EditarActivo";
+import {FormActivosLC} from "./features/Equipos/Activos/AgregarActivo/pages/Forms/FormActivosLC"
+import {FormActivosPMTM} from "./features/Equipos/Activos/AgregarActivo/pages/Forms/FormActivosPMTM"
 
 const App: React.FC = () => {
   const [currentSection, setCurrentSection] = useState<string>("Equipos");
@@ -93,6 +95,28 @@ const App: React.FC = () => {
               setCurrentSection={setCurrentSection}
             >
               <AgregarActivo />
+            </Layout>
+          }
+        />
+        <Route
+          path="/FormActivosLC"
+          element={
+            <Layout
+              currentSection={currentSection}
+              setCurrentSection={setCurrentSection}
+            >
+              <FormActivosLC />
+            </Layout>
+          }
+        />
+        <Route
+          path="/FormActivosPMTM"
+          element={
+            <Layout
+              currentSection={currentSection}
+              setCurrentSection={setCurrentSection}
+            >
+              <FormActivosPMTM />
             </Layout>
           }
         />

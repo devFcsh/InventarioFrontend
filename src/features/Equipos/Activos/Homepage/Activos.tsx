@@ -16,6 +16,7 @@ import { filas } from "../../../../data";
 import { useEliminarComputadoraActivo } from "../hooks/useEliminarComputadoraActivo";
 import { useDarDeBajaEquipo } from "../hooks/useDarDeBajaEquipo";
 
+
 const Activos = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
     useState<Periferico | null>(null);
@@ -370,9 +371,8 @@ const Activos = () => {
           <ModalAgregarActivo
             open={openModalActivos}
             onClose={handleCloseActivos}
-            onConfirm={handleConfirm}
             title={modalContentActivos.title}
-            message={modalContentActivos.message}
+            perifericos={perifericos}
           />
 
         </div>
