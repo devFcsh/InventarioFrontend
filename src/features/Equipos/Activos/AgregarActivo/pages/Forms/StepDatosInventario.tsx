@@ -149,25 +149,6 @@ const Step1DatosInventario = ({
       label="Marca"
       variant="outlined"
       fullWidth
-      sx={{
-        "& .MuiOutlinedInput-root": {
-          "& fieldset": {
-            borderColor: "#00aae4",
-          },
-          "&:hover fieldset": {
-            borderColor: "#00aae4",
-          },
-          "&.Mui-focused fieldset": {
-            borderColor: "#00aae4",
-          },
-        },
-        "& .MuiInputLabel-root": {
-          color: "blue",
-        },
-        "& .MuiAutocomplete-input": {
-          color: "blue",
-        }
-      }}
     />
   )}
 />
