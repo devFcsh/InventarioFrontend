@@ -20,8 +20,7 @@ const StepCargarImagen = () => {
   };
   return (
     <Box>
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold mb-5">Cargar Imagen</h2>
+      <div className="mt-8">
         <div className="flex flex-col items-center gap-4">
           <input
             type="file"
