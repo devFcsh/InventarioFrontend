@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { FiltrosUsuario } from "../../../types";
-import { Usuario } from "../../../types/Usuario";
+import { FiltrosUsuario } from "../../../../types";
+import { Usuario } from "../../../../types/Usuario";
 import clienteAxios from "@hooks/index";
 
 export const useUsuariosFiltrados = (

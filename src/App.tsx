@@ -1,38 +1,26 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import NotFound from "./pages/NotFound";
-import Equipos from "./features/Equipos/Homepage/Equipos";
 import Activos from "./features/Equipos/Activos/Homepage/Activos";
 import Bajas from "./features/Equipos/Baja/Homepage/Bajas";
 import Login from "./pages/Login";
 import Layout from "./components/Layout";
 import Bodega from "./features/Equipos/Bodega/Homepage/Bodega";
-import Usuarios from "./features/Usuarios/Homepage/Usuarios";
-import Categorias from "./features/Administrador/Homepage/Categorias";
+import Usuarios from "./features/Administrador/Usuarios/Homepage/Usuarios";
+import Categorias from "./features/Administrador/Categorías/Homepage/Categorias";
 import AgregarActivo from "./pages/AgregarActivo";
 import EditarActivo from "./pages/EditarActivo";
 import {FormActivosLC} from "./features/Equipos/Activos/AgregarActivo/pages/Forms/FormActivosLC"
 import {FormActivosPMTM} from "./features/Equipos/Activos/AgregarActivo/pages/Forms/FormActivosPMTM"
-import AgregarUsuario from "./features/Usuarios/AgregarUsuario/Homepage/AgregarUsuario";
+import AgregarUsuario from "./features/Administrador/Usuarios/AgregarUsuario/Homepage/AgregarUsuario";
 
 const App: React.FC = () => {
-  const [currentSection, setCurrentSection] = useState<string>("Equipos");
+  const [currentSection, setCurrentSection] = useState<string>("");
 
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route
-          path="/equipos"
-          element={
-            <Layout
-              currentSection={currentSection}
-              setCurrentSection={setCurrentSection}
-            >
-              <Equipos />
-            </Layout>
-          }
-        />
         <Route
           path="/usuarios"
           element={

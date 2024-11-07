@@ -109,7 +109,7 @@ export type Filtros = {
 };
 
 export type FiltrosUsuario = {
-  usoId?: string;
-  usuarioId?: string;
+  usoId?: string | null;
+  usuarioId?: string | null;
 };
 

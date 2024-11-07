@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Autocomplete } from "@mui/material";
 import { TextField, Snackbar, Alert } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import useUsos from "@hooks/useUsos";
 import { useUsuariosFiltrados } from "../hooks/useUsuariosFiltrados";
-import { FiltrosUsuario, Uso, Usuario } from "../../../types/index";
-import { filas } from "../../../data";
+import { FiltrosUsuario, Uso, Usuario } from "../../../../types/index";
+import { filas } from "../../../../data";
 
 const Usuarios = () => {
   const [selectedUso, setSelectedUso] = useState<string | null>(null);
@@ -29,6 +29,14 @@ const Usuarios = () => {
 
   const { usuariosFiltrados, totalCount, loading, error } =
     useUsuariosFiltrados(filtros, currentPage, rowsPerPage, shouldFetch);
+
+    const location = useLocation();
+    useEffect(() => {
+      if (location.state && location.state.snackbarMessage) {
+        setSnackbarMessage(location.state.snackbarMessage);
+        setOpenSnackbar(true);
+      }
+    }, [location]);
 
   useEffect(() => {
     if (totalCount > 0 && rowsPerPage > 0) {
@@ -86,7 +94,7 @@ const Usuarios = () => {
 
   return (
     <div className="flex flex-col p-4">
-      <Snackbar
+       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}

@@ -6,8 +6,8 @@ import { Icon } from "@iconify/react";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import useUsos from "@hooks/useUsos";
 import { useUsuariosFiltrados } from "../../Usuarios/hooks/useUsuariosFiltrados";
-import { FiltrosUsuario, Uso, Usuario } from "../../../types/index";
-import { filas } from "../../../data";
+import { FiltrosUsuario, Uso, Usuario } from "../../../../types/index";
+import { filas } from "../../../../data";
 
 const Categorias = () => {
   const [selectedUso, setSelectedUso] = useState<string | null>(null);
