@@ -128,7 +128,6 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({  open,
         }
       };
     return (
-        <>
 
         <Dialog
           open={open} 
@@ -137,8 +136,9 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({  open,
           <DialogTitle>
             <p className="text-2xl font-semibold">{title}</p>
           </DialogTitle>
-          <DialogContent>
-            <br />
+          
+          <DialogContent >
+          <Box sx={{ width: "100%" , height:"280"}}>
             <div className="flex-1 space-y-4">
         <Autocomplete
           size="small"
@@ -223,7 +223,9 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({  open,
         />
 
       </div>
+          </Box>
           </DialogContent>
+
           
           <DialogActions sx={{ mt: '-10px' }}>
             <Box sx={{ 
@@ -260,7 +262,5 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({  open,
             </Box>
           </DialogActions>
         </Dialog>
-        </>
       );
-
 }
