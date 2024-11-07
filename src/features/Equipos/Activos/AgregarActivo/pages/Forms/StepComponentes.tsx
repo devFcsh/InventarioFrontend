@@ -14,9 +14,20 @@ import usePerifericos from "@hooks/usePerifericos";
 import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
+import { ModalAgregarComponenteActivo } from "./ModalAgregarComponenteActivo.tsx";
 
 
 export const StepComponentes = () => {
+  const [openModalComponentes, setOpenModalComponentes] = useState<boolean>(false);
+  const handleOpenModalComponentes = () => setOpenModalComponentes(true);
+  const handleCloseModalComponentes = () => setOpenModalComponentes(false);
+  const [modalContentComponentes, setModalContentComponentes] = useState<{
+    title: string;
+    message: string;
+  }>({
+    title: "Agregar Componentes",
+    message: "Seleccione el componente a registrar",
+  });
   const [componentes, setComponentes] = useState<Componente[]>([]);
   const eliminarComponente = (index: number) => {
     setComponentes(componentes.filter((_, i) => i !== index));
@@ -121,8 +132,27 @@ export const StepComponentes = () => {
   };
   return (
     <div className="mt-8">
+        <Button
+            onClick={handleOpenModalComponentes}
+            color="primary" 
+            variant="contained" 
+            size="large"
+            sx={{margin:"1rem",
+              display:"flex",
+              alignContent:"end"
+            }}
+          >
+            Agregar Componente
+        </Button>
+        <ModalAgregarComponenteActivo
+            open={openModalComponentes}
+            onClose={handleCloseModalComponentes}
+            title={modalContentComponentes.title}
+            perifericos={perifericos}
+          />
     <div className="flex flex-col md:flex-row gap-4">
       <div className="flex-1 overflow-x-auto">
+        
         <table className="min-w-full border-collapse border border-gray-300">
           <thead>
             <tr className="bg-gray-100 border-b">
@@ -157,100 +187,6 @@ export const StepComponentes = () => {
             ))}
           </tbody>
         </table>
-      </div>
-      <div className="flex-1 space-y-4">
-        <Autocomplete
-          size="small"
-          disablePortal
-          options={filteredPerifericos}
-          getOptionLabel={(option: Periferico) => option?.nombre || ""}
-          onChange={handlePerifericoComponenteChange}
-          value={nuevoComponente.periferico}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Periférico"
-              variant="outlined"
-              fullWidth
-            />
-          )}
-        />
-        <Autocomplete
-          size="small"
-          disablePortal
-          options={marcasComponente}
-          getOptionLabel={(option: Marca) => option?.nombre || ""}
-          onChange={handleMarcaComponenteChange}
-          value={nuevoComponente.marca}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Marca"
-              variant="outlined"
-              fullWidth
-            />
-          )}
-          disabled={!nuevoComponente.periferico}
-        />
-        <Autocomplete
-          size="small"
-          disablePortal
-          options={modelosComponente}
-          getOptionLabel={(option: Modelo) => option?.nombre || ""}
-          onChange={handleModeloComponenteChange}
-          value={nuevoComponente.modelo}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Modelo"
-              variant="outlined"
-              fullWidth
-            />
-          )}
-          disabled={!nuevoComponente.marca}
-        />
-        <Autocomplete
-          size="small"
-          disablePortal
-          options={seriesComponente}
-          getOptionLabel={(option: Serie) => option?.nombre || ""}
-          onChange={handleSerieComponenteChange}
-          value={nuevoComponente.serie}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Serie"
-              variant="outlined"
-              fullWidth
-            />
-          )}
-          disabled={!nuevoComponente.modelo}
-        />
-        <TextField
-          label="Inventario"
-          placeholder="Inventario"
-          variant="outlined"
-          fullWidth
-          size="small"
-          value={nuevoComponente.inventario}
-          onChange={(e) =>
-            setNuevoComponente({
-              ...nuevoComponente,
-              inventario: e.target.value,
-            })
-          }
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={agregarComponente}
-          fullWidth
-        >
-          Agregar Componente
-        </Button>
-        {errorMensajeComponente && (
-          <div className="text-red-500 mb-4">{errorMensajeComponente}</div>
-        )}
       </div>
     </div>
   </div>

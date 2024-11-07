@@ -44,7 +44,6 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
         return;
       }
       setError(null);
-      console.log(selectedPeriferico.nombre)
   
       if (selectedPeriferico.nombre === 'Laptop' || selectedPeriferico.nombre === 'Computadora') {
         navigate('/FormActivosLC');
@@ -65,6 +64,7 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
         <p className="text-2xl font-semibold">{title}</p>
       </DialogTitle>
       <DialogContent>
+      <Box sx={{ width: "100%" , height:"280"}}>
         <br />
         {!hasPerifericos ? (
           <Alert severity="warning" sx={{ mb: 2 }}>
@@ -77,7 +77,7 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
               disablePortal
               options={perifericos}
               getOptionLabel={(option) => option?.nombre || ""}
-              sx={{ width: 500 , height:200}}
+              sx={{ width: "100%" , height:200}}
               value={selectedPeriferico}
               onChange={handlePerifericoChange}
               renderInput={(params) => (
@@ -93,6 +93,7 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
             )}
           </>
         )}
+         </Box>
       </DialogContent>
       
       <DialogActions sx={{ mt: '-10px' }}>
