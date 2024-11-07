@@ -207,14 +207,16 @@ const Usuarios = () => {
                       height="25"
                       className="cursor-pointer"
                     />
-                    <Link to={`/editarActivo/${usuario.nombre}`}>
-                      <Icon
-                        icon="mage:edit" 
-                        width="25"
-                        height="25"
-                        className="cursor-pointer"
-                      />
-                    </Link>
+                   <td className="px-4 py-3 flex items-center gap-2">
+                  <Link to={{ pathname: "/editarUsuario" }} state={{ usuario }}>
+                    <Icon
+                      icon="mage:edit"
+                      width="25"
+                      height="25"
+                      className="cursor-pointer"
+                    />
+                  </Link>
+                </td>
                   </td>
                 </tr>
               ))}

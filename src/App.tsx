@@ -13,6 +13,7 @@ import EditarActivo from "./pages/EditarActivo";
 import {FormActivosLC} from "./features/Equipos/Activos/AgregarActivo/pages/Forms/FormActivosLC"
 import {FormActivosPMTM} from "./features/Equipos/Activos/AgregarActivo/pages/Forms/FormActivosPMTM"
 import AgregarUsuario from "./features/Administrador/Usuarios/AgregarUsuario/Homepage/AgregarUsuario";
+import EditarUsuario from "./features/Administrador/Usuarios/EditarUsuario/Homepage/EditarUsuario";
 
 const App: React.FC = () => {
   const [currentSection, setCurrentSection] = useState<string>("");
@@ -128,6 +129,17 @@ const App: React.FC = () => {
               setCurrentSection={setCurrentSection}
             >
               <AgregarUsuario />
+            </Layout>
+          }
+        />
+        <Route
+          path="/editarUsuario"
+          element={
+            <Layout
+              currentSection={currentSection}
+              setCurrentSection={setCurrentSection}
+            >
+              <EditarUsuario />
             </Layout>
           }
         />
