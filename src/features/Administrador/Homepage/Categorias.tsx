@@ -5,11 +5,11 @@ import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import useUsos from "@hooks/useUsos";
-import { useUsuariosFiltrados } from "../hooks/useUsuariosFiltrados";
+import { useUsuariosFiltrados } from "../../Usuarios/hooks/useUsuariosFiltrados";
 import { FiltrosUsuario, Uso, Usuario } from "../../../types/index";
 import { filas } from "../../../data";
 
-const Usuarios = () => {
+const Categorias = () => {
   const [selectedUso, setSelectedUso] = useState<string | null>(null);
   const [selectedUsuario, setSelectedUsuario] = useState<string | null>(null);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
@@ -101,17 +101,7 @@ const Usuarios = () => {
         </Alert>
       </Snackbar>
       <div className="mb-4">
-      <div className="flex gap-2 items-center">
-          <h1 className="text-2xl font-bold my-5">Consulta de Usuarios</h1>
-          <Link to={{ pathname: "/agregarUsuario" }} state={{  }}>
-            <Icon
-              icon="gridicons:add"
-              width="30"
-              height="30"
-              className="text-green-900 hover:text-green-950"
-            />
-          </Link>
-        </div>
+        <h1 className="text-2xl font-bold my-5">Consulta de Categorías</h1>
         <div className="flex flex-wrap gap-4 my-10">
           <Autocomplete
             size="small"
@@ -120,26 +110,9 @@ const Usuarios = () => {
             onChange={handleUsoChange}
             value={usos.find((uso) => uso.id_uso === selectedUso) || null}
             renderInput={(params) => (
-              <TextField {...params} label="Uso" variant="outlined" />
+              <TextField {...params} label="Categorías" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
-          />
-
-          <Autocomplete
-            size="small"
-            options={usuarios}
-            getOptionLabel={(option) => option.nombre || ""}
-            onChange={handleUsuarioChange}
-            value={
-              usuarios.find(
-                (usuario) => usuario.id_usuario === selectedUsuario
-              ) || null
-            }
-            renderInput={(params) => (
-              <TextField {...params} label="Usuario" variant="outlined" />
-            )}
-            className="w-full md:w-cmbox"
-            disabled={!selectedUso}
           />
 
           <div className="flex flex-col w-full md:w-1/5 md:flex-row gap-4 md:gap-2 lg:ml-2">
@@ -174,10 +147,7 @@ const Usuarios = () => {
             <thead className="text-xs uppercase bg-gray-50 text-gray-700">
               <tr>
                 <th scope="col" className="px-4 py-3">
-                  Uso
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Usuario
+                  Categoría
                 </th>
                 <th scope="col" className="px-4 py-3">
                   Acciones
@@ -191,7 +161,6 @@ const Usuarios = () => {
                   className="bg-white border-b hover:bg-gray-50"
                 >
                   <td className="px-4 py-2">{usuario.uso}</td>
-                  <td className="px-4 py-2">{usuario.nombre}</td>
                   <td className="px-4 py-3 flex items-center gap-2">
                     <Icon
                       icon="weui:delete-outlined"
@@ -207,6 +176,12 @@ const Usuarios = () => {
                         className="cursor-pointer"
                       />
                     </Link>
+                    <Icon
+                      icon="hugeicons:computer-add"
+                      width="25"
+                      height="25"
+                      className="cursor-pointer"
+                    />
                   </td>
                 </tr>
               ))}
@@ -251,4 +226,4 @@ const Usuarios = () => {
   );
 };
 
-export default Usuarios;
+export default Categorias;

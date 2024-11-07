@@ -8,11 +8,12 @@ import Login from "./pages/Login";
 import Layout from "./components/Layout";
 import Bodega from "./features/Equipos/Bodega/Homepage/Bodega";
 import Usuarios from "./features/Usuarios/Homepage/Usuarios";
-import Admin from "./features/Administrador/Homepage/Admin";
+import Categorias from "./features/Administrador/Homepage/Categorias";
 import AgregarActivo from "./pages/AgregarActivo";
 import EditarActivo from "./pages/EditarActivo";
 import {FormActivosLC} from "./features/Equipos/Activos/AgregarActivo/pages/Forms/FormActivosLC"
 import {FormActivosPMTM} from "./features/Equipos/Activos/AgregarActivo/pages/Forms/FormActivosPMTM"
+import AgregarUsuario from "./features/Usuarios/AgregarUsuario/Homepage/AgregarUsuario";
 
 const App: React.FC = () => {
   const [currentSection, setCurrentSection] = useState<string>("Equipos");
@@ -44,13 +45,13 @@ const App: React.FC = () => {
           }
         />
         <Route
-          path="/admin"
+          path="/categorias"
           element={
             <Layout
               currentSection={currentSection}
               setCurrentSection={setCurrentSection}
             >
-              <Admin />
+              <Categorias />
             </Layout>
           }
         />
@@ -128,6 +129,17 @@ const App: React.FC = () => {
               setCurrentSection={setCurrentSection}
             >
               <EditarActivo />
+            </Layout>
+          }
+        />
+        <Route
+          path="/agregarUsuario"
+          element={
+            <Layout
+              currentSection={currentSection}
+              setCurrentSection={setCurrentSection}
+            >
+              <AgregarUsuario />
             </Layout>
           }
         />
