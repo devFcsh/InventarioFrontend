@@ -7,8 +7,8 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import "./FormStyle.css";
 import { useNavigate } from "react-router-dom";
-import StepDatosInventario from "./StepDatosInventario";
-import StepCargarImagen from "./StepCargarImagen";
+import StepDatosInventario from "./Steps/StepDatosInventario";
+import StepCargarImagen from "./Steps/StepCargarImagen";
 
 const steps = ["Datos de inventario", "Cargar imagen"];
 

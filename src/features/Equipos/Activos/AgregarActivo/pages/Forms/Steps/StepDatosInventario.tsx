@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { TextField, Box, Autocomplete } from "@mui/material";
-import Typography from "@mui/material/Typography";
-import { Marca, Modelo, Serie, Edificio, Aula, Usuario, Uso } from "../../../../../../types";
+import { Marca, Modelo, Serie, Edificio, Aula, Usuario, Uso } from "../../../../../../../types";
 import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
@@ -10,7 +9,7 @@ import useAulas from "@hooks/useAulas";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import useUsos from "@hooks/useUsos";
 
-interface Step1DatosInventarioProps {
+interface StepDatosInventarioProps {
   periferico: string;
   idUso: string | null;
   idUsuario: string | null;
@@ -18,22 +17,43 @@ interface Step1DatosInventarioProps {
 
 const Step1DatosInventario = ({
   periferico,
-  idUso,
-  idUsuario,
-}: Step1DatosInventarioProps) => {
+}: StepDatosInventarioProps) => {
+  const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
+  const [selectedUsoId, setSelectedUsoId] = useState<string | null>(null);
+  const [selectedUsuarioId, setSelectedUsuarioId] = useState<string | null>(null);
   const [selectedInventarioMarca, setSelectedInventarioMarca] =
     useState<Marca | null>(null);
   const [selectedInventarioModelo, setSelectedInventarioModelo] =
     useState<Modelo | null>(null);
   const [selectedInventarioSerie, setSelectedInventarioSerie] =
     useState<Serie | null>(null);
-  const [selectedInventarioInv, setSelectedInventarioInv] = useState<
-    string | null
-  >("");
-  const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
+  const [selectedInventarioInv, setSelectedInventarioInv] = useState<string | null>("");
   const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
     null
   );
+  const [selectedAula, setSelectedAula] = useState<Aula | null>(null);
+
+
+  const {
+    usuarios,
+    loading: loadingUsuarios,
+    error: errorUsuarios,
+  } = useUsuariosPorUso(selectedUsoId || "");
+  
+  const { marcas } = useMarcasPorPeriferico(periferico);
+  const { modelos } = useModelosPorMarcaPeriferico(
+    selectedInventarioMarca?.id_marca ?? "",
+    periferico
+  );
+  const { series } = useSeriesPorModelo(
+    periferico,
+    selectedInventarioMarca?.id_marca ?? "",
+    selectedInventarioModelo?.id_modelo ?? ""
+  );
+  const { edificios } = useEdificios();
+  const { aulas } = useAulas(selectedEdificio?.id_edificio ?? "");
+
+
   const handleUsoChange = (event: any, newValue: Uso | null) => {
     if (newValue) {
       setSelectedUsoId(newValue.id_uso);
@@ -41,17 +61,6 @@ const Step1DatosInventario = ({
       setSelectedUsoId(null);
       setSelectedUsuarioId(null);
     }
-  };
-  const [selectedAula, setSelectedAula] = useState<Aula | null>(null);
-  const { edificios } = useEdificios();
-  const { marcas } = useMarcasPorPeriferico(periferico);
-  const { aulas } = useAulas(selectedEdificio?.id_edificio ?? "");
-  const [selectedUsoId, setSelectedUsoId] = useState<string | null>(null);
-  const handleSerieChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Serie | null
-  ) => {
-    setSelectedInventarioSerie(newValue);
   };
   const handleMarcaChange = (
     _event: React.SyntheticEvent<Element, Event>,
@@ -61,14 +70,8 @@ const Step1DatosInventario = ({
     setSelectedInventarioModelo(null);
     setSelectedInventarioSerie(null);
   };
-  const { series } = useSeriesPorModelo(
-    periferico,
-    selectedInventarioMarca?.id_marca ?? "",
-    selectedInventarioModelo?.id_modelo ?? ""
-  );
-  const [selectedUsuarioId, setSelectedUsuarioId] = useState<string | null>(
-    null
-  );
+
+
   const handleModeloChange = (
     _event: React.SyntheticEvent<Element, Event>,
     newValue: Modelo | null
@@ -76,15 +79,13 @@ const Step1DatosInventario = ({
     setSelectedInventarioModelo(newValue);
     setSelectedInventarioSerie(null);
   };
-  const { modelos } = useModelosPorMarcaPeriferico(
-    selectedInventarioMarca?.id_marca ?? "",
-    periferico
-  );
-  const {
-    usuarios,
-    loading: loadingUsuarios,
-    error: errorUsuarios,
-  } = useUsuariosPorUso(selectedUsoId || "");
+  const handleSerieChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    newValue: Serie | null
+  ) => {
+    setSelectedInventarioSerie(newValue);
+  };
+
 
   return (
     <Box>

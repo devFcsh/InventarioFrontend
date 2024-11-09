@@ -6,12 +6,14 @@ import StepLabel from "@mui/material/StepLabel";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import "./FormStyle.css";
-import { Padding } from "@mui/icons-material";
-import StepDatosInventario from "./StepDatosInventario";
-import StepCargarImagen from "./StepCargarImagen";
-import { useNavigate } from "react-router-dom";
-import { StepComponentes } from "./StepComponentes";
-import { StepInformacionGeneral } from "./StepInformacionGeneral";
+import StepDatosInventario from "./Steps/StepDatosInventario";
+import StepCargarImagen from "./Steps/StepCargarImagen";
+import { useLocation, useNavigate } from "react-router-dom";
+import { StepComponentes } from "./Steps/StepComponentes";
+import { StepInformacionGeneral } from "./Steps/StepInformacionGeneral";
+import {
+  Periferico,
+} from "../../../../../../types";
 
 const steps = [
   "Datos de inventario",
@@ -23,6 +25,9 @@ const steps = [
 export const FormActivosLC = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = React.useState(0);
+  const location = useLocation();
+  const selectedPeriferico = location.state?.periferico as Periferico | undefined;
+  const perifericos = location.state?.perifericos as Periferico[];
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -41,13 +46,13 @@ export const FormActivosLC = () => {
   const renderStepContent = (stepIndex: number) => {
     switch (stepIndex) {
       case 0:
-        return <StepDatosInventario />;
+        return <StepDatosInventario periferico={selectedPeriferico?.id_periferico ?? ''} idUso={null} idUsuario={null} />;
       case 1:
         return <StepInformacionGeneral />;
       case 2:
         return <StepCargarImagen />;
       case 3:
-        return <StepComponentes />;
+        return <StepComponentes perifericos={perifericos}/>;
       default:
         return <div>Paso no encontrado</div>;
     }

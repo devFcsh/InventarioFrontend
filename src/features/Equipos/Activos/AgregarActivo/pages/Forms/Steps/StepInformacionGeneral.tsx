@@ -9,9 +9,9 @@ import {
   RAM,
   Disco,
   VersionSO
-} from "../../../../../../types";
+} from "../../../../../../../types";
 import useDominios from "@hooks/useDominios";
-import { antivirus, protocolos } from "../../../../../../data";
+import { antivirus, protocolos } from "../../../../../../../data";
 import useVersionesOffice from "@hooks/useVersionesOffice";
 import useRam from "@hooks/useRam";
 import useDiscos from "@hooks/useDiscos";
@@ -19,25 +19,21 @@ import useVersionesSO from "@hooks/useVersionesSO";
 
 export const StepInformacionGeneral = () => {
   const [selectedSO, setSelectedSO] = useState<SistemaOperativo | null>(null);
-  const { sistemasOperativos } = useSistemasOperativos();
+  const [selectedVersionSO, setSelectedVersionSO] = useState<VersionSO | null>(null);
   const [selectedDominio, setSelectedDominio] = useState<Dominio | null>(null);
-  const { dominios } = useDominios();
-  const [nombreEquipo, setNombreEquipo] = useState<string | null>(null);
-  const [protocolo, setProtocolo] = useState<string | null>(null);
+  const [nombreEquipo, setNombreEquipo] = useState<string | null>("");
+  const [selectedVersionOffice, setSelectedVersionOffice] =useState<VersionOffice | null>(null);
+  const [protocolo, setProtocolo] = useState<string | null>("");
   const [direccionIP, setDireccionIP] = useState<string>("");
-  const [selectedAntivirus, setSelectedAntivirus] = useState<Antivirus | null>(
-    null
-  );
-  const [selectedDisco, setSelectedDisco] = useState<Disco | null>(null);
-  const { versionesOffice } = useVersionesOffice();
-  const [selectedVersionOffice, setSelectedVersionOffice] =
-    useState<VersionOffice | null>(null);
-  const { ram } = useRam();
+  const [selectedAntivirus, setSelectedAntivirus] = useState<Antivirus | null>(null);
   const [selectedRAM, setSelectedRAM] = useState<RAM | null>(null);
+  const [selectedDisco, setSelectedDisco] = useState<Disco | null>(null);
+  
+  const { sistemasOperativos } = useSistemasOperativos();
   const { versionesSO } = useVersionesSO(selectedSO?.id_sistemaoperativo ?? "");
-  const [selectedVersionSO, setSelectedVersionSO] = useState<VersionSO | null>(
-    null
-  );
+  const { dominios } = useDominios();
+  const { versionesOffice } = useVersionesOffice();
+  const { ram } = useRam();
   const { discos } = useDiscos();
   return (
     <Box>

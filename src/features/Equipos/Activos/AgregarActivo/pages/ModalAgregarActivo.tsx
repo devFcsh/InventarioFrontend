@@ -44,11 +44,11 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
         return;
       }
       setError(null);
-  
+      const state = { periferico: selectedPeriferico, perifericos };
       if (selectedPeriferico.nombre === 'Laptop' || selectedPeriferico.nombre === 'Computadora') {
-        navigate('/FormActivosLC');
+        navigate('/FormActivosLC', { state });
       } else if (['Proyector', 'Teclado', 'Mouse', 'Monitor'].includes(selectedPeriferico.nombre)) {
-        navigate('/FormActivosPMTM'); 
+        navigate('/FormActivosPMTM', { state }); 
       }
       
       onClose();

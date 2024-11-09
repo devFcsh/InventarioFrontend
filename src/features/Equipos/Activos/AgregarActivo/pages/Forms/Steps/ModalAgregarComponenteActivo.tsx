@@ -1,59 +1,70 @@
-import { Alert,Box, Button,Autocomplete, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
-import usePerifericos from "@hooks/usePerifericos";
+import {Box, Button,Autocomplete, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
+import { useState } from 'react';
+import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
+import { Componente } from "../../../../../../../types/Activo/Componente/index.ts";
+import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
 import {
     Marca,
     Modelo,
     Serie,
     Periferico,
   
-  } from "../../../../../../types";
-  
-import { useState } from 'react';
-import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
-import { Componente } from "../../../../../../types/Activo/Componente/index.ts";
-import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
+  } from "../../../../../../../types/index.ts";
 
 interface ModalProps {
     open: boolean;
     onClose: () => void;
     title?: string;
     perifericos: Periferico[];
+    onAddComponent: (nuevoComponente:Componente) =>void
   }
 
 export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({  open,
     onClose,
     title = "Agregar activo",
-    perifericos = []
+    perifericos = [],
+    onAddComponent
   })=> {
     
-    const [componentes, setComponentes] = useState<Componente[]>([]);
-    const eliminarComponente = (index: number) => {
-        setComponentes(componentes.filter((_, i) => i !== index));
-      };
-      const limpiarCamposDependientesComponente = () => {
-        setNuevoComponente({
-          ...nuevoComponente,
-          periferico: null,
-          marca: null,
-          modelo: null,
-          serie: null,
-          inventario: "",
-        });
-    };
     const [nuevoComponente, setNuevoComponente] = useState<Componente>({
         periferico: null,
         marca: null,
         modelo: null,
         serie: null,
         inventario: "",
+    });
+    const [errorMensajeComponente, setErrorMensajeComponente] = useState<string | null>(null);
+    
+    const filteredPerifericos = perifericos.filter(
+        (p) =>
+          p?.nombre.toLowerCase() !== "computadora" &&
+          p?.nombre.toLowerCase() !== "laptop"
+      );
+    const { marcas: marcasComponente } = useMarcasPorPeriferico(
+      nuevoComponente.periferico?.id_periferico ?? ""
+    );
+    const { modelos: modelosComponente } = useModelosPorMarcaPeriferico(
+      nuevoComponente.marca?.id_marca ?? "",
+      nuevoComponente.periferico?.id_periferico ?? ""
+    );
+    const { series: seriesComponente } = useSeriesPorModelo(
+      nuevoComponente.periferico?.id_periferico ?? "",
+      nuevoComponente.marca?.id_marca ?? "",
+      nuevoComponente.modelo?.id_modelo ?? ""
+    );
+    const handlePerifericoComponenteChange = (
+      _event: React.SyntheticEvent<Element, Event>,
+      newValue: Periferico | null
+    ) => {
+      setNuevoComponente({
+        ...nuevoComponente,
+        periferico: newValue,
+        marca: null,
+        modelo: null,
+        serie: null,
       });
-      const handleModeloComponenteChange = (
-        _event: React.SyntheticEvent<Element, Event>,
-        newValue: Modelo | null
-      ) => {
-        setNuevoComponente({ ...nuevoComponente, modelo: newValue, serie: null });
-      };
+    };
     const handleMarcaComponenteChange = (
         _event: React.SyntheticEvent<Element, Event>,
         newValue: Marca | null
@@ -65,43 +76,17 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({  open,
           serie: null,
         });
       };
-      const { modelos: modelosComponente } = useModelosPorMarcaPeriferico(
-        nuevoComponente.marca?.id_marca ?? "",
-        nuevoComponente.periferico?.id_periferico ?? ""
-      );
-      const { marcas: marcasComponente } = useMarcasPorPeriferico(
-        nuevoComponente.periferico?.id_periferico ?? ""
-      );
-      const { series: seriesComponente } = useSeriesPorModelo(
-        nuevoComponente.periferico?.id_periferico ?? "",
-        nuevoComponente.marca?.id_marca ?? "",
-        nuevoComponente.modelo?.id_modelo ?? ""
-      );
-      const [errorMensajeComponente, setErrorMensajeComponente] = useState<
-      string | null
-    >(null);
-    const filteredPerifericos = perifericos.filter(
-        (p) =>
-          p?.nombre.toLowerCase() !== "computadora" &&
-          p?.nombre.toLowerCase() !== "laptop"
-      );
+      const handleModeloComponenteChange = (
+        _event: React.SyntheticEvent<Element, Event>,
+        newValue: Modelo | null
+      ) => {
+        setNuevoComponente({ ...nuevoComponente, modelo: newValue, serie: null });
+      };
       const handleSerieComponenteChange = (
         _event: React.SyntheticEvent<Element, Event>,
         newValue: Serie | null
       ) => {
         setNuevoComponente({ ...nuevoComponente, serie: newValue });
-      };
-      const handlePerifericoComponenteChange = (
-        _event: React.SyntheticEvent<Element, Event>,
-        newValue: Periferico | null
-      ) => {
-        setNuevoComponente({
-          ...nuevoComponente,
-          periferico: newValue,
-          marca: null,
-          modelo: null,
-          serie: null,
-        });
       };
       const agregarComponente = () => {
         if (
@@ -111,7 +96,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({  open,
           nuevoComponente.serie &&
           nuevoComponente.inventario !== ""
         ) {
-          setComponentes([...componentes, nuevoComponente]);
+          onAddComponent(nuevoComponente);
           setNuevoComponente({
             periferico: {} as Periferico,
             marca: {} as Marca,
@@ -121,16 +106,28 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({  open,
           });
           limpiarCamposDependientesComponente();
           setErrorMensajeComponente(null);
+          
+          onClose()
         } else {
           setErrorMensajeComponente(
             "Por favor, complete todos los campos del componente."
           );
         }
       };
-    return (
 
-        <Dialog
-          open={open} 
+      const limpiarCamposDependientesComponente = () => {
+          setNuevoComponente({
+            ...nuevoComponente,
+            periferico: null,
+            marca: null,
+            modelo: null,
+            serie: null,
+            inventario: "",
+          });
+      };
+    return (
+      <Dialog
+      open={open} 
           onClose={onClose}
         >
           <DialogTitle>
@@ -138,8 +135,8 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({  open,
           </DialogTitle>
           
           <DialogContent >
-          <Box sx={{ width: "100%" , height:"280"}}>
-            <div className="flex-1 space-y-4">
+          <Box sx={{ width: "100%"}}>
+            <div className="flex-1 space-y-4 m-4">
         <Autocomplete
           size="small"
           disablePortal

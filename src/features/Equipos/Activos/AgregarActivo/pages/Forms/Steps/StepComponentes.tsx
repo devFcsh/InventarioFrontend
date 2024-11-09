@@ -1,0 +1,124 @@
+import { useState } from "react";
+import { useAgregarComponentes } from "../../../hooks/useAgregarComponentes.ts";
+import { Componente } from "../../../../../../../types/Activo/Componente/index.ts";
+import { Alert, Box, Button, Snackbar } from "@mui/material";
+import { Icon } from "@iconify/react";
+import { ModalAgregarComponenteActivo } from "./ModalAgregarComponenteActivo.tsx";
+import {
+  Periferico,
+} from "../../../../../../../types";
+
+interface FormProps {
+  perifericos: Periferico[];
+}
+
+export const StepComponentes : React.FC<FormProps> = ({
+  perifericos = []
+}) => {
+  const [openModalComponentes, setOpenModalComponentes] = useState<boolean>(false);
+  const [componentes, setComponentes] = useState<Componente[]>([]);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [modalContentComponentes, setModalContentComponentes] = useState<{
+    title: string;
+    message: string;
+  }>({
+    title: "Agregar Componentes",
+    message: "Seleccione el componente a registrar",
+  });
+
+  const handleOpenModalComponentes = () => setOpenModalComponentes(true);
+  const handleCloseModalComponentes = () => setOpenModalComponentes(false);
+  const eliminarComponente = (index: number) => {
+    setComponentes(componentes.filter((_, i) => i !== index));
+  };
+
+
+  const { agregarComponentes } = useAgregarComponentes();
+
+
+
+  const onAddComponent = (nuevoComponente:Componente) => {
+    const existeInventario = componentes.some(componente => componente.inventario === nuevoComponente.inventario);
+    if(existeInventario) return;
+    setShowSuccessMessage(true);
+    setComponentes([...componentes, nuevoComponente]);
+  };
+
+  return (
+    <div className="mt-8">
+        <Button
+            onClick={handleOpenModalComponentes}
+            color="primary" 
+            variant="contained" 
+            size="large"
+            sx={{margin:"1rem",
+              display:"flex",
+              alignContent:"end"
+            }}
+          >
+            Agregar Componente
+        </Button>
+        <ModalAgregarComponenteActivo
+            open={openModalComponentes}
+            onClose={handleCloseModalComponentes}
+            title={modalContentComponentes.title}
+            perifericos={perifericos}
+            onAddComponent={onAddComponent}
+          />
+        <Snackbar
+        open={showSuccessMessage}
+        autoHideDuration={3000}
+        onClose={() => setShowSuccessMessage(false)}
+      >
+        <Alert severity="success">Componente agregado exitosamente</Alert>
+      </Snackbar>
+    <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex-1 overflow-x-auto">
+        
+        <table className="min-w-full border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100 border-b">
+              <th className="py-2 px-4 border">Periférico</th>
+              <th className="py-2 px-4 border">Marca</th>
+              <th className="py-2 px-4 border">Modelo</th>
+              <th className="py-2 px-4 border">Serie</th>
+              <th className="py-2 px-4 border">Inventario</th>
+              <th className="py-2 px-1 border">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {componentes.map((comp, index) => (
+              <tr key={index}>
+                <td className="py-2 px-4 border">
+                  {comp.periferico?.nombre}
+                </td>
+                <td className="py-2 px-4 border">{comp.marca?.nombre}</td>
+                <td className="py-2 px-4 border">{comp.modelo?.nombre}</td>
+                <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
+                <td className="py-2 px-4 border">{comp.inventario}</td>
+                <td className="py-2 px-1 border">
+                  <Icon
+                    icon="weui:delete-outlined"
+                    width="25"
+                    height="25"
+                    onClick={() => eliminarComponente(index)}
+                    className="cursor-pointer mx-auto"
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {componentes.length === 0 && (
+  <Box sx={{ background: "#9c9c9c", marginBottom: 8, height: 100 }}>
+    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+      <h1 className="text-xl">No existen componentes agregados</h1>
+    </Box>
+  </Box>
+)}
+
+      </div>
+    </div>
+  </div>
+  )
+};
