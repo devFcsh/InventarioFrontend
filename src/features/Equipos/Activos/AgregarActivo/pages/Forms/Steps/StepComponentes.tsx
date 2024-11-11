@@ -10,10 +10,12 @@ import {
 
 interface FormProps {
   perifericos: Periferico[];
+  handleFormData: any
 }
 
 export const StepComponentes : React.FC<FormProps> = ({
-  perifericos = []
+  perifericos = [],
+  handleFormData
 }) => {
   const [openModalComponentes, setOpenModalComponentes] = useState<boolean>(false);
   const [componentes, setComponentes] = useState<Componente[]>([]);
@@ -42,6 +44,7 @@ export const StepComponentes : React.FC<FormProps> = ({
     if(existeInventario) return;
     setShowSuccessMessage(true);
     setComponentes([...componentes, nuevoComponente]);
+    handleFormData(componentes,"componentes")
   };
 
   return (

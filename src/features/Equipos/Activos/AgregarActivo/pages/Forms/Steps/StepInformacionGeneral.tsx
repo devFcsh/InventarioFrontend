@@ -17,7 +17,13 @@ import useRam from "@hooks/useRam";
 import useDiscos from "@hooks/useDiscos";
 import useVersionesSO from "@hooks/useVersionesSO";
 
-export const StepInformacionGeneral = () => {
+interface StepInformacionGeneralProps {
+  handleFormData: any
+}
+
+export const StepInformacionGeneral = ({
+  handleFormData
+}: StepInformacionGeneralProps) => {
   const [selectedSO, setSelectedSO] = useState<SistemaOperativo | null>(null);
   const [selectedVersionSO, setSelectedVersionSO] = useState<VersionSO | null>(null);
   const [selectedDominio, setSelectedDominio] = useState<Dominio | null>(null);
@@ -61,7 +67,7 @@ export const StepInformacionGeneral = () => {
             options={versionesSO}
             getOptionLabel={(option) => option.nombre}
             value={selectedVersionSO}
-            onChange={(_, newValue) => setSelectedVersionSO(newValue)}
+            onChange={(_, newValue) => {setSelectedVersionSO(newValue);handleFormData(newValue?.id_versionso,"versionso")}}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -77,7 +83,7 @@ export const StepInformacionGeneral = () => {
             options={dominios}
             getOptionLabel={(option) => option.nombre}
             value={selectedDominio}
-            onChange={(_, newValue) => setSelectedDominio(newValue)}
+            onChange={(_, newValue) => {setSelectedDominio(newValue);handleFormData(newValue?.id_dominio,"dominio")}}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -94,7 +100,7 @@ export const StepInformacionGeneral = () => {
             fullWidth
             size="small"
             value={nombreEquipo}
-            onChange={(e) => setNombreEquipo(e.target.value)}
+            onChange={(e) => {setNombreEquipo(e.target.value);handleFormData(e.target.value,"nombreEquipo")}}
           />
           <Autocomplete
             size="small"
@@ -102,7 +108,7 @@ export const StepInformacionGeneral = () => {
             options={versionesOffice}
             getOptionLabel={(option) => option.nombre}
             value={selectedVersionOffice}
-            onChange={(_, newValue) => setSelectedVersionOffice(newValue)}
+            onChange={(_, newValue) => {setSelectedVersionOffice(newValue);handleFormData(newValue?.id_versionoffice,"versionoffice")}}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -141,7 +147,7 @@ export const StepInformacionGeneral = () => {
             fullWidth
             size="small"
             value={direccionIP}
-            onChange={(e) => setDireccionIP(e.target.value)}
+            onChange={(e) => {setDireccionIP(e.target.value);handleFormData(e.target.value,"direccionIp")}}
             disabled={protocolo !== "0"}
           />
           <Autocomplete
@@ -150,7 +156,7 @@ export const StepInformacionGeneral = () => {
             options={antivirus}
             getOptionLabel={(option) => option.nombre}
             value={selectedAntivirus}
-            onChange={(_, newValue) => setSelectedAntivirus(newValue)}
+            onChange={(_, newValue) => {setSelectedAntivirus(newValue);handleFormData(newValue?.id_antivirus,"antivirus")}}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -168,7 +174,7 @@ export const StepInformacionGeneral = () => {
               `${option.capacidad} - ${option.tipo}`
             }
             value={selectedRAM}
-            onChange={(_, newValue) => setSelectedRAM(newValue)}
+            onChange={(_, newValue) => {setSelectedRAM(newValue);handleFormData(newValue?.id_ram,"ram")}}
             renderInput={(params) => (
               <TextField {...params} label="RAM" variant="outlined" fullWidth />
             )}
@@ -179,7 +185,7 @@ export const StepInformacionGeneral = () => {
             options={discos}
             getOptionLabel={(option) => option.capacidad}
             value={selectedDisco}
-            onChange={(_, newValue) => setSelectedDisco(newValue)}
+            onChange={(_, newValue) => {setSelectedDisco(newValue);handleFormData(newValue?.id_disco,"disco")}}
             renderInput={(params) => (
               <TextField
                 {...params}

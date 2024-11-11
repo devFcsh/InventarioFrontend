@@ -1,16 +1,21 @@
 import React, { useRef, useState } from "react";
 import { Box } from "@mui/material";
-import useSubirImagen from "@hooks/useSubirImagen";
 
-const StepCargarImagen = () => {
+interface StepCargarImagenProps {
+  handleFormData: any
+}
+
+const StepCargarImagen = ({
+  handleFormData
+}: StepCargarImagenProps) => {
   const [image, setImage] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { uploadImage } = useSubirImagen();
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setImage(file);
+      handleFormData(file,"image")
     }
   };
   const handleImageClick = () => {

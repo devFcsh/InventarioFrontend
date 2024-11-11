@@ -11,12 +11,12 @@ import useUsos from "@hooks/useUsos";
 
 interface StepDatosInventarioProps {
   periferico: string;
-  idUso: string | null;
-  idUsuario: string | null;
+  handleFormData: any
 }
 
 const Step1DatosInventario = ({
   periferico,
+  handleFormData
 }: StepDatosInventarioProps) => {
   const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
   const [selectedUsoId, setSelectedUsoId] = useState<string | null>(null);
@@ -84,6 +84,7 @@ const Step1DatosInventario = ({
     newValue: Serie | null
   ) => {
     setSelectedInventarioSerie(newValue);
+    handleFormData(newValue?.id_serie,"serie")
   };
 
 
@@ -122,8 +123,10 @@ const Step1DatosInventario = ({
             value={
               usuarios.find((u) => u.id_usuario === selectedUsuarioId) ?? null
             }
-            onChange={(event, newValue: Usuario | null) =>
-              setSelectedUsuarioId(newValue ? newValue.id_usuario : null)
+            onChange={(event, newValue: Usuario | null) =>{
+              setSelectedUsuarioId(newValue ? newValue.id_usuario : null);
+              handleFormData(newValue ? newValue.id_usuario: null,"idUsuario");
+            }
             }
             getOptionLabel={(option) => option.nombre}
             renderInput={(params) => (
@@ -190,7 +193,7 @@ const Step1DatosInventario = ({
                   fullWidth
                   size="small"
                   value={selectedInventarioInv}
-                  onChange={(e) => setSelectedInventarioInv(e.target.value)}
+                  onChange={(e) => {setSelectedInventarioInv(e.target.value),handleFormData(e.target.value,"inventario")}}
                 />
                 <Autocomplete
             size="small"
@@ -214,7 +217,7 @@ const Step1DatosInventario = ({
             options={aulas}
             getOptionLabel={(option) => option.nombre}
             value={selectedAula}
-            onChange={(_, newValue) => setSelectedAula(newValue)}
+            onChange={(_, newValue) => {setSelectedAula(newValue);handleFormData(newValue?.id_aula,"aula")}}
             renderInput={(params) => (
               <TextField
                 {...params}

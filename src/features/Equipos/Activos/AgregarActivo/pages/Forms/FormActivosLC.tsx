@@ -1,4 +1,4 @@
-import * as React from "react";
+import {useState,Fragment} from "react";
 import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
@@ -14,6 +14,8 @@ import { StepInformacionGeneral } from "./Steps/StepInformacionGeneral";
 import {
   Periferico,
 } from "../../../../../../types";
+import useSubirImagen from "@hooks/useSubirImagen";
+import { useAgregarComputadoraActivo } from "../../hooks/useAgregarComputadoraActivo";
 
 const steps = [
   "Datos de inventario",
@@ -24,10 +26,36 @@ const steps = [
 
 export const FormActivosLC = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = useState(0);
   const location = useLocation();
   const selectedPeriferico = location.state?.periferico as Periferico | undefined;
   const perifericos = location.state?.perifericos as Periferico[];
+  const { uploadImage } = useSubirImagen();
+  const { agregarComputadoraActivo } = useAgregarComputadoraActivo();
+  const [formData, setFormData] = useState({
+    inventario: '',
+    serie: 0,
+    nombreEquipo: '',
+    direccionIp: '',
+    versionso: 0,
+    versionoffice: 0,
+    ram: 0,
+    disco: 0,
+    antivirus: 0,
+    dominio: 0,
+    idAula: 0,
+    idUsuario: null,
+    image: null,  
+    componentes: [],
+  });
+  
+  const handleFormData = (newData : any, tipo:any) =>{
+    setFormData({
+      ...formData,
+      [tipo]: newData
+    })
+    console.log(formData)
+  }
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -46,17 +74,46 @@ export const FormActivosLC = () => {
   const renderStepContent = (stepIndex: number) => {
     switch (stepIndex) {
       case 0:
-        return <StepDatosInventario periferico={selectedPeriferico?.id_periferico ?? ''} idUso={null} idUsuario={null} />;
+        return <StepDatosInventario periferico={selectedPeriferico?.id_periferico ?? ''} handleFormData={handleFormData} />;
       case 1:
-        return <StepInformacionGeneral />;
+        return <StepInformacionGeneral handleFormData={handleFormData}/>;
       case 2:
-        return <StepCargarImagen />;
+        return <StepCargarImagen handleFormData={handleFormData}/>;
       case 3:
-        return <StepComponentes perifericos={perifericos}/>;
+        return <StepComponentes perifericos={perifericos} handleFormData={handleFormData}/>;
       default:
         return <div>Paso no encontrado</div>;
     }
   };
+  const handleAgregarEquipo = async () => {
+    let imagePath = "";
+
+    const equipoData = {
+      tipo: "activo",
+      inventario: formData.inventario || "",
+      serie: Number(formData.serie) ?? 0,
+      nombreEquipo: formData.nombreEquipo || "",
+      direccionIp: formData.direccionIp,
+      versionso: Number(formData.versionso) ?? 0,
+      versionoffice: Number(formData.versionoffice) ?? 0,
+      ram: Number(formData.ram) ?? 0,
+      disco: Number(formData.disco) ?? 0,
+      antivirus: Number(formData.antivirus) ?? 0,
+      dominio: Number(formData.dominio) ?? 0,
+      idAula: Number(formData.idAula) ?? 0,
+      idUsuario: parseInt(formData.idUsuario || "" , 10),
+      imagenRuta: imagePath,
+    };
+
+    try {
+      const equipoId = await agregarComputadoraActivo(equipoData);
+      navigate("/activos", { state: { equipoAgregado: true } });
+    } catch (error) {
+      console.error("Error al agregar el equipo y componentes:", error);
+      alert("Error al agregar el equipo y componentes.");
+    }
+  };
+
 
   const stepStyle = {
     "& .Mui-active": {
@@ -108,7 +165,7 @@ export const FormActivosLC = () => {
           })}
         </Stepper>
         {activeStep === steps.length ? (
-          <React.Fragment>
+          <Fragment>
             <Typography sx={{ mt: 2, mb: 1 }}>
               All steps completed - you&apos;re finished
             </Typography>
@@ -116,9 +173,9 @@ export const FormActivosLC = () => {
               <Box sx={{ flex: "1 1 auto" }} />
               <Button onClick={handleReset}>Reset</Button>
             </Box>
-          </React.Fragment>
+          </Fragment>
         ) : (
-          <React.Fragment>
+          <Fragment>
             {renderStepContent(activeStep)}
             <Box
               sx={{
@@ -163,7 +220,7 @@ export const FormActivosLC = () => {
                   : "Siguiente"}
               </Button>
             </Box>
-          </React.Fragment>
+          </Fragment>
         )}
       </Box>
     </Box>
