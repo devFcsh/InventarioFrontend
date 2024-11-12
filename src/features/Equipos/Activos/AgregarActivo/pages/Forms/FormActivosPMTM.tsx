@@ -1,3 +1,4 @@
+/*
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Stepper from "@mui/material/Stepper";
@@ -153,3 +154,5 @@ export const FormActivosPMTM = () => {
     </Box>
   );
 };
+
+*/

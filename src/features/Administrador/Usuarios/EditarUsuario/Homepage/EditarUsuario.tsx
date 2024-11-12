@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { TextField, Button, Snackbar, Alert } from "@mui/material";
+import { TextField, Button, Snackbar, Alert, Autocomplete } from "@mui/material";
 import { Icon } from "@iconify/react";
 import useEquiposPorUsuario from "../hooks/useEquiposPorUsuario";
 import useCambiarUsuarioEquipo from "../hooks/useCambiarUsuarioEquipo";
-import ModalCambiarUsuario from "../../pages/ModalCambiarUsuario";
+import useEditarUsuario from "../hooks/useEditarUsuario"; 
+import ModalCambiarUsuario from "../components/ModalCambiarUsuario";
+import useUsos from "@hooks/useUsos";
 
 const EditarUsuario = () => {
   const location = useLocation();
@@ -13,13 +15,17 @@ const EditarUsuario = () => {
   const { usuario } = location.state || {}; 
 
   const [nombre, setNombre] = useState(usuario?.nombre || "");
+  const [selectedUsoId, setSelectedUsoId] = useState<string | null>(usuario?.id_uso || null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [equipoId, setEquipoId] = useState<string | null>(null);
 
+  const { usos, loading: loadingUsos, error: errorUsos } = useUsos(); 
   const { equipos, loading: loadingEquipos, error: errorEquipos, refetch: refetchEquipos } = useEquiposPorUsuario(usuario?.id_usuario || "");
 
   const { cambiarUsuario, loading: loadingCambio } = useCambiarUsuarioEquipo();
+
+  const { editarUsuario, loading: loadingEdicion, error: errorEdicion } = useEditarUsuario();
 
   const [openModal, setOpenModal] = useState(false);
 
@@ -29,9 +35,20 @@ const EditarUsuario = () => {
     }
   }, [usuario, navigate]);
 
-  const handleSave = () => {
-    setSnackbarMessage("Usuario actualizado correctamente");
-    setOpenSnackbar(true);
+  const handleSave = async () => {
+    try {
+      if (nombre && selectedUsoId) {
+        await editarUsuario(usuario.id_usuario, nombre, selectedUsoId);
+        setSnackbarMessage("Usuario actualizado correctamente");
+        setOpenSnackbar(true);
+      } else {
+        setSnackbarMessage("Por favor, complete todos los campos.");
+        setOpenSnackbar(true);
+      }
+    } catch (error) {
+      setSnackbarMessage("Error al actualizar el usuario");
+      setOpenSnackbar(true);
+    }
   };
 
   const handleCloseSnackbar = () => {
@@ -52,7 +69,6 @@ const EditarUsuario = () => {
         setOpenModal(false); 
 
         refetchEquipos(); 
-
       } catch (error) {
         setSnackbarMessage("Error al cambiar el usuario del equipo");
         setOpenSnackbar(true);
@@ -60,12 +76,12 @@ const EditarUsuario = () => {
     }
   };
 
-  if (loadingEquipos) {
-    return <div>Cargando equipos...</div>; 
+  if (loadingEquipos || loadingEdicion || loadingUsos) {
+    return <div>Cargando...</div>;
   }
 
-  if (errorEquipos) {
-    return <div>Error al obtener los equipos: {errorEquipos}</div>;
+  if (errorEquipos || errorEdicion || errorUsos) {
+    return <div> {errorEquipos || errorEdicion || errorUsos}</div>; 
   }
 
   return (
@@ -81,6 +97,24 @@ const EditarUsuario = () => {
             size="small"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
+          />
+          
+          <Autocomplete
+            value={usos.find((uso) => uso.id_uso === selectedUsoId) || null} 
+            options={usos}
+            getOptionLabel={(option) => option.nombre}
+            onChange={(e, newValue) => {
+              setSelectedUsoId(newValue ? newValue.id_uso : null);
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Uso"
+                variant="outlined"
+                size="small"
+                fullWidth
+              />
+            )}
           />
         </div>
       </div>
@@ -146,7 +180,7 @@ const EditarUsuario = () => {
           color="primary"
           onClick={handleSave}
           fullWidth
-          disabled={loadingCambio}
+          disabled={loadingEdicion || loadingCambio}
         >
           Guardar cambios
         </Button>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Autocomplete, TextField } from "@mui/material";
 import useUsos from "@hooks/useUsos";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
-import { Uso, Usuario } from "../../../../types/"; 
+import { Uso, Usuario } from "../../../../../types"; 
 
 interface ModalCambiarUsuarioProps {
   open: boolean;
