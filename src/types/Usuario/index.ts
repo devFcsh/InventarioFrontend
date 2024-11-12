@@ -6,6 +6,7 @@ export type Usuario = {
 };
 
 export type EquipoUsuario = {
+    id_equipo: string;
     periferico: string;
     marca: string;
     modelo: string;

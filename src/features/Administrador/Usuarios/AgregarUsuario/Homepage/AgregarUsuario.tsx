@@ -114,11 +114,9 @@ const AgregarUsuario = () => {
         </div>
       </div>
 
-      {/* Mensajes de estado */}
       {message && <p className="text-green-500">{message}</p>}
       {error && <p className="text-red-500">{error}</p>}
 
-      {/* Botones */}
       <div className="flex gap-4 mt-10">
         <Button
           variant="contained"
@@ -139,7 +137,6 @@ const AgregarUsuario = () => {
         </Button>
       </div>
 
-      {/* Modal de confirmación de agregar */}
       <ModalConfirmation
         open={openModalAgregar}
         onClose={() => setOpenModalAgregar(false)}

@@ -1,27 +1,31 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Autocomplete, TextField, Button, Snackbar, Alert } from "@mui/material";
+import { TextField, Button, Snackbar, Alert } from "@mui/material";
 import { Icon } from "@iconify/react";
-import useUsos from "@hooks/useUsos";
 import useEquiposPorUsuario from "../hooks/useEquiposPorUsuario";
+import useCambiarUsuarioEquipo from "../hooks/useCambiarUsuarioEquipo";
+import ModalCambiarUsuario from "../../pages/ModalCambiarUsuario";
+
 const EditarUsuario = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   const { usuario } = location.state || {}; 
 
   const [nombre, setNombre] = useState(usuario?.nombre || "");
-  const [uso, setUso] = useState(usuario?.id_uso || "");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [equipoId, setEquipoId] = useState<string | null>(null);
 
-  const { usos } = useUsos();
+  const { equipos, loading: loadingEquipos, error: errorEquipos, refetch: refetchEquipos } = useEquiposPorUsuario(usuario?.id_usuario || "");
 
-  const { equipos, loading: loadingEquipos, error: errorEquipos } = useEquiposPorUsuario(usuario?.id_usuario || "");
+  const { cambiarUsuario, loading: loadingCambio } = useCambiarUsuarioEquipo();
+
+  const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
     if (!usuario) {
-      navigate("/usuarios");
+      navigate("/usuarios"); 
     }
   }, [usuario, navigate]);
 
@@ -34,12 +38,34 @@ const EditarUsuario = () => {
     setOpenSnackbar(false);
   };
 
+  const handleCambiarUsuario = (equipoId: string) => {
+    setEquipoId(equipoId);
+    setOpenModal(true); 
+  };
+
+  const handleConfirmarCambio = async (usuarioId: string) => {
+    if (equipoId) {
+      try {
+        await cambiarUsuario(equipoId, usuarioId);
+        setSnackbarMessage("Usuario cambiado correctamente al equipo");
+        setOpenSnackbar(true);
+        setOpenModal(false); 
+
+        refetchEquipos(); 
+
+      } catch (error) {
+        setSnackbarMessage("Error al cambiar el usuario del equipo");
+        setOpenSnackbar(true);
+      }
+    }
+  };
+
   if (loadingEquipos) {
     return <div>Cargando equipos...</div>; 
   }
 
   if (errorEquipos) {
-    return <div>Error al obtener los equipos: {errorEquipos}</div>; 
+    return <div>Error al obtener los equipos: {errorEquipos}</div>;
   }
 
   return (
@@ -55,23 +81,6 @@ const EditarUsuario = () => {
             size="small"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
-          />
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={usos}
-            value={usos.find((u) => u.id_uso === uso) || null}
-            onChange={(e, newValue) => setUso(newValue ? newValue.id_uso : "")}
-            getOptionLabel={(option) => option.nombre}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Uso"
-                variant="outlined"
-                fullWidth
-                size="small"
-              />
-            )}
           />
         </div>
       </div>
@@ -105,11 +114,11 @@ const EditarUsuario = () => {
                     <td className="py-2 px-4 border">{equipo.inventario}</td>
                     <td className="py-2 px-4 border">
                       <Icon
-                        icon="weui:delete-outlined"
+                        icon="material-symbols:compare-arrows-rounded"
                         width="25"
                         height="25"
                         className="cursor-pointer"
-                        onClick={() => alert(`Eliminar componente ${equipo.periferico}`)}
+                        onClick={() => handleCambiarUsuario(equipo.id_equipo)} 
                       />
                     </td>
                   </tr>
@@ -137,6 +146,7 @@ const EditarUsuario = () => {
           color="primary"
           onClick={handleSave}
           fullWidth
+          disabled={loadingCambio}
         >
           Guardar cambios
         </Button>
@@ -149,6 +159,12 @@ const EditarUsuario = () => {
           Cancelar
         </Button>
       </div>
+
+      <ModalCambiarUsuario
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        onConfirm={handleConfirmarCambio}
+      />
     </div>
   );
 };
