@@ -1,22 +1,11 @@
-import {useState,Fragment} from "react";
-import Box from "@mui/material/Box";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import "./FormStyle.css";
-import StepDatosInventario from "./Steps/StepDatosInventario";
-import StepCargarImagen from "./Steps/StepCargarImagen";
+import { useState, Fragment } from "react";
+import {Box,Stepper,Step,StepLabel,Button,Typography} from "@mui/material";
+import {StepDatosInventario, StepInformacionGeneral,StepCargarImagen,StepComponentes} from "../Forms/Steps/index.ts"
 import { useLocation, useNavigate } from "react-router-dom";
-import { StepComponentes } from "./Steps/StepComponentes";
-import { StepInformacionGeneral } from "./Steps/StepInformacionGeneral";
-import {
-  Periferico,
-} from "../../../../../../types";
-import useSubirImagen from "@hooks/useSubirImagen";
+import { Periferico } from "../../../../../../types";
 import { useAgregarComputadoraActivo } from "../../hooks/useAgregarComputadoraActivo";
-
+import { useAgregarComponentes } from "../../hooks/useAgregarComponentes";
+import {useFormData} from "./hooks/useFormData.ts"
 const steps = [
   "Datos de inventario",
   "Información general",
@@ -28,34 +17,14 @@ export const FormActivosLC = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const location = useLocation();
-  const selectedPeriferico = location.state?.periferico as Periferico | undefined;
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const selectedPeriferico = location.state?.periferico as
+    | Periferico
+    | undefined;
   const perifericos = location.state?.perifericos as Periferico[];
-  const { uploadImage } = useSubirImagen();
   const { agregarComputadoraActivo } = useAgregarComputadoraActivo();
-  const [formData, setFormData] = useState({
-    inventario: '',
-    serie: 0,
-    nombreEquipo: '',
-    direccionIp: '',
-    versionso: 0,
-    versionoffice: 0,
-    ram: 0,
-    disco: 0,
-    antivirus: 0,
-    dominio: 0,
-    idAula: 0,
-    idUsuario: null,
-    image: null,  
-    componentes: [],
-  });
-  
-  const handleFormData = (newData : any, tipo:any) =>{
-    setFormData({
-      ...formData,
-      [tipo]: newData
-    })
-    console.log(formData)
-  }
+  const { agregarComponentes } = useAgregarComponentes();
+  const {formData,handleFormData} = useFormData();
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -74,46 +43,66 @@ export const FormActivosLC = () => {
   const renderStepContent = (stepIndex: number) => {
     switch (stepIndex) {
       case 0:
-        return <StepDatosInventario periferico={selectedPeriferico?.id_periferico ?? ''} handleFormData={handleFormData} />;
+        return (
+          <StepDatosInventario
+            periferico={selectedPeriferico?.id_periferico ?? ""}
+            handleFormData={handleFormData}
+          />
+        );
       case 1:
-        return <StepInformacionGeneral handleFormData={handleFormData}/>;
+        return <StepInformacionGeneral handleFormData={handleFormData} />;
       case 2:
-        return <StepCargarImagen handleFormData={handleFormData}/>;
+        return <StepCargarImagen handleFormData={handleFormData} />;
       case 3:
-        return <StepComponentes perifericos={perifericos} handleFormData={handleFormData}/>;
+        return (
+          <StepComponentes
+            perifericos={perifericos}
+            handleFormData={handleFormData}
+          />
+        );
       default:
         return <div>Paso no encontrado</div>;
     }
   };
   const handleAgregarEquipo = async () => {
     let imagePath = "";
-
     const equipoData = {
       tipo: "activo",
       inventario: formData.inventario || "",
-      serie: Number(formData.serie) ?? 0,
+      serie: formData.serie ?? 0,
       nombreEquipo: formData.nombreEquipo || "",
       direccionIp: formData.direccionIp,
-      versionso: Number(formData.versionso) ?? 0,
-      versionoffice: Number(formData.versionoffice) ?? 0,
-      ram: Number(formData.ram) ?? 0,
-      disco: Number(formData.disco) ?? 0,
-      antivirus: Number(formData.antivirus) ?? 0,
-      dominio: Number(formData.dominio) ?? 0,
-      idAula: Number(formData.idAula) ?? 0,
-      idUsuario: parseInt(formData.idUsuario || "" , 10),
+      versionso: formData.versionso ?? 0,
+      versionoffice: formData.versionoffice ?? 0,
+      ram: formData.ram ?? 0,
+      disco: formData.disco ?? 0,
+      antivirus: formData.antivirus ?? 0,
+      dominio: formData.dominio ?? 0,
+      idAula: formData.idAula ?? 0,
+      idUsuario: parseInt(formData.idUsuario || "", 10),
       imagenRuta: imagePath,
     };
 
     try {
       const equipoId = await agregarComputadoraActivo(equipoData);
+      if (formData.componentes.length > 0 && equipoId) {
+        await agregarComponentes({
+          equipoId: equipoId,
+          componentes: formData.componentes.map((comp) => ({
+            inventario: comp.inventario,
+            serieId: Number(comp.serie?.id_serie) ?? 0,
+          })),
+          aulaId: Number(formData.idAula) ?? 0,
+          usuarioId: parseInt(formData.idUsuario || "", 10),
+          imagenRuta: imagePath,
+        });
+      }
+      setShowSuccessMessage(true);
       navigate("/activos", { state: { equipoAgregado: true } });
     } catch (error) {
-      console.error("Error al agregar el equipo y componentes:", error);
       alert("Error al agregar el equipo y componentes.");
     }
   };
-
 
   const stepStyle = {
     "& .Mui-active": {
@@ -204,7 +193,11 @@ export const FormActivosLC = () => {
               </Button>
 
               <Button
-                onClick={handleNext}
+                onClick={
+                  activeStep === steps.length - 1
+                    ? handleAgregarEquipo
+                    : handleNext
+                }
                 variant="contained"
                 sx={{
                   backgroundColor:

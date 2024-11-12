@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import { TextField, Box, Autocomplete } from "@mui/material";
-import { Marca, Modelo, Serie, Edificio, Aula, Usuario, Uso } from "../../../../../../../types";
+import {
+  Marca,
+  Modelo,
+  Serie,
+  Edificio,
+  Aula,
+  Usuario,
+  Uso,
+} from "../../../../../../../types";
 import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
@@ -11,35 +19,38 @@ import useUsos from "@hooks/useUsos";
 
 interface StepDatosInventarioProps {
   periferico: string;
-  handleFormData: any
+  handleFormData: any;
 }
 
-const Step1DatosInventario = ({
+export const StepDatosInventario = ({
   periferico,
-  handleFormData
+  handleFormData,
 }: StepDatosInventarioProps) => {
   const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
   const [selectedUsoId, setSelectedUsoId] = useState<string | null>(null);
-  const [selectedUsuarioId, setSelectedUsuarioId] = useState<string | null>(null);
+  const [selectedUsuarioId, setSelectedUsuarioId] = useState<string | null>(
+    null
+  );
   const [selectedInventarioMarca, setSelectedInventarioMarca] =
     useState<Marca | null>(null);
   const [selectedInventarioModelo, setSelectedInventarioModelo] =
     useState<Modelo | null>(null);
   const [selectedInventarioSerie, setSelectedInventarioSerie] =
     useState<Serie | null>(null);
-  const [selectedInventarioInv, setSelectedInventarioInv] = useState<string | null>("");
+  const [selectedInventarioInv, setSelectedInventarioInv] = useState<
+    string | null
+  >("");
   const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
     null
   );
   const [selectedAula, setSelectedAula] = useState<Aula | null>(null);
-
 
   const {
     usuarios,
     loading: loadingUsuarios,
     error: errorUsuarios,
   } = useUsuariosPorUso(selectedUsoId || "");
-  
+
   const { marcas } = useMarcasPorPeriferico(periferico);
   const { modelos } = useModelosPorMarcaPeriferico(
     selectedInventarioMarca?.id_marca ?? "",
@@ -52,7 +63,6 @@ const Step1DatosInventario = ({
   );
   const { edificios } = useEdificios();
   const { aulas } = useAulas(selectedEdificio?.id_edificio ?? "");
-
 
   const handleUsoChange = (event: any, newValue: Uso | null) => {
     if (newValue) {
@@ -71,7 +81,6 @@ const Step1DatosInventario = ({
     setSelectedInventarioSerie(null);
   };
 
-
   const handleModeloChange = (
     _event: React.SyntheticEvent<Element, Event>,
     newValue: Modelo | null
@@ -84,15 +93,14 @@ const Step1DatosInventario = ({
     newValue: Serie | null
   ) => {
     setSelectedInventarioSerie(newValue);
-    handleFormData(newValue?.id_serie,"serie")
+    handleFormData(newValue?.id_serie, "serie");
   };
-
 
   return (
     <Box>
       <div className="mt-8">
         <div className="grid grid-cols-2 gap-4">
-        <Autocomplete
+          <Autocomplete
             size="small"
             disablePortal
             options={usos}
@@ -115,7 +123,7 @@ const Step1DatosInventario = ({
               />
             )}
           />
-        <Autocomplete
+          <Autocomplete
             size="small"
             disablePortal
             options={usuarios}
@@ -123,11 +131,13 @@ const Step1DatosInventario = ({
             value={
               usuarios.find((u) => u.id_usuario === selectedUsuarioId) ?? null
             }
-            onChange={(event, newValue: Usuario | null) =>{
+            onChange={(event, newValue: Usuario | null) => {
               setSelectedUsuarioId(newValue ? newValue.id_usuario : null);
-              handleFormData(newValue ? newValue.id_usuario: null,"idUsuario");
-            }
-            }
+              handleFormData(
+                newValue ? newValue.id_usuario : null,
+                "idUsuario"
+              );
+            }}
             getOptionLabel={(option) => option.nombre}
             renderInput={(params) => (
               <TextField
@@ -140,24 +150,24 @@ const Step1DatosInventario = ({
               />
             )}
           />
-        <Autocomplete
-  size="small"
-  disablePortal
-  options={marcas}
-  getOptionLabel={(option: Marca) => option?.nombre || ""}
-  onChange={handleMarcaChange}
-  value={selectedInventarioMarca}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="Marca"
-      variant="outlined"
-      fullWidth
-    />
-  )}
-/>
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={marcas}
+            getOptionLabel={(option: Marca) => option?.nombre || ""}
+            onChange={handleMarcaChange}
+            value={selectedInventarioMarca}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Marca"
+                variant="outlined"
+                fullWidth
+              />
+            )}
+          />
 
-                <Autocomplete
+          <Autocomplete
             size="small"
             disablePortal
             options={modelos}
@@ -174,28 +184,36 @@ const Step1DatosInventario = ({
             )}
             disabled={!selectedInventarioMarca}
           />
-              <Autocomplete
-                size="small"
-                disablePortal
-                options={series}
-                getOptionLabel={(option: Serie) => option?.nombre || ""}
-                onChange={handleSerieChange}
-                value={selectedInventarioSerie}
-                renderInput={(params) => (
-                  <TextField {...params} label="Serie" variant="outlined" fullWidth />
-                )}
-                disabled={!selectedInventarioModelo}
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={series}
+            getOptionLabel={(option: Serie) => option?.nombre || ""}
+            onChange={handleSerieChange}
+            value={selectedInventarioSerie}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Serie"
+                variant="outlined"
+                fullWidth
               />
-                <TextField
-                  label="Inventario"
-                  placeholder="Inventario"
-                  variant="outlined"
-                  fullWidth
-                  size="small"
-                  value={selectedInventarioInv}
-                  onChange={(e) => {setSelectedInventarioInv(e.target.value),handleFormData(e.target.value,"inventario")}}
-                />
-                <Autocomplete
+            )}
+            disabled={!selectedInventarioModelo}
+          />
+          <TextField
+            label="Inventario"
+            placeholder="Inventario"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={selectedInventarioInv}
+            onChange={(e) => {
+              setSelectedInventarioInv(e.target.value),
+                handleFormData(e.target.value, "inventario");
+            }}
+          />
+          <Autocomplete
             size="small"
             disablePortal
             options={edificios}
@@ -211,13 +229,16 @@ const Step1DatosInventario = ({
               />
             )}
           />
-                    <Autocomplete
+          <Autocomplete
             size="small"
             disablePortal
             options={aulas}
             getOptionLabel={(option) => option.nombre}
             value={selectedAula}
-            onChange={(_, newValue) => {setSelectedAula(newValue);handleFormData(newValue?.id_aula,"aula")}}
+            onChange={(_, newValue) => {
+              setSelectedAula(newValue);
+              handleFormData(newValue?.id_aula, "idAula");
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -228,10 +249,8 @@ const Step1DatosInventario = ({
             )}
             disabled={!selectedEdificio}
           />
-          </div>
         </div>
+      </div>
     </Box>
   );
 };
-
-export default Step1DatosInventario;
