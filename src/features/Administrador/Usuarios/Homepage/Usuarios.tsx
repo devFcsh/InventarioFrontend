@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Autocomplete } from "@mui/material";
+import { Autocomplete, IconButton } from "@mui/material";
 import { TextField, Snackbar, Alert } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
@@ -8,6 +8,8 @@ import useUsos from "@hooks/useUsos";
 import { useUsuariosFiltrados } from "../hooks/useUsuariosFiltrados";
 import { FiltrosUsuario, Uso, Usuario } from "../../../../types/index";
 import { filas } from "../../../../data";
+import ModalConfirmation from "../../../../components/ModalConfirmation";
+import useEliminarUsuario from "../hooks/useEliminarUsuario";
 
 const Usuarios = () => {
   const [selectedUso, setSelectedUso] = useState<string | null>(null);
@@ -19,6 +21,10 @@ const Usuarios = () => {
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
   const [totalPages, setTotalPages] = useState<number>(1);
 
+  const [openModal, setOpenModal] = useState(false);
+  const [usuarioToDelete, setUsuarioToDelete] = useState<Usuario | null>(null);
+
+  const { eliminarUsuario } = useEliminarUsuario();
   const { usos } = useUsos();
   const { usuarios } = useUsuariosPorUso(selectedUso || "");
 
@@ -30,13 +36,13 @@ const Usuarios = () => {
   const { usuariosFiltrados, totalCount, loading, error } =
     useUsuariosFiltrados(filtros, currentPage, rowsPerPage, shouldFetch);
 
-    const location = useLocation();
-    useEffect(() => {
-      if (location.state && location.state.snackbarMessage) {
-        setSnackbarMessage(location.state.snackbarMessage);
-        setOpenSnackbar(true);
-      }
-    }, [location]);
+  const location = useLocation();
+  useEffect(() => {
+    if (location.state && location.state.snackbarMessage) {
+      setSnackbarMessage(location.state.snackbarMessage);
+      setOpenSnackbar(true);
+    }
+  }, [location]);
 
   useEffect(() => {
     if (totalCount > 0 && rowsPerPage > 0) {
@@ -57,7 +63,7 @@ const Usuarios = () => {
     newValue: Uso | null
   ) => {
     setSelectedUso(newValue ? newValue.id_uso : null);
-    setSelectedUsuario(null); 
+    setSelectedUsuario(null);
   };
 
   const handleUsuarioChange = (
@@ -92,9 +98,32 @@ const Usuarios = () => {
     setCurrentPage(1);
   };
 
+  const handleDeleteClick = (usuario: Usuario) => {
+    setUsuarioToDelete(usuario);
+    setOpenModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (usuarioToDelete) {
+      try {
+        await eliminarUsuario(usuarioToDelete.id_usuario);
+        setOpenModal(false);
+        setSnackbarMessage("Usuario eliminado con éxito.");
+        setOpenSnackbar(true);
+      } catch (error) {
+        setSnackbarMessage("Error al eliminar el usuario.");
+        setOpenSnackbar(true);
+      }
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setOpenModal(false);
+  };
+
   return (
     <div className="flex flex-col p-4">
-       <Snackbar
+      <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
@@ -109,9 +138,9 @@ const Usuarios = () => {
         </Alert>
       </Snackbar>
       <div className="mb-4">
-      <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Usuarios</h1>
-          <Link to={{ pathname: "/agregarUsuario" }} state={{  }}>
+          <Link to={{ pathname: "/agregarUsuario" }}>
             <Icon
               icon="gridicons:add"
               width="30"
@@ -201,22 +230,27 @@ const Usuarios = () => {
                   <td className="px-4 py-2">{usuario.uso}</td>
                   <td className="px-4 py-2">{usuario.nombre}</td>
                   <td className="px-4 py-3 flex items-center gap-2">
-                    <Icon
-                      icon="weui:delete-outlined"
-                      width="25"
-                      height="25"
-                      className="cursor-pointer"
-                    />
-                   <td className="px-4 py-3 flex items-center gap-2">
-                  <Link to={{ pathname: "/editarUsuario" }} state={{ usuario }}>
-                    <Icon
-                      icon="mage:edit"
-                      width="25"
-                      height="25"
-                      className="cursor-pointer"
-                    />
-                  </Link>
-                </td>
+                    <IconButton onClick={() => handleDeleteClick(usuario)}>
+                      <Icon
+                        icon="weui:delete-outlined"
+                        width="25"
+                        height="25"
+                        className="cursor-pointer"
+                      />
+                    </IconButton>
+                    <td className="px-4 py-3 flex items-center gap-2">
+                      <Link
+                        to={{ pathname: "/editarUsuario" }}
+                        state={{ usuario }}
+                      >
+                        <Icon
+                          icon="mage:edit"
+                          width="25"
+                          height="25"
+                          className="cursor-pointer"
+                        />
+                      </Link>
+                    </td>
                   </td>
                 </tr>
               ))}
@@ -224,6 +258,15 @@ const Usuarios = () => {
           </table>
         )}
       </div>
+
+      <ModalConfirmation
+        open={openModal}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Eliminar Usuario"
+        message="¿Estás seguro de que deseas eliminar a este usuario?"
+      />
+
       <nav
         className="flex flex-col md:flex-row justify-between items-center p-4"
         aria-label="Table navigation"

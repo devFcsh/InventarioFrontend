@@ -47,7 +47,7 @@ const ModalCambiarUsuario: React.FC<ModalCambiarUsuarioProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Cambiar Usuario del Equipo</DialogTitle>
+      <DialogTitle>Seleccione el nuevo usuario:</DialogTitle>
       <DialogContent>
         <div className="mb-4">
           <Autocomplete

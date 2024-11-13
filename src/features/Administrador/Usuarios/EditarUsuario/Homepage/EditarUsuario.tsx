@@ -1,10 +1,16 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { TextField, Button, Snackbar, Alert, Autocomplete } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Snackbar,
+  Alert,
+  Autocomplete,
+} from "@mui/material";
 import { Icon } from "@iconify/react";
 import useEquiposPorUsuario from "../hooks/useEquiposPorUsuario";
 import useCambiarUsuarioEquipo from "../hooks/useCambiarUsuarioEquipo";
-import useEditarUsuario from "../hooks/useEditarUsuario"; 
+import useEditarUsuario from "../hooks/useEditarUsuario";
 import ModalCambiarUsuario from "../components/ModalCambiarUsuario";
 import useUsos from "@hooks/useUsos";
 
@@ -12,26 +18,37 @@ const EditarUsuario = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { usuario } = location.state || {}; 
+  const { usuario } = location.state || {};
 
   const [nombre, setNombre] = useState(usuario?.nombre || "");
-  const [selectedUsoId, setSelectedUsoId] = useState<string | null>(usuario?.id_uso || null);
+  const [selectedUsoId, setSelectedUsoId] = useState<string | null>(
+    usuario?.id_uso || null
+  );
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [equipoId, setEquipoId] = useState<string | null>(null);
 
-  const { usos, loading: loadingUsos, error: errorUsos } = useUsos(); 
-  const { equipos, loading: loadingEquipos, error: errorEquipos, refetch: refetchEquipos } = useEquiposPorUsuario(usuario?.id_usuario || "");
+  const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
+  const {
+    equipos,
+    loading: loadingEquipos,
+    error: errorEquipos,
+    refetch: refetchEquipos,
+  } = useEquiposPorUsuario(usuario?.id_usuario || "");
 
   const { cambiarUsuario, loading: loadingCambio } = useCambiarUsuarioEquipo();
 
-  const { editarUsuario, loading: loadingEdicion, error: errorEdicion } = useEditarUsuario();
+  const {
+    editarUsuario,
+    loading: loadingEdicion,
+    error: errorEdicion,
+  } = useEditarUsuario();
 
   const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
     if (!usuario) {
-      navigate("/usuarios"); 
+      navigate("/usuarios");
     }
   }, [usuario, navigate]);
 
@@ -57,7 +74,7 @@ const EditarUsuario = () => {
 
   const handleCambiarUsuario = (equipoId: string) => {
     setEquipoId(equipoId);
-    setOpenModal(true); 
+    setOpenModal(true);
   };
 
   const handleConfirmarCambio = async (usuarioId: string) => {
@@ -66,9 +83,9 @@ const EditarUsuario = () => {
         await cambiarUsuario(equipoId, usuarioId);
         setSnackbarMessage("Usuario cambiado correctamente al equipo");
         setOpenSnackbar(true);
-        setOpenModal(false); 
+        setOpenModal(false);
 
-        refetchEquipos(); 
+        refetchEquipos();
       } catch (error) {
         setSnackbarMessage("Error al cambiar el usuario del equipo");
         setOpenSnackbar(true);
@@ -81,7 +98,7 @@ const EditarUsuario = () => {
   }
 
   if (errorEquipos || errorEdicion || errorUsos) {
-    return <div> {errorEquipos || errorEdicion || errorUsos}</div>; 
+    return <div> {errorEquipos || errorEdicion || errorUsos}</div>;
   }
 
   return (
@@ -98,9 +115,9 @@ const EditarUsuario = () => {
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
           />
-          
+
           <Autocomplete
-            value={usos.find((uso) => uso.id_uso === selectedUsoId) || null} 
+            value={usos.find((uso) => uso.id_uso === selectedUsoId) || null}
             options={usos}
             getOptionLabel={(option) => option.nombre}
             onChange={(e, newValue) => {
@@ -136,7 +153,9 @@ const EditarUsuario = () => {
             <tbody>
               {equipos.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-4">No hay equipos asignados a este usuario.</td>
+                  <td colSpan={6} className="text-center py-4">
+                    No hay equipos asignados a este usuario.
+                  </td>
                 </tr>
               ) : (
                 equipos.map((equipo, index) => (
@@ -152,7 +171,7 @@ const EditarUsuario = () => {
                         width="25"
                         height="25"
                         className="cursor-pointer"
-                        onClick={() => handleCambiarUsuario(equipo.id_equipo)} 
+                        onClick={() => handleCambiarUsuario(equipo.id_equipo)}
                       />
                     </td>
                   </tr>
@@ -169,7 +188,11 @@ const EditarUsuario = () => {
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: "100%" }}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
