@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { TextField, Box, Autocomplete } from "@mui/material";
 import {
   Marca,
@@ -16,6 +15,8 @@ import useEdificios from "@hooks/useEdificios";
 import useAulas from "@hooks/useAulas";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import useUsos from "@hooks/useUsos";
+import { useFormDatosInventario } from "../hooks/useFormDatosInventario";
+import { useEffect } from "react";
 
 interface StepDatosInventarioProps {
   periferico: string;
@@ -24,77 +25,29 @@ interface StepDatosInventarioProps {
 
 export const StepDatosInventario = ({
   periferico,
-  handleFormData,
 }: StepDatosInventarioProps) => {
+
+  const {inventoryDataForm,handleInventoryChange} = useFormDatosInventario();
   const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
-  const [selectedUsoId, setSelectedUsoId] = useState<string | null>(null);
-  const [selectedUsuarioId, setSelectedUsuarioId] = useState<string | null>(
-    null
-  );
-  const [selectedInventarioMarca, setSelectedInventarioMarca] =
-    useState<Marca | null>(null);
-  const [selectedInventarioModelo, setSelectedInventarioModelo] =
-    useState<Modelo | null>(null);
-  const [selectedInventarioSerie, setSelectedInventarioSerie] =
-    useState<Serie | null>(null);
-  const [selectedInventarioInv, setSelectedInventarioInv] = useState<
-    string | null
-  >("");
-  const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
-    null
-  );
-  const [selectedAula, setSelectedAula] = useState<Aula | null>(null);
 
   const {
     usuarios,
     loading: loadingUsuarios,
     error: errorUsuarios,
-  } = useUsuariosPorUso(selectedUsoId || "");
+  } = useUsuariosPorUso(inventoryDataForm.usoId || "");
 
   const { marcas } = useMarcasPorPeriferico(periferico);
   const { modelos } = useModelosPorMarcaPeriferico(
-    selectedInventarioMarca?.id_marca ?? "",
+    inventoryDataForm.marca?.id_marca ?? "",
     periferico
   );
   const { series } = useSeriesPorModelo(
     periferico,
-    selectedInventarioMarca?.id_marca ?? "",
-    selectedInventarioModelo?.id_modelo ?? ""
+    inventoryDataForm.marca?.id_marca ?? "",
+    inventoryDataForm.modelo?.id_modelo ?? ""
   );
   const { edificios } = useEdificios();
-  const { aulas } = useAulas(selectedEdificio?.id_edificio ?? "");
-
-  const handleUsoChange = (event: any, newValue: Uso | null) => {
-    if (newValue) {
-      setSelectedUsoId(newValue.id_uso);
-    } else {
-      setSelectedUsoId(null);
-      setSelectedUsuarioId(null);
-    }
-  };
-  const handleMarcaChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Marca | null
-  ) => {
-    setSelectedInventarioMarca(newValue);
-    setSelectedInventarioModelo(null);
-    setSelectedInventarioSerie(null);
-  };
-
-  const handleModeloChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Modelo | null
-  ) => {
-    setSelectedInventarioModelo(newValue);
-    setSelectedInventarioSerie(null);
-  };
-  const handleSerieChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Serie | null
-  ) => {
-    setSelectedInventarioSerie(newValue);
-    handleFormData(newValue?.id_serie, "serie");
-  };
+  const { aulas } = useAulas(inventoryDataForm.edificio?.id_edificio ?? "");
 
   return (
     <Box>
@@ -106,12 +59,14 @@ export const StepDatosInventario = ({
             options={usos}
             loading={loadingUsos}
             value={
-              selectedUsoId
-                ? usos.find((u) => u.id_uso === selectedUsoId) ?? null
+              inventoryDataForm.usoId
+                ? usos.find((u) => u?.id_uso === inventoryDataForm.usoId) ?? null
                 : null
             }
-            onChange={handleUsoChange}
-            getOptionLabel={(option) => option.nombre}
+            onChange={(_, newValue: Uso | null) => {
+              handleInventoryChange("uso", newValue);
+            }}
+            getOptionLabel={(option) => option ? option.nombre : ""}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -129,16 +84,12 @@ export const StepDatosInventario = ({
             options={usuarios}
             loading={loadingUsuarios}
             value={
-              usuarios.find((u) => u.id_usuario === selectedUsuarioId) ?? null
+              usuarios.find((u) => u?.id_usuario === inventoryDataForm.usuarioId) ?? null
             }
-            onChange={(event, newValue: Usuario | null) => {
-              setSelectedUsuarioId(newValue ? newValue.id_usuario : null);
-              handleFormData(
-                newValue ? newValue.id_usuario : null,
-                "idUsuario"
-              );
+            onChange={(_, newValue: Usuario | null) => {
+              handleInventoryChange("usuario", newValue);
             }}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option ? option.nombre : ""}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -155,8 +106,10 @@ export const StepDatosInventario = ({
             disablePortal
             options={marcas}
             getOptionLabel={(option: Marca) => option?.nombre || ""}
-            onChange={handleMarcaChange}
-            value={selectedInventarioMarca}
+            onChange={(_, newValue: Marca | null) => {
+              handleInventoryChange("marca", newValue);
+            }}
+            value={inventoryDataForm.marca}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -172,8 +125,10 @@ export const StepDatosInventario = ({
             disablePortal
             options={modelos}
             getOptionLabel={(option: Modelo) => option?.nombre || ""}
-            onChange={handleModeloChange}
-            value={selectedInventarioModelo}
+            onChange={(_, newValue: Modelo | null) => {
+              handleInventoryChange("modelo", newValue);
+            }}
+            value={inventoryDataForm.modelo}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -182,15 +137,17 @@ export const StepDatosInventario = ({
                 fullWidth
               />
             )}
-            disabled={!selectedInventarioMarca}
+            disabled={!inventoryDataForm.marca}
           />
           <Autocomplete
             size="small"
             disablePortal
             options={series}
             getOptionLabel={(option: Serie) => option?.nombre || ""}
-            onChange={handleSerieChange}
-            value={selectedInventarioSerie}
+            onChange={(_, newValue: Serie | null) => {
+              handleInventoryChange("serie", newValue);
+            }}
+            value={inventoryDataForm.serie}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -199,7 +156,7 @@ export const StepDatosInventario = ({
                 fullWidth
               />
             )}
-            disabled={!selectedInventarioModelo}
+            disabled={!inventoryDataForm.modelo}
           />
           <TextField
             label="Inventario"
@@ -207,19 +164,20 @@ export const StepDatosInventario = ({
             variant="outlined"
             fullWidth
             size="small"
-            value={selectedInventarioInv}
+            value={inventoryDataForm.inventario}
             onChange={(e) => {
-              setSelectedInventarioInv(e.target.value),
-                handleFormData(e.target.value, "inventario");
+              handleInventoryChange("inventario", e.target.value);
             }}
           />
           <Autocomplete
             size="small"
             disablePortal
             options={edificios}
-            getOptionLabel={(option) => option.nombre}
-            value={selectedEdificio}
-            onChange={(_, newValue) => setSelectedEdificio(newValue)}
+            getOptionLabel={(option) => option ? option.nombre : ""}
+            value={inventoryDataForm.edificio}
+            onChange={(_, newValue: Edificio | null) => {
+              handleInventoryChange("edificio", newValue);
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -233,11 +191,10 @@ export const StepDatosInventario = ({
             size="small"
             disablePortal
             options={aulas}
-            getOptionLabel={(option) => option.nombre}
-            value={selectedAula}
-            onChange={(_, newValue) => {
-              setSelectedAula(newValue);
-              handleFormData(newValue?.id_aula, "idAula");
+            getOptionLabel={(option) => option ? option.nombre : ""}
+            value={inventoryDataForm.aula}
+            onChange={(_, newValue: Aula | null) => {
+              handleInventoryChange("aula", newValue);
             }}
             renderInput={(params) => (
               <TextField
@@ -247,7 +204,7 @@ export const StepDatosInventario = ({
                 fullWidth
               />
             )}
-            disabled={!selectedEdificio}
+            disabled={!inventoryDataForm.edificio}
           />
         </div>
       </div>

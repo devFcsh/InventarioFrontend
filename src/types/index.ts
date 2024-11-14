@@ -25,12 +25,12 @@ export type Inventario = {
 export type Uso = {
   id_uso: string;
   nombre: string;
-};
+} | null;
 
 export type Usuario = {
   id_usuario: string;
   nombre: string;
-};
+} | null;
 
 export type SistemaOperativo = {
   id_sistemaoperativo: string;
@@ -93,12 +93,12 @@ export type EquipoImagen = {
 export type Edificio = {
   id_edificio: string;
   nombre: string;
-};
+}| null;
 
 export type Aula = {
   id_aula: string;
   nombre: string;
-};
+}| null;
 
 export type Filtros = {
   perifericoId?: string;
