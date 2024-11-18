@@ -1,6 +1,5 @@
 import { useState } from "react";
 import clienteAxios from "@hooks/index";
-import { AxiosError } from "axios"; 
 
 const useEliminarUsuario = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -18,24 +17,22 @@ const useEliminarUsuario = () => {
       const response = await clienteAxios.delete(`/usuarios/${id_usuario}`);
 
       if (response.status === 200) {
-        setSuccess(true);
+        setSuccess(true); 
+        return { success: true, tieneEquipos: false };  
+      } else {
+        if (response.data && response.data.tieneEquipos) {
+          setTieneEquipos(true);
+          return { success: false, tieneEquipos: true };  
+        }
       }
     } catch (err) {
-      if (err instanceof AxiosError) {
-        if (err.response && err.response.data && err.response.data.tieneEquipos) {
-          setError(
-            "No se puede eliminar el usuario porque tiene equipos asociados."
-          );
-          setTieneEquipos(true);
-        } else {
-          setError("Error al eliminar el usuario.");
-        }
-      } else {
-        setError("Error desconocido.");
-      }
+      setError("Error al eliminar el usuario.");
+      return { success: false, error: "Error al eliminar el usuario" };  
     } finally {
       setLoading(false);
     }
+
+    return { success: false, tieneEquipos: false };
   };
 
   return { eliminarUsuario, loading, error, success, tieneEquipos };

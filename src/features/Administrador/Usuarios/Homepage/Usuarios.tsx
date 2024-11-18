@@ -18,6 +18,7 @@ const Usuarios = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error" | "warning">("success"); 
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
   const [totalPages, setTotalPages] = useState<number>(1);
 
@@ -40,6 +41,7 @@ const Usuarios = () => {
   useEffect(() => {
     if (location.state && location.state.snackbarMessage) {
       setSnackbarMessage(location.state.snackbarMessage);
+      setSnackbarSeverity(location.state.snackbarSeverity || "success");
       setOpenSnackbar(true);
     }
   }, [location]);
@@ -106,16 +108,30 @@ const Usuarios = () => {
   const handleConfirmDelete = async () => {
     if (usuarioToDelete) {
       try {
-        await eliminarUsuario(usuarioToDelete.id_usuario);
-        setOpenModal(false);
-        setSnackbarMessage("Usuario eliminado con éxito.");
-        setOpenSnackbar(true);
+        const result = await eliminarUsuario(usuarioToDelete.id_usuario);
+        
+        if (result.success) {
+          setOpenModal(false);
+          setSnackbarMessage("Usuario eliminado con éxito.");
+          setSnackbarSeverity("success"); 
+        } else if (result.tieneEquipos) {
+          setSnackbarMessage("No se puede eliminar el usuario porque tiene equipos asociados.");
+          setSnackbarSeverity("warning"); 
+        } else {
+          setSnackbarMessage("Error al eliminar el usuario.");
+          setSnackbarSeverity("error"); 
+        }
+  
+        setOpenSnackbar(true); 
       } catch (error) {
         setSnackbarMessage("Error al eliminar el usuario.");
+        setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
     }
   };
+  
+   
 
   const handleCancelDelete = () => {
     setOpenModal(false);
@@ -123,7 +139,7 @@ const Usuarios = () => {
 
   return (
     <div className="flex flex-col p-4">
-      <Snackbar
+     <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
@@ -131,8 +147,13 @@ const Usuarios = () => {
       >
         <Alert
           onClose={handleCloseSnackbar}
-          severity="success"
+          severity={snackbarSeverity}
           sx={{ width: "100%" }}
+          iconMapping={{
+            success: <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />,
+            error: <Icon icon="fluent:error-circle-24-regular" width={20} height={20} />,
+            warning: <Icon icon="fluent:warning-24-regular" width={20} height={20} />
+          }}
         >
           {snackbarMessage}
         </Alert>
@@ -153,9 +174,9 @@ const Usuarios = () => {
           <Autocomplete
             size="small"
             options={usos}
-            getOptionLabel={(option) => option.nombre || ""}
+            getOptionLabel={(option) => option?.nombre || ""}
             onChange={handleUsoChange}
-            value={usos.find((uso) => uso.id_uso === selectedUso) || null}
+            value={usos.find((uso) => uso?.id_uso === selectedUso) || null}
             renderInput={(params) => (
               <TextField {...params} label="Uso" variant="outlined" />
             )}
@@ -165,11 +186,11 @@ const Usuarios = () => {
           <Autocomplete
             size="small"
             options={usuarios}
-            getOptionLabel={(option) => option.nombre || ""}
+            getOptionLabel={(option) => option?.nombre || ""}
             onChange={handleUsuarioChange}
             value={
               usuarios.find(
-                (usuario) => usuario.id_usuario === selectedUsuario
+                (usuario) => usuario?.id_usuario === selectedUsuario
               ) || null
             }
             renderInput={(params) => (
