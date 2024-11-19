@@ -72,11 +72,11 @@ const AgregarActivo = () => {
             loading={loadingUsos}
             value={
               selectedUsoId
-                ? usos.find((u) => u.id_uso === selectedUsoId) ?? null
+                ? usos.find((u) => u?.id_uso === selectedUsoId) ?? null
                 : null
             }
             onChange={handleUsoChange}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option?.nombre || ""}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -95,12 +95,12 @@ const AgregarActivo = () => {
             options={usuarios}
             loading={loadingUsuarios}
             value={
-              usuarios.find((u) => u.id_usuario === selectedUsuarioId) ?? null
+              usuarios.find((u) => u?.id_usuario === selectedUsuarioId) ?? null
             }
             onChange={(event, newValue: Usuario | null) =>
               setSelectedUsuarioId(newValue ? newValue.id_usuario : null)
             }
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option?.nombre || ""}
             renderInput={(params) => (
               <TextField
                 {...params}

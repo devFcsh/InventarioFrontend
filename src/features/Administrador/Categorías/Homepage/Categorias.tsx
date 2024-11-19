@@ -1,87 +1,109 @@
 import React, { useEffect, useState } from "react";
-import { Autocomplete } from "@mui/material";
-import { TextField, Snackbar, Alert } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Autocomplete, TextField, Snackbar, Alert } from "@mui/material";
+import { Link, useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
-import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
-import useUsos from "@hooks/useUsos";
-import { useUsuariosFiltrados } from "../../Usuarios/hooks/useUsuariosFiltrados";
-import { FiltrosUsuario, Uso, Usuario } from "../../../../types/index";
+import ModalConfirmation from "../../../../components/ModalConfirmation";
 import { filas } from "../../../../data";
 
+const categorias = [
+  "Uso",
+  "Usuario",
+  "Periférico",
+  "Marca",
+  "Modelo",
+  "Serie",
+  "Edificio",
+  "Aula",
+  "Sistema Operativo",
+  "Versión SO",
+  "Dominio",
+  "Versión Office",
+  "Antivirus",
+  "RAM",
+  "Disco",
+];
+
+const itemsData = [
+  { id: 1, categoria: "Uso" },
+  { id: 2, categoria: "Usuario" },
+  { id: 3, categoria: "Marca" },
+  { id: 4, categoria: "Modelo" },
+  { id: 5, categoria: "Periférico" },
+  { id: 6, categoria: "Serie" },
+  { id: 7, categoria: "Edificio" },
+  { id: 8, categoria: "Aula" },
+  { id: 9, categoria: "Sistema Operativo" },
+  { id: 10, categoria: "Versión SO" },
+  { id: 11, categoria: "Dominio" },
+  { id: 12, categoria: "Antivirus" },
+  { id: 13, categoria: "RAM" },
+  { id: 14, categoria: "Disco" },
+  { id: 15, categoria: "Versión Office" },
+];
+
 const Categorias = () => {
-  const [selectedUso, setSelectedUso] = useState<string | null>(null);
-  const [selectedUsuario, setSelectedUsuario] = useState<string | null>(null);
+  const [selectedCategoria, setSelectedCategoria] = useState<string | null>(
+    null
+  );
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [filteredItems, setFilteredItems] = useState(itemsData);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
-  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
-  const [totalPages, setTotalPages] = useState<number>(1);
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "success" | "error" | "warning"
+  >("success");
 
-  const { usos } = useUsos();
-  const { usuarios } = useUsuariosPorUso(selectedUso || "");
+  const location = useLocation();
 
-  const filtros: FiltrosUsuario = {
-    usoId: selectedUso,
-    usuarioId: selectedUsuario,
-  };
-
-  const { usuariosFiltrados, totalCount, loading, error } =
-    useUsuariosFiltrados(filtros, currentPage, rowsPerPage, shouldFetch);
-
-  useEffect(() => {
-    if (totalCount > 0 && rowsPerPage > 0) {
-      setTotalPages(Math.ceil(totalCount / rowsPerPage));
-    } else {
-      setTotalPages(1);
-    }
-  }, [totalCount, rowsPerPage]);
-
-  useEffect(() => {
-    if (shouldFetch) {
-      setShouldFetch(false);
-    }
-  }, [shouldFetch]);
-
-  const handleUsoChange = (
+  const handleCategoriaChange = (
     event: React.SyntheticEvent<Element, Event>,
-    newValue: Uso | null
+    newValue: string | null
   ) => {
-    setSelectedUso(newValue ? newValue.id_uso : null);
-    setSelectedUsuario(null); 
-  };
-
-  const handleUsuarioChange = (
-    event: React.SyntheticEvent<Element, Event>,
-    newValue: Usuario | null
-  ) => {
-    setSelectedUsuario(newValue ? newValue.id_usuario : null);
+    setSelectedCategoria(newValue);
   };
 
   const handleBuscar = () => {
+    const filtered = itemsData.filter((item) =>
+      selectedCategoria ? item.categoria === selectedCategoria : true
+    );
+    setFilteredItems(filtered);
     setCurrentPage(1);
-    setShouldFetch(true);
   };
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
+  const handleRowsPerPageChange = (
+    event: React.SyntheticEvent<Element, Event>,
+    newValue: { id: number; name: string } | null
+  ) => {
+    setRowsPerPage(parseInt(newValue?.name || "10", 10));
+    setCurrentPage(1);
   };
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
-      setShouldFetch(true);
     }
   };
 
-  const handleRowsPerPageChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: { id: number; name: string } | null
-  ) => {
-    const rows = parseInt(newValue?.name || "10", 10);
-    setRowsPerPage(rows);
-    setCurrentPage(1);
+  useEffect(() => {
+    if (filteredItems.length > 0 && rowsPerPage > 0) {
+      setTotalPages(Math.ceil(filteredItems.length / rowsPerPage));
+    } else {
+      setTotalPages(1);
+    }
+  }, [filteredItems, rowsPerPage]);
+
+  useEffect(() => {
+    if (location.state && location.state.snackbarMessage) {
+      setSnackbarMessage(location.state.snackbarMessage);
+      setSnackbarSeverity(location.state.snackbarSeverity || "success");
+      setOpenSnackbar(true);
+    }
+  }, [location]);
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -94,23 +116,40 @@ const Categorias = () => {
       >
         <Alert
           onClose={handleCloseSnackbar}
-          severity="success"
+          severity={snackbarSeverity}
           sx={{ width: "100%" }}
+          iconMapping={{
+            success: (
+              <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />
+            ),
+            error: (
+              <Icon
+                icon="fluent:error-circle-24-regular"
+                width={20}
+                height={20}
+              />
+            ),
+            warning: (
+              <Icon icon="fluent:warning-24-regular" width={20} height={20} />
+            ),
+          }}
         >
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
       <div className="mb-4">
         <h1 className="text-2xl font-bold my-5">Consulta de Categorías</h1>
-        <div className="flex flex-wrap gap-4 my-10">
+
+        <div className="flex gap-4 my-10">
           <Autocomplete
             size="small"
-            options={usos}
-            getOptionLabel={(option) => option.nombre || ""}
-            onChange={handleUsoChange}
-            value={usos.find((uso) => uso.id_uso === selectedUso) || null}
+            options={categorias}
+            getOptionLabel={(option) => option}
+            onChange={handleCategoriaChange}
+            value={selectedCategoria || null}
             renderInput={(params) => (
-              <TextField {...params} label="Categorías" variant="outlined" />
+              <TextField {...params} label="Categoría" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
           />
@@ -137,11 +176,10 @@ const Categorias = () => {
           </div>
         </div>
       </div>
+
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-        {loading ? (
-          <p>Cargando usuarios...</p>
-        ) : error ? (
-          <p>Error al cargar los usuarios</p>
+        {filteredItems.length === 0 ? (
+          <p>No hay items para mostrar.</p>
         ) : (
           <table className="w-full text-left text-sm text-gray-500">
             <thead className="text-xs uppercase bg-gray-50 text-gray-700">
@@ -155,40 +193,42 @@ const Categorias = () => {
               </tr>
             </thead>
             <tbody>
-              {usuariosFiltrados.map((usuario) => (
-                <tr
-                  key={usuario.id_usuario}
-                  className="bg-white border-b hover:bg-gray-50"
-                >
-                  <td className="px-4 py-2">{usuario.uso}</td>
-                  <td className="px-4 py-3 flex items-center gap-2">
-                    <Icon
-                      icon="weui:delete-outlined"
-                      width="25"
-                      height="25"
-                      className="cursor-pointer"
-                    />
-                    <Link to={`/editarActivo/${usuario.nombre}`}>
-                      <Icon
-                        icon="mage:edit" 
-                        width="25"
-                        height="25"
-                        className="cursor-pointer"
-                      />
-                    </Link>
-                    <Icon
-                      icon="hugeicons:computer-add"
-                      width="25"
-                      height="25"
-                      className="cursor-pointer"
-                    />
-                  </td>
-                </tr>
-              ))}
+              {filteredItems
+                .slice(
+                  (currentPage - 1) * rowsPerPage,
+                  currentPage * rowsPerPage
+                )
+                .map((item) => (
+                  <tr
+                    key={item.id}
+                    className="bg-white border-b hover:bg-gray-50"
+                  >
+                    <td className="px-4 py-2">{item.categoria}</td>
+                    <td className="px-4 py-3 flex items-center gap-2">
+                      <Link to={{ pathname: "/editarItem" }} state={{ item }}>
+                        <Icon
+                          icon="mage:edit"
+                          width="25"
+                          height="25"
+                          className="cursor-pointer"
+                        />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         )}
       </div>
+
+      <ModalConfirmation
+        open={false}
+        onClose={() => {}}
+        onConfirm={() => {}}
+        title="Confirmar Acción"
+        message="¿Estás seguro de que deseas continuar?"
+      />
+
       <nav
         className="flex flex-col md:flex-row justify-between items-center p-4"
         aria-label="Table navigation"

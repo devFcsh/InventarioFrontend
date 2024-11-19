@@ -651,7 +651,7 @@ const AgregarComputadoraActivo = ({
             size="small"
             disablePortal
             options={edificios}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option?.nombre || ""}
             value={selectedEdificio}
             onChange={(_, newValue) => setSelectedEdificio(newValue)}
             renderInput={(params) => (
@@ -667,7 +667,7 @@ const AgregarComputadoraActivo = ({
             size="small"
             disablePortal
             options={aulas}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option?.nombre || ""}
             value={selectedAula}
             onChange={(_, newValue) => setSelectedAula(newValue)}
             renderInput={(params) => (
