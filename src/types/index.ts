@@ -35,38 +35,38 @@ export type Usuario = {
 export type SistemaOperativo = {
   id_sistemaoperativo: string;
   nombre: string;
-};
+}| null;
 
 export type VersionSO = {
   id_versionso: string;
   nombre: string;
-};
+}| null;
 
 export type VersionOffice = {
   id_versionoffice: string;
   nombre: string;
-};
+}| null;
 
 export type RAM = {
   id_ram: string;
   tipo: string;
   capacidad: string;
-};
+}| null;
 
 export type Disco = {
   id_disco: string;
   capacidad: string;
-};
+}| null;
 
 export type Antivirus = {
   id_antivirus: string;
   nombre: string;
-};
+}| null;
 
 export type Dominio = {
   id_dominio: string;
   nombre: string;
-};
+}| null;
 
 export type Clasificacion = {
   id_clasificacion: string;

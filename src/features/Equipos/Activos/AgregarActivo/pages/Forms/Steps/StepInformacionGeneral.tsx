@@ -1,6 +1,5 @@
 import { Autocomplete, Box, TextField } from "@mui/material";
 import useSistemasOperativos from "@hooks/useSistemasOperativos";
-import { useState } from "react";
 import {
   SistemaOperativo,
   Dominio,
@@ -16,6 +15,7 @@ import useVersionesOffice from "@hooks/useVersionesOffice";
 import useRam from "@hooks/useRam";
 import useDiscos from "@hooks/useDiscos";
 import useVersionesSO from "@hooks/useVersionesSO";
+import { useFormDataInformacionGeneral } from "../hooks/UseFormDataInformacionGeneral";
 
 interface StepInformacionGeneralProps {
   handleFormData: any
@@ -24,19 +24,10 @@ interface StepInformacionGeneralProps {
 export const StepInformacionGeneral = ({
   handleFormData
 }: StepInformacionGeneralProps) => {
-  const [selectedSO, setSelectedSO] = useState<SistemaOperativo | null>(null);
-  const [selectedVersionSO, setSelectedVersionSO] = useState<VersionSO | null>(null);
-  const [selectedDominio, setSelectedDominio] = useState<Dominio | null>(null);
-  const [nombreEquipo, setNombreEquipo] = useState<string | null>("");
-  const [selectedVersionOffice, setSelectedVersionOffice] =useState<VersionOffice | null>(null);
-  const [protocolo, setProtocolo] = useState<string | null>("");
-  const [direccionIP, setDireccionIP] = useState<string>("");
-  const [selectedAntivirus, setSelectedAntivirus] = useState<Antivirus | null>(null);
-  const [selectedRAM, setSelectedRAM] = useState<RAM | null>(null);
-  const [selectedDisco, setSelectedDisco] = useState<Disco | null>(null);
+  const {informacionGeneralDataForm, handleInformacionGeneralChange} = useFormDataInformacionGeneral();
   
   const { sistemasOperativos } = useSistemasOperativos();
-  const { versionesSO } = useVersionesSO(selectedSO?.id_sistemaoperativo ?? "");
+  const { versionesSO } = useVersionesSO(informacionGeneralDataForm.sistemaOperativo?.id_sistemaoperativo ?? "");
   const { dominios } = useDominios();
   const { versionesOffice } = useVersionesOffice();
   const { ram } = useRam();
@@ -49,9 +40,11 @@ export const StepInformacionGeneral = ({
             size="small"
             disablePortal
             options={sistemasOperativos}
-            getOptionLabel={(option) => option.nombre}
-            value={selectedSO}
-            onChange={(_, newValue) => setSelectedSO(newValue)}
+            getOptionLabel={(option) => option ? option.nombre : ""}
+            value={informacionGeneralDataForm.sistemaOperativo}
+            onChange={(_, newValue: SistemaOperativo | null) => {
+              handleInformacionGeneralChange("sistemaOperativo", newValue);
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -65,9 +58,11 @@ export const StepInformacionGeneral = ({
             size="small"
             disablePortal
             options={versionesSO}
-            getOptionLabel={(option) => option.nombre}
-            value={selectedVersionSO}
-            onChange={(_, newValue) => {setSelectedVersionSO(newValue);handleFormData(newValue?.id_versionso,"versionso")}}
+            getOptionLabel={(option) => option ? option.nombre : ""}
+            value={informacionGeneralDataForm.versionSO}
+            onChange={(_, newValue: VersionSO | null) => {
+              handleInformacionGeneralChange("versionSO", newValue);
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -81,9 +76,11 @@ export const StepInformacionGeneral = ({
             size="small"
             disablePortal
             options={dominios}
-            getOptionLabel={(option) => option.nombre}
-            value={selectedDominio}
-            onChange={(_, newValue) => {setSelectedDominio(newValue);handleFormData(newValue?.id_dominio,"dominio")}}
+            getOptionLabel={(option) => option ? option.nombre : ""}
+            value={informacionGeneralDataForm.dominio}
+            onChange={(_, newValue: Dominio | null) => {
+              handleInformacionGeneralChange("dominio", newValue);
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -99,16 +96,19 @@ export const StepInformacionGeneral = ({
             variant="outlined"
             fullWidth
             size="small"
-            value={nombreEquipo}
-            onChange={(e) => {setNombreEquipo(e.target.value);handleFormData(e.target.value,"nombreEquipo")}}
+            value={informacionGeneralDataForm.nombreEquipo}
+            onChange={(e) => {
+              handleInformacionGeneralChange("nombreEquipo", e.target.value)}}
           />
           <Autocomplete
             size="small"
             disablePortal
             options={versionesOffice}
-            getOptionLabel={(option) => option.nombre}
-            value={selectedVersionOffice}
-            onChange={(_, newValue) => {setSelectedVersionOffice(newValue);handleFormData(newValue?.id_versionoffice,"versionoffice")}}
+            getOptionLabel={(option) => option ? option.nombre : ""}
+            value={informacionGeneralDataForm.versionOffice}
+            onChange={(_, newValue: VersionOffice | null) => {
+              handleInformacionGeneralChange("versionOffice", newValue);
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -122,13 +122,13 @@ export const StepInformacionGeneral = ({
             size="small"
             disablePortal
             options={protocolos}
-            getOptionLabel={(option) => option.nombre}
-            value={protocolos.find((p) => p.id === protocolo) || null}
+            getOptionLabel={(option) => option ? option.nombre : ""}
+            value={protocolos.find((p) => p.id === informacionGeneralDataForm.protocolo) || null}
             onChange={(event, newValue) => {
               if (newValue) {
-                setProtocolo(newValue.id);
+                handleInformacionGeneralChange("protocolo",newValue.id);
               } else {
-                setProtocolo("1");
+                handleInformacionGeneralChange("protocolo","1");
               }
             }}
             renderInput={(params) => (
@@ -146,17 +146,19 @@ export const StepInformacionGeneral = ({
             variant="outlined"
             fullWidth
             size="small"
-            value={direccionIP}
-            onChange={(e) => {setDireccionIP(e.target.value);handleFormData(e.target.value,"direccionIp")}}
-            disabled={protocolo !== "0"}
+            value={informacionGeneralDataForm.direccionIP}
+            onChange={(e) => {handleInformacionGeneralChange("direccionIP",e.target.value)}}
+            disabled={informacionGeneralDataForm.protocolo !== "0"}
           />
           <Autocomplete
             size="small"
             disablePortal
             options={antivirus}
             getOptionLabel={(option) => option.nombre}
-            value={selectedAntivirus}
-            onChange={(_, newValue) => {setSelectedAntivirus(newValue);handleFormData(newValue?.id_antivirus,"antivirus")}}
+            value={informacionGeneralDataForm.antivirus}
+            onChange={(_, newValue: Antivirus | null) => {
+              handleInformacionGeneralChange("antivirus", newValue);
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -170,11 +172,13 @@ export const StepInformacionGeneral = ({
             size="small"
             disablePortal
             options={ram}
-            getOptionLabel={(option: RAM) =>
-              `${option.capacidad} - ${option.tipo}`
+            getOptionLabel={(option: RAM) =>option ?
+              `${option.capacidad} - ${option.tipo}` : ""
             }
-            value={selectedRAM}
-            onChange={(_, newValue) => {setSelectedRAM(newValue);handleFormData(newValue?.id_ram,"ram")}}
+            value={informacionGeneralDataForm.ram}
+            onChange={(_, newValue: RAM | null) => {
+              handleInformacionGeneralChange("ram", newValue);
+            }}
             renderInput={(params) => (
               <TextField {...params} label="RAM" variant="outlined" fullWidth />
             )}
@@ -183,9 +187,11 @@ export const StepInformacionGeneral = ({
             size="small"
             disablePortal
             options={discos}
-            getOptionLabel={(option) => option.capacidad}
-            value={selectedDisco}
-            onChange={(_, newValue) => {setSelectedDisco(newValue);handleFormData(newValue?.id_disco,"disco")}}
+            getOptionLabel={(option) =>option ? option.capacidad : ""}
+            value={informacionGeneralDataForm.disco}
+            onChange={(_, newValue: Disco | null) => {
+              handleInformacionGeneralChange("disco", newValue);
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}

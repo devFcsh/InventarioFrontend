@@ -30,8 +30,7 @@ export const StepCargarImagen = ({
         return;
       }
     }
-    handleFormData(imagePath,"image")
-    
+    handleFormData(imagePath,"image") 
   }
   const handleImageClick = () => {
     if (fileInputRef.current) {

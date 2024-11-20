@@ -41,8 +41,6 @@ export const useFormDatosInventario = () => {
     field: keyof InventoryDataForm,
     value: Uso | Usuario | Marca | Modelo | Serie | string | Edificio | Aula | null
   ) => {
-    console.log(field)
-    console.log(value)
     setInventoryDataForm((prevState) => ({
       ...prevState,
       [field]: value,
@@ -50,6 +48,11 @@ export const useFormDatosInventario = () => {
       ...(field === 'usuario' && value && typeof value !== 'string' && 'id_usuario' in value ? { usuarioId: value.id_usuario } : {}),
       ...(field === 'marca' && value && typeof value !== 'string' && 'id_marca' in value ? { modelo: null, serie: null } : {}),
       ...(field === 'modelo' && value && typeof value !== 'string' && 'id_modelo' in value ? { serie: null } : {}),
+      ...(field === 'edificio' && value && typeof value !== 'string' && 'id_edificio' in value ? { aula: null } : {}),
+      ...(field === 'uso' && value === null? { usoId: "" } : {}),
+      ...(field === 'marca' && value === null? { modelo: null, serie: null } : {}),
+      ...(field === 'modelo' && value === null? {serie: null } : {}),
+      ...(field === 'edificio' && value === null? { aula: null } : {}),
     }));
   };
   
