@@ -15,17 +15,17 @@ import useVersionesOffice from "@hooks/useVersionesOffice";
 import useRam from "@hooks/useRam";
 import useDiscos from "@hooks/useDiscos";
 import useVersionesSO from "@hooks/useVersionesSO";
-import { useFormDataInformacionGeneral } from "../hooks/UseFormDataInformacionGeneral";
 
 interface StepInformacionGeneralProps {
-  handleFormData: any
+  informacionGeneralDataForm:any;
+  handleInformacionGeneralChange: any;
 }
 
 export const StepInformacionGeneral = ({
-  handleFormData
+  informacionGeneralDataForm,
+  handleInformacionGeneralChange,
 }: StepInformacionGeneralProps) => {
-  const {informacionGeneralDataForm, handleInformacionGeneralChange} = useFormDataInformacionGeneral();
-  
+
   const { sistemasOperativos } = useSistemasOperativos();
   const { versionesSO } = useVersionesSO(informacionGeneralDataForm.sistemaOperativo?.id_sistemaoperativo ?? "");
   const { dominios } = useDominios();

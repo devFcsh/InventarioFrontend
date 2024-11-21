@@ -5,7 +5,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Periferico } from "../../../../../../types";
 import { useAgregarComputadoraActivo } from "../../hooks/useAgregarComputadoraActivo";
 import { useAgregarComponentes } from "../../hooks/useAgregarComponentes";
-import {useFormData} from "./hooks/useFormData.ts"
+import { useFormDatosInventario } from "./hooks/useFormDatosInventario.ts";
+import { useFormDataInformacionGeneral } from "./hooks/useFormDataInformacionGeneral.ts";
+import { useFormDataCargarImagen } from "./hooks/useFormDataCargarImagen.ts";
+import { useFormDataComponentes } from "./hooks/useFormDataComponentes.ts";
 const steps = [
   "Datos de inventario",
   "Información general",
@@ -24,7 +27,10 @@ export const FormActivosLC = () => {
   const perifericos = location.state?.perifericos as Periferico[];
   const { agregarComputadoraActivo } = useAgregarComputadoraActivo();
   const { agregarComponentes } = useAgregarComponentes();
-  const {formData,handleFormData} = useFormData();
+  const {inventoryDataForm, handleInventoryChange} = useFormDatosInventario();
+  const {informacionGeneralDataForm, handleInformacionGeneralChange} = useFormDataInformacionGeneral();
+  const { imageData, handleImageChange} = useFormDataCargarImagen();
+  const {componentes, handleAddComponents,eliminarComponente,showSuccessMessageComponentes,setShowSuccessMessageComponentes} = useFormDataComponentes();
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -46,18 +52,27 @@ export const FormActivosLC = () => {
         return (
           <StepDatosInventario
             periferico={selectedPeriferico?.id_periferico ?? ""}
-            handleFormData={handleFormData}
+            inventoryDataForm={inventoryDataForm}
+            handleInventoryChange={handleInventoryChange}
           />
         );
       case 1:
-        return <StepInformacionGeneral handleFormData={handleFormData} />;
+        return <StepInformacionGeneral 
+        informacionGeneralDataForm={informacionGeneralDataForm}
+        handleInformacionGeneralChange={handleInformacionGeneralChange} />;
       case 2:
-        return <StepCargarImagen handleFormData={handleFormData} />;
+        return <StepCargarImagen
+        imageData={imageData}
+        handleImageChange={handleImageChange}/>;
       case 3:
         return (
           <StepComponentes
             perifericos={perifericos}
-            handleFormData={handleFormData}
+            componentes={componentes}
+            handleAddComponents={handleAddComponents}
+            eliminarComponente={eliminarComponente}
+            showSuccessMessageComponentes={showSuccessMessageComponentes}
+            setShowSuccessMessageComponentes={setShowSuccessMessageComponentes}
           />
         );
       default:
@@ -65,36 +80,37 @@ export const FormActivosLC = () => {
     }
   };
   const handleAgregarEquipo = async () => {
-    let imagePath = "";
     const equipoData = {
       tipo: "activo",
-      inventario: formData.inventario || "",
-      serie: formData.serie ?? 0,
-      nombreEquipo: formData.nombreEquipo || "",
-      direccionIp: formData.direccionIp,
-      versionso: formData.versionso ?? 0,
-      versionoffice: formData.versionoffice ?? 0,
-      ram: formData.ram ?? 0,
-      disco: formData.disco ?? 0,
-      antivirus: formData.antivirus ?? 0,
-      dominio: formData.dominio ?? 0,
-      idAula: formData.idAula ?? 0,
-      idUsuario: parseInt(formData.idUsuario || "", 10),
-      imagenRuta: imagePath,
+      inventario: inventoryDataForm.inventario || "",
+      serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
+      nombreEquipo: informacionGeneralDataForm.nombreEquipo || "",
+      direccionIp: informacionGeneralDataForm.direccionIP,
+      versionso: Number(informacionGeneralDataForm.versionSO?.id_versionso) ?? 0,
+      versionoffice: Number(informacionGeneralDataForm.versionOffice?.id_versionoffice) ?? 0,
+      ram: Number(informacionGeneralDataForm.ram?.id_ram) ?? 0,
+      disco: Number(informacionGeneralDataForm.disco?.id_disco) ?? 0,
+      antivirus: Number(informacionGeneralDataForm.antivirus?.id_antivirus) ?? 0,
+      dominio: Number(informacionGeneralDataForm.dominio?.id_dominio) ?? 0,
+      idAula: Number(inventoryDataForm.aula?.id_aula) ?? 0,
+      idUsuario: parseInt(inventoryDataForm.usuarioId || "", 10),
+      imagenRuta: imageData.imagePath,
     };
 
     try {
+      console.log(equipoData)
       const equipoId = await agregarComputadoraActivo(equipoData);
-      if (formData.componentes.length > 0 && equipoId) {
+      
+      if (componentes.length > 0 && equipoId) {
         await agregarComponentes({
           equipoId: equipoId,
-          componentes: formData.componentes.map((comp) => ({
+          componentes: componentes.map((comp) => ({
             inventario: comp.inventario,
             serieId: Number(comp.serie?.id_serie) ?? 0,
           })),
-          aulaId: Number(formData.idAula) ?? 0,
-          usuarioId: parseInt(formData.idUsuario || "", 10),
-          imagenRuta: imagePath,
+          aulaId: Number(inventoryDataForm.aula?.id_aula) ?? 0,
+          usuarioId: parseInt(inventoryDataForm.usuarioId || "", 10),
+          imagenRuta: imageData.imagePath,
         });
       }
       setShowSuccessMessage(true);

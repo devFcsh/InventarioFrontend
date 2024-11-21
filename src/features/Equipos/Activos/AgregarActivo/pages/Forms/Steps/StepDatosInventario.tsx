@@ -16,18 +16,18 @@ import useAulas from "@hooks/useAulas";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import useUsos from "@hooks/useUsos";
 import { useFormDatosInventario } from "../hooks/useFormDatosInventario";
-import { useEffect } from "react";
 
 interface StepDatosInventarioProps {
   periferico: string;
-  handleFormData: any;
+  inventoryDataForm:any;
+  handleInventoryChange: any;
 }
 
 export const StepDatosInventario = ({
   periferico,
+  inventoryDataForm,
+  handleInventoryChange,
 }: StepDatosInventarioProps) => {
-
-  const {inventoryDataForm,handleInventoryChange} = useFormDatosInventario();
   const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
 
   const {
