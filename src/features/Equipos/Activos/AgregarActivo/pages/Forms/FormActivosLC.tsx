@@ -9,6 +9,7 @@ import { useFormDatosInventario } from "./hooks/useFormDatosInventario.ts";
 import { useFormDataInformacionGeneral } from "./hooks/useFormDataInformacionGeneral.ts";
 import { useFormDataCargarImagen } from "./hooks/useFormDataCargarImagen.ts";
 import { useFormDataComponentes } from "./hooks/useFormDataComponentes.ts";
+import { useInventoryErrors } from './hooks/useInventoryErrors';
 const steps = [
   "Datos de inventario",
   "Información general",
@@ -31,9 +32,13 @@ export const FormActivosLC = () => {
   const {informacionGeneralDataForm, handleInformacionGeneralChange} = useFormDataInformacionGeneral();
   const { imageData, handleImageChange} = useFormDataCargarImagen();
   const {componentes, handleAddComponents,eliminarComponente,showSuccessMessageComponentes,setShowSuccessMessageComponentes} = useFormDataComponentes();
+  const { inventoryErrors, handleInventoryErrors,handleUniqueError } =  useInventoryErrors();
 
   const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    handleInventoryErrors(inventoryDataForm);
+    if(!inventoryErrors){
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    }
   };
 
   const handleBack = () => {
@@ -54,6 +59,8 @@ export const FormActivosLC = () => {
             periferico={selectedPeriferico?.id_periferico ?? ""}
             inventoryDataForm={inventoryDataForm}
             handleInventoryChange={handleInventoryChange}
+            inventoryErrors={inventoryErrors}
+            handleUniqueError={handleUniqueError}
           />
         );
       case 1:
@@ -98,7 +105,6 @@ export const FormActivosLC = () => {
     };
 
     try {
-      console.log(equipoData)
       const equipoId = await agregarComputadoraActivo(equipoData);
       
       if (componentes.length > 0 && equipoId) {
