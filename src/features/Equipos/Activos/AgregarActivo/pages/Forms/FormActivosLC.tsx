@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react";
+import { useState, Fragment,useEffect } from "react";
 import {Box,Stepper,Step,StepLabel,Button,Typography} from "@mui/material";
 import {StepDatosInventario, StepInformacionGeneral,StepCargarImagen,StepComponentes} from "../Forms/Steps/index.ts"
 import { useLocation, useNavigate } from "react-router-dom";
@@ -32,14 +32,16 @@ export const FormActivosLC = () => {
   const {informacionGeneralDataForm, handleInformacionGeneralChange} = useFormDataInformacionGeneral();
   const { imageData, handleImageChange} = useFormDataCargarImagen();
   const {componentes, handleAddComponents,eliminarComponente,showSuccessMessageComponentes,setShowSuccessMessageComponentes} = useFormDataComponentes();
-  const { inventoryErrors, handleInventoryErrors,handleUniqueError } =  useInventoryErrors();
+  const { inventoryErrors, completeDatosInventario,handleInventoryErrors,handleUniqueError } =  useInventoryErrors();
 
   const handleNext = () => {
     handleInventoryErrors(inventoryDataForm);
-    if(!inventoryErrors){
+    if (!Object.values(inventoryErrors).includes(true) && completeDatosInventario(inventoryDataForm)) {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }
   };
+
+  
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);

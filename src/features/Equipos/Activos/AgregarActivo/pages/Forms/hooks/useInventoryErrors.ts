@@ -9,6 +9,7 @@ import {
   Uso,
 } from "../../../../../../../types";
 
+
 interface InventoryDataForm {
   uso: Uso;
   usuario: Usuario;
@@ -23,11 +24,27 @@ interface InventoryDataForm {
 }
 
 export const useInventoryErrors = () => {
-  const [inventoryErrors, setInventoryErrors] = useState({});
+  const [inventoryErrors, setInventoryErrors] = useState<Record<string, boolean>>({
+    "uso":false,
+    "usuario":false,
+    "marca":false,
+    "modelo":false,
+    "serie":false,
+    "inventario":false,
+    "edificio":false,
+    "aula":false,
+  });
+
+  const completeDatosInventario = (dataForm: InventoryDataForm)=>{
+    if(dataForm.uso !==null && dataForm.usuario!==null
+      &&dataForm.marca !==null && dataForm.modelo !==null &&
+      dataForm.modelo !==null && dataForm.serie !==null &&
+      dataForm.inventario !=="" && dataForm.edificio !==null && dataForm.aula &&null
+    ) return true
+    return false;
+  }
 
   const handleInventoryErrors = (formData: InventoryDataForm) => {
-    const errors: Record<string, boolean> = {};
-    
     const fieldsToCheck: (keyof InventoryDataForm)[] = [
       "uso",
       "usuario",
@@ -37,28 +54,24 @@ export const useInventoryErrors = () => {
       "inventario",
       "edificio",
       "aula",
-      "usoId",
-      "usuarioId",
     ];
 
     fieldsToCheck.forEach((field) => {
-      if (
-        !formData[field] ||
-        (typeof formData[field] === "string" && !formData[field].trim())
-      ) {
-        errors[field] = true;
+      if (formData[field] === null || formData[field] === "") {
+        setInventoryErrors((prevErrors) => ({
+          ...prevErrors,
+          [field]: true,
+        }));
       }
     });
-
-    setInventoryErrors(errors);
   };
 
-  const handleUniqueError = (tipo: keyof InventoryDataForm)=>{
-    setInventoryErrors({
-        ...inventoryErrors,
-        [tipo]: false
-    })
-  }
+  const handleUniqueError = (tipo: keyof InventoryDataForm, value: Uso | Usuario | Marca | Modelo | Serie | string | Edificio | Aula | null) => {
+    setInventoryErrors((prevErrors) => ({
+      ...prevErrors,
+      [tipo]: value === null || value === "" ? true : false,
+    }));
+  };
 
-  return { inventoryErrors, handleInventoryErrors,handleUniqueError};
+  return { inventoryErrors,handleInventoryErrors, handleUniqueError,completeDatosInventario};
 };
