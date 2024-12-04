@@ -1,6 +1,13 @@
-// ModalAgregar.tsx
-import { FC, useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from "@mui/material";
+import { FC, useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Autocomplete,
+} from "@mui/material";
 import { useAgregarUso } from "../hooks/useAgregarUso";
 import { useAgregarDominio } from "../hooks/useAgregarDominio";
 import { useAgregarPeriferico } from "../hooks/useAgregarPeriferico";
@@ -9,6 +16,16 @@ import { useAgregarSistemaOperativo } from "../hooks/useAgregarSIstemaOperativo"
 import { useAgregarVersionOffice } from "../hooks/useAgregarVersionOffice";
 import { useAgregarDisco } from "../hooks/useAgregarDisco";
 import { useAgregarRAM } from "../hooks/useAgregarRAM";
+import { useAgregarVersionSO } from "../hooks/useAgregarVersionSO";
+import { useAgregarAula } from "../hooks/useAgregarAula";
+import useEdificios from "@hooks/useEdificios";
+import { Edificio, Marca, Modelo, Periferico, SistemaOperativo } from "../../../../../types";
+import useSistemasOperativos from "@hooks/useSistemasOperativos";
+import useMarcas from "@hooks/useMarcas";
+import usePerifericos from "@hooks/usePerifericos";
+import useModelos from "@hooks/useModelos";
+import { useAgregarMarca } from "../hooks/useAgregarMarca";
+import { useAgregarModelo } from "../hooks/useAgregarModelo";
 
 interface ModalAgregarCategoriaProps {
   open: boolean;
@@ -23,12 +40,25 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   onClose,
   selectedCategoria,
   error,
-  setError
+  setError,
 }) => {
+  const [selectedSO, setSeletedSO] = useState<SistemaOperativo | null>(null);
+  const [selectedEdificio, setSeletedEdificio] = useState<Edificio | null>(
+    null
+  );
+  const [selectedMarca, setSelectedMarca] = useState<Marca | null>(null);
+  const [selectedPeriferico, setSelectedPeriferico] = useState<Periferico | null>(null);
+  const [selectedModelo, setSelectedModelo] = useState<Modelo | null>(null);
 
   const [ramTipo, setRamTipo] = useState("");
   const [capacidad, setCapacidad] = useState("");
   const [newOption, setNewOption] = useState<string>("");
+
+  const { modelos } = useModelos();
+  const { perifericos } = usePerifericos();
+  const { marcas } = useMarcas();
+  const { edificios } = useEdificios();
+  const { sistemasOperativos } = useSistemasOperativos();
 
   const { agregarUso } = useAgregarUso();
   const { agregarDominio } = useAgregarDominio();
@@ -38,6 +68,12 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   const { agregarVersionOffice } = useAgregarVersionOffice();
   const { agregarDisco } = useAgregarDisco();
   const { agregarRam } = useAgregarRAM();
+  const { agregarVersionSO } = useAgregarVersionSO();
+  const { agregarAula } = useAgregarAula();
+  const { agregarMarca } = useAgregarMarca();
+  const { agregarModelo } = useAgregarModelo();
+
+
 
   const getAgregarFunction = (categoria: string) => {
     switch (categoria) {
@@ -57,19 +93,15 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
         return agregarRam;
       case "Disco":
         return agregarDisco;
-      case "Marca":
-        return null;
-      case "Modelo":
-        return null;
-      case "Serie":
-        return null;
-      case "Aula":
-        return null;
       case "Versión SO":
-        return null;
-      case "Antivirus":
-        return null;
-      case "Version Office":
+        return agregarVersionSO;
+      case "Aula":
+        return agregarAula;
+      case "Marca":
+        return agregarMarca;
+      case "Modelo":
+        return agregarModelo;
+      case "Serie":
         return null;
       default:
         return null;
@@ -77,6 +109,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   };
 
   const handleAgregarOption = async () => {
+    /*
     if (
       !newOption.trim() &&
       selectedCategoria !== "RAM" &&
@@ -85,6 +118,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
       setError("Por favor, ingrese una opción válida.");
       return;
     }
+    */
 
     const agregarFunc = getAgregarFunction(selectedCategoria || "");
     if (!agregarFunc) {
@@ -98,18 +132,80 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           tipo: ramTipo,
           capacidad: capacidad,
           nombre: "",
+          sistemaoperativoId: 0,
+          edificioId: 0,
+          perifericoId: 0,
+          marcaId: 0,
         });
       } else if (selectedCategoria === "Disco") {
         result = await agregarFunc({
           capacidad: capacidad,
           nombre: "",
           tipo: "",
+          sistemaoperativoId: 0,
+          edificioId: 0,
+          perifericoId: 0,
+          marcaId: 0,
+        });
+      } else if (selectedCategoria === "Versión SO") {
+        result = await agregarFunc({
+          nombre: newOption,
+          sistemaoperativoId: Number(selectedSO?.id_sistemaoperativo),
+          capacidad: "",
+          tipo: "",
+          edificioId: 0,
+          perifericoId: 0,
+          marcaId: 0,
+        });
+      } else if (selectedCategoria === "Aula") {
+        result = await agregarFunc({
+          nombre: newOption,
+          edificioId: Number(selectedEdificio?.id_edificio),
+          sistemaoperativoId: 0,
+          capacidad: "",
+          tipo: "",
+          perifericoId: 0,
+          marcaId: 0,
+        });
+      } else if (selectedCategoria === "Marca") {
+        result = await agregarFunc({
+          nombre: newOption,
+          edificioId: Number(selectedEdificio?.id_edificio),
+          sistemaoperativoId: 0,
+          capacidad: "",
+          tipo: "",
+          perifericoId: 0,
+          marcaId: 0,
+        });
+      } else if (selectedCategoria === "Modelo") {
+        result = await agregarFunc({
+          nombre: newOption,
+          edificioId: Number(selectedEdificio?.id_edificio),
+          sistemaoperativoId: 0,
+          capacidad: "",
+          tipo: "",
+          perifericoId: 0,
+          marcaId: 0,
+        });
+      } else if (selectedCategoria === "Serie") {
+        result = await agregarFunc({
+          nombre: newOption,
+          edificioId: Number(selectedEdificio?.id_edificio),
+          sistemaoperativoId: 0,
+          capacidad: "",
+          tipo: "",
+          perifericoId: 0,
+          marcaId: 0,
         });
       } else {
         result = await agregarFunc({
           nombre: newOption,
           tipo: "",
           capacidad: "",
+          sistemaoperativoId: 0,
+          edificioId: 0,
+          perifericoId: 0,
+          marcaId: 0,
         });
       }
       console.log("Nueva opción agregada:", result);
@@ -118,6 +214,17 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
       setError("Error al agregar la opción.");
     }
   };
+
+  useEffect(() => {
+    if (!open) {
+      setNewOption("");
+      setSeletedEdificio(null);
+      setCapacidad("");
+      setSelectedMarca(null);
+      setSelectedPeriferico(null);
+      setSelectedModelo(null);
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -148,6 +255,218 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
             value={capacidad}
             onChange={(e) => setCapacidad(e.target.value)}
           />
+        ) : selectedCategoria === "Aula" ? (
+          <>
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={edificios}
+              getOptionLabel={(option) => option?.nombre || ""}
+              value={selectedEdificio}
+              onChange={(_, newValue) => {
+                setSeletedEdificio(newValue);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Edificio"
+                  variant="outlined"
+                  error={!!error}
+                  helperText={error && "Por favor seleccionar un edificio"}
+                  fullWidth
+                />
+              )}
+            />
+            <TextField
+              label="Nombre del Aula"
+              variant="outlined"
+              fullWidth
+              disabled={!selectedEdificio}
+              value={newOption}
+              onChange={(e) => setNewOption(e.target.value)}
+              error={Boolean(error)}
+              helperText={error}
+            />
+          </>
+        ) : selectedCategoria === "Sistema Operativo" ? (
+          <>
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={sistemasOperativos}
+              getOptionLabel={(option) => option?.nombre || ""}
+              value={selectedSO}
+              onChange={(_, newValue) => {
+                setSeletedSO(newValue);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Sistema Operativo"
+                  variant="outlined"
+                  error={!!error}
+                  helperText={
+                    error && "Por favor seleccionar un sistema operativo"
+                  }
+                  fullWidth
+                />
+              )}
+            />
+            <TextField
+              label="Versión Sistema Operativo"
+              variant="outlined"
+              fullWidth
+              disabled={!selectedSO}
+              value={newOption}
+              onChange={(e) => setNewOption(e.target.value)}
+              error={Boolean(error)}
+              helperText={error}
+            />
+          </>
+         ) : selectedCategoria === "Marca" ? (
+          <>
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={perifericos}
+              getOptionLabel={(option) => option?.nombre || ""}
+              value={selectedPeriferico}
+              onChange={(_, newValue) => {
+                setSelectedPeriferico(newValue);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Periférico"
+                  variant="outlined"
+                  fullWidth
+                />
+              )}
+            />
+            <TextField
+              label="Nombre de Marca"
+              variant="outlined"
+              fullWidth
+              disabled={!selectedPeriferico}
+              value={newOption}
+              onChange={(e) => setNewOption(e.target.value)}
+            />
+          </>
+        ) : selectedCategoria === "Modelo" ? (
+          <>
+          <Autocomplete
+              size="small"
+              disablePortal
+              options={perifericos}
+              getOptionLabel={(option) => option?.nombre || ""}
+              value={selectedPeriferico}
+              onChange={(_, newValue) => {
+                setSelectedPeriferico(newValue);
+                setSelectedMarca(null);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Periférico"
+                  variant="outlined"
+                  fullWidth
+                />
+              )}
+            />
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={marcas}
+              getOptionLabel={(option) => option?.nombre || ""}
+              value={selectedMarca}
+              onChange={(_, newValue) => {
+                setSelectedMarca(newValue);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Marca"
+                  variant="outlined"
+                  fullWidth
+                />
+              )}
+              disabled={!selectedPeriferico}
+            />
+            <TextField
+              label="Nombre del Modelo"
+              variant="outlined"
+              fullWidth
+              value={newOption}
+              onChange={(e) => setNewOption(e.target.value)}
+            />
+          </>
+        ) : selectedCategoria === "Serie" ? (
+          <>
+           <Autocomplete
+              size="small"
+              disablePortal
+              options={perifericos}
+              getOptionLabel={(option) => option?.nombre || ""}
+              value={selectedPeriferico}
+              onChange={(_, newValue) => {
+                setSelectedPeriferico(newValue);
+                setSelectedMarca(null);
+                setSelectedModelo(null);
+
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Periférico"
+                  variant="outlined"
+                  fullWidth
+                />
+              )}
+            />
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={marcas}
+              getOptionLabel={(option) => option?.nombre || ""}
+              value={selectedMarca}
+              onChange={(_, newValue) => {
+                setSelectedMarca(newValue);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Marca"
+                  variant="outlined"
+                  fullWidth
+                />
+              )}
+              disabled={!selectedPeriferico}
+            />
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={modelos}
+              getOptionLabel={(option) => option?.nombre || ""}
+              value={selectedModelo}
+              onChange={(_, newValue) => setSelectedModelo(newValue)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Modelo"
+                  variant="outlined"
+                  fullWidth
+                />
+              )}
+              disabled={!selectedPeriferico && !selectedMarca}
+            />
+            <TextField
+              label="Nombre de Serie"
+              variant="outlined"
+              fullWidth
+              value={newOption}
+              onChange={(e) => setNewOption(e.target.value)}
+            />
+          </>
         ) : (
           <TextField
             label={`Nuevo ${selectedCategoria || "Elemento"}`}

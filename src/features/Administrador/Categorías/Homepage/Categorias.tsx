@@ -23,7 +23,6 @@ const categorias = [
   "Versión SO",
   "Dominio",
   "Versión Office",
-  "Antivirus",
   "RAM",
   "Disco",
 ];
@@ -39,10 +38,9 @@ const itemsData = [
   { id: 9, categoria: "Sistema Operativo" },
   { id: 10, categoria: "Versión SO" },
   { id: 11, categoria: "Dominio" },
-  { id: 12, categoria: "Antivirus" },
-  { id: 13, categoria: "RAM" },
-  { id: 14, categoria: "Disco" },
-  { id: 15, categoria: "Versión Office" },
+  { id: 12, categoria: "RAM" },
+  { id: 13, categoria: "Disco" },
+  { id: 14, categoria: "Versión Office" },
 ];
 
 const Categorias = () => {
