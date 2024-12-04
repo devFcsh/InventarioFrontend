@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react";
+import { useState, Fragment,useEffect } from "react";
 import {Box,Stepper,Step,StepLabel,Button,Typography} from "@mui/material";
 import {StepDatosInventario, StepInformacionGeneral,StepCargarImagen,StepComponentes} from "../Forms/Steps/index.ts"
 import { useLocation, useNavigate } from "react-router-dom";
@@ -9,6 +9,7 @@ import { useFormDatosInventario } from "./hooks/useFormDatosInventario.ts";
 import { useFormDataInformacionGeneral } from "./hooks/useFormDataInformacionGeneral.ts";
 import { useFormDataCargarImagen } from "./hooks/useFormDataCargarImagen.ts";
 import { useFormDataComponentes } from "./hooks/useFormDataComponentes.ts";
+import { useInventoryErrors } from './hooks/useInventoryErrors';
 const steps = [
   "Datos de inventario",
   "Información general",
@@ -31,10 +32,16 @@ export const FormActivosLC = () => {
   const {informacionGeneralDataForm, handleInformacionGeneralChange} = useFormDataInformacionGeneral();
   const { imageData, handleImageChange} = useFormDataCargarImagen();
   const {componentes, handleAddComponents,eliminarComponente,showSuccessMessageComponentes,setShowSuccessMessageComponentes} = useFormDataComponentes();
+  const { inventoryErrors, completeDatosInventario,handleInventoryErrors,handleUniqueError } =  useInventoryErrors();
 
   const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    handleInventoryErrors(inventoryDataForm);
+    if (!Object.values(inventoryErrors).includes(true) && completeDatosInventario(inventoryDataForm)) {
+      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    }
   };
+
+  
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -54,6 +61,8 @@ export const FormActivosLC = () => {
             periferico={selectedPeriferico?.id_periferico ?? ""}
             inventoryDataForm={inventoryDataForm}
             handleInventoryChange={handleInventoryChange}
+            inventoryErrors={inventoryErrors}
+            handleUniqueError={handleUniqueError}
           />
         );
       case 1:
@@ -98,7 +107,6 @@ export const FormActivosLC = () => {
     };
 
     try {
-      console.log(equipoData)
       const equipoId = await agregarComputadoraActivo(equipoData);
       
       if (componentes.length > 0 && equipoId) {

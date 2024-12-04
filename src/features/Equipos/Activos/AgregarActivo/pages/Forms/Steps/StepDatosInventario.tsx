@@ -21,12 +21,16 @@ interface StepDatosInventarioProps {
   periferico: string;
   inventoryDataForm:any;
   handleInventoryChange: any;
+  inventoryErrors: any;
+  handleUniqueError:any
 }
 
 export const StepDatosInventario = ({
   periferico,
   inventoryDataForm,
   handleInventoryChange,
+  inventoryErrors,
+  handleUniqueError
 }: StepDatosInventarioProps) => {
   const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
 
@@ -65,6 +69,7 @@ export const StepDatosInventario = ({
             }
             onChange={(_, newValue: Uso | null) => {
               handleInventoryChange("uso", newValue);
+              handleUniqueError("uso",newValue);
             }}
             getOptionLabel={(option) => option ? option.nombre : ""}
             renderInput={(params) => (
@@ -72,12 +77,13 @@ export const StepDatosInventario = ({
                 {...params}
                 label="Uso"
                 variant="outlined"
-                error={!!errorUsos}
-                helperText={errorUsos ? "Error al cargar los usos" : ""}
+                error={!!inventoryErrors.uso}
+                helperText={inventoryErrors.uso? "Por favor seleccionar un uso" :""}
                 fullWidth
               />
             )}
-          />
+            />
+
           <Autocomplete
             size="small"
             disablePortal
@@ -88,6 +94,7 @@ export const StepDatosInventario = ({
             }
             onChange={(_, newValue: Usuario | null) => {
               handleInventoryChange("usuario", newValue);
+              handleUniqueError("usuario",newValue);
             }}
             getOptionLabel={(option) => option ? option.nombre : ""}
             renderInput={(params) => (
@@ -95,8 +102,8 @@ export const StepDatosInventario = ({
                 {...params}
                 label="Usuario"
                 variant="outlined"
-                error={!!errorUsuarios}
-                helperText={errorUsuarios ? "Error al cargar los usuarios" : ""}
+                error={!!inventoryErrors.usuario}
+                helperText={inventoryErrors.usuario? "Por favor seleccionar un usuario" :""}
                 fullWidth
               />
             )}
@@ -108,6 +115,7 @@ export const StepDatosInventario = ({
             getOptionLabel={(option: Marca) => option?.nombre || ""}
             onChange={(_, newValue: Marca | null) => {
               handleInventoryChange("marca", newValue);
+              handleUniqueError("marca",newValue);
             }}
             value={inventoryDataForm.marca}
             renderInput={(params) => (
@@ -115,6 +123,8 @@ export const StepDatosInventario = ({
                 {...params}
                 label="Marca"
                 variant="outlined"
+                error={!!inventoryErrors.marca}
+                helperText={inventoryErrors.marca? "Por favor seleccionar una marca" :""}
                 fullWidth
               />
             )}
@@ -127,6 +137,7 @@ export const StepDatosInventario = ({
             getOptionLabel={(option: Modelo) => option?.nombre || ""}
             onChange={(_, newValue: Modelo | null) => {
               handleInventoryChange("modelo", newValue);
+              handleUniqueError("modelo",newValue);
             }}
             value={inventoryDataForm.modelo}
             renderInput={(params) => (
@@ -134,6 +145,8 @@ export const StepDatosInventario = ({
                 {...params}
                 label="Modelo"
                 variant="outlined"
+                error={!!inventoryErrors.modelo}
+                helperText={inventoryErrors.modelo? "Por favor seleccionar un modelo" :""}
                 fullWidth
               />
             )}
@@ -146,6 +159,7 @@ export const StepDatosInventario = ({
             getOptionLabel={(option: Serie) => option?.nombre || ""}
             onChange={(_, newValue: Serie | null) => {
               handleInventoryChange("serie", newValue);
+              handleUniqueError("serie",newValue);
             }}
             value={inventoryDataForm.serie}
             renderInput={(params) => (
@@ -153,6 +167,8 @@ export const StepDatosInventario = ({
                 {...params}
                 label="Serie"
                 variant="outlined"
+                error={!!inventoryErrors.serie}
+                helperText={inventoryErrors.serie? "Por favor seleccionar una serie" :""}
                 fullWidth
               />
             )}
@@ -165,8 +181,11 @@ export const StepDatosInventario = ({
             fullWidth
             size="small"
             value={inventoryDataForm.inventario}
+            error={!!inventoryErrors.inventario}
+            helperText={inventoryErrors.inventario? "Por favor escribir un inventario" :""}
             onChange={(e) => {
               handleInventoryChange("inventario", e.target.value);
+              handleUniqueError("inventario",e.target.value);
             }}
           />
           <Autocomplete
@@ -177,12 +196,15 @@ export const StepDatosInventario = ({
             value={inventoryDataForm.edificio}
             onChange={(_, newValue: Edificio | null) => {
               handleInventoryChange("edificio", newValue);
+              handleUniqueError("edificio",newValue);
             }}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Edificio"
                 variant="outlined"
+                error={!!inventoryErrors.edificio}
+                helperText={inventoryErrors.edificio? "Por favor seleccionar un edificio" :""}
                 fullWidth
               />
             )}
@@ -195,12 +217,15 @@ export const StepDatosInventario = ({
             value={inventoryDataForm.aula}
             onChange={(_, newValue: Aula | null) => {
               handleInventoryChange("aula", newValue);
+              handleUniqueError("aula",newValue);
             }}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Aula"
                 variant="outlined"
+                error={!!inventoryErrors.aula}
+                helperText={inventoryErrors.aula? "Por favor seleccionar un aula" :""}
                 fullWidth
               />
             )}
