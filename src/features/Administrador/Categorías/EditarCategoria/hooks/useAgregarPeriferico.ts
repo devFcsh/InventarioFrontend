@@ -11,7 +11,7 @@ export const useAgregarPeriferico = () => {
     setError(null);
 
     try {
-      const { data } = await clienteAxios.post("/periferico", perifericoData);
+      const { data } = await clienteAxios.post("/perifericos", perifericoData);
       
       setMessage(data.mensaje);  
       return data.id_periferico; 

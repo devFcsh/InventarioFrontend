@@ -11,7 +11,7 @@ export const useAgregarVersionSO = () => {
     setError(null);
 
     try {
-      const { data } = await clienteAxios.post("/versionSO", versionSOData);
+      const { data } = await clienteAxios.post("/versionesSO", versionSOData);
       
       setMessage(data.mensaje);  
       return data.id_versionSO; 

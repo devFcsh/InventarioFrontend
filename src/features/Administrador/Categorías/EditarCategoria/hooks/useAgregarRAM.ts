@@ -6,7 +6,7 @@ export const useAgregarRAM = () => {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const agregarRam = async (ramData: { nombre: string }): Promise<number | undefined> => {
+  const agregarRam = async (ramData: { tipo: string, capacidad: string }): Promise<number | undefined> => {
     setLoading(true);
     setError(null);
 

@@ -11,7 +11,7 @@ export const useAgregarSerie = () => {
     setError(null);
 
     try {
-      const { data } = await clienteAxios.post("/serie", serieData);
+      const { data } = await clienteAxios.post("/series", serieData);
       
       setMessage(data.mensaje);  
       return data.id_serie; 

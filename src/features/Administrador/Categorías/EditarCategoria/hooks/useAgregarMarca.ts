@@ -11,7 +11,7 @@ export const useAgregarMarca = () => {
     setError(null);
 
     try {
-      const { data } = await clienteAxios.post("/marca", marcaData);
+      const { data } = await clienteAxios.post("/marcas", marcaData);
       
       setMessage(data.mensaje);  
       return data.id_marca; 

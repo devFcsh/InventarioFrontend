@@ -11,7 +11,7 @@ export const useAgregarAula = () => {
     setError(null);
 
     try {
-      const { data } = await clienteAxios.post("/aula", aulaData);
+      const { data } = await clienteAxios.post("/aulas", aulaData);
       
       setMessage(data.mensaje);  
       return data.id_aula; 

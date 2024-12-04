@@ -6,12 +6,12 @@ export const useAgregarDisco = () => {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const agregarDisco = async (discoData: { nombre: string }): Promise<number | undefined> => {
+  const agregarDisco = async (discoData: { capacidad: string }): Promise<number | undefined> => {
     setLoading(true);
     setError(null);
 
     try {
-      const { data } = await clienteAxios.post("/disco", discoData);
+      const { data } = await clienteAxios.post("/discos", discoData);
       
       setMessage(data.mensaje);  
       return data.id_disco; 

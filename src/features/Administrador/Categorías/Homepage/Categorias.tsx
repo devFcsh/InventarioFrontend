@@ -1,13 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { Autocomplete, TextField, Snackbar, Alert } from "@mui/material";
+import { useEffect, useState } from "react";
+import {
+  Autocomplete,
+  TextField,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
 import { filas } from "../../../../data";
 
+import ModalAgregarCategoria from "../EditarCategoria/components/ModalAgregarCategoria";
 const categorias = [
   "Uso",
-  "Usuario",
   "Periférico",
   "Marca",
   "Modelo",
@@ -25,7 +30,6 @@ const categorias = [
 
 const itemsData = [
   { id: 1, categoria: "Uso" },
-  { id: 2, categoria: "Usuario" },
   { id: 3, categoria: "Marca" },
   { id: 4, categoria: "Modelo" },
   { id: 5, categoria: "Periférico" },
@@ -42,10 +46,16 @@ const itemsData = [
 ];
 
 const Categorias = () => {
+  
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(
     null
   );
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [openModalAgregar, setOpenModalAgregar] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedItemCategoria, setSelectedItemCategoria] = useState<
+    string | null
+  >(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [filteredItems, setFilteredItems] = useState(itemsData);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -101,6 +111,15 @@ const Categorias = () => {
       setOpenSnackbar(true);
     }
   }, [location]);
+
+  const handleOpenModalAgregar = () => {
+    setOpenModalAgregar(true);
+  };
+
+  const handleCloseModalAgregar = () => {
+    setOpenModalAgregar(false);
+    setError(null);
+  };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -213,6 +232,16 @@ const Categorias = () => {
                           className="cursor-pointer"
                         />
                       </Link>
+                      <Icon
+                        icon="gridicons:add"
+                        width="30"
+                        height="30"
+                        className="text-green-900 hover:text-green-950 cursor-pointer"
+                        onClick={() => {
+                          setSelectedItemCategoria(item.categoria);
+                          handleOpenModalAgregar();
+                        }}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -262,6 +291,13 @@ const Categorias = () => {
           </ul>
         </div>
       </nav>
+      <ModalAgregarCategoria
+        open={openModalAgregar}
+        onClose={handleCloseModalAgregar}
+        selectedCategoria={selectedItemCategoria}
+        error={error}
+        setError={setError}
+      />
     </div>
   );
 };

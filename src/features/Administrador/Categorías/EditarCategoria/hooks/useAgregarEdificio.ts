@@ -11,7 +11,7 @@ export const useAgregarEdificio = () => {
     setError(null);
 
     try {
-      const { data } = await clienteAxios.post("/edificio", edificioData);
+      const { data } = await clienteAxios.post("/edificios", edificioData);
       
       setMessage(data.mensaje);  
       return data.id_edificio; 

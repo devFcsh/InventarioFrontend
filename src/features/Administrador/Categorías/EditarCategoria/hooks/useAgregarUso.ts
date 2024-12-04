@@ -11,7 +11,7 @@ export const useAgregarUso = () => {
     setError(null);
 
     try {
-      const { data } = await clienteAxios.post("/uso", usoData);
+      const { data } = await clienteAxios.post("/usos", usoData);
       
       setMessage(data.mensaje);  
       return data.id_uso; 

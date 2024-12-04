@@ -11,7 +11,7 @@ export const useAgregarSistemaOperativo = () => {
     setError(null);
 
     try {
-      const { data } = await clienteAxios.post("/sistemaoperativo", soData);
+      const { data } = await clienteAxios.post("/sistemasoperativo", soData);
       
       setMessage(data.mensaje);  
       return data.id_sistemaoperativo; 

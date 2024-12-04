@@ -11,7 +11,7 @@ export const useAgregarVersionOffice = () => {
     setError(null);
 
     try {
-      const { data } = await clienteAxios.post("/versionoffice", versionOfficeData);
+      const { data } = await clienteAxios.post("/versionesoffice", versionOfficeData);
       
       setMessage(data.mensaje);  
       return data.id_versionoffie; 
