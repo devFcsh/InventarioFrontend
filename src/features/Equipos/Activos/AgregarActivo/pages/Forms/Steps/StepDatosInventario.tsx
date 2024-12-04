@@ -22,7 +22,7 @@ interface StepDatosInventarioProps {
   inventoryDataForm:any;
   handleInventoryChange: any;
   inventoryErrors: any;
-  handleUniqueError:any
+  handleUniqueInventarioError:any
 }
 
 export const StepDatosInventario = ({
@@ -30,7 +30,7 @@ export const StepDatosInventario = ({
   inventoryDataForm,
   handleInventoryChange,
   inventoryErrors,
-  handleUniqueError
+  handleUniqueInventarioError
 }: StepDatosInventarioProps) => {
   const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
 
@@ -69,7 +69,7 @@ export const StepDatosInventario = ({
             }
             onChange={(_, newValue: Uso | null) => {
               handleInventoryChange("uso", newValue);
-              handleUniqueError("uso",newValue);
+              handleUniqueInventarioError("uso",newValue);
             }}
             getOptionLabel={(option) => option ? option.nombre : ""}
             renderInput={(params) => (
@@ -94,7 +94,7 @@ export const StepDatosInventario = ({
             }
             onChange={(_, newValue: Usuario | null) => {
               handleInventoryChange("usuario", newValue);
-              handleUniqueError("usuario",newValue);
+              handleUniqueInventarioError("usuario",newValue);
             }}
             getOptionLabel={(option) => option ? option.nombre : ""}
             renderInput={(params) => (
@@ -115,7 +115,7 @@ export const StepDatosInventario = ({
             getOptionLabel={(option: Marca) => option?.nombre || ""}
             onChange={(_, newValue: Marca | null) => {
               handleInventoryChange("marca", newValue);
-              handleUniqueError("marca",newValue);
+              handleUniqueInventarioError("marca",newValue);
             }}
             value={inventoryDataForm.marca}
             renderInput={(params) => (
@@ -137,7 +137,7 @@ export const StepDatosInventario = ({
             getOptionLabel={(option: Modelo) => option?.nombre || ""}
             onChange={(_, newValue: Modelo | null) => {
               handleInventoryChange("modelo", newValue);
-              handleUniqueError("modelo",newValue);
+              handleUniqueInventarioError("modelo",newValue);
             }}
             value={inventoryDataForm.modelo}
             renderInput={(params) => (
@@ -159,7 +159,7 @@ export const StepDatosInventario = ({
             getOptionLabel={(option: Serie) => option?.nombre || ""}
             onChange={(_, newValue: Serie | null) => {
               handleInventoryChange("serie", newValue);
-              handleUniqueError("serie",newValue);
+              handleUniqueInventarioError("serie",newValue);
             }}
             value={inventoryDataForm.serie}
             renderInput={(params) => (
@@ -185,7 +185,7 @@ export const StepDatosInventario = ({
             helperText={inventoryErrors.inventario? "Por favor escribir un inventario" :""}
             onChange={(e) => {
               handleInventoryChange("inventario", e.target.value);
-              handleUniqueError("inventario",e.target.value);
+              handleUniqueInventarioError("inventario",e.target.value);
             }}
           />
           <Autocomplete
@@ -196,7 +196,7 @@ export const StepDatosInventario = ({
             value={inventoryDataForm.edificio}
             onChange={(_, newValue: Edificio | null) => {
               handleInventoryChange("edificio", newValue);
-              handleUniqueError("edificio",newValue);
+              handleUniqueInventarioError("edificio",newValue);
             }}
             renderInput={(params) => (
               <TextField
@@ -217,7 +217,7 @@ export const StepDatosInventario = ({
             value={inventoryDataForm.aula}
             onChange={(_, newValue: Aula | null) => {
               handleInventoryChange("aula", newValue);
-              handleUniqueError("aula",newValue);
+              handleUniqueInventarioError("aula",newValue);
             }}
             renderInput={(params) => (
               <TextField

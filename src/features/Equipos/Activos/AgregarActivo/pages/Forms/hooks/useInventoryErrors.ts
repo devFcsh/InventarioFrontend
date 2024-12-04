@@ -37,9 +37,8 @@ export const useInventoryErrors = () => {
 
   const completeDatosInventario = (dataForm: InventoryDataForm)=>{
     if(dataForm.uso !==null && dataForm.usuario!==null
-      &&dataForm.marca !==null && dataForm.modelo !==null &&
-      dataForm.modelo !==null && dataForm.serie !==null &&
-      dataForm.inventario !=="" && dataForm.edificio !==null && dataForm.aula &&null
+      &&dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
+      dataForm.inventario !=="" && dataForm.edificio !==null && dataForm.aula!==null
     ) return true
     return false;
   }
@@ -66,12 +65,12 @@ export const useInventoryErrors = () => {
     });
   };
 
-  const handleUniqueError = (tipo: keyof InventoryDataForm, value: Uso | Usuario | Marca | Modelo | Serie | string | Edificio | Aula | null) => {
+  const handleUniqueInventarioError = (tipo: keyof InventoryDataForm, value: Uso | Usuario | Marca | Modelo | Serie | string | Edificio | Aula | null) => {
     setInventoryErrors((prevErrors) => ({
       ...prevErrors,
       [tipo]: value === null || value === "" ? true : false,
     }));
   };
 
-  return { inventoryErrors,handleInventoryErrors, handleUniqueError,completeDatosInventario};
+  return { inventoryErrors,handleInventoryErrors, handleUniqueInventarioError,completeDatosInventario};
 };

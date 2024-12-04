@@ -10,6 +10,8 @@ import { useFormDataInformacionGeneral } from "./hooks/useFormDataInformacionGen
 import { useFormDataCargarImagen } from "./hooks/useFormDataCargarImagen.ts";
 import { useFormDataComponentes } from "./hooks/useFormDataComponentes.ts";
 import { useInventoryErrors } from './hooks/useInventoryErrors';
+import { useInformacionGeneralError } from './hooks/useInformacionGeneralError.ts';
+import { useCargarImagenErrors } from './hooks/useCargarImagenErrors.ts';
 const steps = [
   "Datos de inventario",
   "Información general",
@@ -32,12 +34,28 @@ export const FormActivosLC = () => {
   const {informacionGeneralDataForm, handleInformacionGeneralChange} = useFormDataInformacionGeneral();
   const { imageData, handleImageChange} = useFormDataCargarImagen();
   const {componentes, handleAddComponents,eliminarComponente,showSuccessMessageComponentes,setShowSuccessMessageComponentes} = useFormDataComponentes();
-  const { inventoryErrors, completeDatosInventario,handleInventoryErrors,handleUniqueError } =  useInventoryErrors();
+  const { inventoryErrors, completeDatosInventario,handleInventoryErrors,handleUniqueInventarioError } =  useInventoryErrors();
+  const { informacionGeneralErrors,handleInformacionGeneralErrors, handleUniqueInformacionGeneralError,completeDatosInformacionGeneral} =  useInformacionGeneralError();
+  const { cargarImagenErrors,handleCargarImagenErrors, handleUniqueCargarImagenError,completeDatosCargarImagen } =  useCargarImagenErrors();
 
   const handleNext = () => {
-    handleInventoryErrors(inventoryDataForm);
-    if (!Object.values(inventoryErrors).includes(true) && completeDatosInventario(inventoryDataForm)) {
-      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    if(activeStep===0){
+      handleInventoryErrors(inventoryDataForm);
+      if (!Object.values(inventoryErrors).includes(true) && completeDatosInventario(inventoryDataForm)) {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      }
+    }
+    if(activeStep===1){
+      handleInformacionGeneralErrors(informacionGeneralDataForm);
+      if (!Object.values(informacionGeneralErrors).includes(true) && completeDatosInformacionGeneral(informacionGeneralDataForm)) {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      }
+    }
+    if(activeStep===2){
+      handleCargarImagenErrors(imageData);
+      if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData)) {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      }
     }
   };
 
@@ -62,17 +80,22 @@ export const FormActivosLC = () => {
             inventoryDataForm={inventoryDataForm}
             handleInventoryChange={handleInventoryChange}
             inventoryErrors={inventoryErrors}
-            handleUniqueError={handleUniqueError}
+            handleUniqueInventarioError={handleUniqueInventarioError}
           />
         );
       case 1:
         return <StepInformacionGeneral 
         informacionGeneralDataForm={informacionGeneralDataForm}
-        handleInformacionGeneralChange={handleInformacionGeneralChange} />;
+        handleInformacionGeneralChange={handleInformacionGeneralChange}
+        informacionGeneralErrors={informacionGeneralErrors}
+        handleUniqueInformacionGeneralError={handleUniqueInformacionGeneralError}
+        />;
       case 2:
         return <StepCargarImagen
         imageData={imageData}
-        handleImageChange={handleImageChange}/>;
+        handleImageChange={handleImageChange}
+        cargarImagenErrors={cargarImagenErrors}
+        handleUniqueCargarImagenError={handleUniqueCargarImagenError}/>;
       case 3:
         return (
           <StepComponentes

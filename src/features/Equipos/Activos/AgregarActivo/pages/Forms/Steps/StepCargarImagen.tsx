@@ -4,11 +4,15 @@ import { Box } from "@mui/material";
 interface StepCargarImagenProps {
   imageData: any;
   handleImageChange:any;
+  cargarImagenErrors:any;
+  handleUniqueCargarImagenError:any
 }
 
 export const StepCargarImagen = ({
   imageData,
   handleImageChange,
+  cargarImagenErrors,
+  handleUniqueCargarImagenError
 }: StepCargarImagenProps) => {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -26,7 +30,12 @@ export const StepCargarImagen = ({
           <input
             type="file"
             accept="image/*"
-            onChange={handleImageChange}
+            onChange={(event)=>{
+              handleImageChange(event)
+              handleUniqueCargarImagenError("image",event.target.files?.[0])
+            }
+              
+            }
             ref={fileInputRef}
             style={{ display: "none" }}
           />
@@ -44,6 +53,7 @@ export const StepCargarImagen = ({
               <p className="text-gray-500">Haz clic para cargar una imagen</p>
             )}
           </div>
+            {(cargarImagenErrors.image===true)? <span style={{color:"red"}}> Por favor seleccionar una imagen</span> :""}
         </div>
       </div>
     </Box>

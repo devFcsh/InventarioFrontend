@@ -19,11 +19,15 @@ import useVersionesSO from "@hooks/useVersionesSO";
 interface StepInformacionGeneralProps {
   informacionGeneralDataForm:any;
   handleInformacionGeneralChange: any;
+  informacionGeneralErrors: any;
+  handleUniqueInformacionGeneralError:any
 }
 
 export const StepInformacionGeneral = ({
   informacionGeneralDataForm,
   handleInformacionGeneralChange,
+  informacionGeneralErrors,
+  handleUniqueInformacionGeneralError
 }: StepInformacionGeneralProps) => {
 
   const { sistemasOperativos } = useSistemasOperativos();
@@ -44,12 +48,15 @@ export const StepInformacionGeneral = ({
             value={informacionGeneralDataForm.sistemaOperativo}
             onChange={(_, newValue: SistemaOperativo | null) => {
               handleInformacionGeneralChange("sistemaOperativo", newValue);
+              handleUniqueInformacionGeneralError("sistemaOperativo",newValue);
             }}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Sistema Operativo"
                 variant="outlined"
+                error={!!informacionGeneralErrors.sistemaOperativo}
+                helperText={informacionGeneralErrors.sistemaOperativo? "Por favor seleccionar un sistema operativo" :""}
                 fullWidth
               />
             )}
@@ -62,12 +69,15 @@ export const StepInformacionGeneral = ({
             value={informacionGeneralDataForm.versionSO}
             onChange={(_, newValue: VersionSO | null) => {
               handleInformacionGeneralChange("versionSO", newValue);
+              handleUniqueInformacionGeneralError("versionSO",newValue);
             }}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Versión SO"
                 variant="outlined"
+                error={!!informacionGeneralErrors.versionSO}
+                helperText={informacionGeneralErrors.versionSO? "Por favor seleccionar una versión del sistema operativo" :""}
                 fullWidth
               />
             )}
@@ -80,12 +90,16 @@ export const StepInformacionGeneral = ({
             value={informacionGeneralDataForm.dominio}
             onChange={(_, newValue: Dominio | null) => {
               handleInformacionGeneralChange("dominio", newValue);
+              handleUniqueInformacionGeneralError("dominio",newValue);
             }}
+            
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Dominio"
                 variant="outlined"
+                error={!!informacionGeneralErrors.dominio}
+                helperText={informacionGeneralErrors.dominio? "Por favor seleccionar un dominio" :""}
                 fullWidth
               />
             )}
@@ -97,8 +111,11 @@ export const StepInformacionGeneral = ({
             fullWidth
             size="small"
             value={informacionGeneralDataForm.nombreEquipo}
+            error={!!informacionGeneralErrors.nombreEquipo}
+            helperText={informacionGeneralErrors.nombreEquipo? "Por favor escribir un nombre del equipo" :""}
             onChange={(e) => {
-              handleInformacionGeneralChange("nombreEquipo", e.target.value)}}
+              handleInformacionGeneralChange("nombreEquipo", e.target.value)
+              handleUniqueInformacionGeneralError("nombreEquipo",e.target.value);}}
           />
           <Autocomplete
             size="small"
@@ -108,12 +125,15 @@ export const StepInformacionGeneral = ({
             value={informacionGeneralDataForm.versionOffice}
             onChange={(_, newValue: VersionOffice | null) => {
               handleInformacionGeneralChange("versionOffice", newValue);
+              handleUniqueInformacionGeneralError("versionOffice",newValue);
             }}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Versión Office"
                 variant="outlined"
+                error={!!informacionGeneralErrors.versionOffice}
+                helperText={informacionGeneralErrors.versionOffice? "Por favor seleccionar una version de office" :""}
                 fullWidth
               />
             )}
@@ -126,9 +146,11 @@ export const StepInformacionGeneral = ({
             value={protocolos.find((p) => p.id === informacionGeneralDataForm.protocolo) || null}
             onChange={(event, newValue) => {
               if (newValue) {
-                handleInformacionGeneralChange("protocolo",newValue.id);
+                handleInformacionGeneralChange("protocolo",newValue.id);   
+                handleUniqueInformacionGeneralError("protocolo",newValue.id);
               } else {
                 handleInformacionGeneralChange("protocolo","1");
+                handleUniqueInformacionGeneralError("protocolo","1");
               }
             }}
             renderInput={(params) => (
@@ -136,6 +158,8 @@ export const StepInformacionGeneral = ({
                 {...params}
                 label="Protocolo"
                 variant="outlined"
+                error={!!informacionGeneralErrors.protocolo}
+                helperText={informacionGeneralErrors.protocolo? "Por favor seleccionar un protocolo" :""}
                 fullWidth
               />
             )}
@@ -147,7 +171,11 @@ export const StepInformacionGeneral = ({
             fullWidth
             size="small"
             value={informacionGeneralDataForm.direccionIP}
-            onChange={(e) => {handleInformacionGeneralChange("direccionIP",e.target.value)}}
+            error={!!informacionGeneralErrors.direccionIP}
+            helperText={informacionGeneralErrors.direccionIP? "Por favor escribir una direccion IP" :""}
+            onChange={(e) => {handleInformacionGeneralChange("direccionIP",e.target.value)
+              
+            }}
             disabled={informacionGeneralDataForm.protocolo !== "0"}
           />
           <Autocomplete
@@ -158,12 +186,16 @@ export const StepInformacionGeneral = ({
             value={informacionGeneralDataForm.antivirus}
             onChange={(_, newValue: Antivirus | null) => {
               handleInformacionGeneralChange("antivirus", newValue);
+              handleUniqueInformacionGeneralError("antivirus",newValue);
+              
             }}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Antivirus"
                 variant="outlined"
+                error={!!informacionGeneralErrors.antivirus}
+                helperText={informacionGeneralErrors.antivirus? "Por favor seleccionar un antivirus" :""}
                 fullWidth
               />
             )}
@@ -178,9 +210,12 @@ export const StepInformacionGeneral = ({
             value={informacionGeneralDataForm.ram}
             onChange={(_, newValue: RAM | null) => {
               handleInformacionGeneralChange("ram", newValue);
+              handleUniqueInformacionGeneralError("ram",newValue);
             }}
             renderInput={(params) => (
-              <TextField {...params} label="RAM" variant="outlined" fullWidth />
+              <TextField {...params} label="RAM" variant="outlined" fullWidth
+              error={!!informacionGeneralErrors.ram}
+              helperText={informacionGeneralErrors.ram? "Por favor seleccionar el tamaño de la ram" :""}/>
             )}
           />
           <Autocomplete
@@ -191,12 +226,15 @@ export const StepInformacionGeneral = ({
             value={informacionGeneralDataForm.disco}
             onChange={(_, newValue: Disco | null) => {
               handleInformacionGeneralChange("disco", newValue);
+              handleUniqueInformacionGeneralError("disco",newValue);
             }}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Disco"
                 variant="outlined"
+                error={!!informacionGeneralErrors.disco}
+                helperText={informacionGeneralErrors.disco? "Por favor seleccionar el tamaño del disco" :""}
                 fullWidth
               />
             )}
