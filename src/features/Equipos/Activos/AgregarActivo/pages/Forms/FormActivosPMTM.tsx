@@ -1,37 +1,26 @@
-/*
-import * as React from "react";
-import Box from "@mui/material/Box";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import "./FormStyle.css";
-import { useNavigate } from "react-router-dom";
-import StepDatosInventario from "./Steps/StepDatosInventario";
-import StepCargarImagen from "./Steps/StepCargarImagen";
-
+import {useState, Fragment} from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import {Box,Stepper, Step, StepLabel, Button, Typography} from "@mui/material";
+import { Periferico } from "../../../../../../types";
+import {StepDatosInventario, StepCargarImagen} from "./Steps/index";
+import {useFormDatosInventario,useFormDataCargarImagen} from "./hooks/index"
+import { useAgregarComputadoraActivo } from "../../hooks/useAgregarComputadoraActivo";
+import { useInventoryErrors,useCargarImagenErrors } from './hooks/index';
 const steps = ["Datos de inventario", "Cargar imagen"];
 
 export const FormActivosPMTM = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = React.useState(0);
-
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-  const onClose = () => {
-    navigate("/activos");
-  };
-
+  const location = useLocation();
+  const [activeStep, setActiveStep] = useState(1);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const selectedPeriferico = location.state?.periferico as
+  | Periferico
+  | undefined;
+  const {inventoryDataForm, handleInventoryChange} = useFormDatosInventario();
+  const { imageData, handleImageChange} = useFormDataCargarImagen();
+  const { agregarComputadoraActivo } = useAgregarComputadoraActivo();
+  const { inventoryErrors, completeDatosInventario,handleInventoryErrors,handleUniqueInventarioError } =  useInventoryErrors();
+  const { cargarImagenErrors,handleCargarImagenErrors, handleUniqueCargarImagenError,completeDatosCargarImagen } =  useCargarImagenErrors();
   const stepStyle = {
     "& .Mui-active": {
       "&.MuiStepIcon-root": {
@@ -55,16 +44,67 @@ export const FormActivosPMTM = () => {
     },
   };
 
+  const handleNext = () => {
+    if(activeStep===0){
+      handleInventoryErrors(inventoryDataForm);
+      if (!Object.values(inventoryErrors).includes(true) && completeDatosInventario(inventoryDataForm)) {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      }
+    }
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleReset = () => {
+    setActiveStep(0);
+  };
+  const onClose = () => {
+    navigate("/activos");
+  };
+
+
+
   const renderStepContent = (stepIndex: number) => {
     switch (stepIndex) {
       case 0:
-        return <StepDatosInventario />;
+        return <StepDatosInventario
+        periferico={selectedPeriferico?.id_periferico ?? ""}
+        inventoryDataForm={inventoryDataForm}
+        handleInventoryChange={handleInventoryChange}
+        inventoryErrors={inventoryErrors}
+        handleUniqueInventarioError={handleUniqueInventarioError}/>;
       case 1:
-        return <StepCargarImagen />;
+        return <StepCargarImagen 
+        imageData={imageData}
+        handleImageChange={handleImageChange}
+        cargarImagenErrors={cargarImagenErrors}
+        handleUniqueCargarImagenError={handleUniqueCargarImagenError}/>;
       default:
         return <div>Paso no encontrado</div>;
     }
   };
+
+  const handleAgregarEquipo = async () => {
+    try {
+      if(activeStep===1){
+        handleCargarImagenErrors(imageData);
+        if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData)) {
+
+
+
+
+          setShowSuccessMessage(true);
+          navigate("/activos", { state: { equipoAgregado: true } });
+        }
+      }
+    } catch (error) {
+      alert("Error al agregar el componente");
+    }
+
+  }
+  
 
   return (
     <Box
@@ -93,7 +133,7 @@ export const FormActivosPMTM = () => {
           })}
         </Stepper>
         {activeStep === steps.length ? (
-          <React.Fragment>
+          <Fragment>
             <Typography sx={{ mt: 2, mb: 1 }}>
               All steps completed - you&apos;re finished
             </Typography>
@@ -101,9 +141,9 @@ export const FormActivosPMTM = () => {
               <Box sx={{ flex: "1 1 auto" }} />
               <Button onClick={handleReset}>Reset</Button>
             </Box>
-          </React.Fragment>
+          </Fragment>
         ) : (
-          <React.Fragment>
+          <Fragment>
             {renderStepContent(activeStep)}
             <Box
               sx={{
@@ -132,7 +172,11 @@ export const FormActivosPMTM = () => {
               </Button>
 
               <Button
-                onClick={handleNext}
+                onClick={
+                  activeStep === steps.length - 1
+                    ? handleAgregarEquipo
+                    : handleNext
+                }
                 variant="contained"
                 sx={{
                   backgroundColor:
@@ -148,11 +192,9 @@ export const FormActivosPMTM = () => {
                   : "Siguiente"}
               </Button>
             </Box>
-          </React.Fragment>
+          </Fragment>
         )}
       </Box>
     </Box>
   );
 };
-
-*/

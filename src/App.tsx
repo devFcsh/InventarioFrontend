@@ -11,7 +11,7 @@ import Categorias from "./features/Administrador/Categorías/Homepage/Categorias
 import AgregarActivo from "./pages/AgregarActivo";
 import EditarActivo from "./pages/EditarActivo";
 import {FormActivosLC} from "./features/Equipos/Activos/AgregarActivo/pages/Forms/FormActivosLC"
-//import {FormActivosPMTM} from "./features/Equipos/Activos/AgregarActivo/pages/Forms/FormActivosPMTM"
+import {FormActivosPMTM} from "./features/Equipos/Activos/AgregarActivo/pages/Forms/FormActivosPMTM"
 import AgregarUsuario from "./features/Administrador/Usuarios/AgregarUsuario/Homepage/AgregarUsuario";
 import EditarUsuario from "./features/Administrador/Usuarios/EditarUsuario/Homepage/EditarUsuario";
 
@@ -99,7 +99,7 @@ const App: React.FC = () => {
             </Layout>
           }
         />
-        {/*
+        {
         <Route
           path="/FormActivosPMTM"
           element={
@@ -111,7 +111,7 @@ const App: React.FC = () => {
             </Layout>
           }
         />
-        */}
+        }
         <Route
           path="/editarActivo"
           element={
