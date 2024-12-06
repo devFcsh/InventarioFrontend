@@ -64,6 +64,7 @@ const EditarComputadoraActivo = ({
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  
 
   const navigate = useNavigate();
   const [selectedRAM, setSelectedRAM] = useState<RAM | null>(null);
@@ -151,35 +152,35 @@ const EditarComputadoraActivo = ({
       );
       setSelectedSO(
         sistemasOperativos.find(
-          (so) => so.id_sistemaoperativo === equipo.id_sistemaoperativo
+          (so) => so?.id_sistemaoperativo === equipo.id_sistemaoperativo
         ) || null
       );
       setSelectedVersionSO(
         versionesSO.find(
-          (version) => version.id_versionso === equipo.id_versionso
+          (version) => version?.id_versionso === equipo.id_versionso
         ) || null
       );
       setSelectedRAM(
-        ram.find((ramItem) => ramItem.id_ram === equipo.id_ram) || null
+        ram.find((ramItem) => ramItem?.id_ram === equipo.id_ram) || null
       );
       setSelectedDisco(
-        discos.find((disco) => disco.id_disco === equipo.id_disco) || null
+        discos.find((disco) => disco?.id_disco === equipo.id_disco) || null
       );
       setSelectedDominio(
-        dominios.find((dominio) => dominio.id_dominio === equipo.id_dominio) ||
+        dominios.find((dominio) => dominio?.id_dominio === equipo.id_dominio) ||
           null
       );
       setSelectedEdificio(
         edificios.find(
-          (edificio) => edificio.id_edificio === equipo.id_edificio
+          (edificio) => edificio?.id_edificio === equipo.id_edificio
         ) || null
       );
       setSelectedAula(
-        aulas.find((aula) => aula.id_aula === equipo.id_aula) || null
+        aulas.find((aula) => aula?.id_aula === equipo.id_aula) || null
       );
       setSelectedVersionOffice(
         versionesOffice.find(
-          (version) => version.id_versionoffice === equipo.id_versionoffice
+          (version) => version?.id_versionoffice === equipo.id_versionoffice
         ) || null
       );
       setSelectedAntivirus(
@@ -354,7 +355,11 @@ const EditarComputadoraActivo = ({
           disablePortal
           options={marcas}
           value={selectedInventarioMarca}
-          onChange={(_, newValue) => setSelectedInventarioMarca(newValue)}
+          onChange={(_, newValue) => {
+            setSelectedInventarioMarca(newValue);
+            setSelectedInventarioModelo(null);
+            setSelectedInventarioSerie(null);
+          }}
           getOptionLabel={(option) => option?.nombre || ""}
           renderInput={(params) => (
             <TextField {...params} label="Marca" variant="outlined" fullWidth />
@@ -366,7 +371,10 @@ const EditarComputadoraActivo = ({
           disablePortal
           options={modelos}
           value={selectedInventarioModelo}
-          onChange={(_, newValue) => setSelectedInventarioModelo(newValue)}
+          onChange={(_, newValue) => {
+            setSelectedInventarioModelo(newValue);
+            setSelectedInventarioSerie(null);
+          }}
           getOptionLabel={(option) => option?.nombre || ""}
           renderInput={(params) => (
             <TextField
@@ -411,7 +419,7 @@ const EditarComputadoraActivo = ({
             setSelectedSO(newValue);
             setSelectedVersionSO(null);
           }}
-          getOptionLabel={(option) => option.nombre}
+          getOptionLabel={(option) => option? option.nombre : ""}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -428,7 +436,7 @@ const EditarComputadoraActivo = ({
           options={versionesSO}
           value={selectedVersionSO}
           onChange={(_, newValue) => setSelectedVersionSO(newValue)}
-          getOptionLabel={(option) => option.nombre}
+          getOptionLabel={(option) => option? option.nombre : ""}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -462,7 +470,7 @@ const EditarComputadoraActivo = ({
           options={versionesOffice}
           value={selectedVersionOffice}
           onChange={(_, newValue) => setSelectedVersionOffice(newValue)}
-          getOptionLabel={(option) => option.nombre}
+          getOptionLabel={(option) => option? option.nombre : ""}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -478,7 +486,7 @@ const EditarComputadoraActivo = ({
           options={ram}
           value={selectedRAM}
           onChange={(_, newValue) => setSelectedRAM(newValue)}
-          getOptionLabel={(option) => `${option.capacidad} - ${option.tipo}`}
+          getOptionLabel={(option) => `${option?.capacidad} - ${option?.tipo}`}
           renderInput={(params) => (
             <TextField {...params} label="RAM" variant="outlined" fullWidth />
           )}
@@ -489,7 +497,7 @@ const EditarComputadoraActivo = ({
           options={discos}
           value={selectedDisco}
           onChange={(_, newValue) => setSelectedDisco(newValue)}
-          getOptionLabel={(option) => option.capacidad}
+          getOptionLabel={(option) => option? option.capacidad : ""}
           renderInput={(params) => (
             <TextField {...params} label="Disco" variant="outlined" fullWidth />
           )}
@@ -534,7 +542,7 @@ const EditarComputadoraActivo = ({
           options={dominios}
           value={selectedDominio}
           onChange={(_, newValue) => setSelectedDominio(newValue)}
-          getOptionLabel={(option) => option.nombre}
+          getOptionLabel={(option) => option? option.nombre : ""}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -553,7 +561,7 @@ const EditarComputadoraActivo = ({
             setSelectedEdificio(newValue);
             setSelectedAula(null);
           }}
-          getOptionLabel={(option) => option.nombre}
+          getOptionLabel={(option) => option? option.nombre : ""}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -570,7 +578,7 @@ const EditarComputadoraActivo = ({
           options={aulas}
           value={selectedAula}
           onChange={(_, newValue) => setSelectedAula(newValue)}
-          getOptionLabel={(option) => option.nombre}
+          getOptionLabel={(option) => option? option.nombre : ""}
           renderInput={(params) => (
             <TextField {...params} label="Aula" variant="outlined" fullWidth />
           )}
@@ -753,15 +761,27 @@ const EditarComputadoraActivo = ({
       <div className="flex gap-4 mt-10">
         <Button
           variant="contained"
-          color="primary"
+          sx={{
+            backgroundColor:
+              "#4CAF50",
+            "&:hover": {
+              backgroundColor:
+                "#45a049"
+            },
+          }}
           onClick={handleConfirmEditarEquipo}
           fullWidth
         >
           Editar Activo
         </Button>
-        <Button variant="outlined" color="primary" onClick={handleConfirmCancelar} fullWidth>
-          Cancelar
-        </Button>   
+        <Button
+                onClick={handleConfirmCancelar}
+                color="error"
+                variant="contained"
+                fullWidth
+              >
+                Cancelar
+              </Button>
       </div>
       {errorMensajeEquipo && (
         <div className="text-red-500 mt-2">{errorMensajeEquipo}</div>

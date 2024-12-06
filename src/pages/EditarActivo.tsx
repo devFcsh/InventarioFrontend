@@ -30,7 +30,7 @@ const EditarActivo = () => {
       const selectedPeriferico = perifericos.find(
         (p) => p?.id_periferico === equipo.id_periferico
       );
-      const selectedUso = usos.find((uso) => uso.id_uso === equipo.id_uso);
+      const selectedUso = usos.find((uso) => uso?.id_uso === equipo.id_uso);
       setPerifericoId(selectedPeriferico?.id_periferico || null);
       setSelectedUso(selectedUso || null);
     }
@@ -39,7 +39,7 @@ const EditarActivo = () => {
   useEffect(() => {
     if (selectedUso && usuarios.length > 0) {
       const selectedUsuario = usuarios.find(
-        (usuario) => usuario.id_usuario === equipo?.id_usuario
+        (usuario) => usuario?.id_usuario === equipo?.id_usuario
       );
       setSelectedUsuario(selectedUsuario || null);
     }
@@ -87,7 +87,7 @@ const EditarActivo = () => {
               setSelectedUso(newValue);
               setSelectedUsuario(null);
             }}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) =>option ? option.nombre : ""}
             renderInput={(params) => (
               <TextField {...params} label="Uso" variant="outlined" fullWidth />
             )}
@@ -99,7 +99,7 @@ const EditarActivo = () => {
             options={usuarios}
             value={selectedUsuario}
             onChange={(event, newValue) => setSelectedUsuario(newValue)}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) =>option ? option.nombre : ""}
             renderInput={(params) => (
               <TextField
                 {...params}
