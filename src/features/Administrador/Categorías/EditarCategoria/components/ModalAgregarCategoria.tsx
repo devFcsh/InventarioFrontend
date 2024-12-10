@@ -7,6 +7,7 @@ import {
   TextField,
   Button,
   Autocomplete,
+  Box,
 } from "@mui/material";
 import { useAgregarUso } from "../hooks/useAgregarUso";
 import { useAgregarDominio } from "../hooks/useAgregarDominio";
@@ -26,6 +27,7 @@ import usePerifericos from "@hooks/usePerifericos";
 import useModelos from "@hooks/useModelos";
 import { useAgregarMarca } from "../hooks/useAgregarMarca";
 import { useAgregarModelo } from "../hooks/useAgregarModelo";
+import { useAgregarSerie } from "../hooks/useAgregarSerie";
 
 interface ModalAgregarCategoriaProps {
   open: boolean;
@@ -72,8 +74,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   const { agregarAula } = useAgregarAula();
   const { agregarMarca } = useAgregarMarca();
   const { agregarModelo } = useAgregarModelo();
-
-
+  const { agregarSerie } = useAgregarSerie();
 
   const getAgregarFunction = (categoria: string) => {
     switch (categoria) {
@@ -102,7 +103,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
       case "Modelo":
         return agregarModelo;
       case "Serie":
-        return null;
+        return agregarSerie;
       default:
         return null;
     }
@@ -136,6 +137,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           edificioId: 0,
           perifericoId: 0,
           marcaId: 0,
+          modeloId: 0,
         });
       } else if (selectedCategoria === "Disco") {
         result = await agregarFunc({
@@ -146,8 +148,10 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           edificioId: 0,
           perifericoId: 0,
           marcaId: 0,
+          modeloId: 0,
         });
       } else if (selectedCategoria === "Versión SO") {
+        console.log(selectedSO)
         result = await agregarFunc({
           nombre: newOption,
           sistemaoperativoId: Number(selectedSO?.id_sistemaoperativo),
@@ -156,6 +160,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           edificioId: 0,
           perifericoId: 0,
           marcaId: 0,
+          modeloId: 0,
         });
       } else if (selectedCategoria === "Aula") {
         result = await agregarFunc({
@@ -166,31 +171,35 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           tipo: "",
           perifericoId: 0,
           marcaId: 0,
+          modeloId: 0,
         });
       } else if (selectedCategoria === "Marca") {
         result = await agregarFunc({
           nombre: newOption,
-          edificioId: Number(selectedEdificio?.id_edificio),
+          perifericoId: Number(selectedPeriferico?.id_periferico),
           sistemaoperativoId: 0,
           capacidad: "",
           tipo: "",
-          perifericoId: 0,
+          edificioId: 0,
           marcaId: 0,
+          modeloId: 0,
         });
       } else if (selectedCategoria === "Modelo") {
         result = await agregarFunc({
           nombre: newOption,
-          edificioId: Number(selectedEdificio?.id_edificio),
+          marcaId: Number(selectedMarca?.id_marca),
           sistemaoperativoId: 0,
           capacidad: "",
           tipo: "",
           perifericoId: 0,
-          marcaId: 0,
+          edificioId: 0,
+          modeloId: 0,
         });
       } else if (selectedCategoria === "Serie") {
         result = await agregarFunc({
           nombre: newOption,
-          edificioId: Number(selectedEdificio?.id_edificio),
+          modeloId: Number(selectedModelo?.id_modelo),
+          edificioId: 0,
           sistemaoperativoId: 0,
           capacidad: "",
           tipo: "",
@@ -206,6 +215,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           edificioId: 0,
           perifericoId: 0,
           marcaId: 0,
+          modeloId: 0,
         });
       }
       console.log("Nueva opción agregada:", result);
@@ -229,9 +239,9 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Agregar {selectedCategoria || "Elemento"}</DialogTitle>
-      <DialogContent>
+      <DialogContent className="h-auto">
         {selectedCategoria === "RAM" ? (
-          <>
+          <Box className="flex flex-col mt-2 gap-3">
             <TextField
               label="Tipo de RAM"
               variant="outlined"
@@ -246,8 +256,9 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               value={capacidad}
               onChange={(e) => setCapacidad(e.target.value)}
             />
-          </>
+          </Box>
         ) : selectedCategoria === "Disco" ? (
+          <Box className="flex flex-col mt-2 gap-3">
           <TextField
             label="Capacidad"
             variant="outlined"
@@ -255,8 +266,9 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
             value={capacidad}
             onChange={(e) => setCapacidad(e.target.value)}
           />
+          </Box>
         ) : selectedCategoria === "Aula" ? (
-          <>
+          <Box className="flex flex-col mt-2 gap-3">
             <Autocomplete
               size="small"
               disablePortal
@@ -287,9 +299,9 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               error={Boolean(error)}
               helperText={error}
             />
-          </>
-        ) : selectedCategoria === "Sistema Operativo" ? (
-          <>
+          </Box>
+        ) : selectedCategoria === "Versión SO" ? (
+          <Box className="flex flex-col mt-2 gap-3">
             <Autocomplete
               size="small"
               disablePortal
@@ -322,9 +334,9 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               error={Boolean(error)}
               helperText={error}
             />
-          </>
+          </Box>
          ) : selectedCategoria === "Marca" ? (
-          <>
+          <Box className="flex flex-col mt-2 gap-3">
             <Autocomplete
               size="small"
               disablePortal
@@ -351,9 +363,9 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               value={newOption}
               onChange={(e) => setNewOption(e.target.value)}
             />
-          </>
+          </Box>
         ) : selectedCategoria === "Modelo" ? (
-          <>
+          <Box className="flex flex-col mt-2 gap-3">
           <Autocomplete
               size="small"
               disablePortal
@@ -399,9 +411,9 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               value={newOption}
               onChange={(e) => setNewOption(e.target.value)}
             />
-          </>
+          </Box>
         ) : selectedCategoria === "Serie" ? (
-          <>
+          <Box className="flex flex-col mt-2 gap-3">
            <Autocomplete
               size="small"
               disablePortal
@@ -466,8 +478,9 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               value={newOption}
               onChange={(e) => setNewOption(e.target.value)}
             />
-          </>
+          </Box>
         ) : (
+          <Box className="flex flex-col mt-2 gap-3">
           <TextField
             label={`Nuevo ${selectedCategoria || "Elemento"}`}
             variant="outlined"
@@ -477,6 +490,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
             error={Boolean(error)}
             helperText={error}
           />
+          </Box>
         )}
       </DialogContent>
       <DialogActions>

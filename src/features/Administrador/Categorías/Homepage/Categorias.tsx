@@ -234,7 +234,7 @@ const Categorias = () => {
                         icon="gridicons:add"
                         width="30"
                         height="30"
-                        className="text-green-900 hover:text-green-950 cursor-pointer"
+                        className="cursor-pointer"
                         onClick={() => {
                           setSelectedItemCategoria(item.categoria);
                           handleOpenModalAgregar();

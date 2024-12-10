@@ -95,11 +95,11 @@ const AgregarUsuario = () => {
             loading={loadingUsos}
             value={
               selectedUsoId
-                ? usos.find((u) => u.id_uso === selectedUsoId) ?? null
+                ? usos.find((u) => u?.id_uso === selectedUsoId) ?? null
                 : null
             }
             onChange={handleUsoChange}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option?.nombre || ""}
             renderInput={(params) => (
               <TextField
                 {...params}

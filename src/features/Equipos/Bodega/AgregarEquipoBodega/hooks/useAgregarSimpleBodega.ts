@@ -1,18 +1,18 @@
 import { useState } from "react";
-import { ActivoComputadoraData } from '../../../../../types/Activo';
+import { BodegaSimpleData } from '../../../../../types/Bodega';
 import clienteAxios from "../../../../../hooks";
 
-export const useAgregarComputadoraActivo = () => {
+export const useAgregarSimpleBodega = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const agregarComputadoraActivo = async (equipoData: ActivoComputadoraData): Promise<number | undefined> => {
+  const agregarSimpleBodega = async (equipoData: BodegaSimpleData): Promise<number | undefined> => {
     setLoading(true);
     setError(null);
 
     try {
-      const { data } = await clienteAxios.post("/equipos/agregarEquipoComputadora", equipoData);
+      const { data } = await clienteAxios.post("/equipos/agregarEquipoSimple", equipoData);
       setMessage(data.message);
       return data.equipoId; 
     } catch (err) {
@@ -23,5 +23,5 @@ export const useAgregarComputadoraActivo = () => {
     }
   };
 
-  return { agregarComputadoraActivo, loading, error, message };
+  return { agregarSimpleBodega, loading, error, message };
 };

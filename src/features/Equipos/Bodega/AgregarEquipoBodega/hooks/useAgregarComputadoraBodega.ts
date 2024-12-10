@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { ActivoComputadoraData } from '../../../../../types/Activo';
+import { BodegaComputadoraData } from '../../../../../types/Bodega';
 import clienteAxios from "../../../../../hooks";
 
-export const useAgregarComputadoraActivo = () => {
+export const useAgregarComputadoraBodega = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const agregarComputadoraActivo = async (equipoData: ActivoComputadoraData): Promise<number | undefined> => {
+  const agregarComputadoraBodega = async (equipoData: BodegaComputadoraData): Promise<number | undefined> => {
     setLoading(true);
     setError(null);
 
@@ -23,5 +23,5 @@ export const useAgregarComputadoraActivo = () => {
     }
   };
 
-  return { agregarComputadoraActivo, loading, error, message };
+  return { agregarComputadoraBodega, loading, error, message };
 };

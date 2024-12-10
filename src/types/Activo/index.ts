@@ -37,3 +37,12 @@ export type ActivoComputadoraData = {
     imagenRuta: string;
   };
   
+  export type ActivoSimpleData = {
+    tipo: string;
+    inventario: string;
+    serie: number;     
+    idAula: number;
+    idUsuario: number;
+    imagenRuta: string;
+  };
+  
