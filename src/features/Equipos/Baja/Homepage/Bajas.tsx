@@ -12,14 +12,18 @@ import { useSeriesPorModelo } from "../../../../hooks/useSeriesPorModelo";
 import { useInventariosPorSerie } from "../../../../hooks/useInventariosPorSerie";
 import { filas } from "../../../../data";
 import { useEquiposBajaFiltrados } from "../hooks/useEquiposBajaFiltrados";
+import {ModalAgregarBaja} from "../../Baja/Pages/ModalAgregarBaja"
+
 const Bajas = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
-    useState<Periferico | null>(null);
+  useState<Periferico | null>(null);
+  
+  const [openModalBajas, setOpenModalBajas] = useState<boolean>(false);
   const [selectedMarca, setSelectedMarca] = useState<Marca | null>(null);
   const [selectedModelo, setSelectedModelo] = useState<Modelo | null>(null);
   const [selectedSerie, setSelectedSerie] = useState<Serie | null>(null);
   const [selectedInventario, setSelectedInventario] =
-    useState<Inventario | null>(null);
+  useState<Inventario | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -35,7 +39,16 @@ const Bajas = () => {
     title: "Confirmar",
     message: "¿Estás seguro de que deseas realizar esta acción?",
   });
-
+  const [modalContentBajas, setModalContentBajas] = useState<{
+    title: string;
+    message: string;
+  }>({
+    title: "Agregar Bajas",
+    message: "Seleccione el periférico a registrar",
+  });
+  
+  const handleOpenBajas = () => setOpenModalBajas(true);
+  const handleCloseBajas = () => setOpenModalBajas(false);
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -345,14 +358,19 @@ const Bajas = () => {
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Bajas</h1>
-          <Link to={{ pathname: "/agregarActivo" }} state={{ perifericos }}>
-            <Icon
-              icon="gridicons:add"
-              width="30"
-              height="30"
-              className="text-green-900 hover:text-green-950"
-            />
-          </Link>
+          <Icon
+            icon="gridicons:add"
+            width="30"
+            height="30"
+            className="text-green-900 hover:text-green-950"
+            onClick={handleOpenBajas}
+          />
+          <ModalAgregarBaja
+            open={openModalBajas}
+            onClose={handleCloseBajas}
+            title={modalContentBajas.title}
+            perifericos={perifericos}
+          />
         </div>
         <div className="flex flex-wrap gap-4 my-10">
           <Autocomplete

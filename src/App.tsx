@@ -10,8 +10,8 @@ import Usuarios from "./features/Administrador/Usuarios/Homepage/Usuarios";
 import Categorias from "./features/Administrador/Categorías/Homepage/Categorias";
 import AgregarActivo from "./pages/AgregarActivo";
 import EditarActivo from "./pages/EditarActivo";
-import {FormActivosLC} from "./features/Equipos/Activos/AgregarActivo/pages/Forms/FormActivosLC"
-import {FormActivosPMTM} from "./features/Equipos/Activos/AgregarActivo/pages/Forms/FormActivosPMTM"
+import {FormLC} from "./pages/Forms/FormLC"
+import {FormPMTM} from "./pages/Forms/FormPMTM"
 import AgregarUsuario from "./features/Administrador/Usuarios/AgregarUsuario/Homepage/AgregarUsuario";
 import EditarUsuario from "./features/Administrador/Usuarios/EditarUsuario/Homepage/EditarUsuario";
 
@@ -89,25 +89,25 @@ const App: React.FC = () => {
           }
         />
         <Route
-          path="/FormActivosLC"
+          path="/FormLC"
           element={
             <Layout
               currentSection={currentSection}
               setCurrentSection={setCurrentSection}
             >
-              <FormActivosLC />
+              <FormLC />
             </Layout>
           }
         />
         {
         <Route
-          path="/FormActivosPMTM"
+          path="/FormPMTM"
           element={
             <Layout
               currentSection={currentSection}
               setCurrentSection={setCurrentSection}
             >
-              <FormActivosPMTM />
+              <FormPMTM />
             </Layout>
           }
         />

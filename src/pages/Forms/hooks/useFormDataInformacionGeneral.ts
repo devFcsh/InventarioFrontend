@@ -7,7 +7,7 @@ import {
     RAM,
     Disco,
     VersionSO
-  } from "../../../../../../../types";
+  } from "../../../types/index";
 
 interface InformacionGeneralDataForm{
   sistemaOperativo: SistemaOperativo;

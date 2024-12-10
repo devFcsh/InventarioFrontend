@@ -12,11 +12,13 @@ import { useSeriesPorModelo } from "../../../../hooks/useSeriesPorModelo";
 import { useInventariosPorSerie } from "../../../../hooks/useInventariosPorSerie";
 import { filas } from "../../../../data";
 import { useEquiposBodegaFiltrados } from "../hooks/useEquiposBodegaFiltrados";
+import {ModalAgregarBodega} from "../../../../features/Equipos/Bodega/Pages/ModalAgregarBodega";
 
 const Bodega = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
     useState<Periferico | null>(null);
   const [selectedMarca, setSelectedMarca] = useState<Marca | null>(null);
+  const [openModalBodega, setOpenModalBodega] = useState<boolean>(false);
   const [selectedModelo, setSelectedModelo] = useState<Modelo | null>(null);
   const [selectedSerie, setSelectedSerie] = useState<Serie | null>(null);
   const [selectedInventario, setSelectedInventario] =
@@ -28,6 +30,13 @@ const Bodega = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
+  const [modalContentBodega, setModalContentBodega] = useState<{
+    title: string;
+    message: string;
+  }>({
+    title: "Agregar Bodega",
+    message: "Seleccione el periférico a registrar",
+  });
   const [totalPages, setTotalPages] = useState<number>(1);
   const [modalContent, setModalContent] = useState<{
     title: string;
@@ -40,6 +49,8 @@ const Bodega = () => {
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const handleOpenBodega = () => setOpenModalBodega(true);
+  const handleCloseBodega = () => setOpenModalBodega(false);
 
   const { perifericos } = usePerifericos();
   const { marcas } = useMarcasPorPeriferico(
@@ -346,14 +357,19 @@ const Bodega = () => {
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Bodega</h1>
-          <Link to={{ pathname: "/agregarActivo" }} state={{ perifericos }}>
-            <Icon
-              icon="gridicons:add"
-              width="30"
-              height="30"
-              className="text-green-900 hover:text-green-950"
-            />
-          </Link>
+          <Icon
+            icon="gridicons:add"
+            width="30"
+            height="30"
+            className="text-green-900 hover:text-green-950"
+            onClick={handleOpenBodega}
+          />
+          <ModalAgregarBodega
+            open={openModalBodega}
+            onClose={handleCloseBodega}
+            title={modalContentBodega.title}
+            perifericos={perifericos}
+          />
         </div>
         <div className="flex flex-wrap gap-4 my-10">
           <Autocomplete

@@ -1,26 +1,27 @@
-import {useState, Fragment} from "react";
+import { useState, Fragment } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {Box,Stepper, Step, StepLabel, Button, Typography} from "@mui/material";
-import { Periferico } from "../../../../../../types";
-import {StepDatosInventario, StepCargarImagen} from "./Steps/index";
-import {useFormDatosInventario,useFormDataCargarImagen} from "./hooks/index"
-import { useAgregarComputadoraActivo } from "../../hooks/useAgregarComputadoraActivo";
-import { useInventoryErrors,useCargarImagenErrors } from './hooks/index';
+import { Box, Stepper, Step, StepLabel, Button, Typography } from "@mui/material";
+import { Periferico } from "../../types";
+import { StepDatosInventario, StepCargarImagen } from "./Steps/index";
+import { useFormDatosInventario, useFormDataCargarImagen } from "./hooks/index"
+import { useAgregarComputadoraActivo } from "../../features/Equipos/Activos/AgregarActivo/hooks/useAgregarComputadoraActivo";
+import { useInventoryErrors, useCargarImagenErrors } from './hooks/index';
 const steps = ["Datos de inventario", "Cargar imagen"];
 
-export const FormActivosPMTM = () => {
+export const FormPMTM = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(0);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const tipoInventario = location.state?.tipoInventario;
   const selectedPeriferico = location.state?.periferico as
-  | Periferico
-  | undefined;
-  const {inventoryDataForm, handleInventoryChange} = useFormDatosInventario();
-  const { imageData, handleImageChange} = useFormDataCargarImagen();
+    | Periferico
+    | undefined;
+  const { inventoryDataForm, handleInventoryChange } = useFormDatosInventario();
+  const { imageData, handleImageChange } = useFormDataCargarImagen();
   const { agregarComputadoraActivo } = useAgregarComputadoraActivo();
-  const { inventoryErrors, completeDatosInventario,handleInventoryErrors,handleUniqueInventarioError } =  useInventoryErrors();
-  const { cargarImagenErrors,handleCargarImagenErrors, handleUniqueCargarImagenError,completeDatosCargarImagen } =  useCargarImagenErrors();
+  const { inventoryErrors, completeDatosInventario, handleInventoryErrors, handleUniqueInventarioError } = useInventoryErrors(tipoInventario);
+  const { cargarImagenErrors, handleCargarImagenErrors, handleUniqueCargarImagenError, completeDatosCargarImagen } = useCargarImagenErrors();
   const stepStyle = {
     "& .Mui-active": {
       "&.MuiStepIcon-root": {
@@ -45,7 +46,7 @@ export const FormActivosPMTM = () => {
   };
 
   const handleNext = () => {
-    if(activeStep===0){
+    if (activeStep === 0) {
       handleInventoryErrors(inventoryDataForm);
       if (!Object.values(inventoryErrors).includes(true) && completeDatosInventario(inventoryDataForm)) {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -61,7 +62,13 @@ export const FormActivosPMTM = () => {
     setActiveStep(0);
   };
   const onClose = () => {
-    navigate("/activos");
+    if (tipoInventario === "activo") {
+      navigate("/activos");
+    } else if (tipoInventario === "bodega") {
+      navigate("/bodega")
+    } else {
+      navigate("/bajas");
+    }
   };
 
 
@@ -70,25 +77,26 @@ export const FormActivosPMTM = () => {
     switch (stepIndex) {
       case 0:
         return <StepDatosInventario
-        periferico={selectedPeriferico?.id_periferico ?? ""}
-        inventoryDataForm={inventoryDataForm}
-        handleInventoryChange={handleInventoryChange}
-        inventoryErrors={inventoryErrors}
-        handleUniqueInventarioError={handleUniqueInventarioError}/>;
+          periferico={selectedPeriferico?.id_periferico ?? ""}
+          inventoryDataForm={inventoryDataForm}
+          handleInventoryChange={handleInventoryChange}
+          inventoryErrors={inventoryErrors}
+          handleUniqueInventarioError={handleUniqueInventarioError}
+          tipoInventario={tipoInventario} />;
       case 1:
-        return <StepCargarImagen 
-        imageData={imageData}
-        handleImageChange={handleImageChange}
-        cargarImagenErrors={cargarImagenErrors}
-        handleUniqueCargarImagenError={handleUniqueCargarImagenError}/>;
+        return <StepCargarImagen
+          imageData={imageData}
+          handleImageChange={handleImageChange}
+          cargarImagenErrors={cargarImagenErrors}
+          handleUniqueCargarImagenError={handleUniqueCargarImagenError} />;
       default:
         return <div>Paso no encontrado</div>;
     }
   };
 
-  const handleAgregarEquipo = async () => {
+  const handleAgregarEquipoActivo = async () => {
     try {
-      if(activeStep===1){
+      if (activeStep === 1) {
         handleCargarImagenErrors(imageData);
         if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData)) {
 
@@ -105,6 +113,14 @@ export const FormActivosPMTM = () => {
 
   }
   
+  const handleAgregarEquipoBodega = async () => {
+
+  }
+  const handleAgregarEquipoBaja = async () => {
+
+  }
+
+
 
   return (
     <Box
@@ -174,9 +190,16 @@ export const FormActivosPMTM = () => {
               <Button
                 onClick={
                   activeStep === steps.length - 1
-                    ? handleAgregarEquipo
+                    ? tipoInventario === "activo"
+                      ? handleAgregarEquipoActivo
+                      : tipoInventario === "bodega"
+                        ? handleAgregarEquipoBodega
+                        : tipoInventario === "baja"
+                          ? handleAgregarEquipoBaja
+                          : handleNext
                     : handleNext
                 }
+
                 variant="contained"
                 sx={{
                   backgroundColor:
@@ -187,9 +210,17 @@ export const FormActivosPMTM = () => {
                   },
                 }}
               >
-                {activeStep === steps.length - 1
-                  ? "Agregar Activo"
-                  : "Siguiente"}
+                {
+                  activeStep === steps.length - 1
+                    ? tipoInventario === "activo"
+                      ? "Agregar Activo"
+                      : tipoInventario === "bodega"
+                        ? "Agregar Bodega"
+                        : tipoInventario === "baja"
+                          ? "Agregar Baja"
+                          : "Siguiente"
+                    : "Siguiente"
+                }
               </Button>
             </Box>
           </Fragment>

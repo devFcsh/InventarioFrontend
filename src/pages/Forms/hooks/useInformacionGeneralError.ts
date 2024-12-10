@@ -7,7 +7,7 @@ import {
     RAM,
     Disco,
     VersionSO
-  } from "../../../../../../../types";
+  } from "../../../types";
 
 interface InformacionGeneralDataForm{
   sistemaOperativo: SistemaOperativo;
@@ -37,7 +37,6 @@ export const useInformacionGeneralError = () => {
   });
 
   const completeDatosInformacionGeneral = (dataForm: InformacionGeneralDataForm)=>{
-    console.log(dataForm)
     if(dataForm.sistemaOperativo !==null && dataForm.versionSO!==null
       &&dataForm.dominio !==null && dataForm.nombreEquipo !=="" &&
       dataForm.versionOffice !==null && dataForm.protocolo !=="" && dataForm.antivirus !==null && dataForm.ram!==null &&dataForm.disco!==null

@@ -8,9 +8,9 @@ import {
   RAM,
   Disco,
   VersionSO
-} from "../../../../../../../types";
+} from "../../../types/index";
 import useDominios from "@hooks/useDominios";
-import { antivirus, protocolos } from "../../../../../../../data";
+import { antivirus, protocolos } from "@data/index";
 import useVersionesOffice from "@hooks/useVersionesOffice";
 import useRam from "@hooks/useRam";
 import useDiscos from "@hooks/useDiscos";

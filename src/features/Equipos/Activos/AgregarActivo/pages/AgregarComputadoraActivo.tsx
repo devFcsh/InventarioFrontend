@@ -40,7 +40,7 @@ import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 import useSubirImagen from "@hooks/useSubirImagen";
 import { useAgregarComputadoraActivo } from "../hooks/useAgregarComputadoraActivo";
-import { useAgregarComponentes } from "../hooks/useAgregarComponentes";
+import { useAgregarComponentes } from "../../../../../hooks/useAgregarComponentes.ts";
 
 interface AgregarComputadoraActivoProps {
   periferico: string;

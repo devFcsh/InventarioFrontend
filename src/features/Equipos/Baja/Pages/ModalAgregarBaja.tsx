@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import {SyntheticEvent, FC,useState } from "react";
 import {
   Dialog,
   DialogActions,
@@ -8,7 +8,7 @@ import {
   Alert,
 } from "@mui/material";
 import {Autocomplete, TextField, Box} from '@mui/material';
-import { Periferico } from "../../../../../types/index";
+import { Periferico } from "../../../../types";
 import { useNavigate } from "react-router-dom";
 
 interface ModalConfirmationProps {
@@ -18,10 +18,10 @@ interface ModalConfirmationProps {
   perifericos: Periferico[];
 }
 
-export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
+export const ModalAgregarBaja: FC<ModalConfirmationProps> = ({
   open,
   onClose,
-  title = "Agregar activo",
+  title = "Agregar Baja",
   perifericos = []
 }) => {
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
     useState<Periferico | null>(null);
   
   const handlePerifericoChange = (
-      _event: React.SyntheticEvent<Element, Event>,
+      _event: SyntheticEvent<Element, Event>,
       newValue: Periferico | null
     ) => {
       setSelectedPeriferico(newValue);
@@ -44,7 +44,7 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
         return;
       }
       setError(null);
-      const state = { periferico: selectedPeriferico, perifericos,tipoInventario: "activo" };
+      const state = { periferico: selectedPeriferico, perifericos,tipoInventario:"baja" };
       if (selectedPeriferico.nombre === 'Laptop' || selectedPeriferico.nombre === 'Computadora') {
         navigate('/FormLC', { state });
       } else if (['Proyector', 'Teclado', 'Mouse', 'Monitor'].includes(selectedPeriferico.nombre)) {

@@ -7,7 +7,7 @@ import {
     Aula,
     Usuario,
     Uso,
-  } from "../../../../../../../types";
+  } from "../../../types";
 
 interface InventoryDataForm{
   uso: Uso;

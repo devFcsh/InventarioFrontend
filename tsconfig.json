@@ -13,6 +13,7 @@
       "@hooks/*": ["hooks/*"],
       "@pages/*": ["pages/*"],
       "@types/*": ["types/*"],
+      "@data/*": ["data/*"],
     }
   }
 }

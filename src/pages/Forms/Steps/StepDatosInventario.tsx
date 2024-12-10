@@ -7,7 +7,7 @@ import {
   Aula,
   Usuario,
   Uso,
-} from "../../../../../../../types";
+} from "../../../types/index";
 import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
@@ -15,14 +15,14 @@ import useEdificios from "@hooks/useEdificios";
 import useAulas from "@hooks/useAulas";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import useUsos from "@hooks/useUsos";
-import { useFormDatosInventario } from "../hooks/useFormDatosInventario";
 
 interface StepDatosInventarioProps {
   periferico: string;
   inventoryDataForm:any;
   handleInventoryChange: any;
   inventoryErrors: any;
-  handleUniqueInventarioError:any
+  handleUniqueInventarioError:any;
+  tipoInventario: string;
 }
 
 export const StepDatosInventario = ({
@@ -30,7 +30,8 @@ export const StepDatosInventario = ({
   inventoryDataForm,
   handleInventoryChange,
   inventoryErrors,
-  handleUniqueInventarioError
+  handleUniqueInventarioError,
+  tipoInventario,
 }: StepDatosInventarioProps) => {
   const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
 
@@ -57,57 +58,61 @@ export const StepDatosInventario = ({
     <Box>
       <div className="mt-8">
         <div className="grid grid-cols-2 gap-4">
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={usos}
-            loading={loadingUsos}
-            value={
-              inventoryDataForm.usoId
-                ? usos.find((u) => u?.id_uso === inventoryDataForm.usoId) ?? null
-                : null
-            }
-            onChange={(_, newValue: Uso | null) => {
-              handleInventoryChange("uso", newValue);
-              handleUniqueInventarioError("uso",newValue);
-            }}
-            getOptionLabel={(option) => option ? option.nombre : ""}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Uso"
-                variant="outlined"
-                error={!!inventoryErrors.uso}
-                helperText={inventoryErrors.uso? "Por favor seleccionar un uso" :""}
-                fullWidth
-              />
-            )}
-            />
-
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={usuarios}
-            loading={loadingUsuarios}
-            value={
-              usuarios.find((u) => u?.id_usuario === inventoryDataForm.usuarioId) ?? null
-            }
-            onChange={(_, newValue: Usuario | null) => {
-              handleInventoryChange("usuario", newValue);
-              handleUniqueInventarioError("usuario",newValue);
-            }}
-            getOptionLabel={(option) => option ? option.nombre : ""}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Usuario"
-                variant="outlined"
-                error={!!inventoryErrors.usuario}
-                helperText={inventoryErrors.usuario? "Por favor seleccionar un usuario" :""}
-                fullWidth
-              />
-            )}
+        {tipoInventario==="activo"?
+        <Autocomplete
+        size="small"
+        disablePortal
+        options={usos}
+        loading={loadingUsos}
+        value={
+          inventoryDataForm.usoId
+            ? usos.find((u) => u?.id_uso === inventoryDataForm.usoId) ?? null
+            : null
+        }
+        onChange={(_, newValue: Uso | null) => {
+          handleInventoryChange("uso", newValue);
+          handleUniqueInventarioError("uso",newValue);
+        }}
+        getOptionLabel={(option) => option ? option.nombre : ""}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Uso"
+            variant="outlined"
+            error={!!inventoryErrors.uso}
+            helperText={inventoryErrors.uso? "Por favor seleccionar un uso" :""}
+            fullWidth
           />
+        )}
+        />:""
+        }
+        {tipoInventario==="activo"?
+                  <Autocomplete
+                  size="small"
+                  disablePortal
+                  options={usuarios}
+                  loading={loadingUsuarios}
+                  value={
+                    usuarios.find((u) => u?.id_usuario === inventoryDataForm.usuarioId) ?? null
+                  }
+                  onChange={(_, newValue: Usuario | null) => {
+                    handleInventoryChange("usuario", newValue);
+                    handleUniqueInventarioError("usuario",newValue);
+                  }}
+                  getOptionLabel={(option) => option ? option.nombre : ""}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Usuario"
+                      variant="outlined"
+                      error={!!inventoryErrors.usuario}
+                      helperText={inventoryErrors.usuario? "Por favor seleccionar un usuario" :""}
+                      fullWidth
+                    />
+                  )}
+                />:""}
+
+
           <Autocomplete
             size="small"
             disablePortal

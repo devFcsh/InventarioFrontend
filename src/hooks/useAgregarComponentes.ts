@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { ComponenteData } from '../../../../../types/Activo/Componente';
-import clienteAxios from "../../../../../hooks";
+import { ComponenteData } from '../types/Activo/Componente';
+import clienteAxios from ".";
 export const useAgregarComponentes = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

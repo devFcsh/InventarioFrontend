@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert, Box, Button, Snackbar } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { ModalAgregarComponenteActivo } from "./ModalAgregarComponenteActivo.tsx";
-import { Periferico } from "../../../../../../../types";
+import { Periferico } from "../../../types/index.ts";
 
 interface FormProps {
   perifericos: Periferico[];

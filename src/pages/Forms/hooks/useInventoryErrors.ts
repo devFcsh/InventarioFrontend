@@ -7,7 +7,7 @@ import {
   Aula,
   Usuario,
   Uso,
-} from "../../../../../../../types";
+} from "../../../types";
 
 
 interface InventoryDataForm {
@@ -23,7 +23,7 @@ interface InventoryDataForm {
   usuarioId: string;
 }
 
-export const useInventoryErrors = () => {
+export const useInventoryErrors = (tipoInventario: string) => {
   const [inventoryErrors, setInventoryErrors] = useState<Record<string, boolean>>({
     "uso":false,
     "usuario":false,
@@ -36,11 +36,18 @@ export const useInventoryErrors = () => {
   });
 
   const completeDatosInventario = (dataForm: InventoryDataForm)=>{
-    if(dataForm.uso !==null && dataForm.usuario!==null
-      &&dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
-      dataForm.inventario !=="" && dataForm.edificio !==null && dataForm.aula!==null
-    ) return true
-    return false;
+    if(tipoInventario==="activo"){
+      if(dataForm.uso !==null && dataForm.usuario!==null
+        &&dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
+        dataForm.inventario !=="" && dataForm.edificio !==null && dataForm.aula!==null
+      ) return true
+      return false;
+    }else{
+      if(dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
+        dataForm.inventario !=="" && dataForm.edificio !==null && dataForm.aula!==null
+      ) return true
+      return false;
+    }
   }
 
   const handleInventoryErrors = (formData: InventoryDataForm) => {
@@ -54,15 +61,26 @@ export const useInventoryErrors = () => {
       "edificio",
       "aula",
     ];
-
-    fieldsToCheck.forEach((field) => {
-      if (formData[field] === null || formData[field] === "") {
-        setInventoryErrors((prevErrors) => ({
-          ...prevErrors,
-          [field]: true,
-        }));
-      }
-    });
+    if(tipoInventario==="activo"){
+      fieldsToCheck.forEach((field) => {
+        if (formData[field] === null || formData[field] === "") {
+          setInventoryErrors((prevErrors) => ({
+            ...prevErrors,
+            [field]: true,
+          }));
+        }
+      });
+    }else{
+      fieldsToCheck.forEach((field) => {
+        if(field==="uso" || field === "usuario") return
+        if (formData[field] === null || formData[field] === "") {
+          setInventoryErrors((prevErrors) => ({
+            ...prevErrors,
+            [field]: true,
+          }));
+        }
+      });
+    }
   };
 
   const handleUniqueInventarioError = (tipo: keyof InventoryDataForm, value: Uso | Usuario | Marca | Modelo | Serie | string | Edificio | Aula | null) => {

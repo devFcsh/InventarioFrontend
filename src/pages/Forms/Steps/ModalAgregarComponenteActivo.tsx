@@ -2,7 +2,7 @@ import {Box, Button,Autocomplete, Dialog, DialogActions, DialogContent, DialogTi
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import { useState } from 'react';
 import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
-import { Componente } from "../../../../../../../types/Activo/Componente/index.ts";
+import { Componente } from "../../../types/Activo/Componente/index.ts";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
 import {
     Marca,
@@ -10,7 +10,7 @@ import {
     Serie,
     Periferico,
   
-  } from "../../../../../../../types/index.ts";
+  } from "../../../types/index.ts";
 
 interface ModalProps {
     open: boolean;

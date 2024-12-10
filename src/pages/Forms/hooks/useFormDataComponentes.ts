@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Componente } from "../../../../../../../types/Activo/Componente/index.ts";
+import { Componente } from "../../../types/Activo/Componente/index.ts";
 
 
 export const useFormDataComponentes = () => {
