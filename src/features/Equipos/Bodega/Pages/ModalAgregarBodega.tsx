@@ -47,7 +47,7 @@ export const ModalAgregarBodega: FC<ModalConfirmationProps> = ({
       const state = { periferico: selectedPeriferico, perifericos, tipoInventario: "bodega" };
       if (selectedPeriferico.nombre === 'Laptop' || selectedPeriferico.nombre === 'Computadora') {
         navigate('/FormLC', { state });
-      } else if (['Proyector', 'Teclado', 'Mouse', 'Monitor'].includes(selectedPeriferico.nombre)) {
+      } else {
         navigate('/FormPMTM', { state }); 
       }
       

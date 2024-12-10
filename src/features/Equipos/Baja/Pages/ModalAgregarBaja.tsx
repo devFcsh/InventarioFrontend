@@ -47,7 +47,7 @@ export const ModalAgregarBaja: FC<ModalConfirmationProps> = ({
       const state = { periferico: selectedPeriferico, perifericos,tipoInventario:"baja" };
       if (selectedPeriferico.nombre === 'Laptop' || selectedPeriferico.nombre === 'Computadora') {
         navigate('/FormLC', { state });
-      } else if (['Proyector', 'Teclado', 'Mouse', 'Monitor'].includes(selectedPeriferico.nombre)) {
+      } else {
         navigate('/FormPMTM', { state }); 
       }
       
