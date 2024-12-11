@@ -4,9 +4,11 @@ import { Box, Stepper, Step, StepLabel, Button, Typography } from "@mui/material
 import { Periferico } from "../../types";
 import { StepDatosInventario, StepCargarImagen } from "./Steps/index";
 import { useFormDatosInventario, useFormDataCargarImagen } from "./hooks/index"
-import { useAgregarComputadoraActivo } from "../../features/Equipos/Activos/AgregarActivo/hooks/useAgregarComputadoraActivo";
+import { useAgregarSimpleActivo } from "../../features/Equipos/Activos/AgregarActivo/hooks/useAgregarSimpleActivo";
 import { useInventoryErrors, useCargarImagenErrors } from './hooks/index';
-const steps = ["Datos de inventario", "Cargar imagen"];
+import { useAgregarSimpleBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarSimpleBodega";
+
+let steps = ["Datos de inventario", "Cargar imagen"];
 
 export const FormPMTM = () => {
   const navigate = useNavigate();
@@ -14,14 +16,20 @@ export const FormPMTM = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const tipoInventario = location.state?.tipoInventario;
+  if(tipoInventario==="baja" || tipoInventario==="bodega"){
+    steps = [
+      "Datos de inventario",
+    ];
+  }
   const selectedPeriferico = location.state?.periferico as
     | Periferico
     | undefined;
   const { inventoryDataForm, handleInventoryChange } = useFormDatosInventario();
   const { imageData, handleImageChange } = useFormDataCargarImagen();
-  const { agregarComputadoraActivo } = useAgregarComputadoraActivo();
   const { inventoryErrors, completeDatosInventario, handleInventoryErrors, handleUniqueInventarioError } = useInventoryErrors(tipoInventario);
   const { cargarImagenErrors, handleCargarImagenErrors, handleUniqueCargarImagenError, completeDatosCargarImagen } = useCargarImagenErrors();
+  const { agregarSimpleActivo } = useAgregarSimpleActivo();
+  const {agregarSimpleBodega} = useAgregarSimpleBodega();
   const stepStyle = {
     "& .Mui-active": {
       "&.MuiStepIcon-root": {
@@ -95,17 +103,20 @@ export const FormPMTM = () => {
   };
 
   const handleAgregarEquipoActivo = async () => {
+    handleCargarImagenErrors(imageData);
+    const equipoSimpleData = {
+      tipo: "activo",
+      inventario: inventoryDataForm.inventario || "",
+      serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
+      idAula: Number(inventoryDataForm.aula?.id_aula) ?? 0,
+      idUsuario: parseInt(inventoryDataForm.usuarioId || "", 10),
+      imagenRuta: imageData.imagePath,
+    };
     try {
-      if (activeStep === 1) {
-        handleCargarImagenErrors(imageData);
-        if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData)) {
-
-
-
-
-          setShowSuccessMessage(true);
-          navigate("/activos", { state: { equipoAgregado: true } });
-        }
+    if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData)) {
+        await agregarSimpleActivo(equipoSimpleData);
+        setShowSuccessMessage(true);
+        navigate("/activos", { state: { equipoAgregado: true } });
       }
     } catch (error) {
       alert("Error al agregar el componente");
@@ -114,10 +125,39 @@ export const FormPMTM = () => {
   }
   
   const handleAgregarEquipoBodega = async () => {
+    handleInventoryErrors(inventoryDataForm);
+    const bodegaSimpleData = {
+      tipo: "bodega",
+      inventario: inventoryDataForm.inventario || "",
+      serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
+    };
+    try {
+    if (!Object.values(cargarImagenErrors).includes(true) && completeDatosInventario(inventoryDataForm)) {
+        await agregarSimpleBodega(bodegaSimpleData);
+        setShowSuccessMessage(true);
+        navigate("/bodega", { state: { equipoAgregado: true } });
+      }
+    } catch (error) {
+      alert("Error al agregar el componente");
+    }
 
   }
   const handleAgregarEquipoBaja = async () => {
-
+    handleInventoryErrors(inventoryDataForm);
+    const bajaSimpleData = {
+      tipo: "baja",
+      inventario: inventoryDataForm.inventario || "",
+      serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
+    };
+    try {
+    if (!Object.values(cargarImagenErrors).includes(true) && completeDatosInventario(inventoryDataForm)) {
+        await agregarSimpleBodega(bajaSimpleData);
+        setShowSuccessMessage(true);
+        navigate("/baja", { state: { equipoAgregado: true } });
+      }
+    } catch (error) {
+      alert("Error al agregar el componente");
+    }
   }
 
 

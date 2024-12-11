@@ -12,7 +12,8 @@ import { useFormDataComponentes } from "./hooks/useFormDataComponentes.ts";
 import { useInventoryErrors } from './hooks/useInventoryErrors.ts';
 import { useInformacionGeneralError } from './hooks/useInformacionGeneralError.ts';
 import { useCargarImagenErrors } from './hooks/useCargarImagenErrors.ts';
-const steps = [
+import { useAgregarComputadoraBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarComputadoraBodega.ts";
+let steps = [
   "Datos de inventario",
   "Información general",
   "Cargar imagen",
@@ -29,7 +30,15 @@ export const FormLC = () => {
     | undefined;
   const perifericos = location.state?.perifericos as Periferico[];
   const tipoInventario = location.state?.tipoInventario;
+  if(tipoInventario==="baja" || tipoInventario==="bodega"){
+    steps = [
+      "Datos de inventario",
+      "Información general",
+      "Componentes",
+    ];
+  }
   const { agregarComputadoraActivo } = useAgregarComputadoraActivo();
+  const { agregarComputadoraBodega } = useAgregarComputadoraBodega();
   const { agregarComponentes } = useAgregarComponentes();
   const { inventoryDataForm, handleInventoryChange } = useFormDatosInventario();
   const { informacionGeneralDataForm, handleInformacionGeneralChange } = useFormDataInformacionGeneral();
@@ -160,7 +169,40 @@ export const FormLC = () => {
   };
 
   const handleAgregarEquipoBodega = async () => {
-
+    const bodegaComputadoraData = {
+      tipo: "bodega",
+      inventario: inventoryDataForm.inventario || "",
+      serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
+      nombreEquipo: informacionGeneralDataForm.nombreEquipo || "",
+      direccionIp: informacionGeneralDataForm.direccionIP,
+      versionso: Number(informacionGeneralDataForm.versionSO?.id_versionso) ?? 0,
+      versionoffice: Number(informacionGeneralDataForm.versionOffice?.id_versionoffice) ?? 0,
+      ram: Number(informacionGeneralDataForm.ram?.id_ram) ?? 0,
+      disco: Number(informacionGeneralDataForm.disco?.id_disco) ?? 0,    
+      antivirus: Number(informacionGeneralDataForm.antivirus?.id_antivirus) ?? 0,
+      dominio: Number(informacionGeneralDataForm.dominio?.id_dominio) ?? 0, 
+    };
+    try {
+      const equipoId = await agregarComputadoraBodega(bodegaComputadoraData);
+      /*
+      if (componentes.length > 0 && equipoId) {
+        await agregarComponentes({
+          equipoId: equipoId,
+          componentes: componentes.map((comp) => ({
+            inventario: comp.inventario,
+            serieId: Number(comp.serie?.id_serie) ?? 0,
+          })),
+          aulaId: Number(inventoryDataForm.aula?.id_aula) ?? 0,
+          usuarioId: parseInt(inventoryDataForm.usuarioId || "", 10),
+          imagenRuta: imageData.imagePath,
+        });
+      }
+      */
+      setShowSuccessMessage(true);
+      navigate("/bodega", { state: { equipoAgregado: true } });
+    } catch (error) {
+      alert("Error al agregar el equipo y componentes.");
+    }
   }
   const handleAgregarEquipoBaja = async () => {
 
