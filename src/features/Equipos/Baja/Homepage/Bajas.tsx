@@ -73,9 +73,9 @@ const Bajas = () => {
     selectedSerie?.id_serie ?? ""
   );
 
-   /** 
+  
   const location = useLocation();
-  */
+  
   const filtros = {
     perifericoId: selectedPeriferico?.id_periferico,
     marcaId: selectedMarca?.id_marca,
@@ -109,7 +109,7 @@ const Bajas = () => {
     setOpenModal(false);
   };
 
-  /** 
+  
   useEffect(() => {
     if (location.state && location.state.equipoAgregado) {
       setSnackbarMessage("¡Equipo agregado con éxito!");
@@ -119,7 +119,7 @@ const Bajas = () => {
       setOpenSnackbar(true);
     }
   }, [location.state]);
-*/
+
   const handleConfirm = async () => {
     try {
       await confirmAction();

@@ -152,6 +152,7 @@ export const FormLC = () => {
 
       if (componentes.length > 0 && equipoId) {
         await agregarComponentes({
+          tipo:"activo",
           equipoId: equipoId,
           componentes: componentes.map((comp) => ({
             inventario: comp.inventario,
@@ -185,9 +186,9 @@ export const FormLC = () => {
     };
     try {
       const equipoId = await agregarComputadoraBodega(bodegaComputadoraData);
-      /*
       if (componentes.length > 0 && equipoId) {
         await agregarComponentes({
+          tipo: "bodega",
           equipoId: equipoId,
           componentes: componentes.map((comp) => ({
             inventario: comp.inventario,
@@ -198,17 +199,13 @@ export const FormLC = () => {
           imagenRuta: imageData.imagePath,
         });
       }
-      */
       setShowSuccessMessage(true);
       navigate("/bodega", { state: { equipoAgregado: true } });
     } catch (error) {
       alert("Error al agregar el equipo y componentes.");
     }
   }
-  const handleAgregarEquipoBaja = async () => {
-
-  }
-
+  
 
 
   const stepStyle = {
@@ -306,8 +303,6 @@ export const FormLC = () => {
                       ? handleAgregarEquipoActivo
                       : tipoInventario === "bodega"
                         ? handleAgregarEquipoBodega
-                        : tipoInventario === "baja"
-                          ? handleAgregarEquipoBaja
                           : handleNext
                     : handleNext
                 }

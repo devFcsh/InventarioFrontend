@@ -7,13 +7,14 @@ import { useFormDatosInventario, useFormDataCargarImagen } from "./hooks/index"
 import { useAgregarSimpleActivo } from "../../features/Equipos/Activos/AgregarActivo/hooks/useAgregarSimpleActivo";
 import { useInventoryErrors, useCargarImagenErrors } from './hooks/index';
 import { useAgregarSimpleBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarSimpleBodega";
+import { useAgregarSimpleBaja } from "../../features/Equipos/Baja/AgregarEquipoBaja/hooks/useAgregarSimpleBaja";
 
 let steps = ["Datos de inventario", "Cargar imagen"];
 
 export const FormPMTM = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(0);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const tipoInventario = location.state?.tipoInventario;
   if(tipoInventario==="baja" || tipoInventario==="bodega"){
@@ -30,6 +31,7 @@ export const FormPMTM = () => {
   const { cargarImagenErrors, handleCargarImagenErrors, handleUniqueCargarImagenError, completeDatosCargarImagen } = useCargarImagenErrors();
   const { agregarSimpleActivo } = useAgregarSimpleActivo();
   const {agregarSimpleBodega} = useAgregarSimpleBodega();
+  const {agregarSimpleBaja} = useAgregarSimpleBaja();
   const stepStyle = {
     "& .Mui-active": {
       "&.MuiStepIcon-root": {
@@ -152,9 +154,9 @@ export const FormPMTM = () => {
     };
     try {
     if (!Object.values(cargarImagenErrors).includes(true) && completeDatosInventario(inventoryDataForm)) {
-        await agregarSimpleBodega(bajaSimpleData);
+        await agregarSimpleBaja(bajaSimpleData);
         setShowSuccessMessage(true);
-        navigate("/baja", { state: { equipoAgregado: true } });
+        navigate("/bajas", { state: { equipoAgregado: true } });
       }
     } catch (error) {
       alert("Error al agregar el componente");
