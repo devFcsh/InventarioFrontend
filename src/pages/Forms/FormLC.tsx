@@ -42,7 +42,7 @@ export const FormLC = () => {
   const { agregarComponentes } = useAgregarComponentes();
   const { inventoryDataForm, handleInventoryChange } = useFormDatosInventario();
   const { informacionGeneralDataForm, handleInformacionGeneralChange } = useFormDataInformacionGeneral();
-  const { imageData, handleImageChange } = useFormDataCargarImagen();
+  const { imageData, handleImageChange, error } = useFormDataCargarImagen();
   const { componentes, handleAddComponents, eliminarComponente, showSuccessMessageComponentes, setShowSuccessMessageComponentes } = useFormDataComponentes();
   const { inventoryErrors, completeDatosInventario, handleInventoryErrors, handleUniqueInventarioError } = useInventoryErrors(tipoInventario);
   const { informacionGeneralErrors, handleInformacionGeneralErrors, handleUniqueInformacionGeneralError, completeDatosInformacionGeneral } = useInformacionGeneralError();
@@ -112,7 +112,8 @@ export const FormLC = () => {
           imageData={imageData}
           handleImageChange={handleImageChange}
           cargarImagenErrors={cargarImagenErrors}
-          handleUniqueCargarImagenError={handleUniqueCargarImagenError} />;
+          handleUniqueCargarImagenError={handleUniqueCargarImagenError}
+          error={error}/>;
       case 3:
         return (
           <StepComponentes

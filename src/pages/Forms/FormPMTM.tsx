@@ -13,7 +13,7 @@ let steps = ["Datos de inventario", "Cargar imagen"];
 export const FormPMTM = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(1);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const tipoInventario = location.state?.tipoInventario;
   if(tipoInventario==="baja" || tipoInventario==="bodega"){
@@ -25,7 +25,7 @@ export const FormPMTM = () => {
     | Periferico
     | undefined;
   const { inventoryDataForm, handleInventoryChange } = useFormDatosInventario();
-  const { imageData, handleImageChange } = useFormDataCargarImagen();
+  const { imageData, handleImageChange, error} = useFormDataCargarImagen();
   const { inventoryErrors, completeDatosInventario, handleInventoryErrors, handleUniqueInventarioError } = useInventoryErrors(tipoInventario);
   const { cargarImagenErrors, handleCargarImagenErrors, handleUniqueCargarImagenError, completeDatosCargarImagen } = useCargarImagenErrors();
   const { agregarSimpleActivo } = useAgregarSimpleActivo();
@@ -96,7 +96,8 @@ export const FormPMTM = () => {
           imageData={imageData}
           handleImageChange={handleImageChange}
           cargarImagenErrors={cargarImagenErrors}
-          handleUniqueCargarImagenError={handleUniqueCargarImagenError} />;
+          handleUniqueCargarImagenError={handleUniqueCargarImagenError}
+          error={error}/>;
       default:
         return <div>Paso no encontrado</div>;
     }

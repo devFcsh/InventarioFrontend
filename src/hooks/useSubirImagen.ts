@@ -7,7 +7,15 @@ const useSubirImagen = () => {
 
   const uploadImage = async (file: File) => {
     setLoading(true);
-    setError(null); 
+    setError(null);
+
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/heif'];
+    if (!allowedTypes.includes(file.type)) {
+      setError('Formato de imagen no permitido. Solo se aceptan archivos JPEG, JPG o HEIF.');
+      setLoading(false);
+      return;
+    }
+
     const formData = new FormData();
     formData.append('image', file);
 
@@ -17,7 +25,7 @@ const useSubirImagen = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-      return response.data.imagePath; 
+      return response.data.imagePath;
     } catch (err) {
       setError("Error al cargar la imagen: " + err);
       throw err;

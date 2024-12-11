@@ -5,18 +5,19 @@ interface StepCargarImagenProps {
   imageData: any;
   handleImageChange:any;
   cargarImagenErrors:any;
-  handleUniqueCargarImagenError:any
+  handleUniqueCargarImagenError:any;
+  error: string | null
 }
 
 export const StepCargarImagen = ({
   imageData,
   handleImageChange,
   cargarImagenErrors,
-  handleUniqueCargarImagenError
+  handleUniqueCargarImagenError,
+  error
 }: StepCargarImagenProps) => {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
   const handleImageClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -54,6 +55,8 @@ export const StepCargarImagen = ({
             )}
           </div>
             {(cargarImagenErrors.image===true)? <span style={{color:"red"}}> Por favor seleccionar una imagen</span> :""}
+            {error!==null?<span style={{color:"red"}}>{error}</span>:""}
+            
         </div>
       </div>
     </Box>

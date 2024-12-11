@@ -12,7 +12,7 @@ export const useFormDataCargarImagen = () => {
     imagePath: "",
   });
 
-  const { uploadImage } = useSubirImagen();
+  const { uploadImage, error } = useSubirImagen();
 
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -28,6 +28,7 @@ export const useFormDataCargarImagen = () => {
     if (file) {
       try {
         imagePath = await uploadImage(file);
+        if(error!==null) return;
         handleImagenDataForm("imagePath", imagePath);
       } catch (error) {
         alert("Error al cargar la imagen.");
@@ -45,5 +46,6 @@ export const useFormDataCargarImagen = () => {
       [field]: value,
     }));
   };
-  return { imageData, handleImageChange };
+
+  return { imageData, handleImageChange, error };
 };
