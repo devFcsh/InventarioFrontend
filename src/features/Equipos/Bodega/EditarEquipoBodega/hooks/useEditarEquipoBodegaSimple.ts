@@ -1,15 +1,15 @@
 import { useState } from "react";
 import clienteAxios from "../../../../../hooks";
-import { ActivoComputadoraEditSend } from "../../../../../types/Activo";
+import { BodegaSimpleEditSend } from "../../../../../types/Bodega";
 
-const useEditarActivo = () => {
+const useEditarEquipoBodegaSimple = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const editarActivo = async (equipoId: string, payload: ActivoComputadoraEditSend) => {
+  const editarEquipoBodegaSimple = async (equipoId: string, payload: BodegaSimpleEditSend) => {
     setLoading(true);
     try {
-      const response = await clienteAxios.put(`/equipos/editarEquipo/${equipoId}`, payload, {
+      const response = await clienteAxios.put(`/equipos/editarEquipoSimple/${equipoId}`, payload, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -23,7 +23,7 @@ const useEditarActivo = () => {
     }
   };
 
-  return { editarActivo, loading, error };
+  return { editarEquipoBodegaSimple, loading, error };
 };
 
-export default useEditarActivo;
+export default useEditarEquipoBodegaSimple;

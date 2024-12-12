@@ -1,3 +1,18 @@
+export type BajaSimpleEdit = {
+  id_equipo: string;
+  id_periferico: string;
+  inventario: string;
+  id_marca: string;
+  id_modelo: string;
+  id_serie: string;
+};
+
+export type BajaSimpleEditSend = {
+  tipo: string;
+  inventario: string;
+  id_serie: string;
+};
+
 export type BajaComputadoraData = {
     tipo: string;
     inventario: string;
