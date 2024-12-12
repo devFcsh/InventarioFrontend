@@ -10,7 +10,7 @@ import { Icon } from "@iconify/react";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
 import { filas } from "../../../../data";
 
-import ModalAgregarCategoria from "../EditarCategoria/components/ModalAgregarCategoria";
+import ModalAgregarCategoria from "../AgregarCategoria/Homepage/ModalAgregarCategoria";
 const categorias = [
   "Uso",
   "Periférico",
