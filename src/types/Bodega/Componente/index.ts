@@ -10,6 +10,7 @@ export type ComponenteBodega = {
   };
 
 export type ComponenteDataBodega = {
+    tipo: string;
     equipoId: number;
     componentes: {
       inventario: string;

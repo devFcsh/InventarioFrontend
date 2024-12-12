@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ComponenteData } from '../types/Activo/Componente';
+import { ComponenteData } from "../types/Activo/Componente";
 import clienteAxios from ".";
 export const useAgregarComponentes = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -11,10 +11,13 @@ export const useAgregarComponentes = () => {
     setError(null);
 
     try {
-      const { data } = await clienteAxios.post("/equipos/agregarComponentes", componenteData); 
+      const { data } = await clienteAxios.post(
+        "/equipos/agregarComponentes",
+        componenteData
+      );
       setMessage(data.message);
     } catch (err) {
-      setError("Error al sagregar los componentes "+err);
+      setError("Error al sagregar los componentes " + err);
     } finally {
       setLoading(false);
     }
