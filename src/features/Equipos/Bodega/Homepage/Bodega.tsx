@@ -563,7 +563,7 @@ const Bodega = () => {
                       className="cursor-pointer"
                     />
                     <Link
-                      to="/editarActivo"
+                      to="/editarBodega"
                       state={{ equipoId: equipo.id_equipo, perifericos }}
                     >
                       <Icon

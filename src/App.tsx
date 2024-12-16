@@ -10,6 +10,7 @@ import Usuarios from "./features/Administrador/Usuarios/Homepage/Usuarios";
 import Categorias from "./features/Administrador/Categorías/Homepage/Categorias";
 import AgregarActivo from "./pages/AgregarActivo";
 import EditarActivo from "./pages/EditarActivo";
+import {EditarBodega} from "./pages/EditarBodega";
 import {FormLC} from "./pages/Forms/FormLC"
 import {FormPMTM} from "./pages/Forms/FormPMTM"
 import AgregarUsuario from "./features/Administrador/Usuarios/AgregarUsuario/Homepage/AgregarUsuario";
@@ -120,6 +121,17 @@ const App: React.FC = () => {
               setCurrentSection={setCurrentSection}
             >
               <EditarActivo />
+            </Layout>
+          }
+        />
+        <Route
+          path="/editarBodega"
+          element={
+            <Layout
+              currentSection={currentSection}
+              setCurrentSection={setCurrentSection}
+            >
+              <EditarBodega />
             </Layout>
           }
         />
