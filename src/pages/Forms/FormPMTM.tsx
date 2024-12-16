@@ -222,13 +222,15 @@ export const FormPMTM = () => {
                 Cancelar
               </Button>
 
-              <Button
-                variant="contained"
-                disabled={activeStep === 0}
-                onClick={handleBack}
-              >
-                Atrás
-              </Button>
+
+              {steps.length===1
+              ?"":<Button
+              variant="contained"
+              disabled={activeStep === 0}
+              onClick={handleBack}
+            >
+              Atrás
+            </Button>}
 
               <Button
                 onClick={

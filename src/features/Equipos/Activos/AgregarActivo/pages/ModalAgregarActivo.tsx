@@ -16,13 +16,16 @@ interface ModalConfirmationProps {
   onClose: () => void;
   title?: string;
   perifericos: Periferico[];
+  steps: string[]
 }
+
 
 export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
   open,
   onClose,
   title = "Agregar activo",
-  perifericos = []
+  perifericos = [],
+  steps = []
 }) => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -44,10 +47,22 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
         return;
       }
       setError(null);
-      const state = { periferico: selectedPeriferico, perifericos,tipoInventario: "activo" };
+      let state = {};
       if (selectedPeriferico.nombre === 'Laptop' || selectedPeriferico.nombre === 'Computadora') {
+        steps = [
+          "Datos de inventario",
+          "Información general",
+          "Cargar imagen",
+          "Componentes",
+        ];
+        state = { periferico: selectedPeriferico, perifericos,tipoInventario: "activo", steps};
         navigate('/FormLC', { state });
       } else {
+        steps = [
+          "Datos de inventario",
+          "Cargar imagen",
+        ];
+        state = { periferico: selectedPeriferico, perifericos,tipoInventario: "activo", steps};
         navigate('/FormPMTM', { state }); 
       }
       

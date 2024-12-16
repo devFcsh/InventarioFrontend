@@ -28,7 +28,6 @@ export const useFormDataCargarImagen = () => {
     if (file) {
       try {
         imagePath = await uploadImage(file);
-        if(error!==null) return;
         handleImagenDataForm("imagePath", imagePath);
       } catch (error) {
         alert("Error al cargar la imagen.");
