@@ -13,12 +13,8 @@ import { useInventoryErrors } from './hooks/useInventoryErrors.ts';
 import { useInformacionGeneralError } from './hooks/useInformacionGeneralError.ts';
 import { useCargarImagenErrors } from './hooks/useCargarImagenErrors.ts';
 import { useAgregarComputadoraBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarComputadoraBodega.ts";
-let steps = [
-  "Datos de inventario",
-  "Información general",
-  "Cargar imagen",
-  "Componentes",
-];
+import { useAgregarComponentesBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarComponentesBodega.ts";
+
 
 export const FormLC = () => {
   const navigate = useNavigate();
@@ -30,17 +26,12 @@ export const FormLC = () => {
     | undefined;
   const perifericos = location.state?.perifericos as Periferico[];
   const tipoInventario = location.state?.tipoInventario;
-  if(tipoInventario==="baja" || tipoInventario==="bodega"){
-    steps = [
-      "Datos de inventario",
-      "Información general",
-      "Componentes",
-    ];
-  }
+  const steps = location.state?.steps;
   const { agregarComputadoraActivo } = useAgregarComputadoraActivo();
   const { agregarComputadoraBodega } = useAgregarComputadoraBodega();
-  const { agregarComponentes } = useAgregarComponentes();
   const { inventoryDataForm, handleInventoryChange } = useFormDatosInventario();
+  const { agregarComponentes } = useAgregarComponentes();
+  const { agregarComponentesBodega } = useAgregarComponentesBodega();
   const { informacionGeneralDataForm, handleInformacionGeneralChange } = useFormDataInformacionGeneral();
   const { imageData, handleImageChange, error } = useFormDataCargarImagen();
   const { componentes, handleAddComponents, eliminarComponente, showSuccessMessageComponentes, setShowSuccessMessageComponentes } = useFormDataComponentes();
@@ -58,12 +49,17 @@ export const FormLC = () => {
     if (activeStep === 1) {
       handleInformacionGeneralErrors(informacionGeneralDataForm);
       if (!Object.values(informacionGeneralErrors).includes(true) && completeDatosInformacionGeneral(informacionGeneralDataForm)) {
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        if(tipoInventario==="activo"){
+          setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        }else{
+          setActiveStep(3);
+        }
       }
+
     }
     if (activeStep === 2) {
       handleCargarImagenErrors(imageData);
-      if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData)) {
+      if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData) && error===null) {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
       }
     }
@@ -73,6 +69,9 @@ export const FormLC = () => {
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    if(tipoInventario!=="activo" && activeStep===3){
+      setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    }
   };
   const onClose = () => {
     if (tipoInventario === "activo") {
@@ -84,9 +83,6 @@ export const FormLC = () => {
     }
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-  };
   const renderStepContent = (stepIndex: number) => {
     switch (stepIndex) {
       case 0:
@@ -100,6 +96,7 @@ export const FormLC = () => {
             tipoInventario={tipoInventario}
           />
         );
+        
       case 1:
         return <StepInformacionGeneral
           informacionGeneralDataForm={informacionGeneralDataForm}
@@ -187,16 +184,13 @@ export const FormLC = () => {
     try {
       const equipoId = await agregarComputadoraBodega(bodegaComputadoraData);
       if (componentes.length > 0 && equipoId) {
-        await agregarComponentes({
+        await agregarComponentesBodega({
           tipo: "bodega",
           equipoId: equipoId,
           componentes: componentes.map((comp) => ({
             inventario: comp.inventario,
             serieId: Number(comp.serie?.id_serie) ?? 0,
-          })),
-          aulaId: Number(inventoryDataForm.aula?.id_aula) ?? 0,
-          usuarioId: parseInt(inventoryDataForm.usuarioId || "", 10),
-          imagenRuta: imageData.imagePath,
+          }))
         });
       }
       setShowSuccessMessage(true);
@@ -257,17 +251,7 @@ export const FormLC = () => {
             );
           })}
         </Stepper>
-        {activeStep === steps.length ? (
-          <Fragment>
-            <Typography sx={{ mt: 2, mb: 1 }}>
-              All steps completed - you&apos;re finished
-            </Typography>
-            <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-              <Box sx={{ flex: "1 1 auto" }} />
-              <Button onClick={handleReset}>Reset</Button>
-            </Box>
-          </Fragment>
-        ) : (
+
           <Fragment>
             {renderStepContent(activeStep)}
             <Box
@@ -298,39 +282,33 @@ export const FormLC = () => {
 
               <Button
                 onClick={
-                  activeStep === steps.length - 1
-                    ? tipoInventario === "activo"
-                      ? handleAgregarEquipoActivo
-                      : tipoInventario === "bodega"
-                        ? handleAgregarEquipoBodega
-                          : handleNext
-                    : handleNext
+                  (activeStep === steps.length - 1 && tipoInventario==="activo")?handleAgregarEquipoActivo
+                    : (activeStep-1 === steps.length - 1 && tipoInventario==="bodega")?handleAgregarEquipoBodega
+                      : handleNext
                 }
                 variant="contained"
                 sx={{
                   backgroundColor:
-                    activeStep === steps.length - 1 ? "#4CAF50" : "#1976d2",
+                  (activeStep === steps.length - 1 && tipoInventario==="activo")?"#4CAF50" 
+                  : (activeStep-1 === steps.length - 1 && tipoInventario==="bodega")?"#4CAF50" :"#1976d2",
                   "&:hover": {
                     backgroundColor:
-                      activeStep === steps.length - 1 ? "#45a049" : "#1565c0",
+                    (activeStep === steps.length - 1 && tipoInventario==="activo")?
+                    "#45a049" : (activeStep-1 === steps.length - 1 && tipoInventario==="bodega")? "#45a049":"#1565c0",
                   },
                 }}
               >
                 {
-                  activeStep === steps.length - 1
-                    ? tipoInventario === "activo"
+              (activeStep === steps.length - 1 && tipoInventario==="activo")
                       ? "Agregar Activo"
-                      : tipoInventario === "bodega"
-                        ? "Agregar Bodega"
-                        : tipoInventario === "baja"
-                          ? "Agregar Baja"
-                          : "Siguiente"
+                      : (activeStep-1 === steps.length - 1 && tipoInventario==="bodega")?
+                         "Agregar Bodega"
                     : "Siguiente"
                 }
               </Button>
             </Box>
           </Fragment>
-        )}
+        
       </Box>
     </Box>
   );

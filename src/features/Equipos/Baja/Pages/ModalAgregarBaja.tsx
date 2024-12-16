@@ -16,6 +16,7 @@ interface ModalConfirmationProps {
   onClose: () => void;
   title?: string;
   perifericos: Periferico[];
+  steps: string[]
 }
 
 export const ModalAgregarBaja: FC<ModalConfirmationProps> = ({
@@ -23,6 +24,7 @@ export const ModalAgregarBaja: FC<ModalConfirmationProps> = ({
   onClose,
   title = "Agregar Baja",
   perifericos = [],
+  steps = []
 }) => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -44,10 +46,15 @@ export const ModalAgregarBaja: FC<ModalConfirmationProps> = ({
       return;
     }
     setError(null);
-    const state = { periferico: selectedPeriferico, perifericos, tipoInventario: "baja" };
+    let state = {}
     if (selectedPeriferico.nombre === 'Laptop' || selectedPeriferico.nombre === 'Computadora') {
+      state = { periferico: selectedPeriferico, perifericos, tipoInventario: "baja" };
       navigate('/FormLC', { state });
     } else {
+      steps = [
+        "Datos de inventario",
+      ];
+      state = { periferico: selectedPeriferico, perifericos, tipoInventario: "baja",steps };
       navigate('/FormPMTM', { state });
     }
 

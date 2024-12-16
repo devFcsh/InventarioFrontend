@@ -16,13 +16,15 @@ interface ModalConfirmationProps {
   onClose: () => void;
   title?: string;
   perifericos: Periferico[];
+  steps: string[]
 }
 
 export const ModalAgregarBodega: FC<ModalConfirmationProps> = ({
   open,
   onClose,
   title = "Agregar Bodega",
-  perifericos = []
+  perifericos = [],
+  steps = []
 }) => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -44,10 +46,20 @@ export const ModalAgregarBodega: FC<ModalConfirmationProps> = ({
         return;
       }
       setError(null);
-      const state = { periferico: selectedPeriferico, perifericos, tipoInventario: "bodega" };
+      let state = {};
       if (selectedPeriferico.nombre === 'Laptop' || selectedPeriferico.nombre === 'Computadora') {
+        steps = [
+          "Datos de inventario",
+          "Información general",
+          "Componentes",
+        ];
+        state = { periferico: selectedPeriferico, perifericos, tipoInventario: "bodega" ,steps};
         navigate('/FormLC', { state });
       } else {
+        steps = [
+          "Datos de inventario"
+        ];
+        state = { periferico: selectedPeriferico, perifericos, tipoInventario: "bodega",steps };
         navigate('/FormPMTM', { state }); 
       }
       
