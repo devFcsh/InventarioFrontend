@@ -1,20 +1,15 @@
-export type BodegaComputadoraEdit = {
+export type BajaSimpleEdit = {
   id_equipo: string;
   id_periferico: string;
   inventario: string;
   id_marca: string;
   id_modelo: string;
-  id_sistemaoperativo: string;
-  id_versionso: string;
-  id_ram: string;
-  id_disco: string;
-  id_dominio: string;
-  id_edificio: string;
-  id_aula: string;
-  id_versionoffice: string;
-  id_antivirus: number;
-  nombre_equipo: string;
-  direccion_ip: string;
+  id_serie: string;
+};
+
+export type BajaSimpleEditSend = {
+  tipo: string;
+  inventario: string;
   id_serie: string;
 };
 

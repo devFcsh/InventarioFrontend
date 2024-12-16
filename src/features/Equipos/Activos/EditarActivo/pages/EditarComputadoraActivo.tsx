@@ -250,18 +250,19 @@ const EditarComputadoraActivo = ({
     }
 
     const payload = {
-      id_ram: selectedRAM?.id_ram,
-      id_disco: selectedDisco?.id_disco,
-      id_versionso: selectedVersionSO?.id_versionso,
-      id_versionoffice: selectedVersionOffice?.id_versionoffice,
-      id_antivirus: selectedAntivirus?.id_antivirus,
-      id_dominio: selectedDominio?.id_dominio,
-      id_serie: selectedInventarioSerie?.id_serie,
+      tipo: "activo",
+      id_ram: selectedRAM?.id_ram ?? "",
+      id_disco: selectedDisco?.id_disco ?? "",
+      id_versionso: selectedVersionSO?.id_versionso ?? "",
+      id_versionoffice: selectedVersionOffice?.id_versionoffice ?? "",
+      id_antivirus: selectedAntivirus?.id_antivirus ?? "",
+      id_dominio: selectedDominio?.id_dominio ?? "",
+      id_serie: selectedInventarioSerie?.id_serie ?? "",
       inventario: selectedInventarioInv,
       nombre_equipo: nombreEquipo,
       direccion_ip: protocolo === "0" ? direccionIP : "",
-      id_usuario: idUsuario,
-      id_aula: selectedAula?.id_aula,
+      id_usuario: idUsuario ?? "",
+      id_aula: selectedAula?.id_aula ?? "",
       imagenRuta: image ? nuevaImagen : "",
     };
     try {
@@ -269,6 +270,7 @@ const EditarComputadoraActivo = ({
 
       if (componentesState.length > 0 && equipo.id_equipo) {
         await gestionarComponentes({
+          tipo: "activo",
           equipoId: Number(equipo.id_equipo),
           componentes: componentesState.map((comp) => ({
             id_componente: comp.id_componente,

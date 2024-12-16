@@ -5,12 +5,13 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
 import { filas } from "../../../../data";
 
 import ModalAgregarCategoria from "../AgregarCategoria/Homepage/ModalAgregarCategoria";
+import ModalEditarCategoria from "../EditarCategoria/Homepage/ModalEditarCategoria";
 const categorias = [
   "Uso",
   "Periférico",
@@ -50,6 +51,7 @@ const Categorias = () => {
   );
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [openModalAgregar, setOpenModalAgregar] = useState<boolean>(false);
+  const [openModalEditar, setOpenModalEditar] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedItemCategoria, setSelectedItemCategoria] = useState<
     string | null
@@ -116,6 +118,15 @@ const Categorias = () => {
 
   const handleCloseModalAgregar = () => {
     setOpenModalAgregar(false);
+    setError(null);
+  };
+
+  const handleOpenModalEditar = () => {
+    setOpenModalEditar(true);
+  };
+
+  const handleCloseModalEditar = () => {
+    setOpenModalEditar(false);
     setError(null);
   };
 
@@ -222,14 +233,16 @@ const Categorias = () => {
                   >
                     <td className="px-4 py-2">{item.categoria}</td>
                     <td className="px-4 py-3 flex items-center gap-2">
-                      <Link to={{ pathname: "/editarItem" }} state={{ item }}>
                         <Icon
                           icon="mage:edit"
-                          width="25"
-                          height="25"
+                          width="30"
+                          height="30"
                           className="cursor-pointer"
+                          onClick={() => {
+                            setSelectedItemCategoria(item.categoria);
+                            handleOpenModalEditar();
+                          }}
                         />
-                      </Link>
                       <Icon
                         icon="gridicons:add"
                         width="30"
@@ -292,6 +305,13 @@ const Categorias = () => {
       <ModalAgregarCategoria
         open={openModalAgregar}
         onClose={handleCloseModalAgregar}
+        selectedCategoria={selectedItemCategoria}
+        error={error}
+        setError={setError}
+      />
+      <ModalEditarCategoria
+        open={openModalEditar}
+        onClose={handleCloseModalEditar}
         selectedCategoria={selectedItemCategoria}
         error={error}
         setError={setError}

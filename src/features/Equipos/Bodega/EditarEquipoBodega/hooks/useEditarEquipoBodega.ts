@@ -1,12 +1,12 @@
 import { useState } from "react";
 import clienteAxios from "../../../../../hooks";
-import { ActivoComputadoraEditSend } from "../../../../../types/Activo";
+import { BodegaComputadoraEditSend } from "../../../../../types/Bodega";
 
-const useEditarActivo = () => {
+const useEditarEquipoBodega = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const editarActivo = async (equipoId: string, payload: ActivoComputadoraEditSend) => {
+  const editarEquipoBodega = async (equipoId: string, payload: BodegaComputadoraEditSend) => {
     setLoading(true);
     try {
       const response = await clienteAxios.put(`/equipos/editarEquipo/${equipoId}`, payload, {
@@ -16,14 +16,14 @@ const useEditarActivo = () => {
       });
       return response.data;
     } catch (err) {
-      setError("Error al editar activo" + err);
+      setError("Error al editar equipo bodega" + err);
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  return { editarActivo, loading, error };
+  return { editarEquipoBodega, loading, error };
 };
 
-export default useEditarActivo;
+export default useEditarEquipoBodega;
