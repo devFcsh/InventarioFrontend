@@ -17,7 +17,6 @@ export const EditarBodega = () => {
 
   const { equipoBodega, componentesBodega, loading, error } =
   useObtenerComputadoraBodega(equipoId);
-
   useEffect(() => {
     if (equipoBodega) {
       const selectedPeriferico = perifericos.find(

@@ -22,6 +22,7 @@ const EditarActivo = () => {
 
   const { equipo, componentes, loading, error } =
     useObtenerComputadora(equipoId);
+  console.log(useObtenerComputadora(equipoId))
   const { usos } = useUsos();
   const { usuarios } = useUsuariosPorUso(selectedUso?.id_uso || "");
 
