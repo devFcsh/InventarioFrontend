@@ -25,9 +25,9 @@ export type BajaComputadoraData = {
     disco?: number;       
     antivirus?: number;   
     dominio?: number;      
-  };
+};
   
-  export type BajaSimpleData = {
+export type BajaSimpleData = {
     tipo: string;
     inventario: string;
     serie: number;
