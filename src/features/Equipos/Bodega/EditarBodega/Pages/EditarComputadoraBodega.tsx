@@ -10,11 +10,9 @@ import {
   Disco,
   Dominio,
   VersionOffice,
-  Aula,
-  Edificio,
   Antivirus,
 } from "../../../../../types";
-import { BodegaComputadoraEdit } from "../../../../../types/Bodega";
+import { BodegaComputadoraEdit, BodegaComputadoraEditSend } from "../../../../../types/Bodega";
 import { ComponenteBodega } from "../../../../../types/Bodega/Componente";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
 import useDiscos from "../../../../../hooks/useDiscos";
@@ -23,9 +21,7 @@ import useRam from "../../../../../hooks/useRam";
 import useSistemasOperativos from "../../../../../hooks/useSistemasOperativos";
 import useVersionesSO from "../../../../../hooks/useVersionesSO";
 import useVersionesOffice from "../../../../../hooks/useVersionesOffice";
-import useEdificios from "../../../../../hooks/useEdificios";
-import useAulas from "../../../../../hooks/useAulas";
-import { antivirus, protocolos } from "../../../../../data";
+import { antivirus } from "../../../../../data";
 import { Icon } from "@iconify/react";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
@@ -36,13 +32,13 @@ import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 
 interface EditarComputadoraBodegaProps {
-  equipo: BodegaComputadoraEdit;
-  componentes: ComponenteBodega[];
+  equipoBodega: BodegaComputadoraEdit;
+  componentesBodega: ComponenteBodega[];
 }
 
 export const EditarComputadoraBodega = ({
-  equipo,
-  componentes,
+  equipoBodega,
+  componentesBodega,
 }: EditarComputadoraBodegaProps) => {
   const [selectedInventarioMarca, setSelectedInventarioMarca] =
     useState<Marca | null>(null);
@@ -52,7 +48,7 @@ export const EditarComputadoraBodega = ({
     useState<Serie | null>(null);
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
-  const [componentesState, setComponentesState] = useState<ComponenteBodega[]>(componentes);
+  const [componentesState, setComponentesState] = useState<ComponenteBodega[]>(componentesBodega);
   const [selectedSO, setSelectedSO] = useState<SistemaOperativo | null>(null);
   const [selectedVersionSO, setSelectedVersionSO] = useState<VersionSO | null>(
     null
@@ -67,18 +63,12 @@ export const EditarComputadoraBodega = ({
   const [selectedRAM, setSelectedRAM] = useState<RAM | null>(null);
   const [selectedDisco, setSelectedDisco] = useState<Disco | null>(null);
   const [selectedDominio, setSelectedDominio] = useState<Dominio | null>(null);
-  const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
-    null
-  );
-  const [selectedAula, setSelectedAula] = useState<Aula | null>(null);
   const [selectedVersionOffice, setSelectedVersionOffice] =
     useState<VersionOffice | null>(null);
   const [selectedAntivirus, setSelectedAntivirus] = useState<Antivirus | null>(
     null
   );
   const [nombreEquipo, setNombreEquipo] = useState<string>("");
-  const [protocolo, setProtocolo] = useState<string>("1");
-  const [direccionIP, setDireccionIP] = useState<string>("");
 
   const [nuevoComponente, setNuevoComponente] = useState<ComponenteBodega>({
     id_componente: undefined,
@@ -89,13 +79,13 @@ export const EditarComputadoraBodega = ({
     inventario: "",
   });
 
-  const { marcas } = useMarcasPorPeriferico(equipo?.id_periferico ?? "");
+  const { marcas } = useMarcasPorPeriferico(equipoBodega?.id_periferico ?? "");
   const { modelos } = useModelosPorMarcaPeriferico(
     selectedInventarioMarca?.id_marca ?? "",
-    equipo?.id_periferico ?? ""
+    equipoBodega?.id_periferico ?? ""
   );
   const { series } = useSeriesPorModelo(
-    equipo?.id_periferico ?? "",
+    equipoBodega?.id_periferico ?? "",
     selectedInventarioMarca?.id_marca ?? "",
     selectedInventarioModelo?.id_modelo ?? ""
   );
@@ -105,8 +95,6 @@ export const EditarComputadoraBodega = ({
   const { sistemasOperativos } = useSistemasOperativos();
   const { versionesSO } = useVersionesSO(selectedSO?.id_sistemaoperativo ?? "");
   const { versionesOffice } = useVersionesOffice();
-  const { edificios } = useEdificios();
-  const { aulas } = useAulas(selectedEdificio?.id_edificio ?? "");
   const { editarBodega } = useEditarBodega();
   const { gestionarComponentesBodega } = useGestionarComponentesBodega();
   const { perifericos } = usePerifericos();
@@ -132,60 +120,50 @@ export const EditarComputadoraBodega = ({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    if (equipo) {
-      setSelectedInventarioInv(equipo.inventario);
+    if (equipoBodega) {
+      setSelectedInventarioInv(equipoBodega.inventario);
       setSelectedInventarioMarca(
-        marcas.find((marca) => marca?.id_marca === equipo.id_marca) || null
+        marcas.find((marca) => marca?.id_marca === equipoBodega.id_marca) || null
       );
       setSelectedInventarioModelo(
-        modelos.find((modelo) => modelo?.id_modelo === equipo.id_modelo) || null
+        modelos.find((modelo) => modelo?.id_modelo === equipoBodega.id_modelo) || null
       );
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipo.id_serie) || null
+        series.find((serie) => serie?.id_serie === equipoBodega.id_serie) || null
       );
       setSelectedSO(
         sistemasOperativos.find(
-          (so) => so?.id_sistemaoperativo === equipo.id_sistemaoperativo
+          (so) => so?.id_sistemaoperativo === equipoBodega.id_sistemaoperativo
         ) || null
       );
       setSelectedVersionSO(
         versionesSO.find(
-          (version) => version?.id_versionso === equipo.id_versionso
+          (version) => version?.id_versionso === equipoBodega.id_versionso
         ) || null
       );
       setSelectedRAM(
-        ram.find((ramItem) => ramItem?.id_ram === equipo.id_ram) || null
+        ram.find((ramItem) => ramItem?.id_ram === equipoBodega.id_ram) || null
       );
       setSelectedDisco(
-        discos.find((disco) => disco?.id_disco === equipo.id_disco) || null
+        discos.find((disco) => disco?.id_disco === equipoBodega.id_disco) || null
       );
       setSelectedDominio(
-        dominios.find((dominio) => dominio?.id_dominio === equipo.id_dominio) ||
+        dominios.find((dominio) => dominio?.id_dominio === equipoBodega.id_dominio) ||
           null
-      );
-      setSelectedEdificio(
-        edificios.find(
-          (edificio) => edificio?.id_edificio === equipo.id_edificio
-        ) || null
-      );
-      setSelectedAula(
-        aulas.find((aula) => aula?.id_aula === equipo.id_aula) || null
       );
       setSelectedVersionOffice(
         versionesOffice.find(
-          (version) => version?.id_versionoffice === equipo.id_versionoffice
+          (version) => version?.id_versionoffice === equipoBodega.id_versionoffice
         ) || null
       );
       setSelectedAntivirus(
         antivirus.find(
-          (av) => Number(av.id_antivirus) === equipo.id_antivirus
+          (av) => Number(av.id_antivirus) === equipoBodega.id_antivirus
         ) || null
       );
-      setNombreEquipo(equipo.nombre_equipo);
-      setDireccionIP(equipo.direccion_ip);
-      setProtocolo(equipo.direccion_ip ? "0" : "1");
+      setNombreEquipo(equipoBodega.nombre_equipo)
     }
-  }, [equipo, marcas, modelos, series, ram, discos, dominios, versionesOffice]);
+  }, [equipoBodega, marcas, modelos, series, ram, discos, dominios, versionesOffice]);
 
   const handleAddComponente = () => {
     if (
@@ -219,26 +197,26 @@ export const EditarComputadoraBodega = ({
 
   const handleEditEquipo = async () => {
 
-    const payload = {
+    const payload : BodegaComputadoraEdit = {
+      tipo: "bodega",
+      inventario: selectedInventarioInv,
+      id_versionso: selectedVersionSO?.id_versionso,
       id_ram: selectedRAM?.id_ram,
       id_disco: selectedDisco?.id_disco,
-      id_versionso: selectedVersionSO?.id_versionso,
+      id_dominio: selectedDominio?.id_dominio,
       id_versionoffice: selectedVersionOffice?.id_versionoffice,
       id_antivirus: selectedAntivirus?.id_antivirus,
-      id_dominio: selectedDominio?.id_dominio,
-      id_serie: selectedInventarioSerie?.id_serie,
-      inventario: selectedInventarioInv,
       nombre_equipo: nombreEquipo,
-      direccion_ip: protocolo === "0" ? direccionIP : "",
-      id_aula: selectedAula?.id_aula,
+      direccion_ip: "",
+      id_serie: selectedInventarioSerie?.id_serie,
     };
     try {
-      await editarBodega(equipo.id_equipo, payload);
+      await editarBodega(equipoBodega.id_equipo, payload);
 
-      if (componentesState.length > 0 && equipo.id_equipo) {
+      if (componentesState.length > 0 && equipoBodega.id_equipo) {
         await gestionarComponentesBodega({
           tipo: "bodega",
-          equipoId: Number(equipo.id_equipo),
+          equipoId: Number(equipoBodega.id_equipo),
           componentes: componentesState.map((comp) => ({
             id_componente: comp.id_componente,
             inventario: comp.inventario,
@@ -247,6 +225,9 @@ export const EditarComputadoraBodega = ({
         });
         setShowSuccessMessage(true);
         navigate("/bodega", { state: { equipoEditado: true } });
+      }else{
+        setShowSuccessMessage(true);
+        navigate("/bodega", { state: { equipoEditado: true } })
       }
     } catch (error) {
       console.error("Error al actualizar equipo:", error);
@@ -281,8 +262,7 @@ export const EditarComputadoraBodega = ({
       !selectedVersionOffice ||
       !selectedRAM ||
       !selectedDisco ||
-      !selectedDominio ||
-      !selectedAula
+      !selectedDominio
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -468,32 +448,7 @@ export const EditarComputadoraBodega = ({
             <TextField {...params} label="Disco" variant="outlined" fullWidth />
           )}
         />
-        <Autocomplete
-          size="small"
-          disablePortal
-          options={protocolos}
-          value={protocolos.find((p) => p.id === protocolo) || null}
-          onChange={(_, newValue) => setProtocolo(newValue?.id || "1")}
-          getOptionLabel={(option) => option.nombre}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Protocolo"
-              variant="outlined"
-              fullWidth
-            />
-          )}
-        />
 
-        <TextField
-          size="small"
-          label="Dirección IP"
-          value={direccionIP}
-          onChange={(e) => setDireccionIP(e.target.value)}
-          fullWidth
-          variant="outlined"
-          disabled={protocolo !== "0"}
-        />
         <TextField
           size="small"
           label="Nombre Equipo"
@@ -517,38 +472,6 @@ export const EditarComputadoraBodega = ({
               fullWidth
             />
           )}
-        />
-        <Autocomplete
-          size="small"
-          disablePortal
-          options={edificios}
-          value={selectedEdificio}
-          onChange={(_, newValue) => {
-            setSelectedEdificio(newValue);
-            setSelectedAula(null);
-          }}
-          getOptionLabel={(option) => option? option.nombre : ""}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Edificio"
-              variant="outlined"
-              fullWidth
-            />
-          )}
-        />
-
-        <Autocomplete
-          size="small"
-          disablePortal
-          options={aulas}
-          value={selectedAula}
-          onChange={(_, newValue) => setSelectedAula(newValue)}
-          getOptionLabel={(option) => option? option.nombre : ""}
-          renderInput={(params) => (
-            <TextField {...params} label="Aula" variant="outlined" fullWidth />
-          )}
-          disabled={!selectedEdificio}
         />
       </div>
 

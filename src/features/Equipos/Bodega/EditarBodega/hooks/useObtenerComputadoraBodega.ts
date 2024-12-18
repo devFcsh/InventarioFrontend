@@ -15,7 +15,7 @@ export const useObtenerComputadoraBodega = (id: string) => {
     const obtenerComputadoraBodega = async () => {
       try {
         const response = await clienteAxios.get(`/equipos/computadoraBodega/${id}`);
-        setEquipoBodega(response.data.equipo);
+        setEquipoBodega(response.data.computadora);
         setComponentesBodega(response.data.componentes.map((comp: ComponenteBodega) => ({
           periferico: { nombre: comp.periferico },
           marca: { nombre: comp.marca },
