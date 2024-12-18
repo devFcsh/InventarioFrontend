@@ -6,13 +6,14 @@ import clienteAxios from '../../../../../hooks';
 
 export const useObtenerComputadoraActivo = (id: string) => {
   const [equipoSimpleActivo, setEquipoSimpleActivo] = useState<ActivoSimpleEdit | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loadingActivoSimple, setLoading] = useState<boolean>(true);
+  const [errorActivoSimple, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const obtenerEquipoSimpleActivo = async () => {
       try {
         const response = await clienteAxios.get(`/equipos/equipoSimpleActivo/${id}`);
+        console.log(response)
         setEquipoSimpleActivo(response.data.equipo);
       } catch (err) {
         setError("Error al obtener equipo" + err);
@@ -24,5 +25,5 @@ export const useObtenerComputadoraActivo = (id: string) => {
     obtenerEquipoSimpleActivo();
   }, [id]);
 
-  return { equipoSimpleActivo, loading, error };
+  return { equipoSimpleActivo, loadingActivoSimple, errorActivoSimple };
 };
