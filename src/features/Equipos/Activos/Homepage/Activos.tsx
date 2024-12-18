@@ -595,9 +595,10 @@ const Activos = () => {
                       }
                       className="cursor-pointer"
                     />
+                    
                     <Link
                       to="/editarActivo"
-                      state={{ equipoId: equipo.id_equipo, perifericos }}
+                      state={{ equipoId: equipo.id_equipo, perifericos,equipoName: equipo.periferico }}
                     >
                       <Icon
                         icon="mage:edit"
