@@ -13,8 +13,8 @@ import { useSeriesPorModelo } from "../../../../hooks/useSeriesPorModelo";
 import { useInventariosPorSerie } from "../../../../hooks/useInventariosPorSerie";
 import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../../../../data";
-import { useEliminarComputadoraActivo } from "../hooks/useEliminarComputadoraActivo";
 import { useDarDeBajaEquipo } from "../hooks/useDarDeBajaEquipo";
+import { useEliminarComputadora } from "@hooks/useEliminarComputadora.ts";
 
 
 const Activos = () => {
@@ -83,7 +83,7 @@ const Activos = () => {
     inventario: selectedInventario?.inventario,
   };
 
-  const { eliminarEquipo } = useEliminarComputadoraActivo();
+  const { eliminarEquipo } = useEliminarComputadora();
   const { darDeBajaEquipo } = useDarDeBajaEquipo();
   const { equipos, totalCount, loading, error } = useEquiposFiltrados(
     filtros,
