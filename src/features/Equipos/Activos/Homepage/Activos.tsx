@@ -153,7 +153,7 @@ const Activos = () => {
   const bajaEquipo = async (equipoId: string) => {
     if (equipoId) {
       try {
-        await darDeBajaEquipo(equipoId);
+        await darDeBajaEquipo(equipoId,"activo");
         console.log(`Equipo con ID ${equipoId} dado de baja`);
         setShouldFetch(true);
       } catch (error) {

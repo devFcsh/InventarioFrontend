@@ -11,7 +11,7 @@ export const useModelosPorMarcaPeriferico = (marcaId: string, perifericoId: stri
         if (marcaId && perifericoId) {
             const fetchModelos = async () => {
                 try {
-                    const response = await clienteAxios.get('/modelos/', {
+                    const response = await clienteAxios.get('/modelos/modelosPorMarcaPeriferico', {
                         params: {
                             marcaId,
                             perifericoId

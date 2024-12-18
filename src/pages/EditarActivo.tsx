@@ -223,11 +223,7 @@ const EditarActivo = () => {
             />
           </div>
   
-          {perifericoId &&
-          computadores.includes(
-            perifericos.find((p) => p?.id_periferico === perifericoId)?.nombre ??
-              ""
-          ) ? (
+          {perifericoId ? (
             <EditarActivoSimple
             equipoSimpleActivo={equipoSimpleActivo}
               idUsuario={selectedUsuario?.id_usuario || null}

@@ -283,6 +283,9 @@ const EditarComputadoraActivo = ({
         });
         setShowSuccessMessage(true);
         navigate("/activos", { state: { equipoEditado: true } });
+      }else{
+        setShowSuccessMessage(true);
+        navigate("/activos", { state: { equipoEditado: true } });
       }
     } catch (error) {
       console.error("Error al actualizar equipo:", error);
