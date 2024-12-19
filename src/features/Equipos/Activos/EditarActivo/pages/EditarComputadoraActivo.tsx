@@ -651,7 +651,7 @@ const EditarComputadoraActivo = ({
                     <td className="py-2 px-4 border">{comp.inventario}</td>
                     <td className="py-2 px-1 border">
                       <Icon
-                        icon="weui:delete-outlined"
+                        icon="fluent-mdl2:disconnect-virtual-machine"
                         width="25"
                         height="25"
                         onClick={() => eliminarComponente(index)}
