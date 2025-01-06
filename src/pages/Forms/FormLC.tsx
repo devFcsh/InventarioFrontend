@@ -2,7 +2,7 @@ import { useState, Fragment, useEffect } from "react";
 import { Box, Stepper, Step, StepLabel, Button, Typography } from "@mui/material";
 import { StepDatosInventario, StepInformacionGeneral, StepCargarImagen, StepComponentes } from "./Steps/index.ts"
 import { useLocation, useNavigate } from "react-router-dom";
-import { Periferico } from "../../types/index.ts";
+import { Periferico, Edificio, Uso } from "../../types/index.ts";
 import { useAgregarComputadoraActivo } from "../../features/Equipos/Activos/AgregarActivo/hooks/useAgregarComputadoraActivo.ts";
 import { useAgregarComponentes } from "../../hooks/useAgregarComponentes.ts";
 import { useFormDatosInventario } from "./hooks/useFormDatosInventario.ts";
@@ -23,6 +23,12 @@ export const FormLC = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const selectedPeriferico = location.state?.periferico as
     | Periferico
+    | undefined;
+  const selectedUso = location.state?.uso as
+    | Uso
+    | undefined;
+  const selectedEdificio = location.state?.edificio as
+    | Edificio
     | undefined;
   const perifericos = location.state?.perifericos as Periferico[];
   const tipoInventario = location.state?.tipoInventario;
@@ -89,6 +95,8 @@ export const FormLC = () => {
         return (
           <StepDatosInventario
             periferico={selectedPeriferico?.id_periferico ?? ""}
+            uso={selectedUso?.id_uso ?? ""}
+            edificio={selectedEdificio?.id_edificio ?? ""}
             inventoryDataForm={inventoryDataForm}
             handleInventoryChange={handleInventoryChange}
             inventoryErrors={inventoryErrors}

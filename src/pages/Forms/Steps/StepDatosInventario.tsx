@@ -3,7 +3,6 @@ import {
   Marca,
   Modelo,
   Serie,
-  Edificio,
   Aula,
   Usuario,
   Uso,
@@ -11,13 +10,13 @@ import {
 import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
-import useEdificios from "@hooks/useEdificios";
 import useAulas from "@hooks/useAulas";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
-import useUsos from "@hooks/useUsos";
 
 interface StepDatosInventarioProps {
   periferico: string;
+  uso: string;
+  edificio:string;
   inventoryDataForm:any;
   handleInventoryChange: any;
   inventoryErrors: any;
@@ -27,19 +26,19 @@ interface StepDatosInventarioProps {
 
 export const StepDatosInventario = ({
   periferico,
+  uso,
+  edificio,
   inventoryDataForm,
   handleInventoryChange,
   inventoryErrors,
   handleUniqueInventarioError,
   tipoInventario,
 }: StepDatosInventarioProps) => {
-  const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
-
   const {
     usuarios,
     loading: loadingUsuarios,
     error: errorUsuarios,
-  } = useUsuariosPorUso(inventoryDataForm.usoId || "");
+  } = useUsuariosPorUso(uso || "");
 
   const { marcas } = useMarcasPorPeriferico(periferico);
   const { modelos } = useModelosPorMarcaPeriferico(
@@ -51,41 +50,13 @@ export const StepDatosInventario = ({
     inventoryDataForm.marca?.id_marca ?? "",
     inventoryDataForm.modelo?.id_modelo ?? ""
   );
-  const { edificios } = useEdificios();
-  const { aulas } = useAulas(inventoryDataForm.edificio?.id_edificio ?? "");
+  const { aulas } = useAulas(edificio);
 
   return (
     <Box>
       <div className="mt-8">
         <div className="grid grid-cols-2 gap-4">
-        {tipoInventario==="activo"?
-        <Autocomplete
-        size="small"
-        disablePortal
-        options={usos}
-        loading={loadingUsos}
-        value={
-          inventoryDataForm.usoId
-            ? usos.find((u) => u?.id_uso === inventoryDataForm.usoId) ?? null
-            : null
-        }
-        onChange={(_, newValue: Uso | null) => {
-          handleInventoryChange("uso", newValue);
-          handleUniqueInventarioError("uso",newValue);
-        }}
-        getOptionLabel={(option) => option ? option.nombre : ""}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Uso"
-            variant="outlined"
-            error={!!inventoryErrors.uso}
-            helperText={inventoryErrors.uso? "Por favor seleccionar un uso" :""}
-            fullWidth
-          />
-        )}
-        />:""
-        }
+        
         {tipoInventario==="activo"?
                   <Autocomplete
                   size="small"
@@ -193,27 +164,7 @@ export const StepDatosInventario = ({
               handleUniqueInventarioError("inventario",e.target.value);
             }}
           />
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={edificios}
-            getOptionLabel={(option) => option ? option.nombre : ""}
-            value={inventoryDataForm.edificio}
-            onChange={(_, newValue: Edificio | null) => {
-              handleInventoryChange("edificio", newValue);
-              handleUniqueInventarioError("edificio",newValue);
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Edificio"
-                variant="outlined"
-                error={!!inventoryErrors.edificio}
-                helperText={inventoryErrors.edificio? "Por favor seleccionar un edificio" :""}
-                fullWidth
-              />
-            )}
-          />
+          
           <Autocomplete
             size="small"
             disablePortal
@@ -234,7 +185,7 @@ export const StepDatosInventario = ({
                 fullWidth
               />
             )}
-            disabled={!inventoryDataForm.edificio}
+            disabled={!edificio}
           />
         </div>
       </div>

@@ -15,6 +15,8 @@ import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../../../../data";
 import { useDarDeBajaEquipo } from "../hooks/useDarDeBajaEquipo";
 import { useEliminarComputadora } from "@hooks/useEliminarComputadora.ts";
+import useEdificios from "@hooks/useEdificios.ts";
+import useUsos from "@hooks/useUsos.ts";
 
 
 const Activos = () => {
@@ -55,6 +57,8 @@ const Activos = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const { perifericos } = usePerifericos();
+  const { edificios } = useEdificios();
+  const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
   const { marcas } = useMarcasPorPeriferico(
     selectedPeriferico?.id_periferico ?? ""
   );
@@ -373,6 +377,8 @@ const Activos = () => {
             onClose={handleCloseActivos}
             title={modalContentActivos.title}
             perifericos={perifericos}
+            usos={usos}
+            edificios={edificios}
           />
 
         </div>
