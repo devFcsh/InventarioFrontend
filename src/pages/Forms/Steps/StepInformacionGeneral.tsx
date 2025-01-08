@@ -1,4 +1,4 @@
-import { Autocomplete, Box, TextField } from "@mui/material";
+import { Autocomplete, Box, FormHelperText, TextField } from "@mui/material";
 import useSistemasOperativos from "@hooks/useSistemasOperativos";
 import {
   SistemaOperativo,
@@ -29,7 +29,6 @@ export const StepInformacionGeneral = ({
   informacionGeneralErrors,
   handleUniqueInformacionGeneralError
 }: StepInformacionGeneralProps) => {
-
   const { sistemasOperativos } = useSistemasOperativos();
   const { versionesSO } = useVersionesSO(informacionGeneralDataForm.sistemaOperativo?.id_sistemaoperativo ?? "");
   const { dominios } = useDominios();
@@ -138,46 +137,60 @@ export const StepInformacionGeneral = ({
               />
             )}
           />
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={protocolos}
-            getOptionLabel={(option) => option ? option.nombre : ""}
-            value={protocolos.find((p) => p.id === informacionGeneralDataForm.protocolo) || null}
-            onChange={(event, newValue) => {
-              if (newValue) {
-                handleInformacionGeneralChange("protocolo",newValue.id);   
-                handleUniqueInformacionGeneralError("protocolo",newValue.id);
-              } else {
-                handleInformacionGeneralChange("protocolo","1");
-                handleUniqueInformacionGeneralError("protocolo","1");
-              }
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Protocolo"
-                variant="outlined"
-                error={!!informacionGeneralErrors.protocolo}
-                helperText={informacionGeneralErrors.protocolo? "Por favor seleccionar un protocolo" :""}
-                fullWidth
-              />
-            )}
-          />
-          <TextField
-            label="Dirección IP"
-            placeholder="Dirección IP"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={informacionGeneralDataForm.direccionIP}
-            error={!!informacionGeneralErrors.direccionIP}
-            helperText={informacionGeneralErrors.direccionIP? "Por favor escribir una direccion IP" :""}
-            onChange={(e) => {handleInformacionGeneralChange("direccionIP",e.target.value)
-              
-            }}
-            disabled={informacionGeneralDataForm.protocolo !== "0"}
-          />
+          <Box       sx={{
+        display: 'inline-flex'
+      }}>
+            <Autocomplete
+              size="small"
+              disablePortal
+              sx={{width:"50%"}}
+              options={protocolos}
+              getOptionLabel={(option) => option ? option.nombre : ""}
+              value={protocolos.find((p) => p.id === informacionGeneralDataForm.protocolo) || null}
+              onChange={(event, newValue) => {
+                if (newValue) {
+                  handleInformacionGeneralChange("protocolo",newValue.id);   
+                  handleUniqueInformacionGeneralError("protocolo",newValue.id);
+                } else {
+                  handleInformacionGeneralChange("protocolo","1");
+                  handleUniqueInformacionGeneralError("protocolo","1");
+                }
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Protocolo"
+                  variant="outlined"
+                  error={!!informacionGeneralErrors.protocolo}
+                  helperText={informacionGeneralErrors.protocolo? "Por favor seleccionar un protocolo" :""}
+                  fullWidth
+                />
+              )}
+            />
+
+
+  <TextField
+    label="Dirección IP"
+    placeholder="Dirección IP"
+    variant="outlined"
+    fullWidth
+    size="small"
+    value={informacionGeneralDataForm.direccionIP}
+    error={!!informacionGeneralErrors.direccionIP}
+    onChange={(e) => {
+      handleInformacionGeneralChange("direccionIP", e.target.value);
+      handleUniqueInformacionGeneralError("direccionIP", e.target.value);
+    }}
+    disabled={informacionGeneralDataForm.protocolo !== "0"}
+    sx={{ marginRight: 4 ,width:"50%"}}
+  />
+  {informacionGeneralErrors.direccionIP && (
+    <FormHelperText error sx={{ marginLeft: "auto", color: "green" }}>
+      Por favor escribir una dirección IP válida
+    </FormHelperText>
+  )}
+
+          </Box>
           <Autocomplete
             size="small"
             disablePortal

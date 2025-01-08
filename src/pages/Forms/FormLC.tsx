@@ -18,7 +18,7 @@ import { useAgregarComponentesBodega } from "../../features/Equipos/Bodega/Agreg
 
 export const FormLC = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(1);
   const location = useLocation();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const selectedPeriferico = location.state?.periferico as

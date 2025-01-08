@@ -80,34 +80,27 @@ export const useInformacionGeneralError = () => {
     });
   };
 
+  const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/;
   const handleUniqueInformacionGeneralError = (tipo: keyof InformacionGeneralDataForm, value: SistemaOperativo | VersionSO | Dominio | VersionOffice | Antivirus | string | RAM | Disco | null) => {
-    if(tipo==="protocolo" || tipo==="direccionIP"){
-      if(value==="0"){
+  
+    setInformacionGeneralErrors((prevErrors) => ({
+      ...prevErrors,
+      [tipo]: value === null || value === "" ? true : false,
+    }));
+    if (tipo === "direccionIP") {
+      if (!ipRegex.test(value as string)) {
         setInformacionGeneralErrors((prevErrors) => ({
           ...prevErrors,
-          ["direccionIP"]: true,
-          ["protocolo"]:false
+          ["direccionIP"]: true
+        }));
+      } else {
+        setInformacionGeneralErrors((prevErrors) => ({
+          ...prevErrors,
+          ["direccionIP"]: false
         }));
       }
-      else if(value==="1"){
-        setInformacionGeneralErrors((prevErrors) => ({
-          ...prevErrors,
-          ["direccionIP"]: false,
-          ["protocolo"]:false
-        }));
-      }else{
-        setInformacionGeneralErrors((prevErrors) => ({
-          ...prevErrors,
-          ["direccionIP"]: true,
-          ["protocolo"]:true
-        }));
-      }
-    }else{
-      setInformacionGeneralErrors((prevErrors) => ({
-        ...prevErrors,
-        [tipo]: value === null || value === "" ? true : false,
-      }));
     }
+
   };
 
   return { informacionGeneralErrors,handleInformacionGeneralErrors, handleUniqueInformacionGeneralError,completeDatosInformacionGeneral};
