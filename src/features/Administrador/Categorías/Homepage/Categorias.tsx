@@ -26,6 +26,7 @@ const categorias = [
   "Versión Office",
   "RAM",
   "Disco",
+  "Procesador"
 ];
 
 const itemsData = [
@@ -41,7 +42,8 @@ const itemsData = [
   { id: 11, categoria: "Dominio" },
   { id: 12, categoria: "RAM" },
   { id: 13, categoria: "Disco" },
-  { id: 14, categoria: "Versión Office" },
+  { id: 14, categoria: "Procesador" },
+  { id: 15, categoria: "Versión Office" },
 ];
 
 const Categorias = () => {
