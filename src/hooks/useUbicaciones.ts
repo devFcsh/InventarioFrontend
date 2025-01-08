@@ -16,7 +16,7 @@ const useUbicaciones = (id_edificio: string) => {
           const response = await clienteAxios.get(`/ubicaciones/${id_edificio}`);
           setUbicaciones(response.data);
         } catch (err) {
-          setError("Error al obtener aulas" + err);
+          setError("Error al obtener ubicaciones" + err);
         } finally {
           setLoading(false);
         }

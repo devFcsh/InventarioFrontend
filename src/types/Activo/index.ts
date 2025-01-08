@@ -56,7 +56,7 @@ export type ActivoComputadoraEdit = {
     tipo: string;
     inventario: string;
     id_usuario: string;
-    imagenRuta: string;
+    imagenRuta: string | null;
     id_ubicacion: string;
     id_serie: string;
   };

@@ -111,7 +111,7 @@ export const FormPMTM = () => {
       tipo: "activo",
       inventario: inventoryDataForm.inventario || "",
       serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
-      idAula: Number(inventoryDataForm.aula?.id_aula) ?? 0,
+      idUbicacion: Number(inventoryDataForm.ubicacion?.id_ubicacion) ?? 0,
       idUsuario: parseInt(inventoryDataForm.usuarioId || "", 10),
       imagenRuta: imageData.imagePath,
     };

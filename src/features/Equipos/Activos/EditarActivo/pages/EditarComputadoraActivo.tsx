@@ -10,7 +10,7 @@ import {
   Disco,
   Dominio,
   VersionOffice,
-  Aula,
+  Ubicacion,
   Edificio,
   Antivirus,
 } from "../../../../../types";
@@ -24,7 +24,7 @@ import useSistemasOperativos from "../../../../../hooks/useSistemasOperativos";
 import useVersionesSO from "../../../../../hooks/useVersionesSO";
 import useVersionesOffice from "../../../../../hooks/useVersionesOffice";
 import useEdificios from "../../../../../hooks/useEdificios";
-import useAulas from "../../../../../hooks/useUbicaciones";
+import useUbicaciones from "../../../../../hooks/useUbicaciones";
 import { antivirus, protocolos } from "../../../../../data";
 import { Icon } from "@iconify/react";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
@@ -73,7 +73,7 @@ const EditarComputadoraActivo = ({
   const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
     null
   );
-  const [selectedAula, setSelectedAula] = useState<Aula | null>(null);
+  const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(null);
   const [selectedVersionOffice, setSelectedVersionOffice] =
     useState<VersionOffice | null>(null);
   const [selectedAntivirus, setSelectedAntivirus] = useState<Antivirus | null>(
@@ -112,7 +112,7 @@ const EditarComputadoraActivo = ({
   const { versionesSO } = useVersionesSO(selectedSO?.id_sistemaoperativo ?? "");
   const { versionesOffice } = useVersionesOffice();
   const { edificios } = useEdificios();
-  const { aulas } = useAulas(selectedEdificio?.id_edificio ?? "");
+  const { ubicaciones } = useUbicaciones(selectedEdificio?.id_edificio ?? "");
   const { editarActivo } = useEditarActivo();
   const { gestionarComponentes } = useGestionarComponentes();
   const { perifericos } = usePerifericos();
@@ -175,8 +175,8 @@ const EditarComputadoraActivo = ({
           (edificio) => edificio?.id_edificio === equipo.id_edificio
         ) || null
       );
-      setSelectedAula(
-        aulas.find((aula) => aula?.id_aula === equipo.id_aula) || null
+      setSelectedUbicacion(
+        ubicaciones.find((ubicacion) => ubicacion?.id_ubicacion === equipo.id_ubicacion) || null
       );
       setSelectedVersionOffice(
         versionesOffice.find(
@@ -262,7 +262,7 @@ const EditarComputadoraActivo = ({
       nombre_equipo: nombreEquipo,
       direccion_ip: protocolo === "0" ? direccionIP : "",
       id_usuario: idUsuario ?? "",
-      id_aula: selectedAula?.id_aula ?? "",
+      id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
       imagenRuta: image ? nuevaImagen : "",
     };
     try {
@@ -277,7 +277,7 @@ const EditarComputadoraActivo = ({
             inventario: comp.inventario,
             serieId: Number(comp.serie?.id_serie) ?? 0,
           })),
-          aulaId: Number(selectedAula?.id_aula) ?? 0,
+          ubicacionId: Number(selectedUbicacion?.id_ubicacion) ?? 0,
           usuarioId: parseInt(idUsuario ?? "", 10),
           imagenRuta: nuevaImagen ?? "",
         });
@@ -321,7 +321,7 @@ const EditarComputadoraActivo = ({
       !selectedRAM ||
       !selectedDisco ||
       !selectedDominio ||
-      !selectedAula
+      !selectedUbicacion
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -564,7 +564,7 @@ const EditarComputadoraActivo = ({
           value={selectedEdificio}
           onChange={(_, newValue) => {
             setSelectedEdificio(newValue);
-            setSelectedAula(null);
+            setSelectedUbicacion(null);
           }}
           getOptionLabel={(option) => option? option.nombre : ""}
           renderInput={(params) => (
@@ -580,12 +580,12 @@ const EditarComputadoraActivo = ({
         <Autocomplete
           size="small"
           disablePortal
-          options={aulas}
-          value={selectedAula}
-          onChange={(_, newValue) => setSelectedAula(newValue)}
+          options={ubicaciones}
+          value={selectedUbicacion}
+          onChange={(_, newValue) => setSelectedUbicacion(newValue)}
           getOptionLabel={(option) => option? option.nombre : ""}
           renderInput={(params) => (
-            <TextField {...params} label="Aula" variant="outlined" fullWidth />
+            <TextField {...params} label="Ubicacion" variant="outlined" fullWidth />
           )}
           disabled={!selectedEdificio}
         />

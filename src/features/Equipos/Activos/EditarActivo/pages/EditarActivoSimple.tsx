@@ -4,13 +4,13 @@ import {
   Marca,
   Modelo,
   Serie,
-  Aula,
+  Ubicacion,
   Edificio,
 } from "../../../../../types";
 import { ActivoSimpleEdit } from "../../../../../types/Activo";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
 import useEdificios from "../../../../../hooks/useEdificios";
-import useAulas from "../../../../../hooks/useUbicaciones";
+import useUbicaciones from "../../../../../hooks/useUbicaciones";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
 import useSubirImagen from "../../../../../hooks/useSubirImagen";
@@ -45,7 +45,7 @@ const EditarActivoSimple = ({
   const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
     null
   );
-  const [selectedAula, setSelectedAula] = useState<Aula | null>(null);
+  const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(null);
   const [image, setImage] = useState<File | null>(null);
   const [currentImagePath, setCurrentImagePath] = useState<string | null>(null);
 
@@ -62,7 +62,7 @@ const EditarActivoSimple = ({
   );
   
   const { edificios } = useEdificios();
-  const { aulas } = useAulas(selectedEdificio?.id_edificio ?? "");
+  const { ubicaciones } = useUbicaciones(selectedEdificio?.id_edificio ?? "");
   const { editarActivoSimple } = useEditarActivoSimple();
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -85,8 +85,8 @@ const EditarActivoSimple = ({
           (edificio) => edificio?.id_edificio === equipoSimpleActivo.id_edificio
         ) || null
       );
-      setSelectedAula(
-        aulas.find((aula) => aula?.id_aula === equipoSimpleActivo.id_aula) || null
+      setSelectedUbicacion(
+        ubicaciones.find((ubicacion) => ubicacion?.id_ubicacion === equipoSimpleActivo.id_ubicacion) || null
       );
     }
   }, [equipoSimpleActivo, marcas, modelos, series]);
@@ -121,7 +121,7 @@ const EditarActivoSimple = ({
       inventario: selectedInventarioInv,
       id_usuario: idUsuario ?? "",
       imagenRuta: image ? nuevaImagen : "",
-      id_aula: selectedAula?.id_aula ?? "",
+      id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
       id_serie: selectedInventarioSerie?.id_serie ?? "",
     };
     try {
@@ -157,7 +157,7 @@ const EditarActivoSimple = ({
     if (
       !selectedInventarioInv ||
       !selectedInventarioSerie ||
-      !selectedAula
+      !selectedUbicacion
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -259,7 +259,7 @@ const EditarActivoSimple = ({
           value={selectedEdificio}
           onChange={(_, newValue) => {
             setSelectedEdificio(newValue);
-            setSelectedAula(null);
+            setSelectedUbicacion(null);
           }}
           getOptionLabel={(option) => option? option.nombre : ""}
           renderInput={(params) => (
@@ -275,12 +275,12 @@ const EditarActivoSimple = ({
         <Autocomplete
           size="small"
           disablePortal
-          options={aulas}
-          value={selectedAula}
-          onChange={(_, newValue) => setSelectedAula(newValue)}
+          options={ubicaciones}
+          value={selectedUbicacion}
+          onChange={(_, newValue) => setSelectedUbicacion(newValue)}
           getOptionLabel={(option) => option? option.nombre : ""}
           renderInput={(params) => (
-            <TextField {...params} label="Aula" variant="outlined" fullWidth />
+            <TextField {...params} label="Ubicacion" variant="outlined" fullWidth />
           )}
           disabled={!selectedEdificio}
         />

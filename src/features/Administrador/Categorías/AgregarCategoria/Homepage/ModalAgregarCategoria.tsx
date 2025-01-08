@@ -19,7 +19,7 @@ import { useAgregarDisco } from "../hooks/useAgregarDisco";
 import { useAgregarRAM } from "../hooks/useAgregarRAM";
 import { useAgregarVersionSO } from "../hooks/useAgregarVersionSO";
 import { useAgregarProcesador } from "../hooks/useAgregarProcesador";
-import { useAgregarAula } from "../hooks/useAgregarAula";
+import { useAgregarUbicacion } from "../hooks/useAgregarUbicacion";
 import useEdificios from "@hooks/useEdificios";
 import { Edificio, Marca, Modelo, Periferico, SistemaOperativo } from "../../../../../types";
 import useSistemasOperativos from "@hooks/useSistemasOperativos";
@@ -72,7 +72,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   const { agregarDisco } = useAgregarDisco();
   const { agregarRam } = useAgregarRAM();
   const { agregarVersionSO } = useAgregarVersionSO();
-  const { agregarAula } = useAgregarAula();
+  const { agregarUbicacion } = useAgregarUbicacion();
   const { agregarProcesador } = useAgregarProcesador();
   const { agregarMarca } = useAgregarMarca();
   const { agregarModelo } = useAgregarModelo();
@@ -98,8 +98,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
         return agregarDisco;
       case "Versión SO":
         return agregarVersionSO;
-      case "Aula":
-        return agregarAula;
+      case "Ubicacion":
+        return agregarUbicacion ;
       case "Procesador":
         return agregarProcesador;
       case "Marca":
@@ -166,7 +166,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           marcaId: 0,
           modeloId: 0,
         });
-      } else if (selectedCategoria === "Aula") {
+      } else if (selectedCategoria === "Ubicacion") {
         result = await agregarFunc({
           nombre: newOption,
           edificioId: Number(selectedEdificio?.id_edificio),
@@ -271,7 +271,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
             onChange={(e) => setCapacidad(e.target.value)}
           />
           </Box>
-        ) : selectedCategoria === "Aula" ? (
+        ) : selectedCategoria === "Ubicacion" ? (
           <Box className="flex flex-col mt-2 gap-3">
             <Autocomplete
               size="small"
@@ -294,7 +294,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               )}
             />
             <TextField
-              label="Nombre del Aula"
+              label="Ubicacion"
               variant="outlined"
               fullWidth
               disabled={!selectedEdificio}

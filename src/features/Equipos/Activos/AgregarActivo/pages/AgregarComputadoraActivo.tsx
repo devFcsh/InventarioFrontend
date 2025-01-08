@@ -19,7 +19,7 @@ import {
   Disco,
   Dominio,
   VersionOffice,
-  Aula,
+  Ubicacion,
   Edificio,
   Antivirus,
 } from "../../../../../types";
@@ -35,7 +35,7 @@ import { antivirus, protocolos } from "../../../../../data";
 import { Icon } from "@iconify/react";
 import useVersionesOffice from "@hooks/useVersionesOffice";
 import useEdificios from "@hooks/useEdificios";
-import useAulas from "@hooks/useUbicaciones.ts";
+import useUbicaciones from "@hooks/useUbicaciones.ts";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 import useSubirImagen from "@hooks/useSubirImagen";
@@ -73,7 +73,7 @@ const AgregarComputadoraActivo = ({
   const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
     null
   );
-  const [selectedAula, setSelectedAula] = useState<Aula | null>(null);
+  const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(null);
   const [selectedVersionOffice, setSelectedVersionOffice] =
     useState<VersionOffice | null>(null);
   const [selectedAntivirus, setSelectedAntivirus] = useState<Antivirus | null>(
@@ -136,7 +136,7 @@ const AgregarComputadoraActivo = ({
   const { uploadImage } = useSubirImagen();
   const { versionesOffice } = useVersionesOffice();
   const { edificios } = useEdificios();
-  const { aulas } = useAulas(selectedEdificio?.id_edificio ?? "");
+  const { ubicaciones } = useUbicaciones(selectedEdificio?.id_edificio ?? "");
   const { discos } = useDiscos();
   const { dominios } = useDominios();
   const { ram } = useRam();
@@ -212,7 +212,7 @@ const AgregarComputadoraActivo = ({
       disco: Number(selectedDisco?.id_disco) ?? 0,
       antivirus: Number(selectedAntivirus?.id_antivirus) ?? 0,
       dominio: Number(selectedDominio?.id_dominio) ?? 0,
-      idAula: Number(selectedAula?.id_aula) ?? 0,
+      idUbicacion: Number(selectedUbicacion?.id_ubicacion) ?? 0,
       idUsuario: parseInt(idUsuario, 10),
       imagenRuta: imagePath,
     };
@@ -222,12 +222,13 @@ const AgregarComputadoraActivo = ({
 
       if (componentes.length > 0 && equipoId) {
         await agregarComponentes({
+          tipo: "activo",
           equipoId: equipoId,
           componentes: componentes.map((comp) => ({
             inventario: comp.inventario,
             serieId: Number(comp.serie?.id_serie) ?? 0,
           })),
-          aulaId: Number(selectedAula?.id_aula) ?? 0,
+          ubicacionId: Number(selectedUbicacion?.id_ubicacion) ?? 0,
           usuarioId: parseInt(idUsuario, 10),
           imagenRuta: imagePath,
         });
@@ -262,7 +263,7 @@ const AgregarComputadoraActivo = ({
     setSelectedDominio(null);
     setSelectedEdificio(null);
     setSelectedAntivirus(null);
-    setSelectedAula(null);
+    setSelectedUbicacion(null);
     setSelectedVersionOffice(null);
     setNombreEquipo("");
     setProtocolo(null);
@@ -393,7 +394,7 @@ const AgregarComputadoraActivo = ({
       !selectedRAM ||
       !selectedDisco ||
       !selectedDominio ||
-      !selectedAula
+      !selectedUbicacion
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -501,7 +502,7 @@ const AgregarComputadoraActivo = ({
             size="small"
             disablePortal
             options={sistemasOperativos}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option?.nombre || ""}
             value={selectedSO}
             onChange={(_, newValue) => setSelectedSO(newValue)}
             renderInput={(params) => (
@@ -517,7 +518,7 @@ const AgregarComputadoraActivo = ({
             size="small"
             disablePortal
             options={versionesSO}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option?.nombre || ""}
             value={selectedVersionSO}
             onChange={(_, newValue) => setSelectedVersionSO(newValue)}
             renderInput={(params) => (
@@ -549,7 +550,7 @@ const AgregarComputadoraActivo = ({
             size="small"
             disablePortal
             options={versionesOffice}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option?.nombre || ""}
             value={selectedVersionOffice}
             onChange={(_, newValue) => setSelectedVersionOffice(newValue)}
             renderInput={(params) => (
@@ -566,7 +567,7 @@ const AgregarComputadoraActivo = ({
             disablePortal
             options={ram}
             getOptionLabel={(option: RAM) =>
-              `${option.capacidad} - ${option.tipo}`
+              `${option?.capacidad} - ${option?.tipo}`
             }
             value={selectedRAM}
             onChange={(_, newValue) => setSelectedRAM(newValue)}
@@ -578,7 +579,7 @@ const AgregarComputadoraActivo = ({
             size="small"
             disablePortal
             options={discos}
-            getOptionLabel={(option) => option.capacidad}
+            getOptionLabel={(option) => option?.capacidad || ""}
             value={selectedDisco}
             onChange={(_, newValue) => setSelectedDisco(newValue)}
             renderInput={(params) => (
@@ -635,7 +636,7 @@ const AgregarComputadoraActivo = ({
             size="small"
             disablePortal
             options={dominios}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option?.nombre || ""}
             value={selectedDominio}
             onChange={(_, newValue) => setSelectedDominio(newValue)}
             renderInput={(params) => (
@@ -666,14 +667,14 @@ const AgregarComputadoraActivo = ({
           <Autocomplete
             size="small"
             disablePortal
-            options={aulas}
+            options={ubicaciones}
             getOptionLabel={(option) => option?.nombre || ""}
-            value={selectedAula}
-            onChange={(_, newValue) => setSelectedAula(newValue)}
+            value={selectedUbicacion}
+            onChange={(_, newValue) => setSelectedUbicacion(newValue)}
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Aula"
+                label="Ubicacion"
                 variant="outlined"
                 fullWidth
               />
