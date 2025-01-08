@@ -1,11 +1,23 @@
 import useDiscos from "@hooks/useDiscos";
 import useUsos from "@hooks/useUsos";
-import { Disco, Uso } from "../../../../../types/index";
+import { Disco, Uso, Marca, Modelo, Serie, Periferico, Edificio, SistemaOperativo, VersionOffice, VersionSO, Ubicacion, Dominio, Procesador, RAM } from "../../../../../types/index";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { FC } from "react";
 import { Dialog } from "@mui/material";
+import useMarcas from "@hooks/useMarcas";
+import useModelos from "@hooks/useModelos";
+import usePerifericos from "@hooks/usePerifericos";
+import useSeries from "@hooks/useSeries";
+import useEdificios from "@hooks/useEdificios";
+import useSistemasOperativos from "@hooks/useSistemasOperativos";
+/*import useUbicaciones from "@hooks/useUbicaciones";
+import useVersionesSO from "@hooks/useVersionesSO"; */
+import useRam from "@hooks/useRam";
+import useProcesadores from "@hooks/useProcesadores";
+import useVersionesOffice from "@hooks/useVersionesOffice";
+import useDominios from "@hooks/useDominios";
 
-type Opcion = Uso | Disco; 
+type Opcion = Uso | Disco | Marca | Modelo | Periferico | Serie | Dominio | Edificio | Ubicacion | SistemaOperativo | VersionOffice | VersionSO | Procesador | RAM; 
 
 interface ModalEditarCategoriaProps {
     open: boolean;
@@ -24,9 +36,36 @@ interface ModalEditarCategoriaProps {
   }) => {
   const { usos } = useUsos();
   const { discos } = useDiscos();
+  const { marcas } = useMarcas();
+  const { modelos } = useModelos();
+  const { perifericos } = usePerifericos();
+  const { series } = useSeries();
+  const { edificios } = useEdificios();
+  const { sistemasOperativos } = useSistemasOperativos();
+  /*const { ubicaciones } = useUbicaciones();
+  const { versionesSO } = useVersionesSO(); */
+  const { dominios } = useDominios();
+  const { ram } = useRam();
+  const { procesadores } = useProcesadores();
+  const { versionesOffice } = useVersionesOffice();
 
   const elementos: Opcion[] =
-  selectedCategoria === 'Uso' ? usos : selectedCategoria === 'Disco' ? discos : [];
+  selectedCategoria === 'Uso' ? usos : 
+  selectedCategoria === 'Disco' ? discos : 
+  selectedCategoria === 'Marca' ? marcas :
+  selectedCategoria === 'Modelo' ? modelos :
+  selectedCategoria === 'Serie' ? series :
+  selectedCategoria === 'Periferico' ? perifericos :
+  selectedCategoria === 'Edificio' ? edificios :
+  /*selectedCategoria === 'Ubicacion' ? ubicaciones :
+  selectedCategoria === 'Version SO' ? versionesSO :
+  */
+  selectedCategoria === 'Sistema Operativo' ? sistemasOperativos :
+  selectedCategoria === 'Dominio' ? dominios :
+  selectedCategoria === 'Ram' ? ram :
+  selectedCategoria === 'Procesador' ? procesadores :
+  selectedCategoria === 'Version Office' ? versionesOffice :
+  [];
 
   const handleEditarCategoria = () => {
     console.log("golA" + error);
