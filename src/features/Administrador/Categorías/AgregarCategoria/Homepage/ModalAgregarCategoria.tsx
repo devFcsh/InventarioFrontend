@@ -18,6 +18,7 @@ import { useAgregarVersionOffice } from "../hooks/useAgregarVersionOffice";
 import { useAgregarDisco } from "../hooks/useAgregarDisco";
 import { useAgregarRAM } from "../hooks/useAgregarRAM";
 import { useAgregarVersionSO } from "../hooks/useAgregarVersionSO";
+import { useAgregarProcesador } from "../hooks/useAgregarProcesador";
 import { useAgregarAula } from "../hooks/useAgregarAula";
 import useEdificios from "@hooks/useEdificios";
 import { Edificio, Marca, Modelo, Periferico, SistemaOperativo } from "../../../../../types";
@@ -72,6 +73,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   const { agregarRam } = useAgregarRAM();
   const { agregarVersionSO } = useAgregarVersionSO();
   const { agregarAula } = useAgregarAula();
+  const { agregarProcesador } = useAgregarProcesador();
   const { agregarMarca } = useAgregarMarca();
   const { agregarModelo } = useAgregarModelo();
   const { agregarSerie } = useAgregarSerie();
@@ -98,6 +100,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
         return agregarVersionSO;
       case "Aula":
         return agregarAula;
+      case "Procesador":
+        return agregarProcesador;
       case "Marca":
         return agregarMarca;
       case "Modelo":
