@@ -24,7 +24,7 @@ import useSistemasOperativos from "../../../../../hooks/useSistemasOperativos";
 import useVersionesSO from "../../../../../hooks/useVersionesSO";
 import useVersionesOffice from "../../../../../hooks/useVersionesOffice";
 import useEdificios from "../../../../../hooks/useEdificios";
-import useAulas from "../../../../../hooks/useAulas";
+import useAulas from "../../../../../hooks/useUbicaciones";
 import { antivirus, protocolos } from "../../../../../data";
 import { Icon } from "@iconify/react";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";

@@ -1,5 +1,5 @@
-import { useState, Fragment, useEffect } from "react";
-import { Box, Stepper, Step, StepLabel, Button, Typography } from "@mui/material";
+import { useState, Fragment } from "react";
+import { Box, Stepper, Step, StepLabel, Button } from "@mui/material";
 import { StepDatosInventario, StepInformacionGeneral, StepCargarImagen, StepComponentes } from "./Steps/index.ts"
 import { useLocation, useNavigate } from "react-router-dom";
 import { Periferico, Edificio, Uso } from "../../types/index.ts";
@@ -147,7 +147,7 @@ export const FormLC = () => {
       disco: Number(informacionGeneralDataForm.disco?.id_disco) ?? 0,
       antivirus: Number(informacionGeneralDataForm.antivirus?.id_antivirus) ?? 0,
       dominio: Number(informacionGeneralDataForm.dominio?.id_dominio) ?? 0,
-      idAula: Number(inventoryDataForm.aula?.id_aula) ?? 0,
+      idUbicacion: Number(inventoryDataForm.ubicacion?.id_ubicacion) ?? 0,
       idUsuario: parseInt(inventoryDataForm.usuarioId || "", 10),
       imagenRuta: imageData.imagePath,
     };
@@ -163,7 +163,7 @@ export const FormLC = () => {
             inventario: comp.inventario,
             serieId: Number(comp.serie?.id_serie) ?? 0,
           })),
-          aulaId: Number(inventoryDataForm.aula?.id_aula) ?? 0,
+          ubicacionId: Number(inventoryDataForm.ubicacion?.id_ubicacion) ?? 0,
           usuarioId: parseInt(inventoryDataForm.usuarioId || "", 10),
           imagenRuta: imageData.imagePath,
         });

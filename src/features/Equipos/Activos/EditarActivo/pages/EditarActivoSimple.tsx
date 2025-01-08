@@ -10,7 +10,7 @@ import {
 import { ActivoSimpleEdit } from "../../../../../types/Activo";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
 import useEdificios from "../../../../../hooks/useEdificios";
-import useAulas from "../../../../../hooks/useAulas";
+import useAulas from "../../../../../hooks/useUbicaciones";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
 import useSubirImagen from "../../../../../hooks/useSubirImagen";

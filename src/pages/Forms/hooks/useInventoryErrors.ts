@@ -3,7 +3,7 @@ import {
   Marca,
   Modelo,
   Serie,
-  Aula,
+  Ubicacion,
   Usuario,
 } from "../../../types";
 
@@ -14,7 +14,7 @@ interface InventoryDataForm {
   modelo: Modelo;
   serie: Serie;
   inventario: string;
-  aula: Aula;
+  ubicacion: Ubicacion;
   usuarioId: string;
 }
 
@@ -25,19 +25,19 @@ export const useInventoryErrors = (tipoInventario: string) => {
     "modelo":false,
     "serie":false,
     "inventario":false,
-    "aula":false,
+    "ubicacion":false,
   });
 
   const completeDatosInventario = (dataForm: InventoryDataForm)=>{
     if(tipoInventario==="activo"){
       if(dataForm.usuario!==null
         &&dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
-        dataForm.inventario !==""  && dataForm.aula!==null
+        dataForm.inventario !==""  && dataForm.ubicacion!==null
       ) return true
       return false;
     }else{
       if(dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
-        dataForm.inventario !=="" && dataForm.aula!==null
+        dataForm.inventario !=="" && dataForm.ubicacion!==null
       ) return true
       return false;
     }
@@ -50,7 +50,7 @@ export const useInventoryErrors = (tipoInventario: string) => {
       "modelo",
       "serie",
       "inventario",
-      "aula",
+      "ubicacion",
     ];
     if(tipoInventario==="activo"){
       fieldsToCheck.forEach((field) => {
@@ -74,7 +74,7 @@ export const useInventoryErrors = (tipoInventario: string) => {
     }
   };
 
-  const handleUniqueInventarioError = (tipo: keyof InventoryDataForm, value: Usuario | Marca | Modelo | Serie | string  | Aula | null) => {
+  const handleUniqueInventarioError = (tipo: keyof InventoryDataForm, value: Usuario | Marca | Modelo | Serie | string  | Ubicacion | null) => {
     setInventoryErrors((prevErrors) => ({
       ...prevErrors,
       [tipo]: value === null || value === ""? true : false,

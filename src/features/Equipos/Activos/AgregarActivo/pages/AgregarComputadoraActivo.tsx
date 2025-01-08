@@ -35,7 +35,7 @@ import { antivirus, protocolos } from "../../../../../data";
 import { Icon } from "@iconify/react";
 import useVersionesOffice from "@hooks/useVersionesOffice";
 import useEdificios from "@hooks/useEdificios";
-import useAulas from "@hooks/useAulas";
+import useAulas from "@hooks/useUbicaciones.ts";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 import useSubirImagen from "@hooks/useSubirImagen";

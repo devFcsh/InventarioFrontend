@@ -3,7 +3,7 @@ import {
     Marca,
     Modelo,
     Serie,
-    Aula,
+    Ubicacion,
     Usuario,
   } from "../../../types";
 
@@ -13,7 +13,7 @@ interface InventoryDataForm{
   modelo: Modelo;
   serie: Serie;
   inventario: string;
-  aula: Aula;
+  ubicacion: Ubicacion;
   usuarioId: string;
 }
 
@@ -25,13 +25,13 @@ export const useFormDatosInventario = () => {
     modelo:  null,
     serie: null,
     inventario:  "",
-    aula: null,
+    ubicacion: null,
     usuarioId: "",
   });
 
   const handleInventoryChange = (
     field: keyof InventoryDataForm,
-    value: Usuario | Marca | Modelo | Serie | string  | Aula | null
+    value: Usuario | Marca | Modelo | Serie | string  | Ubicacion | null
   ) => {
     setInventoryDataForm((prevState) => ({
       ...prevState,

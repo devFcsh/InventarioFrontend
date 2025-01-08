@@ -3,14 +3,14 @@ import {
   Marca,
   Modelo,
   Serie,
-  Aula,
+  Ubicacion,
   Usuario,
   Uso,
 } from "../../../types/index";
 import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
-import useAulas from "@hooks/useAulas";
+import useUbicaciones from "@hooks/useUbicaciones";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 
 interface StepDatosInventarioProps {
@@ -50,7 +50,7 @@ export const StepDatosInventario = ({
     inventoryDataForm.marca?.id_marca ?? "",
     inventoryDataForm.modelo?.id_modelo ?? ""
   );
-  const { aulas } = useAulas(edificio);
+  const { ubicaciones } = useUbicaciones(edificio);
 
   return (
     <Box>
@@ -168,20 +168,20 @@ export const StepDatosInventario = ({
           <Autocomplete
             size="small"
             disablePortal
-            options={aulas}
+            options={ubicaciones}
             getOptionLabel={(option) => option ? option.nombre : ""}
-            value={inventoryDataForm.aula}
-            onChange={(_, newValue: Aula | null) => {
-              handleInventoryChange("aula", newValue);
-              handleUniqueInventarioError("aula",newValue);
+            value={inventoryDataForm.ubicacion}
+            onChange={(_, newValue: Ubicacion | null) => {
+              handleInventoryChange("ubicacion", newValue);
+              handleUniqueInventarioError("ubicacion",newValue);
             }}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Ubicación"
                 variant="outlined"
-                error={!!inventoryErrors.aula}
-                helperText={inventoryErrors.aula? "Por favor seleccionar una ubicación" :""}
+                error={!!inventoryErrors.ubicacion}
+                helperText={inventoryErrors.ubicacion? "Por favor seleccionar una ubicación" :""}
                 fullWidth
               />
             )}

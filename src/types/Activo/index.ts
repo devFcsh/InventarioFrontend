@@ -13,7 +13,7 @@ export type ActivoComputadoraEdit = {
     id_disco: string;
     id_dominio: string;
     id_edificio: string;
-    id_aula: string;
+    id_ubicacion: string;
     id_versionoffice: string;
     id_antivirus: number;
     nombre_equipo: string;
@@ -30,7 +30,7 @@ export type ActivoComputadoraEdit = {
     id_ram: string;
     id_disco: string;
     id_dominio: string;
-    id_aula: string;
+    id_ubicacion: string;
     id_versionoffice: string;
     id_antivirus: string;
     nombre_equipo: string;
@@ -48,7 +48,7 @@ export type ActivoComputadoraEdit = {
     id_marca: string;
     id_modelo: string;
     id_edificio: string;
-    id_aula: string;
+    id_ubicacion: string;
     id_serie: string;
   };
 
@@ -57,7 +57,7 @@ export type ActivoComputadoraEdit = {
     inventario: string;
     id_usuario: string;
     imagenRuta: string;
-    id_aula: string;
+    id_ubicacion: string;
     id_serie: string;
   };
 
@@ -73,7 +73,7 @@ export type ActivoComputadoraData = {
     disco?: number;       
     antivirus?: number;   
     dominio?: number;      
-    idAula: number;
+    idUbicacion: number;
     idUsuario: number;
     imagenRuta: string;
   };
@@ -82,7 +82,7 @@ export type ActivoComputadoraData = {
     tipo: string;
     inventario: string;
     serie: number;     
-    idAula: number;
+    idUbicacion: number;
     idUsuario: number;
     imagenRuta: string;
   };

@@ -16,7 +16,7 @@ export type ComponenteData = {
       inventario: string;
       serieId: number;
     }[];
-    aulaId: number;
+    ubicacionId: number;
     usuarioId: number;
     imagenRuta: string;
   };

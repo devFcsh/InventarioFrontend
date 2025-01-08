@@ -95,8 +95,8 @@ export type Edificio = {
   nombre: string;
 }| null;
 
-export type Aula = {
-  id_aula: string;
+export type Ubicacion = {
+  id_ubicacion: string;
   nombre: string;
 }| null;
 

@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
-import { Aula } from '../types';
+import { Ubicacion } from '../types';
 import clienteAxios from '.';
 
-const useVersionesSO = (id_edificio: string) => {
-    const [aulas, setAulas] = useState<Aula[]>([]);
+const useUbicaciones = (id_edificio: string) => {
+    const [ubicaciones, setUbicaciones] = useState<Ubicacion[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);  
 
     useEffect(() => {
       if (!id_edificio) return; 
 
-      const fetchAulas = async () => {
+      const fetchUbicaciones = async () => {
         setLoading(true);
         try {
-          const response = await clienteAxios.get(`/aulas/${id_edificio}`);
-          setAulas(response.data);
+          const response = await clienteAxios.get(`/ubicaciones/${id_edificio}`);
+          setUbicaciones(response.data);
         } catch (err) {
           setError("Error al obtener aulas" + err);
         } finally {
@@ -22,10 +22,10 @@ const useVersionesSO = (id_edificio: string) => {
         }
       };
 
-      fetchAulas();
+      fetchUbicaciones();
     }, [id_edificio]); 
 
-    return { aulas, loading, error };
+    return { ubicaciones, loading, error };
 };
 
-export default useVersionesSO;
+export default useUbicaciones;
