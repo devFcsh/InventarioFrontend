@@ -178,10 +178,10 @@ export const StepDatosInventario = ({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Aula"
+                label="Ubicación"
                 variant="outlined"
                 error={!!inventoryErrors.aula}
-                helperText={inventoryErrors.aula? "Por favor seleccionar un aula" :""}
+                helperText={inventoryErrors.aula? "Por favor seleccionar una ubicación" :""}
                 fullWidth
               />
             )}

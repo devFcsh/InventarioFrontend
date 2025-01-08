@@ -17,6 +17,10 @@ import { useDarDeBajaEquipo } from "../hooks/useDarDeBajaEquipo";
 import { useEliminarComputadora } from "@hooks/useEliminarComputadora.ts";
 import useEdificios from "@hooks/useEdificios.ts";
 import useUsos from "@hooks/useUsos.ts";
+import useMarcas from "@hooks/useMarcas.ts";
+import useModelos from "@hooks/useModelos.ts";
+import useSeries from "@hooks/useSeries.ts";
+import { useInventario } from "@hooks/useInventario.ts";
 
 
 const Activos = () => {
@@ -59,24 +63,10 @@ const Activos = () => {
   const { perifericos } = usePerifericos();
   const { edificios } = useEdificios();
   const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
-  const { marcas } = useMarcasPorPeriferico(
-    selectedPeriferico?.id_periferico ?? ""
-  );
-  const { modelos } = useModelosPorMarcaPeriferico(
-    selectedMarca?.id_marca ?? "",
-    selectedPeriferico?.id_periferico ?? ""
-  );
-  const { series } = useSeriesPorModelo(
-    selectedPeriferico?.id_periferico ?? "",
-    selectedMarca?.id_marca ?? "",
-    selectedModelo?.id_modelo ?? ""
-  );
-  const { inventarios } = useInventariosPorSerie(
-    selectedPeriferico?.id_periferico ?? "",
-    selectedMarca?.id_marca ?? "",
-    selectedModelo?.id_modelo ?? "",
-    selectedSerie?.id_serie ?? ""
-  );
+  const { marcas } = useMarcas();
+  const { modelos } = useModelos();
+  const { series } = useSeries();
+  const { inventarios } = useInventario();
 
   const location = useLocation();
   const filtros = {
@@ -235,10 +225,6 @@ const Activos = () => {
     newValue: Periferico | null
   ) => {
     setSelectedPeriferico(newValue);
-    setSelectedMarca(null);
-    setSelectedModelo(null);
-    setSelectedSerie(null);
-    setSelectedInventario(null);
   };
 
   const handleMarcaChange = (
@@ -246,9 +232,6 @@ const Activos = () => {
     newValue: Marca | null
   ) => {
     setSelectedMarca(newValue);
-    setSelectedModelo(null);
-    setSelectedSerie(null);
-    setSelectedInventario(null);
   };
 
   const handleModeloChange = (
@@ -256,8 +239,6 @@ const Activos = () => {
     newValue: Modelo | null
   ) => {
     setSelectedModelo(newValue);
-    setSelectedSerie(null);
-    setSelectedInventario(null);
   };
 
   const handleSerieChange = (
@@ -265,7 +246,6 @@ const Activos = () => {
     newValue: Serie | null
   ) => {
     setSelectedSerie(newValue);
-    setSelectedInventario(null);
   };
 
   const handleBuscar = () => {
@@ -413,7 +393,6 @@ const Activos = () => {
               <TextField {...params} label="Marca" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
-            disabled={!selectedPeriferico}
           />
           <Autocomplete
             size="small"
@@ -429,7 +408,6 @@ const Activos = () => {
               <TextField {...params} label="Modelo" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
-            disabled={!selectedMarca}
           />
 
           <Autocomplete
@@ -446,7 +424,6 @@ const Activos = () => {
               <TextField {...params} label="Serie" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
-            disabled={!selectedModelo}
           />
           <Autocomplete
             size="small"
@@ -462,7 +439,6 @@ const Activos = () => {
               <TextField {...params} label="Inventario" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
-            disabled={!selectedSerie}
           />
 
           <div className="flex flex-col w-full md:w-1/5 md:flex-row gap-4 md:gap-2 lg:ml-2">
@@ -544,7 +520,7 @@ const Activos = () => {
                   Uso
                 </th>
                 <th scope="col" className="px-4 py-3">
-                  Ubicación
+                  Edificio
                 </th>
                 <th scope="col" className="px-4 py-3">
                   Acciones
