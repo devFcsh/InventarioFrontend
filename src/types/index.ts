@@ -22,6 +22,11 @@ export type Inventario = {
   inventario: string;
 };
 
+export type Procesador = {
+  id_procesador: string;
+  nombre: string;
+} | null;
+
 export type Uso = {
   id_uso: string;
   nombre: string;
