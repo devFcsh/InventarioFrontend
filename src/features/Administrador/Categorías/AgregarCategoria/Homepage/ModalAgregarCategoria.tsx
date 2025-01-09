@@ -19,7 +19,6 @@ import { useAgregarDisco } from "../hooks/useAgregarDisco";
 import { useAgregarRAM } from "../hooks/useAgregarRAM";
 import { useAgregarVersionSO } from "../hooks/useAgregarVersionSO";
 import { useAgregarProcesador } from "../hooks/useAgregarProcesador";
-import { useAgregarUbicacion } from "../hooks/useAgregarUbicacion";
 import useEdificios from "@hooks/useEdificios";
 import { Edificio, Marca, Modelo, Periferico, SistemaOperativo } from "../../../../../types";
 import useSistemasOperativos from "@hooks/useSistemasOperativos";
@@ -29,6 +28,7 @@ import useModelos from "@hooks/useModelos";
 import { useAgregarMarca } from "../hooks/useAgregarMarca";
 import { useAgregarModelo } from "../hooks/useAgregarModelo";
 import { useAgregarSerie } from "../hooks/useAgregarSerie";
+import { useAgregarUbicacion } from "../hooks/useAgregarUbicacion";
 
 interface ModalAgregarCategoriaProps {
   open: boolean;
@@ -98,7 +98,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
         return agregarDisco;
       case "Versión SO":
         return agregarVersionSO;
-      case "Ubicacion":
+      case "Ubicación":
         return agregarUbicacion ;
       case "Procesador":
         return agregarProcesador;
