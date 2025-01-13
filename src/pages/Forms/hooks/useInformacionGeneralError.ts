@@ -6,7 +6,8 @@ import {
     VersionOffice,
     RAM,
     Disco,
-    VersionSO
+    VersionSO,
+    Procesador
   } from "../../../types";
 
 interface InformacionGeneralDataForm{
@@ -20,6 +21,7 @@ interface InformacionGeneralDataForm{
   antivirus: Antivirus;
   ram: RAM;
   disco: Disco;
+  procesador: Procesador
 }
 
 export const useInformacionGeneralError = () => {
@@ -34,6 +36,7 @@ export const useInformacionGeneralError = () => {
     "antivirus":false,
     "ram":false,
     "disco":false,
+    "procesador": false
   });
 
   const completeDatosInformacionGeneral = (dataForm: InformacionGeneralDataForm)=>{
@@ -56,19 +59,13 @@ export const useInformacionGeneralError = () => {
         "antivirus",
         "ram",
         "disco",
+        "procesador"
     ];
-
     fieldsToCheck.forEach((field) => {
       if (formData[field] === null || formData[field] === "") {
         setInformacionGeneralErrors((prevErrors) => ({
           ...prevErrors,
           [field]: true,
-        }));
-      }
-      if(field==="direccionIP" && formData["protocolo"]==="0"){
-        setInformacionGeneralErrors((prevErrors) => ({
-          ...prevErrors,
-          ["direccionIP"]: true,
         }));
       }
       if(field==="direccionIP" && formData["protocolo"]==="1"){
@@ -81,7 +78,7 @@ export const useInformacionGeneralError = () => {
   };
 
   const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/;
-  const handleUniqueInformacionGeneralError = (tipo: keyof InformacionGeneralDataForm, value: SistemaOperativo | VersionSO | Dominio | VersionOffice | Antivirus | string | RAM | Disco | null) => {
+  const handleUniqueInformacionGeneralError = (tipo: keyof InformacionGeneralDataForm, value: SistemaOperativo | VersionSO | Dominio | VersionOffice | Antivirus | string | RAM | Disco |Procesador| null) => {
   
     setInformacionGeneralErrors((prevErrors) => ({
       ...prevErrors,
@@ -100,6 +97,13 @@ export const useInformacionGeneralError = () => {
         }));
       }
     }
+    if(tipo==="protocolo" && value==="1"){
+      setInformacionGeneralErrors((prevErrors) => ({
+        ...prevErrors,
+        ["direccionIP"]: false,
+      }));
+    }
+    
 
   };
 

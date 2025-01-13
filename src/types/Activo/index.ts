@@ -11,6 +11,7 @@ export type ActivoComputadoraEdit = {
     id_versionso: string;
     id_ram: string;
     id_disco: string;
+    id_procesador: string;
     id_dominio: string;
     id_edificio: string;
     id_ubicacion: string;
@@ -29,6 +30,7 @@ export type ActivoComputadoraEdit = {
     id_versionso: string;
     id_ram: string;
     id_disco: string;
+    id_procesador: string;
     id_dominio: string;
     id_ubicacion: string;
     id_versionoffice: string;
@@ -70,7 +72,8 @@ export type ActivoComputadoraData = {
     versionso?: number;    
     versionoffice?: number; 
     ram?: number;          
-    disco?: number;       
+    disco?: number;
+    procesador?: number;     
     antivirus?: number;   
     dominio?: number;      
     idUbicacion: number;
