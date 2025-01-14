@@ -32,6 +32,18 @@ import {
   RAM,
 } from "../../../../../types/index";
 import { useEditarDominio } from "../../AgregarCategoria/hooks/useEditarDominio";
+import { useEditarPeriferico } from "../../AgregarCategoria/hooks/useEditarPeriferico";
+import { useEditarUso } from "../../AgregarCategoria/hooks/useEditarUso";
+import { useEditarDisco } from "../../AgregarCategoria/hooks/useEditarDisco";
+import { useEditarMarca } from "../../AgregarCategoria/hooks/useEditarMarca";
+import { useEditarModelo } from "../../AgregarCategoria/hooks/useEditarModelo";
+import { useEditarSerie } from "../../AgregarCategoria/hooks/useEditarSerie";
+import { useEditarSistemaOperativo } from "../../AgregarCategoria/hooks/useEditarSistemaOperativo";
+import { useEditarEdificio } from "../../AgregarCategoria/hooks/useEditarEdificio";
+import { useEditarUbicacion } from "../../AgregarCategoria/hooks/useEditarUbicacion";
+import { useEditarVersionSO } from "../../AgregarCategoria/hooks/useEditarVersionSO";
+import { useEditarProcesador } from "../../AgregarCategoria/hooks/useEditarProcesador";
+import { useEditarVersionOffice } from "../../AgregarCategoria/hooks/useEditarVersionOffice";
 
 type Opcion =
   | Uso
@@ -77,6 +89,18 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const { versionesOffice } = useVersionesOffice();
 
   const { editarDominio } = useEditarDominio();
+  const { editarPeriferico } = useEditarPeriferico();
+  const { editarUso } = useEditarUso();
+  const { editarDisco } = useEditarDisco();
+  const { editarMarca } = useEditarMarca();
+  const { editarModelo } = useEditarModelo();
+  const { editarSerie } = useEditarSerie();
+  const { editarSistemaOperativo } = useEditarSistemaOperativo();
+  const { editarEdificio } = useEditarEdificio();
+  const { editarUbicacion } = useEditarUbicacion();
+  const { editarVersionSO } = useEditarVersionSO();
+  const { editarProcesador } = useEditarProcesador();
+  const { editarVersionOffice } = useEditarVersionOffice();
 
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState<Opcion | null>(null);
@@ -123,10 +147,46 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
     if (selectedOption) {
       switch (selectedCategoria) {
         case "Dominio":
-          editarDominio({ id_dominio: selectedOption.id_dominio, nuevoNombre: editedValue });          break;
-        case "Periférico":
-          console.log("editando periferico");
-          //editarPeriferico(selectedOption.id, editedValue);
+          editarDominio({ id_dominio: selectedOption.id_dominio, nuevoNombre: editedValue });
+          break;
+          case "Periférico":
+          editarPeriferico({ id_periferico: selectedOption.id_periferico, nuevoNombre: editedValue });
+          break;
+          case "Uso":
+          editarUso({ id_uso: selectedOption.id_uso, nuevoNombre: editedValue });
+          break;
+          case "Disco":
+          editarDisco({ id_disco: selectedOption.id_disco, nuevoNombre: editedValue });
+          break;
+          case "Marca":
+          editarMarca({ id_marca: selectedOption.id_marca, nuevoNombre: editedValue });
+          break;
+          case "Modelo":
+          editarModelo({ id_modelo: selectedOption.id_modelo, nuevoNombre: editedValue });
+          break;
+          case "Serie":
+          editarSerie({ id_serie: selectedOption.id_serie, nuevoNombre: editedValue });
+          break;
+          case "Sistema Operativo":
+          editarSistemaOperativo({ id_sistemaoperativo: selectedOption.id_sistemaoperativo, nuevoNombre: editedValue });
+          break;
+          case "Edificio":
+          editarEdificio({ id_edificio: selectedOption.id_edificio, nuevoNombre: editedValue });
+          break;
+          case "Ubicación":
+          editarUbicacion({ id_ubicacion: selectedOption.id_ubicacion, nuevoNombre: editedValue });
+          break;
+          case "Versión SO":
+          editarVersionSO({ id_versionso: selectedOption.id_versionso, nuevoNombre: editedValue });
+          break;
+          case "RAM":
+          editarSerie({ id_serie: selectedOption.id_serie, nuevoNombre: editedValue });
+          break;
+          case "Procesador":
+          editarProcesador({ id_procesador: selectedOption.id_procesador, nuevoNombre: editedValue });
+          break;
+          case "Versión Office":
+          editarVersionOffice({ id_versionoffice: selectedOption.id_versionoffice, nuevoNombre: editedValue });
           break;
         default:
           console.log(`No hay función para editar la categoría ${selectedCategoria}`);
