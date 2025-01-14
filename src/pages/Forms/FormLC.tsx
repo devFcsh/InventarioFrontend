@@ -18,7 +18,7 @@ import { useAgregarComponentesBodega } from "../../features/Equipos/Bodega/Agreg
 
 export const FormLC = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(0);
   const location = useLocation();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const selectedPeriferico = location.state?.periferico as
@@ -145,6 +145,7 @@ export const FormLC = () => {
       versionoffice: Number(informacionGeneralDataForm.versionOffice?.id_versionoffice) ?? 0,
       ram: Number(informacionGeneralDataForm.ram?.id_ram) ?? 0,
       disco: Number(informacionGeneralDataForm.disco?.id_disco) ?? 0,
+      procesador: Number(informacionGeneralDataForm.procesador?.id_procesador) ?? 0,
       antivirus: Number(informacionGeneralDataForm.antivirus?.id_antivirus) ?? 0,
       dominio: Number(informacionGeneralDataForm.dominio?.id_dominio) ?? 0,
       idUbicacion: Number(inventoryDataForm.ubicacion?.id_ubicacion) ?? 0,

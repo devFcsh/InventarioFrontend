@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Autocomplete, TextField, Button, Snackbar, Alert } from "@mui/material";
+import { Autocomplete, TextField, Button, Snackbar, Alert, Box } from "@mui/material";
 import {
   Marca,
   Modelo,
@@ -13,6 +13,7 @@ import {
   Ubicacion,
   Edificio,
   Antivirus,
+  Procesador,
 } from "../../../../../types";
 import { ActivoComputadoraEdit } from "../../../../../types/Activo";
 import { Componente } from "../../../../../types/Activo/Componente";
@@ -35,6 +36,8 @@ import useEditarActivo from "../hooks/useEditarActivo";
 import { useGestionarComponentes } from "../hooks/useGestionarComponentes";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
+import useProcesadores from "@hooks/useProcesadores";
+import {validateIP} from "../../../../../pages/Forms/helpers/validateIP.ts"
 
 interface EditarComputadoraActivoProps {
   equipo: ActivoComputadoraEdit;
@@ -69,6 +72,7 @@ const EditarComputadoraActivo = ({
   const navigate = useNavigate();
   const [selectedRAM, setSelectedRAM] = useState<RAM | null>(null);
   const [selectedDisco, setSelectedDisco] = useState<Disco | null>(null);
+  const [selectedProcesador, setSelectedProcesador] = useState<Procesador | null>(null);
   const [selectedDominio, setSelectedDominio] = useState<Dominio | null>(null);
   const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
     null
@@ -106,6 +110,7 @@ const EditarComputadoraActivo = ({
     selectedInventarioModelo?.id_modelo ?? ""
   );
   const { discos } = useDiscos();
+  const { procesadores } = useProcesadores();
   const { dominios } = useDominios();
   const { ram } = useRam();
   const { sistemasOperativos } = useSistemasOperativos();
@@ -166,6 +171,9 @@ const EditarComputadoraActivo = ({
       setSelectedDisco(
         discos.find((disco) => disco?.id_disco === equipo.id_disco) || null
       );
+      setSelectedProcesador(
+        procesadores.find((procesador) => procesador?.id_procesador === equipo.id_procesador) || null
+      );
       setSelectedDominio(
         dominios.find((dominio) => dominio?.id_dominio === equipo.id_dominio) ||
           null
@@ -192,7 +200,7 @@ const EditarComputadoraActivo = ({
       setDireccionIP(equipo.direccion_ip);
       setProtocolo(equipo.direccion_ip ? "0" : "1");
     }
-  }, [equipo, marcas, modelos, series, ram, discos, dominios, versionesOffice]);
+  }, [equipo, marcas, modelos, series, ram, discos,procesadores, dominios, versionesOffice]);
 
   const handleAddComponente = () => {
     if (
@@ -253,6 +261,7 @@ const EditarComputadoraActivo = ({
       tipo: "activo",
       id_ram: selectedRAM?.id_ram ?? "",
       id_disco: selectedDisco?.id_disco ?? "",
+      id_procesador: selectedProcesador?.id_procesador ?? "",
       id_versionso: selectedVersionSO?.id_versionso ?? "",
       id_versionoffice: selectedVersionOffice?.id_versionoffice ?? "",
       id_antivirus: selectedAntivirus?.id_antivirus ?? "",
@@ -320,6 +329,7 @@ const EditarComputadoraActivo = ({
       !selectedVersionOffice ||
       !selectedRAM ||
       !selectedDisco ||
+      !selectedProcesador ||
       !selectedDominio ||
       !selectedUbicacion
     ) {
@@ -329,6 +339,12 @@ const EditarComputadoraActivo = ({
     setErrorMensajeEquipo(null);
     return true;
   };
+  const handleIP = (value:string)=>{
+    setDireccionIP(value);
+    if(validateIP(value)){
+      // implementar
+    };
+  }
 
   return (
     <div>
@@ -510,6 +526,23 @@ const EditarComputadoraActivo = ({
         <Autocomplete
           size="small"
           disablePortal
+          options={procesadores}
+          value={selectedProcesador}
+          onChange={(_, newValue) => setSelectedProcesador(newValue)}
+          getOptionLabel={(option) => option? option.nombre : ""}
+          renderInput={(params) => (
+            <TextField {...params} label="Procesador" variant="outlined" fullWidth />
+          )}
+        />
+        <Box
+            sx={{
+              display: "inline-flex",
+            }}
+          >
+        <Autocomplete
+          size="small"
+          disablePortal
+          sx={{ width: "50%" }}
           options={protocolos}
           value={protocolos.find((p) => p.id === protocolo) || null}
           onChange={(_, newValue) => setProtocolo(newValue?.id || "1")}
@@ -528,11 +561,12 @@ const EditarComputadoraActivo = ({
           size="small"
           label="Dirección IP"
           value={direccionIP}
-          onChange={(e) => setDireccionIP(e.target.value)}
+          onChange={(e) => {handleIP(e.target.value)}}
           fullWidth
           variant="outlined"
           disabled={protocolo !== "0"}
         />
+        </Box>
         <TextField
           size="small"
           label="Nombre Equipo"

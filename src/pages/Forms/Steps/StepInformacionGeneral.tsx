@@ -7,34 +7,39 @@ import {
   VersionOffice,
   RAM,
   Disco,
-  VersionSO
+  VersionSO,
+  Procesador,
 } from "../../../types/index";
 import useDominios from "@hooks/useDominios";
 import { antivirus, protocolos } from "@data/index";
 import useVersionesOffice from "@hooks/useVersionesOffice";
 import useRam from "@hooks/useRam";
 import useDiscos from "@hooks/useDiscos";
+import useProcesadores from "@hooks/useProcesadores";
 import useVersionesSO from "@hooks/useVersionesSO";
 
 interface StepInformacionGeneralProps {
-  informacionGeneralDataForm:any;
+  informacionGeneralDataForm: any;
   handleInformacionGeneralChange: any;
   informacionGeneralErrors: any;
-  handleUniqueInformacionGeneralError:any
+  handleUniqueInformacionGeneralError: any;
 }
 
 export const StepInformacionGeneral = ({
   informacionGeneralDataForm,
   handleInformacionGeneralChange,
   informacionGeneralErrors,
-  handleUniqueInformacionGeneralError
+  handleUniqueInformacionGeneralError,
 }: StepInformacionGeneralProps) => {
   const { sistemasOperativos } = useSistemasOperativos();
-  const { versionesSO } = useVersionesSO(informacionGeneralDataForm.sistemaOperativo?.id_sistemaoperativo ?? "");
+  const { versionesSO } = useVersionesSO(
+    informacionGeneralDataForm.sistemaOperativo?.id_sistemaoperativo ?? ""
+  );
   const { dominios } = useDominios();
   const { versionesOffice } = useVersionesOffice();
   const { ram } = useRam();
   const { discos } = useDiscos();
+  const { procesadores } = useProcesadores();
   return (
     <Box>
       <div className="mt-8">
@@ -43,11 +48,11 @@ export const StepInformacionGeneral = ({
             size="small"
             disablePortal
             options={sistemasOperativos}
-            getOptionLabel={(option) => option ? option.nombre : ""}
+            getOptionLabel={(option) => (option ? option.nombre : "")}
             value={informacionGeneralDataForm.sistemaOperativo}
             onChange={(_, newValue: SistemaOperativo | null) => {
               handleInformacionGeneralChange("sistemaOperativo", newValue);
-              handleUniqueInformacionGeneralError("sistemaOperativo",newValue);
+              handleUniqueInformacionGeneralError("sistemaOperativo", newValue);
             }}
             renderInput={(params) => (
               <TextField
@@ -55,7 +60,11 @@ export const StepInformacionGeneral = ({
                 label="Sistema Operativo"
                 variant="outlined"
                 error={!!informacionGeneralErrors.sistemaOperativo}
-                helperText={informacionGeneralErrors.sistemaOperativo? "Por favor seleccionar un sistema operativo" :""}
+                helperText={
+                  informacionGeneralErrors.sistemaOperativo
+                    ? "Por favor seleccionar un sistema operativo"
+                    : ""
+                }
                 fullWidth
               />
             )}
@@ -64,11 +73,11 @@ export const StepInformacionGeneral = ({
             size="small"
             disablePortal
             options={versionesSO}
-            getOptionLabel={(option) => option ? option.nombre : ""}
+            getOptionLabel={(option) => (option ? option.nombre : "")}
             value={informacionGeneralDataForm.versionSO}
             onChange={(_, newValue: VersionSO | null) => {
               handleInformacionGeneralChange("versionSO", newValue);
-              handleUniqueInformacionGeneralError("versionSO",newValue);
+              handleUniqueInformacionGeneralError("versionSO", newValue);
             }}
             renderInput={(params) => (
               <TextField
@@ -76,7 +85,11 @@ export const StepInformacionGeneral = ({
                 label="Versión SO"
                 variant="outlined"
                 error={!!informacionGeneralErrors.versionSO}
-                helperText={informacionGeneralErrors.versionSO? "Por favor seleccionar una versión del sistema operativo" :""}
+                helperText={
+                  informacionGeneralErrors.versionSO
+                    ? "Por favor seleccionar una versión del sistema operativo"
+                    : ""
+                }
                 fullWidth
               />
             )}
@@ -85,20 +98,23 @@ export const StepInformacionGeneral = ({
             size="small"
             disablePortal
             options={dominios}
-            getOptionLabel={(option) => option ? option.nombre : ""}
+            getOptionLabel={(option) => (option ? option.nombre : "")}
             value={informacionGeneralDataForm.dominio}
             onChange={(_, newValue: Dominio | null) => {
               handleInformacionGeneralChange("dominio", newValue);
-              handleUniqueInformacionGeneralError("dominio",newValue);
+              handleUniqueInformacionGeneralError("dominio", newValue);
             }}
-            
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Dominio"
                 variant="outlined"
                 error={!!informacionGeneralErrors.dominio}
-                helperText={informacionGeneralErrors.dominio? "Por favor seleccionar un dominio" :""}
+                helperText={
+                  informacionGeneralErrors.dominio
+                    ? "Por favor seleccionar un dominio"
+                    : ""
+                }
                 fullWidth
               />
             )}
@@ -111,20 +127,28 @@ export const StepInformacionGeneral = ({
             size="small"
             value={informacionGeneralDataForm.nombreEquipo}
             error={!!informacionGeneralErrors.nombreEquipo}
-            helperText={informacionGeneralErrors.nombreEquipo? "Por favor escribir un nombre del equipo" :""}
+            helperText={
+              informacionGeneralErrors.nombreEquipo
+                ? "Por favor escribir un nombre del equipo"
+                : ""
+            }
             onChange={(e) => {
-              handleInformacionGeneralChange("nombreEquipo", e.target.value)
-              handleUniqueInformacionGeneralError("nombreEquipo",e.target.value);}}
+              handleInformacionGeneralChange("nombreEquipo", e.target.value);
+              handleUniqueInformacionGeneralError(
+                "nombreEquipo",
+                e.target.value
+              );
+            }}
           />
           <Autocomplete
             size="small"
             disablePortal
             options={versionesOffice}
-            getOptionLabel={(option) => option ? option.nombre : ""}
+            getOptionLabel={(option) => (option ? option.nombre : "")}
             value={informacionGeneralDataForm.versionOffice}
             onChange={(_, newValue: VersionOffice | null) => {
               handleInformacionGeneralChange("versionOffice", newValue);
-              handleUniqueInformacionGeneralError("versionOffice",newValue);
+              handleUniqueInformacionGeneralError("versionOffice", newValue);
             }}
             renderInput={(params) => (
               <TextField
@@ -132,28 +156,38 @@ export const StepInformacionGeneral = ({
                 label="Versión Office"
                 variant="outlined"
                 error={!!informacionGeneralErrors.versionOffice}
-                helperText={informacionGeneralErrors.versionOffice? "Por favor seleccionar una version de office" :""}
+                helperText={
+                  informacionGeneralErrors.versionOffice
+                    ? "Por favor seleccionar una version de office"
+                    : ""
+                }
                 fullWidth
               />
             )}
           />
-          <Box       sx={{
-        display: 'inline-flex'
-      }}>
+          <Box
+            sx={{
+              display: "inline-flex",
+            }}
+          >
             <Autocomplete
               size="small"
               disablePortal
-              sx={{width:"50%"}}
+              sx={{ width: "50%" }}
               options={protocolos}
-              getOptionLabel={(option) => option ? option.nombre : ""}
-              value={protocolos.find((p) => p.id === informacionGeneralDataForm.protocolo) || null}
+              getOptionLabel={(option) => (option ? option.nombre : "")}
+              value={
+                protocolos.find(
+                  (p) => p.id === informacionGeneralDataForm.protocolo
+                ) || null
+              }
               onChange={(event, newValue) => {
                 if (newValue) {
-                  handleInformacionGeneralChange("protocolo",newValue.id);   
-                  handleUniqueInformacionGeneralError("protocolo",newValue.id);
+                  handleInformacionGeneralChange("protocolo", newValue.id);
+                  handleUniqueInformacionGeneralError("protocolo", newValue.id);
                 } else {
-                  handleInformacionGeneralChange("protocolo","1");
-                  handleUniqueInformacionGeneralError("protocolo","1");
+                  handleInformacionGeneralChange("protocolo", "1");
+                  handleUniqueInformacionGeneralError("protocolo", "1");
                 }
               }}
               renderInput={(params) => (
@@ -162,34 +196,39 @@ export const StepInformacionGeneral = ({
                   label="Protocolo"
                   variant="outlined"
                   error={!!informacionGeneralErrors.protocolo}
-                  helperText={informacionGeneralErrors.protocolo? "Por favor seleccionar un protocolo" :""}
+                  helperText={
+                    informacionGeneralErrors.protocolo
+                      ? "Por favor seleccionar un protocolo"
+                      : ""
+                  }
                   fullWidth
                 />
               )}
             />
 
-
-  <TextField
-    label="Dirección IP"
-    placeholder="Dirección IP"
-    variant="outlined"
-    fullWidth
-    size="small"
-    value={informacionGeneralDataForm.direccionIP}
-    error={!!informacionGeneralErrors.direccionIP}
-    onChange={(e) => {
-      handleInformacionGeneralChange("direccionIP", e.target.value);
-      handleUniqueInformacionGeneralError("direccionIP", e.target.value);
-    }}
-    disabled={informacionGeneralDataForm.protocolo !== "0"}
-    sx={{ marginRight: 4 ,width:"50%"}}
-  />
-  {informacionGeneralErrors.direccionIP && (
-    <FormHelperText error sx={{ marginLeft: "auto", color: "green" }}>
-      Por favor escribir una dirección IP válida
-    </FormHelperText>
-  )}
-
+            <TextField
+              label="Dirección IP"
+              placeholder="Dirección IP"
+              variant="outlined"
+              fullWidth
+              size="small"
+              value={informacionGeneralDataForm.direccionIP}
+              error={!!informacionGeneralErrors.direccionIP}
+              onChange={(e) => {
+                handleInformacionGeneralChange("direccionIP", e.target.value);
+                handleUniqueInformacionGeneralError(
+                  "direccionIP",
+                  e.target.value
+                );
+              }}
+              disabled={informacionGeneralDataForm.protocolo !== "0"}
+              sx={{ marginRight: 4, width: "50%" }}
+            />
+            {informacionGeneralErrors.direccionIP && (
+              <FormHelperText error sx={{ marginLeft: "auto", color: "green" }}>
+                Por favor escribir una dirección IP válida
+              </FormHelperText>
+            )}
           </Box>
           <Autocomplete
             size="small"
@@ -199,8 +238,7 @@ export const StepInformacionGeneral = ({
             value={informacionGeneralDataForm.antivirus}
             onChange={(_, newValue: Antivirus | null) => {
               handleInformacionGeneralChange("antivirus", newValue);
-              handleUniqueInformacionGeneralError("antivirus",newValue);
-              
+              handleUniqueInformacionGeneralError("antivirus", newValue);
             }}
             renderInput={(params) => (
               <TextField
@@ -208,7 +246,11 @@ export const StepInformacionGeneral = ({
                 label="Antivirus"
                 variant="outlined"
                 error={!!informacionGeneralErrors.antivirus}
-                helperText={informacionGeneralErrors.antivirus? "Por favor seleccionar un antivirus" :""}
+                helperText={
+                  informacionGeneralErrors.antivirus
+                    ? "Por favor seleccionar un antivirus"
+                    : ""
+                }
                 fullWidth
               />
             )}
@@ -217,29 +259,38 @@ export const StepInformacionGeneral = ({
             size="small"
             disablePortal
             options={ram}
-            getOptionLabel={(option: RAM) =>option ?
-              `${option.capacidad} - ${option.tipo}` : ""
+            getOptionLabel={(option: RAM) =>
+              option ? `${option.capacidad} - ${option.tipo}` : ""
             }
             value={informacionGeneralDataForm.ram}
             onChange={(_, newValue: RAM | null) => {
               handleInformacionGeneralChange("ram", newValue);
-              handleUniqueInformacionGeneralError("ram",newValue);
+              handleUniqueInformacionGeneralError("ram", newValue);
             }}
             renderInput={(params) => (
-              <TextField {...params} label="RAM" variant="outlined" fullWidth
-              error={!!informacionGeneralErrors.ram}
-              helperText={informacionGeneralErrors.ram? "Por favor seleccionar el tamaño de la ram" :""}/>
+              <TextField
+                {...params}
+                label="RAM"
+                variant="outlined"
+                fullWidth
+                error={!!informacionGeneralErrors.ram}
+                helperText={
+                  informacionGeneralErrors.ram
+                    ? "Por favor seleccionar el tamaño de la ram"
+                    : ""
+                }
+              />
             )}
           />
           <Autocomplete
             size="small"
             disablePortal
             options={discos}
-            getOptionLabel={(option) =>option ? option.capacidad : ""}
+            getOptionLabel={(option) => (option ? option.capacidad : "")}
             value={informacionGeneralDataForm.disco}
             onChange={(_, newValue: Disco | null) => {
               handleInformacionGeneralChange("disco", newValue);
-              handleUniqueInformacionGeneralError("disco",newValue);
+              handleUniqueInformacionGeneralError("disco", newValue);
             }}
             renderInput={(params) => (
               <TextField
@@ -247,7 +298,36 @@ export const StepInformacionGeneral = ({
                 label="Disco"
                 variant="outlined"
                 error={!!informacionGeneralErrors.disco}
-                helperText={informacionGeneralErrors.disco? "Por favor seleccionar el tamaño del disco" :""}
+                helperText={
+                  informacionGeneralErrors.disco
+                    ? "Por favor seleccionar el tamaño del disco"
+                    : ""
+                }
+                fullWidth
+              />
+            )}
+          />
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={procesadores}
+            getOptionLabel={(option) => (option ? option.nombre : "")}
+            value={informacionGeneralDataForm.procesador}
+            onChange={(_, newValue: Procesador | null) => {
+              handleInformacionGeneralChange("procesador", newValue);
+              handleUniqueInformacionGeneralError("procesador", newValue);
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Procesador"
+                variant="outlined"
+                error={!!informacionGeneralErrors.procesador}
+                helperText={
+                  informacionGeneralErrors.procesador
+                    ? "Por favor seleccionar el tipo de procesador"
+                    : ""
+                }
                 fullWidth
               />
             )}

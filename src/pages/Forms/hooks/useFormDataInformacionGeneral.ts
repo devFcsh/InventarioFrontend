@@ -6,7 +6,8 @@ import {
     VersionOffice,
     RAM,
     Disco,
-    VersionSO
+    VersionSO,
+    Procesador
   } from "../../../types/index";
 
 interface InformacionGeneralDataForm{
@@ -20,6 +21,7 @@ interface InformacionGeneralDataForm{
   antivirus: Antivirus;
   ram: RAM;
   disco: Disco;
+  procesador: Procesador;
 }
 
 
@@ -35,11 +37,12 @@ export const useFormDataInformacionGeneral = () => {
     antivirus: null,
     ram: null,
     disco: null,
+    procesador: null,
   });
 
   const handleInformacionGeneralChange = (
     field: keyof InformacionGeneralDataForm,
-    value: SistemaOperativo | VersionSO | Dominio | VersionOffice | Antivirus | RAM | Disco | string | null
+    value: SistemaOperativo | VersionSO | Dominio | VersionOffice | Antivirus | RAM | Disco |Procesador | string | null
   ) => {
     setInformacionGeneralDataForm((prevState) => ({
       ...prevState,
