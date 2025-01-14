@@ -37,6 +37,7 @@ import { useGestionarComponentes } from "../hooks/useGestionarComponentes";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 import useProcesadores from "@hooks/useProcesadores";
+import {validateIP} from "../../../../../pages/Forms/helpers/validateIP.ts"
 
 interface EditarComputadoraActivoProps {
   equipo: ActivoComputadoraEdit;
@@ -338,6 +339,12 @@ const EditarComputadoraActivo = ({
     setErrorMensajeEquipo(null);
     return true;
   };
+  const handleIP = (value:string)=>{
+    setDireccionIP(value);
+    if(validateIP(value)){
+      // implementar
+    };
+  }
 
   return (
     <div>
@@ -554,11 +561,12 @@ const EditarComputadoraActivo = ({
           size="small"
           label="Dirección IP"
           value={direccionIP}
-          onChange={(e) => setDireccionIP(e.target.value)}
+          onChange={(e) => {handleIP(e.target.value)}}
           fullWidth
           variant="outlined"
           disabled={protocolo !== "0"}
         />
+        </Box>
         <TextField
           size="small"
           label="Nombre Equipo"
@@ -567,7 +575,6 @@ const EditarComputadoraActivo = ({
           fullWidth
           variant="outlined"
         />
-        </Box>
         <Autocomplete
           size="small"
           disablePortal

@@ -96,14 +96,7 @@ export const useInformacionGeneralError = () => {
           ["direccionIP"]: false
         }));
       }
-    }
-    if(tipo==="protocolo" && value==="1"){
-      setInformacionGeneralErrors((prevErrors) => ({
-        ...prevErrors,
-        ["direccionIP"]: false,
-      }));
-    }
-    
+    }    
 
   };
 
