@@ -1,7 +1,7 @@
 import { useState, Fragment } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Box, Stepper, Step, StepLabel, Button, Typography } from "@mui/material";
-import { Periferico } from "../../types";
+import { Edificio, Periferico, Uso } from "../../types";
 import { StepDatosInventario, StepCargarImagen } from "./Steps/index";
 import { useFormDatosInventario, useFormDataCargarImagen } from "./hooks/index"
 import { useAgregarSimpleActivo } from "../../features/Equipos/Activos/AgregarActivo/hooks/useAgregarSimpleActivo";
@@ -24,6 +24,12 @@ export const FormPMTM = () => {
   }
   const selectedPeriferico = location.state?.periferico as
     | Periferico
+    | undefined;
+  const selectedUso = location.state?.uso as
+    | Uso
+    | undefined;
+  const selectedEdificio = location.state?.edificio as
+    | Edificio
     | undefined;
   const { inventoryDataForm, handleInventoryChange } = useFormDatosInventario();
   const { imageData, handleImageChange, error} = useFormDataCargarImagen();
@@ -88,6 +94,8 @@ export const FormPMTM = () => {
       case 0:
         return <StepDatosInventario
           periferico={selectedPeriferico?.id_periferico ?? ""}
+          uso={selectedUso?.id_uso ?? ""}
+          edificio={selectedEdificio?.id_edificio ?? ""}
           inventoryDataForm={inventoryDataForm}
           handleInventoryChange={handleInventoryChange}
           inventoryErrors={inventoryErrors}
