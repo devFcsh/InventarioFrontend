@@ -114,16 +114,54 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   };
 
   const handleAgregarOption = async () => {
-    /*
+    
     if (
-      !newOption.trim() &&
-      selectedCategoria !== "RAM" &&
-      selectedCategoria !== "Disco"
-    ) {
+      !capacidad.trim() && !ramTipo.trim() && selectedCategoria === "RAM") {
       setError("Por favor, ingrese una opción válida.");
       return;
     }
-    */
+
+    if (
+      !capacidad.trim() && selectedCategoria === "Disco" ) {
+      setError("Por favor, ingrese una opción válida.");
+      return;
+    }
+
+    if (
+      !newOption.trim() ) {
+      setError("Por favor, ingrese una opción válida.");
+      return;
+    }
+
+    if (
+      !selectedSO?.id_sistemaoperativo.trim() && selectedCategoria === "Versión SO" ) {
+      setError("Por favor, ingrese una opción válida.");
+      return;
+    }
+
+    if (
+      !selectedEdificio?.id_edificio.trim() && selectedCategoria === "Ubicación" ) {
+      setError("Por favor, ingrese una opción válida.");
+      return;
+    }
+
+    if (
+      !selectedPeriferico?.id_periferico.trim() && selectedCategoria === "Periférico" ) {
+      setError("Por favor, ingrese una opción válida.");
+      return;
+    }
+
+    if (
+      !selectedMarca?.id_marca.trim() && selectedCategoria === "Modelo" ) {
+      setError("Por favor, ingrese una opción válida.");
+      return;
+    }
+
+    if (
+      !selectedModelo?.id_modelo.trim() && selectedCategoria === "Serie" ) {
+      setError("Por favor, ingrese una opción válida.");
+      return;
+    }
 
     const agregarFunc = getAgregarFunction(selectedCategoria || "");
     if (!agregarFunc) {
@@ -155,7 +193,6 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           modeloId: 0,
         });
       } else if (selectedCategoria === "Versión SO") {
-        console.log(selectedSO)
         result = await agregarFunc({
           nombre: newOption,
           sistemaoperativoId: Number(selectedSO?.id_sistemaoperativo),
@@ -300,8 +337,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               disabled={!selectedEdificio}
               value={newOption}
               onChange={(e) => setNewOption(e.target.value)}
-              error={Boolean(error)}
-              helperText={error}
+              error={!!error}
+              helperText={error && "Por favor seleccionar una ubicación"}
             />
           </Box>
         ) : selectedCategoria === "Versión SO" ? (
@@ -335,8 +372,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               disabled={!selectedSO}
               value={newOption}
               onChange={(e) => setNewOption(e.target.value)}
-              error={Boolean(error)}
-              helperText={error}
+              error={!!error}
+              helperText={error && "Por favor seleccionar una versión"}
             />
           </Box>
          ) : selectedCategoria === "Marca" ? (
