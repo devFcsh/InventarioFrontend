@@ -9,6 +9,7 @@ import {
     VersionSO,
     Procesador
   } from "../../../types";
+import {validateIP} from "../../../pages/Forms/helpers/validateIP.ts"
 
 interface InformacionGeneralDataForm{
   sistemaOperativo: SistemaOperativo;
@@ -43,6 +44,7 @@ export const useInformacionGeneralError = () => {
     if(dataForm.sistemaOperativo !==null && dataForm.versionSO!==null
       &&dataForm.dominio !==null && dataForm.nombreEquipo !=="" &&
       dataForm.versionOffice !==null && dataForm.protocolo !=="" && dataForm.antivirus !==null && dataForm.ram!==null &&dataForm.disco!==null
+      && (dataForm.protocolo==="0"?validateIP(dataForm.direccionIP):true)
     ) return true
     return false;
   }
@@ -77,7 +79,6 @@ export const useInformacionGeneralError = () => {
     });
   };
 
-  const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/;
   const handleUniqueInformacionGeneralError = (tipo: keyof InformacionGeneralDataForm, value: SistemaOperativo | VersionSO | Dominio | VersionOffice | Antivirus | string | RAM | Disco |Procesador| null) => {
   
     setInformacionGeneralErrors((prevErrors) => ({
@@ -85,7 +86,7 @@ export const useInformacionGeneralError = () => {
       [tipo]: value === null || value === "" ? true : false,
     }));
     if (tipo === "direccionIP") {
-      if (!ipRegex.test(value as string)) {
+      if (!validateIP(value)) {
         setInformacionGeneralErrors((prevErrors) => ({
           ...prevErrors,
           ["direccionIP"]: true
@@ -96,7 +97,13 @@ export const useInformacionGeneralError = () => {
           ["direccionIP"]: false
         }));
       }
-    }    
+    }  
+    if(tipo==="protocolo" && value==="1"){
+      setInformacionGeneralErrors((prevErrors) => ({
+        ...prevErrors,
+        ["direccionIP"]: false
+      }));
+    }
 
   };
 
