@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Autocomplete, TextField, Button, Snackbar, Alert, Box } from "@mui/material";
+import { Autocomplete, TextField, Button, Snackbar, Alert, Box, FormHelperText } from "@mui/material";
 import {
   Marca,
   Modelo,
@@ -58,6 +58,7 @@ const EditarComputadoraActivo = ({
     useState<Serie | null>(null);
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
+  const [errorDireccionIP, setErrorDireccionIP] = useState(false);
   const [componentesState, setComponentesState] = useState<Componente[]>(componentes);
   const [selectedSO, setSelectedSO] = useState<SistemaOperativo | null>(null);
   const [selectedVersionSO, setSelectedVersionSO] = useState<VersionSO | null>(
@@ -84,7 +85,7 @@ const EditarComputadoraActivo = ({
     null
   );
   const [nombreEquipo, setNombreEquipo] = useState<string>("");
-  const [protocolo, setProtocolo] = useState<string>("1");
+  const [protocolo, setProtocolo] = useState<string>("");
   const [direccionIP, setDireccionIP] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
   const [currentImagePath, setCurrentImagePath] = useState<string | null>(null);
@@ -331,7 +332,8 @@ const EditarComputadoraActivo = ({
       !selectedDisco ||
       !selectedProcesador ||
       !selectedDominio ||
-      !selectedUbicacion
+      !selectedUbicacion ||
+      !(protocolo==="0"?validateIP(direccionIP):true)
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -341,9 +343,20 @@ const EditarComputadoraActivo = ({
   };
   const handleIP = (value:string)=>{
     setDireccionIP(value);
-    if(validateIP(value)){
-      // implementar
-    };
+    if(!validateIP(value) && protocolo === "0"){
+      setErrorDireccionIP(true)
+    }else{
+      setErrorDireccionIP(false);
+    }
+  }
+  const handleProtocolo = (value:string)=>{
+    setProtocolo(value);
+    if(value === "0" && !validateIP(direccionIP)){
+      setErrorDireccionIP(true)
+    }else{
+      setErrorDireccionIP(false);
+      setDireccionIP("")
+    }
   }
 
   return (
@@ -545,7 +558,7 @@ const EditarComputadoraActivo = ({
           sx={{ width: "50%" }}
           options={protocolos}
           value={protocolos.find((p) => p.id === protocolo) || null}
-          onChange={(_, newValue) => setProtocolo(newValue?.id || "1")}
+          onChange={(_, newValue) =>handleProtocolo(newValue?.id || "1")}
           getOptionLabel={(option) => option.nombre}
           renderInput={(params) => (
             <TextField
@@ -558,14 +571,22 @@ const EditarComputadoraActivo = ({
         />
 
         <TextField
-          size="small"
           label="Dirección IP"
-          value={direccionIP}
-          onChange={(e) => {handleIP(e.target.value)}}
-          fullWidth
+          placeholder="Dirección IP"
           variant="outlined"
+          fullWidth
+          size="small"
+          value={direccionIP}
+          error={!!errorDireccionIP}
+          onChange={(e) => {handleIP(e.target.value)}}
           disabled={protocolo !== "0"}
+          sx={{ marginRight: 4, width: "50%" }}
         />
+        {errorDireccionIP && (
+              <FormHelperText error sx={{ marginLeft: "auto", color: "green" }}>
+                Por favor escribir una dirección IP válida
+              </FormHelperText>
+        )}
         </Box>
         <TextField
           size="small"
