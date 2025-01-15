@@ -37,7 +37,7 @@ export const useInventoryErrors = (tipoInventario: string) => {
       return false;
     }else{
       if(dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
-        dataForm.inventario !=="" && dataForm.ubicacion!==null
+        dataForm.inventario !==""
       ) return true
       return false;
     }
@@ -64,6 +64,7 @@ export const useInventoryErrors = (tipoInventario: string) => {
     }else{
       fieldsToCheck.forEach((field) => {
         if(field === "usuario") return
+        if(field==="ubicacion") return
         if (formData[field] === null || formData[field] === "") {
           setInventoryErrors((prevErrors) => ({
             ...prevErrors,

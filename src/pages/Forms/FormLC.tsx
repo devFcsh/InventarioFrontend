@@ -186,7 +186,8 @@ export const FormLC = () => {
       versionso: Number(informacionGeneralDataForm.versionSO?.id_versionso) ?? 0,
       versionoffice: Number(informacionGeneralDataForm.versionOffice?.id_versionoffice) ?? 0,
       ram: Number(informacionGeneralDataForm.ram?.id_ram) ?? 0,
-      disco: Number(informacionGeneralDataForm.disco?.id_disco) ?? 0,    
+      disco: Number(informacionGeneralDataForm.disco?.id_disco) ?? 0,
+      procesador: Number(informacionGeneralDataForm.procesador?.id_procesador) ?? 0, 
       antivirus: Number(informacionGeneralDataForm.antivirus?.id_antivirus) ?? 0,
       dominio: Number(informacionGeneralDataForm.dominio?.id_dominio) ?? 0, 
     };

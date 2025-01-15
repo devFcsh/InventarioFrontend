@@ -11,6 +11,7 @@ import {
   Dominio,
   VersionOffice,
   Antivirus,
+  Procesador,
 } from "../../../../../types";
 import { BodegaComputadoraEdit, BodegaComputadoraEditSend } from "../../../../../types/Bodega";
 import { ComponenteBodega } from "../../../../../types/Bodega/Componente";
@@ -30,6 +31,8 @@ import {useEditarBodega} from "../hooks/useEditarBodega";
 import { useGestionarComponentesBodega } from "../hooks/useGestionarComponentesBodega";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
+import useProcesadores from "@hooks/useProcesadores";
+import {validateIP} from "../../../../../pages/Forms/helpers/validateIP.ts"
 
 interface EditarComputadoraBodegaProps {
   equipoBodega: BodegaComputadoraEdit;
@@ -62,6 +65,7 @@ export const EditarComputadoraBodega = ({
   const navigate = useNavigate();
   const [selectedRAM, setSelectedRAM] = useState<RAM | null>(null);
   const [selectedDisco, setSelectedDisco] = useState<Disco | null>(null);
+  const [selectedProcesador, setSelectedProcesador] = useState<Procesador | null>(null);
   const [selectedDominio, setSelectedDominio] = useState<Dominio | null>(null);
   const [selectedVersionOffice, setSelectedVersionOffice] =
     useState<VersionOffice | null>(null);
@@ -90,6 +94,7 @@ export const EditarComputadoraBodega = ({
     selectedInventarioModelo?.id_modelo ?? ""
   );
   const { discos } = useDiscos();
+  const { procesadores } = useProcesadores();
   const { dominios } = useDominios();
   const { ram } = useRam();
   const { sistemasOperativos } = useSistemasOperativos();
@@ -147,6 +152,9 @@ export const EditarComputadoraBodega = ({
       setSelectedDisco(
         discos.find((disco) => disco?.id_disco === equipoBodega.id_disco) || null
       );
+      setSelectedProcesador(
+        procesadores.find((procesador) => procesador?.id_procesador === equipoBodega.id_procesador) || null
+      );
       setSelectedDominio(
         dominios.find((dominio) => dominio?.id_dominio === equipoBodega.id_dominio) ||
           null
@@ -163,7 +171,7 @@ export const EditarComputadoraBodega = ({
       );
       setNombreEquipo(equipoBodega.nombre_equipo)
     }
-  }, [equipoBodega, marcas, modelos, series, ram, discos, dominios, versionesOffice]);
+  }, [equipoBodega, marcas, modelos, series, ram, discos, procesadores,dominios, versionesOffice]);
 
   const handleAddComponente = () => {
     if (
@@ -200,15 +208,16 @@ export const EditarComputadoraBodega = ({
     const payload : BodegaComputadoraEdit = {
       tipo: "bodega",
       inventario: selectedInventarioInv,
-      id_versionso: selectedVersionSO?.id_versionso,
-      id_ram: selectedRAM?.id_ram,
-      id_disco: selectedDisco?.id_disco,
-      id_dominio: selectedDominio?.id_dominio,
-      id_versionoffice: selectedVersionOffice?.id_versionoffice,
+      id_versionso: selectedVersionSO?.id_versionso?? "",
+      id_ram: selectedRAM?.id_ram?? "",
+      id_disco: selectedDisco?.id_disco?? "",
+      id_procesador: selectedProcesador?.id_procesador ?? "",
+      id_dominio: selectedDominio?.id_dominio?? "",
+      id_versionoffice: selectedVersionOffice?.id_versionoffice?? "",
       id_antivirus: selectedAntivirus?.id_antivirus,
       nombre_equipo: nombreEquipo,
       direccion_ip: "",
-      id_serie: selectedInventarioSerie?.id_serie,
+      id_serie: selectedInventarioSerie?.id_serie?? "",
     };
     try {
       await editarBodega(equipoBodega.id_equipo, payload);
@@ -262,6 +271,7 @@ export const EditarComputadoraBodega = ({
       !selectedVersionOffice ||
       !selectedRAM ||
       !selectedDisco ||
+      !selectedProcesador ||
       !selectedDominio
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
@@ -448,7 +458,17 @@ export const EditarComputadoraBodega = ({
             <TextField {...params} label="Disco" variant="outlined" fullWidth />
           )}
         />
-
+        <Autocomplete
+          size="small"
+          disablePortal
+          options={procesadores}
+          value={selectedProcesador}
+          onChange={(_, newValue) => setSelectedProcesador(newValue)}
+          getOptionLabel={(option) => option? option.nombre : ""}
+          renderInput={(params) => (
+            <TextField {...params} label="Procesador" variant="outlined" fullWidth />
+          )}
+        />
         <TextField
           size="small"
           label="Nombre Equipo"

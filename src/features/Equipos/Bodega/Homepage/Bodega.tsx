@@ -6,10 +6,10 @@ import { Link, useLocation } from "react-router-dom";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
 import { Periferico, Marca, Modelo, Serie, Inventario } from "../../../../types";
 import usePerifericos from "../../../../hooks/usePerifericos";
-import useMarcasPorPeriferico from "../../../../hooks/useMarcasPorPeriferico";
-import { useModelosPorMarcaPeriferico } from "../../../../hooks/useModelosPorMarcaPeriferico";
-import { useSeriesPorModelo } from "../../../../hooks/useSeriesPorModelo";
-import { useInventariosPorSerie } from "../../../../hooks/useInventariosPorSerie";
+import useMarcas from "@hooks/useMarcas.ts";
+import useModelos from "@hooks/useModelos.ts";
+import useSeries from "@hooks/useSeries.ts";
+import { useInventario } from "@hooks/useInventario.ts";
 import { filas } from "../../../../data";
 import { useEquiposBodegaFiltrados } from "../hooks/useEquiposBodegaFiltrados";
 import {ModalAgregarBodega} from "../../../../features/Equipos/Bodega/Pages/ModalAgregarBodega";
@@ -53,24 +53,11 @@ const Bodega = () => {
   const handleCloseBodega = () => setOpenModalBodega(false);
 
   const { perifericos } = usePerifericos();
-  const { marcas } = useMarcasPorPeriferico(
-    selectedPeriferico?.id_periferico ?? ""
-  );
-  const { modelos } = useModelosPorMarcaPeriferico(
-    selectedMarca?.id_marca ?? "",
-    selectedPeriferico?.id_periferico ?? ""
-  );
-  const { series } = useSeriesPorModelo(
-    selectedPeriferico?.id_periferico ?? "",
-    selectedMarca?.id_marca ?? "",
-    selectedModelo?.id_modelo ?? ""
-  );
-  const { inventarios } = useInventariosPorSerie(
-    selectedPeriferico?.id_periferico ?? "",
-    selectedMarca?.id_marca ?? "",
-    selectedModelo?.id_modelo ?? "",
-    selectedSerie?.id_serie ?? ""
-  );
+  const { marcas } = useMarcas();
+  const { modelos } = useModelos();
+  const { series } = useSeries();
+  const { inventarios } = useInventario();
+
 
    
   const location = useLocation();
@@ -234,10 +221,6 @@ const Bodega = () => {
     newValue: Periferico | null
   ) => {
     setSelectedPeriferico(newValue);
-    setSelectedMarca(null);
-    setSelectedModelo(null);
-    setSelectedSerie(null);
-    setSelectedInventario(null);
   };
 
   const handleMarcaChange = (
@@ -245,9 +228,6 @@ const Bodega = () => {
     newValue: Marca | null
   ) => {
     setSelectedMarca(newValue);
-    setSelectedModelo(null);
-    setSelectedSerie(null);
-    setSelectedInventario(null);
   };
 
   const handleModeloChange = (
@@ -255,8 +235,6 @@ const Bodega = () => {
     newValue: Modelo | null
   ) => {
     setSelectedModelo(newValue);
-    setSelectedSerie(null);
-    setSelectedInventario(null);
   };
 
   const handleSerieChange = (
@@ -264,7 +242,6 @@ const Bodega = () => {
     newValue: Serie | null
   ) => {
     setSelectedSerie(newValue);
-    setSelectedInventario(null);
   };
 
   const handleBuscar = () => {
@@ -402,7 +379,6 @@ const Bodega = () => {
               <TextField {...params} label="Marca" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
-            disabled={!selectedPeriferico}
           />
           <Autocomplete
             size="small"
@@ -418,7 +394,6 @@ const Bodega = () => {
               <TextField {...params} label="Modelo" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
-            disabled={!selectedMarca}
           />
 
           <Autocomplete
@@ -435,7 +410,6 @@ const Bodega = () => {
               <TextField {...params} label="Serie" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
-            disabled={!selectedModelo}
           />
           <Autocomplete
             size="small"
@@ -451,7 +425,6 @@ const Bodega = () => {
               <TextField {...params} label="Inventario" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
-            disabled={!selectedSerie}
           />
 
           <div className="flex flex-col w-full md:w-1/5 md:flex-row gap-4 md:gap-2 lg:ml-2">

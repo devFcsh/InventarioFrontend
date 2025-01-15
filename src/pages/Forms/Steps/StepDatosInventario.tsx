@@ -5,7 +5,6 @@ import {
   Serie,
   Ubicacion,
   Usuario,
-  Uso,
 } from "../../../types/index";
 import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
@@ -164,7 +163,7 @@ export const StepDatosInventario = ({
               handleUniqueInventarioError("inventario",e.target.value);
             }}
           />
-          
+          {tipoInventario==="activo"?
           <Autocomplete
             size="small"
             disablePortal
@@ -186,7 +185,7 @@ export const StepDatosInventario = ({
               />
             )}
             disabled={!edificio}
-          />
+          />:""}
         </div>
       </div>
     </Box>
