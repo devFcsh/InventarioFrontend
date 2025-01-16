@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { Dialog, TextField } from "@mui/material";
+import { Alert, Dialog, Snackbar, TextField } from "@mui/material";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import useUsos from "@hooks/useUsos";
 import useDiscos from "@hooks/useDiscos";
@@ -44,6 +44,20 @@ import { useEditarUbicacion } from "../../AgregarCategoria/hooks/useEditarUbicac
 import { useEditarVersionSO } from "../../AgregarCategoria/hooks/useEditarVersionSO";
 import { useEditarProcesador } from "../../AgregarCategoria/hooks/useEditarProcesador";
 import { useEditarVersionOffice } from "../../AgregarCategoria/hooks/useEditarVersionOffice";
+import { useEliminarDominio } from "../../AgregarCategoria/hooks/useEliminarDominio";
+import { useEliminarPeriferico } from "../../AgregarCategoria/hooks/useEliminarPeriferico";
+import { useEliminarUso } from "../../AgregarCategoria/hooks/useEliiminarUso";
+import { useEliminarDisco } from "../../AgregarCategoria/hooks/useEliminarDisco";
+import { useEliminarMarca } from "../../AgregarCategoria/hooks/useEliminarMarca";
+import { useEliminarSerie } from "../../AgregarCategoria/hooks/useEliminarSerie";
+import { useEliminarSistemaOperativo } from "../../AgregarCategoria/hooks/useEliminarSistemaOperativo";
+import { useEliminarEdificio } from "../../AgregarCategoria/hooks/useEliminarEdificio";
+import { useEliminarUbicacion } from "../../AgregarCategoria/hooks/useEliminarUbicacion";
+import { useEliminarVersionSO } from "../../AgregarCategoria/hooks/useEliminarVersionSO";
+import { useEliminarProcesador } from "../../AgregarCategoria/hooks/useEliminarProcesador";
+import { useEliminarVersionOffice } from "../../AgregarCategoria/hooks/useEliminarVersionOffice";
+import { useEliminarModelo } from "../../AgregarCategoria/hooks/useEliminarModelo";
+import { useNavigate } from "react-router-dom";
 
 type Opcion =
   | Uso
@@ -72,7 +86,14 @@ interface ModalEditarCategoriaProps {
 const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   open,
   onClose,
-  selectedCategoria}) => {
+  selectedCategoria,
+}) => {
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+
   const { usos } = useUsos();
   const { discos } = useDiscos();
   const { marcas } = useMarcas();
@@ -102,9 +123,25 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const { editarProcesador } = useEditarProcesador();
   const { editarVersionOffice } = useEditarVersionOffice();
 
+  const { eliminarDominio } = useEliminarDominio();
+  const { eliminarPeriferico } = useEliminarPeriferico();
+  const { eliminarUso } = useEliminarUso();
+  const { eliminarDisco } = useEliminarDisco();
+  const { eliminarMarca } = useEliminarMarca();
+  const { eliminarModelo } = useEliminarModelo();
+  const { eliminarSerie } = useEliminarSerie();
+  const { eliminarSistemaOperativo } = useEliminarSistemaOperativo();
+  const { eliminarEdificio } = useEliminarEdificio();
+  const { eliminarUbicacion } = useEliminarUbicacion();
+  const { eliminarVersionSO } = useEliminarVersionSO();
+  const { eliminarProcesador } = useEliminarProcesador();
+  const { eliminarVersionOffice } = useEliminarVersionOffice();
+
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState<Opcion | null>(null);
   const [editedValue, setEditedValue] = useState<string>("");
+  const navigate = useNavigate();
+
 
   const elementos: Opcion[] =
     selectedCategoria === "Uso"
@@ -145,144 +182,283 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
 
   const handleSaveEdit = () => {
     if (selectedOption) {
-      switch (selectedCategoria) {
-        case "Dominio":
-          editarDominio({ id_dominio: selectedOption.id_dominio, nuevoNombre: editedValue });
-          break;
+      try {
+        switch (selectedCategoria) {
+          case "Dominio":
+            editarDominio({
+              id_dominio: selectedOption.id_dominio,
+              nuevoNombre: editedValue,
+            });
+            break;
           case "Periférico":
-          editarPeriferico({ id_periferico: selectedOption.id_periferico, nuevoNombre: editedValue });
-          break;
+            editarPeriferico({
+              id_periferico: selectedOption.id_periferico,
+              nuevoNombre: editedValue,
+            });
+            break;
           case "Uso":
-          editarUso({ id_uso: selectedOption.id_uso, nuevoNombre: editedValue });
-          break;
+            editarUso({
+              id_uso: selectedOption.id_uso,
+              nuevoNombre: editedValue,
+            });
+            break;
           case "Disco":
-          editarDisco({ id_disco: selectedOption.id_disco, nuevoNombre: editedValue });
-          break;
+            editarDisco({
+              id_disco: selectedOption.id_disco,
+              nuevoNombre: editedValue,
+            });
+            break;
           case "Marca":
-          editarMarca({ id_marca: selectedOption.id_marca, nuevoNombre: editedValue });
-          break;
+            editarMarca({
+              id_marca: selectedOption.id_marca,
+              nuevoNombre: editedValue,
+            });
+            break;
           case "Modelo":
-          editarModelo({ id_modelo: selectedOption.id_modelo, nuevoNombre: editedValue });
-          break;
+            editarModelo({
+              id_modelo: selectedOption.id_modelo,
+              nuevoNombre: editedValue,
+            });
+            break;
           case "Serie":
-          editarSerie({ id_serie: selectedOption.id_serie, nuevoNombre: editedValue });
-          break;
+            editarSerie({
+              id_serie: selectedOption.id_serie,
+              nuevoNombre: editedValue,
+            });
+            break;
           case "Sistema Operativo":
-          editarSistemaOperativo({ id_sistemaoperativo: selectedOption.id_sistemaoperativo, nuevoNombre: editedValue });
-          break;
+            editarSistemaOperativo({
+              id_sistemaoperativo: selectedOption.id_sistemaoperativo,
+              nuevoNombre: editedValue,
+            });
+            break;
           case "Edificio":
-          editarEdificio({ id_edificio: selectedOption.id_edificio, nuevoNombre: editedValue });
-          break;
+            editarEdificio({
+              id_edificio: selectedOption.id_edificio,
+              nuevoNombre: editedValue,
+            });
+            break;
           case "Ubicación":
-          editarUbicacion({ id_ubicacion: selectedOption.id_ubicacion, nuevoNombre: editedValue });
-          break;
+            editarUbicacion({
+              id_ubicacion: selectedOption.id_ubicacion,
+              nuevoNombre: editedValue,
+            });
+            break;
           case "Versión SO":
-          editarVersionSO({ id_versionso: selectedOption.id_versionso, nuevoNombre: editedValue });
-          break;
+            editarVersionSO({
+              id_versionso: selectedOption.id_versionso,
+              nuevoNombre: editedValue,
+            });
+            break;
           case "RAM":
-          editarSerie({ id_serie: selectedOption.id_serie, nuevoNombre: editedValue });
-          break;
+            editarSerie({
+              id_serie: selectedOption.id_serie,
+              nuevoNombre: editedValue,
+            });
+            break;
           case "Procesador":
-          editarProcesador({ id_procesador: selectedOption.id_procesador, nuevoNombre: editedValue });
-          break;
+            editarProcesador({
+              id_procesador: selectedOption.id_procesador,
+              nuevoNombre: editedValue,
+            });
+            break;
           case "Versión Office":
-          editarVersionOffice({ id_versionoffice: selectedOption.id_versionoffice, nuevoNombre: editedValue });
-          break;
-        default:
-          console.log(`No hay función para editar la categoría ${selectedCategoria}`);
-          break;
+            editarVersionOffice({
+              id_versionoffice: selectedOption.id_versionoffice,
+              nuevoNombre: editedValue,
+            });
+            break;
+          default:
+            console.log(
+              `No hay función para editar la categoría ${selectedCategoria}`
+            );
+            break;
+        }
+
+        setSnackbarMessage("Opción editada correctamente");
+        setSnackbarSeverity("success");
+        navigate("/categorias");
+        
+        setOpenSnackbar(true);
+      } catch (error) {
+        setSnackbarMessage("Error al editar la opción");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
       }
     }
     setOpenEditModal(false);
   };
 
+  const handleEliminarCategoria = async (elemento: Opcion) => {
+    if (elemento) {
+      try {
+        switch (selectedCategoria) {
+          case "Dominio":
+            await eliminarDominio(elemento.id_dominio);
+            break;
+          case "Periférico":
+            await eliminarPeriferico(elemento.id_periferico);
+            break;
+          case "Uso":
+            await eliminarUso(elemento.id_uso);
+            break;
+          case "Disco":
+            await eliminarDisco(elemento.id_disco);
+            break;
+          case "Marca":
+            await eliminarMarca(elemento.id_marca);
+            break;
+          case "Modelo":
+            await eliminarModelo(elemento.id_modelo);
+            break;
+          case "Serie":
+            await eliminarSerie(elemento.id_serie);
+            break;
+          case "Sistema Operativo":
+            await eliminarSistemaOperativo(elemento.id_sistemaoperativo);
+            break;
+          case "Edificio":
+            await eliminarEdificio(elemento.id_edificio);
+            break;
+          case "Ubicación":
+            await eliminarUbicacion(elemento.id_ubicacion);
+            break;
+          case "Versión SO":
+            await eliminarVersionSO(elemento.id_versionso);
+            break;
+          case "RAM":
+            await eliminarSerie(elemento.id_serie);
+            break;
+          case "Procesador":
+            await eliminarProcesador(elemento.id_procesador);
+            break;
+          case "Versión Office":
+            await eliminarVersionOffice(elemento.id_versionoffice);
+            break;
+          default:
+            console.log(
+              `No hay función para eliminar la categoría ${selectedCategoria}`
+            );
+            break;
+        }
+        setSnackbarMessage("Opción eliminada correctamente");
+        setSnackbarSeverity("success");
+        setOpenSnackbar(true);
+      } catch (error) {
+        setSnackbarMessage("Desligue la opción antes de eliminarla");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
+      }
+    }
+  };
+
   return (
-    <Dialog open={open} onClose={onClose}>
-      <div className="py-5 px-10">
-        <h2 className="text-xl font-semibold mb-4">Editar {selectedCategoria}</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full table-auto border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-100 border-b">
-                <th className="py-2 px-4 border">Opción</th>
-                {selectedCategoria === "RAM" ? (
-                  <th className="py-2 px-4 border">Opción Tipo</th>
-                ) : (
-                  <></>
-                )}
-                <th className="py-2 px-4 border">Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {elementos.length === 0 ? (
-                <tr>
-                  <td colSpan={2} className="text-center py-4">
-                    No hay opciones para esta categoría.
-                  </td>
+    <>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setOpenSnackbar(false)}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+      <Dialog open={open} onClose={onClose}>
+        <div className="py-5 px-10">
+          <h2 className="text-xl font-semibold mb-4">
+            Editar {selectedCategoria}
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full table-auto border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-gray-100 border-b">
+                  <th className="py-2 px-4 border">Opción</th>
+                  {selectedCategoria === "RAM" ? (
+                    <th className="py-2 px-4 border">Opción Tipo</th>
+                  ) : (
+                    <></>
+                  )}
+                  <th className="py-2 px-4 border">Acción</th>
                 </tr>
-              ) : (
-                elementos.map((elemento, index) => (
-                  <tr key={index}>
-                    <td className="py-2 px-4 border">
-                      {(selectedCategoria === "RAM" || selectedCategoria === "Disco")
-                        ? elemento?.capacidad
-                        : elemento?.nombre}
-                    </td>
-                    {selectedCategoria === "RAM" ? (
-                      <td className="py-2 px-4 border">{elemento?.tipo}</td>
-                    ) : (
-                      <></>
-                    )}
-                    <td className="py-2 px-3 border flex gap-2 items-center">
-                      <Icon
-                        icon="mage:edit"
-                        width="25"
-                        height="25"
-                        className="cursor-pointer"
-                        onClick={() => handleEditarCategoria(elemento)}
-                      />
-                      <Icon
-                        icon="weui:delete-outlined"
-                        width="25"
-                        height="25"
-                        className="cursor-pointer"
-                      />
+              </thead>
+              <tbody>
+                {elementos.length === 0 ? (
+                  <tr>
+                    <td colSpan={2} className="text-center py-4">
+                      No hay opciones para esta categoría.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
-        <div className="p-5">
-          <h3 className="text-xl font-semibold mb-4">Editar Opción</h3>
-          <TextField
-            label="Nuevo Valor"
-            variant="outlined"
-            fullWidth
-            value={editedValue}
-            onChange={(e) => setEditedValue(e.target.value)}
-          />
-          <div className="mt-4 flex justify-end gap-2">
-            <button
-              className="py-2 px-4 bg-gray-300 rounded"
-              onClick={() => setOpenEditModal(false)}
-            >
-              Cancelar
-            </button>
-            <button
-              className="py-2 px-4 bg-blue-500 text-white rounded"
-              onClick={handleSaveEdit}
-            >
-              Guardar
-            </button>
+                ) : (
+                  elementos.map((elemento, index) => (
+                    <tr key={index}>
+                      <td className="py-2 px-4 border">
+                        {selectedCategoria === "RAM" ||
+                        selectedCategoria === "Disco"
+                          ? elemento?.capacidad
+                          : elemento?.nombre}
+                      </td>
+                      {selectedCategoria === "RAM" ? (
+                        <td className="py-2 px-4 border">{elemento?.tipo}</td>
+                      ) : (
+                        <></>
+                      )}
+                      <td className="py-2 px-3 border flex gap-2 items-center">
+                        <Icon
+                          icon="mage:edit"
+                          width="25"
+                          height="25"
+                          className="cursor-pointer"
+                          onClick={() => handleEditarCategoria(elemento)}
+                        />
+                        <Icon
+                          icon="weui:delete-outlined"
+                          width="25"
+                          height="25"
+                          className="cursor-pointer"
+                          onClick={() => handleEliminarCategoria(elemento)}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
+
+        <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
+          <div className="p-5">
+            <h3 className="text-xl font-semibold mb-4">Editar Opción</h3>
+            <TextField
+              label="Nuevo Valor"
+              variant="outlined"
+              fullWidth
+              value={editedValue}
+              onChange={(e) => setEditedValue(e.target.value)}
+            />
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                className="py-2 px-4 bg-gray-300 rounded"
+                onClick={() => setOpenEditModal(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="py-2 px-4 bg-blue-500 text-white rounded"
+                onClick={handleSaveEdit}
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </Dialog>
       </Dialog>
-    </Dialog>
+    </>
   );
 };
 
