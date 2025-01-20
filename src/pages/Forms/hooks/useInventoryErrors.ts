@@ -78,13 +78,13 @@ export const useInventoryErrors = (tipoInventario: string) => {
     }
   };
 
-  const handleUniqueInventarioError = (tipo: keyof InventoryDataForm, value: Usuario | Marca | Modelo | Serie | string  | Ubicacion | null) => {
+  const handleUniqueInventarioError = (tipo: keyof InventoryDataForm, value: Usuario | Marca | Modelo | Serie | string  | Ubicacion | null,formData:InventoryDataForm) => {
     setInventoryErrors((prevErrors) => ({
       ...prevErrors,
       [tipo]: value === null || value === ""? true : false,
     }));
     if (tipo === "inventario") {
-      if (!validateInventario(value)) {
+      if (!validateInventario(value,formData.empresa)) {
         setInventoryErrors((prevErrors) => ({
           ...prevErrors,
           ["inventario"]: true

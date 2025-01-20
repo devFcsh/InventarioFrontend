@@ -44,7 +44,8 @@ export const useFormDatosInventario = () => {
       ...(field === 'marca' && value === null? { modelo: null, serie: null } : {}),
       ...(field === 'modelo' && value === null? {serie: null } : {}),
       ...(field === 'usuario' && value === null? { usuarioId: "" } : {}),
-      ...(field === 'empresa' && value === ""? { inventario: "" } : {}),
+      ...(field === 'empresa' && value === null? { inventario: "" } : {}),
+      ...(field === 'empresa' && value? { inventario: "" } : {}),
     }));
   };
   
