@@ -1,4 +1,4 @@
-import { TextField, Box, Autocomplete } from "@mui/material";
+import { TextField, Box, Autocomplete, FormHelperText } from "@mui/material";
 import {
   Marca,
   Modelo,
@@ -11,6 +11,7 @@ import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferic
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import useUbicaciones from "@hooks/useUbicaciones";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
+import { useState } from "react";
 
 interface StepDatosInventarioProps {
   periferico: string;
@@ -149,7 +150,38 @@ export const StepDatosInventario = ({
             )}
             disabled={!inventoryDataForm.modelo}
           />
-          <TextField
+          <Box
+            sx={{
+              display: "inline-flex",
+            }}
+          >
+            <Autocomplete
+              size="small"
+              disablePortal
+              sx={{ width: "50%" }}
+              options={["Espol","EspolTech"]}
+              getOptionLabel={(option) => (option ? option : "")}
+              value={inventoryDataForm.empresa}
+              onChange={(event, newValue) => {
+                handleInventoryChange("empresa", newValue);
+                handleUniqueInventarioError("empresa",newValue);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Empresa"
+                  variant="outlined"
+                  error={!!inventoryErrors.empresa}
+                  helperText={
+                    inventoryErrors.empresa
+                      ? "Por favor seleccionar una empresa"
+                      : ""
+                  }
+                  fullWidth
+                />
+              )}
+            />
+            <TextField
             label="Inventario"
             placeholder="Inventario"
             variant="outlined"
@@ -157,12 +189,16 @@ export const StepDatosInventario = ({
             size="small"
             value={inventoryDataForm.inventario}
             error={!!inventoryErrors.inventario}
-            helperText={inventoryErrors.inventario? "Por favor escribir un inventario" :""}
+            helperText={inventoryErrors.inventario? "Por favor escribir un inventario válido" :""}
             onChange={(e) => {
               handleInventoryChange("inventario", e.target.value);
               handleUniqueInventarioError("inventario",e.target.value);
             }}
+            disabled={inventoryDataForm.empresa === ""}
+              sx={{ marginRight: 4, width: "50%" }}
           />
+          </Box>
+
           {tipoInventario==="activo"?
           <Autocomplete
             size="small"

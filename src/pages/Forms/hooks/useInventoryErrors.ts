@@ -6,7 +6,7 @@ import {
   Ubicacion,
   Usuario,
 } from "../../../types";
-
+import {validateInventario} from "../../../pages/Forms/helpers/validateInventario.ts"
 
 interface InventoryDataForm {
   usuario: Usuario;
@@ -14,6 +14,7 @@ interface InventoryDataForm {
   modelo: Modelo;
   serie: Serie;
   inventario: string;
+  empresa:string
   ubicacion: Ubicacion;
   usuarioId: string;
 }
@@ -25,6 +26,7 @@ export const useInventoryErrors = (tipoInventario: string) => {
     "modelo":false,
     "serie":false,
     "inventario":false,
+    "empresa":false,
     "ubicacion":false,
   });
 
@@ -32,7 +34,7 @@ export const useInventoryErrors = (tipoInventario: string) => {
     if(tipoInventario==="activo"){
       if(dataForm.usuario!==null
         &&dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
-        dataForm.inventario !==""  && dataForm.ubicacion!==null
+        dataForm.inventario !==""  && dataForm.ubicacion!==null && dataForm.empresa!=""
       ) return true
       return false;
     }else{
@@ -50,6 +52,7 @@ export const useInventoryErrors = (tipoInventario: string) => {
       "modelo",
       "serie",
       "inventario",
+      "empresa",
       "ubicacion",
     ];
     if(tipoInventario==="activo"){
@@ -80,6 +83,19 @@ export const useInventoryErrors = (tipoInventario: string) => {
       ...prevErrors,
       [tipo]: value === null || value === ""? true : false,
     }));
+    if (tipo === "inventario") {
+      if (!validateInventario(value)) {
+        setInventoryErrors((prevErrors) => ({
+          ...prevErrors,
+          ["inventario"]: true
+        }));
+      } else {
+        setInventoryErrors((prevErrors) => ({
+          ...prevErrors,
+          ["inventario"]: false
+        }));
+      }
+    } 
   };
 
   return { inventoryErrors,handleInventoryErrors, handleUniqueInventarioError,completeDatosInventario};
