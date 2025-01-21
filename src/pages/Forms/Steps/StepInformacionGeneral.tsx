@@ -202,6 +202,7 @@ export const StepInformacionGeneral = ({
                       : ""
                   }
                   fullWidth
+                  sx={{ marginRight: 8, width: "100%" }}
                 />
               )}
             />
@@ -222,7 +223,6 @@ export const StepInformacionGeneral = ({
                 );
               }}
               disabled={informacionGeneralDataForm.protocolo !== "0"}
-              sx={{ marginRight: 4, width: "50%" }}
             />
             {informacionGeneralErrors.direccionIP && (
               <FormHelperText error sx={{ marginLeft: "auto", color: "green" }}>

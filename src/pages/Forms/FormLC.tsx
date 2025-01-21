@@ -14,11 +14,12 @@ import { useInformacionGeneralError } from './hooks/useInformacionGeneralError.t
 import { useCargarImagenErrors } from './hooks/useCargarImagenErrors.ts';
 import { useAgregarComputadoraBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarComputadoraBodega.ts";
 import { useAgregarComponentesBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarComponentesBodega.ts";
+import { ModalObservation } from "./components/ModalObservation.tsx";
 
 
 export const FormLC = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(3);
   const location = useLocation();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const selectedPeriferico = location.state?.periferico as
@@ -30,6 +31,8 @@ export const FormLC = () => {
   const selectedEdificio = location.state?.edificio as
     | Edificio
     | undefined;
+  const [openModalObservation, setOpenModalObservation] = useState(false);
+  const [observation, setObservation] = useState("")
   const perifericos = location.state?.perifericos as Periferico[];
   const tipoInventario = location.state?.tipoInventario;
   const steps = location.state?.steps;
@@ -88,6 +91,13 @@ export const FormLC = () => {
       navigate("/bajas")
     }
   };
+  
+  const handleModalBeforeAdd = () => {
+    setOpenModalObservation(true);
+  };
+  const onAddObservation = (value: string)=>{
+    setObservation(value)
+  }
 
   const renderStepContent = (stepIndex: number) => {
     switch (stepIndex) {
@@ -121,20 +131,31 @@ export const FormLC = () => {
           error={error}/>;
       case 3:
         return (
-          <StepComponentes
-            perifericos={perifericos}
-            componentes={componentes}
-            handleAddComponents={handleAddComponents}
-            eliminarComponente={eliminarComponente}
-            showSuccessMessageComponentes={showSuccessMessageComponentes}
-            setShowSuccessMessageComponentes={setShowSuccessMessageComponentes}
-          />
+          <>
+            <ModalObservation 
+              open={openModalObservation}
+              onClose={() => setOpenModalObservation(false)}
+              onConfirm={handleAgregarEquipoActivo}
+              title="Agregar observación"
+              message="¿Desea agregar una observación al equipo?"
+              onAddObservation={onAddObservation}
+            />
+            <StepComponentes
+              perifericos={perifericos}
+              componentes={componentes}
+              handleAddComponents={handleAddComponents}
+              eliminarComponente={eliminarComponente}
+              showSuccessMessageComponentes={showSuccessMessageComponentes}
+              setShowSuccessMessageComponentes={setShowSuccessMessageComponentes}
+            />
+          </>
         );
       default:
         return <div>Paso no encontrado</div>;
     }
   };
   const handleAgregarEquipoActivo = async () => {
+    setOpenModalObservation(false);
     const equipoData = {
       tipo: "activo",
       inventario: inventoryDataForm.inventario || "",
@@ -292,7 +313,7 @@ export const FormLC = () => {
 
               <Button
                 onClick={
-                  (activeStep === steps.length - 1 && tipoInventario==="activo")?handleAgregarEquipoActivo
+                  (activeStep === steps.length - 1 && tipoInventario==="activo")?handleModalBeforeAdd
                     : (activeStep-1 === steps.length - 1 && tipoInventario==="bodega")?handleAgregarEquipoBodega
                       : handleNext
                 }
@@ -310,7 +331,7 @@ export const FormLC = () => {
               >
                 {
               (activeStep === steps.length - 1 && tipoInventario==="activo")
-                      ? "Agregar Activo"
+                      ? "Finalizar"
                       : (activeStep-1 === steps.length - 1 && tipoInventario==="bodega")?
                          "Agregar Bodega"
                     : "Siguiente"

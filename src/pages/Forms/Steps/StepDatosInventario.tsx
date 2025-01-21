@@ -11,7 +11,7 @@ import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferic
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import useUbicaciones from "@hooks/useUbicaciones";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
-import { useState } from "react";
+import Textarea from '@mui/joy/Textarea';
 
 interface StepDatosInventarioProps {
   periferico: string;
@@ -178,6 +178,7 @@ export const StepDatosInventario = ({
                       : ""
                   }
                   fullWidth
+                  sx={{ marginRight: 8, width: "100%" }}
                 />
               )}
             />
@@ -195,7 +196,7 @@ export const StepDatosInventario = ({
               handleUniqueInventarioError("inventario",e.target.value,inventoryDataForm);
             }}
             disabled={inventoryDataForm.empresa === ""}
-              sx={{ marginRight: 4, width: "50%" }}
+              
           />
           </Box>
 
