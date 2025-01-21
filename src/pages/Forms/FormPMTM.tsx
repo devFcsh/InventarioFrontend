@@ -8,6 +8,7 @@ import { useAgregarSimpleActivo } from "../../features/Equipos/Activos/AgregarAc
 import { useInventoryErrors, useCargarImagenErrors } from './hooks/index';
 import { useAgregarSimpleBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarSimpleBodega";
 import { useAgregarSimpleBaja } from "../../features/Equipos/Baja/AgregarEquipoBaja/hooks/useAgregarSimpleBaja";
+import { ModalObservation } from "./components/ModalObservation.tsx";
 
 let steps = ["Datos de inventario", "Cargar imagen"];
 
@@ -31,6 +32,8 @@ export const FormPMTM = () => {
   const selectedEdificio = location.state?.edificio as
     | Edificio
     | undefined;
+  const [openModalObservation, setOpenModalObservation] = useState(false);
+  const [observation, setObservation] = useState("")
   const { inventoryDataForm, handleInventoryChange } = useFormDatosInventario();
   const { imageData, handleImageChange, error} = useFormDataCargarImagen();
   const { inventoryErrors, completeDatosInventario, handleInventoryErrors, handleUniqueInventarioError } = useInventoryErrors(tipoInventario);
@@ -88,7 +91,15 @@ export const FormPMTM = () => {
   };
 
 
-
+  const handleModalBeforeAdd = () => {
+    handleCargarImagenErrors(imageData);
+    if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData) &&!error) {
+      setOpenModalObservation(true);
+    }
+  };
+  const onAddObservation = (value: string)=>{
+    setObservation(value)
+  }
   const renderStepContent = (stepIndex: number) => {
     switch (stepIndex) {
       case 0:
@@ -102,19 +113,31 @@ export const FormPMTM = () => {
           handleUniqueInventarioError={handleUniqueInventarioError}
           tipoInventario={tipoInventario} />;
       case 1:
-        return <StepCargarImagen
-          imageData={imageData}
-          handleImageChange={handleImageChange}
-          cargarImagenErrors={cargarImagenErrors}
-          handleUniqueCargarImagenError={handleUniqueCargarImagenError}
-          error={error}/>;
+        return (
+        <>
+          <ModalObservation 
+            open={openModalObservation}
+            onClose={() => setOpenModalObservation(false)}
+            onConfirm={handleAgregarEquipoActivo}
+            title="Agregar observación"
+            message="¿Desea agregar una observación al equipo?"
+            onAddObservation={onAddObservation}
+          />
+          <StepCargarImagen
+            imageData={imageData}
+            handleImageChange={handleImageChange}
+            cargarImagenErrors={cargarImagenErrors}
+            handleUniqueCargarImagenError={handleUniqueCargarImagenError}
+            error={error}/>
+        </>
+        );
       default:
         return <div>Paso no encontrado</div>;
     }
   };
 
   const handleAgregarEquipoActivo = async () => {
-    handleCargarImagenErrors(imageData);
+    setOpenModalObservation(false);
     const equipoSimpleData = {
       tipo: "activo",
       inventario: inventoryDataForm.inventario || "",
@@ -143,7 +166,7 @@ export const FormPMTM = () => {
       serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
     };
     try {
-    if (!Object.values(cargarImagenErrors).includes(true) && completeDatosInventario(inventoryDataForm)) {
+    if (!Object.values(cargarImagenErrors).includes(true) && completeDatosInventario(inventoryDataForm) &&!error) {
         await agregarSimpleBodega(bodegaSimpleData);
         setShowSuccessMessage(true);
         navigate("/bodega", { state: { equipoAgregado: true } });
@@ -244,7 +267,7 @@ export const FormPMTM = () => {
                 onClick={
                   activeStep === steps.length - 1
                     ? tipoInventario === "activo"
-                      ? handleAgregarEquipoActivo
+                      ? handleModalBeforeAdd
                       : tipoInventario === "bodega"
                         ? handleAgregarEquipoBodega
                         : tipoInventario === "baja"
