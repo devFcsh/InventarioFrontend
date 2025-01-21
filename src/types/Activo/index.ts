@@ -20,6 +20,7 @@ export type ActivoComputadoraEdit = {
     nombre_equipo: string;
     direccion_ip: string;
     id_serie: string;
+    observacion: string;
   };
 
   export type ActivoComputadoraEditSend = {
@@ -38,6 +39,7 @@ export type ActivoComputadoraEdit = {
     nombre_equipo: string;
     direccion_ip: string;
     id_serie: string;
+    observacion: string;
   };
 
   export type ActivoSimpleEdit = {
@@ -52,6 +54,7 @@ export type ActivoComputadoraEdit = {
     id_edificio: string;
     id_ubicacion: string;
     id_serie: string;
+    observacion: string;
   };
 
   export type ActivoSimpleEditSend = {
@@ -61,6 +64,7 @@ export type ActivoComputadoraEdit = {
     imagenRuta: string | null;
     id_ubicacion: string;
     id_serie: string;
+    observacion: string;
   };
 
 export type ActivoComputadoraData = {
@@ -79,6 +83,7 @@ export type ActivoComputadoraData = {
     idUbicacion: number;
     idUsuario: number;
     imagenRuta: string;
+    observacion: string;
   };
   
   export type ActivoSimpleData = {
@@ -88,5 +93,6 @@ export type ActivoComputadoraData = {
     idUbicacion: number;
     idUsuario: number;
     imagenRuta: string;
+    observacion: string;
   };
   

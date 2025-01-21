@@ -145,6 +145,7 @@ export const FormPMTM = () => {
       idUbicacion: Number(inventoryDataForm.ubicacion?.id_ubicacion) ?? 0,
       idUsuario: parseInt(inventoryDataForm.usuarioId || "", 10),
       imagenRuta: imageData.imagePath,
+      observacion: observation
     };
     try {
     if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData)) {
@@ -164,6 +165,7 @@ export const FormPMTM = () => {
       tipo: "bodega",
       inventario: inventoryDataForm.inventario || "",
       serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
+      observacion: observation
     };
     try {
     if (!Object.values(cargarImagenErrors).includes(true) && completeDatosInventario(inventoryDataForm) &&!error) {
@@ -182,6 +184,7 @@ export const FormPMTM = () => {
       tipo: "baja",
       inventario: inventoryDataForm.inventario || "",
       serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
+      observacion: observation
     };
     try {
     if (!Object.values(cargarImagenErrors).includes(true) && completeDatosInventario(inventoryDataForm)) {

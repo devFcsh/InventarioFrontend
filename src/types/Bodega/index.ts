@@ -14,6 +14,8 @@ export type BodegaComputadoraEdit = {
   nombre_equipo: string;
   direccion_ip: string;
   id_serie: string;
+  id_procesador: string;
+  observacion: string;
 };
 
 export type BodegaComputadoraEditSend = {
@@ -28,6 +30,8 @@ export type BodegaComputadoraEditSend = {
   nombre_equipo: string;
   direccion_ip: string;
   id_serie: string;
+  id_procesador: string
+  observacion: string;
 };
 
 export type BodegaSimpleEdit = {
@@ -37,12 +41,14 @@ export type BodegaSimpleEdit = {
   id_marca: string;
   id_modelo: string;
   id_serie: string;
+  observacion: string;
 };
 
 export type BodegaSimpleEditSend = {
   tipo: string;
   inventario: string;
   id_serie: string;
+  observacion: string;
 };
 
 export type BodegaComputadoraData = {
@@ -56,12 +62,15 @@ export type BodegaComputadoraData = {
     ram?: number;          
     disco?: number;       
     antivirus?: number;   
-    dominio?: number;      
+    dominio?: number;
+    procesador?: number;
+    observacion: string;
   };
   
   export type BodegaSimpleData = {
     tipo: string;
     inventario: string;
     serie: number;
+    observacion: string;
   };
   

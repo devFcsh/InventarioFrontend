@@ -5,12 +5,14 @@ export type BajaSimpleEdit = {
   id_marca: string;
   id_modelo: string;
   id_serie: string;
+  observacion: string;
 };
 
 export type BajaSimpleEditSend = {
   tipo: string;
   inventario: string;
   id_serie: string;
+  observacion: string;
 };
 
 export type BajaComputadoraData = {
@@ -24,12 +26,15 @@ export type BajaComputadoraData = {
     ram?: number;          
     disco?: number;       
     antivirus?: number;   
-    dominio?: number;      
+    dominio?: number;
+    procesador?: number;     
+    observacion: string;
 };
   
 export type BajaSimpleData = {
     tipo: string;
     inventario: string;
     serie: number;
+    observacion: string;
   };
   

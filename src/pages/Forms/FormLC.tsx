@@ -172,6 +172,7 @@ export const FormLC = () => {
       idUbicacion: Number(inventoryDataForm.ubicacion?.id_ubicacion) ?? 0,
       idUsuario: parseInt(inventoryDataForm.usuarioId || "", 10),
       imagenRuta: imageData.imagePath,
+      observacion: observation
     };
 
     try {
@@ -211,6 +212,7 @@ export const FormLC = () => {
       procesador: Number(informacionGeneralDataForm.procesador?.id_procesador) ?? 0, 
       antivirus: Number(informacionGeneralDataForm.antivirus?.id_antivirus) ?? 0,
       dominio: Number(informacionGeneralDataForm.dominio?.id_dominio) ?? 0, 
+      observacion: observation
     };
     try {
       const equipoId = await agregarComputadoraBodega(bodegaComputadoraData);
