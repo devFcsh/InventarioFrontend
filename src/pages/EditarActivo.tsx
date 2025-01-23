@@ -244,7 +244,7 @@ const EditarActivo = () => {
         </div>
       </div>
     );
-  };
+  }
 }
 
 

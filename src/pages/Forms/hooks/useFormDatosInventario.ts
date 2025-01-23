@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Lampara,
     Marca,
     Modelo,
     Serie,
@@ -14,6 +15,7 @@ interface InventoryDataForm{
   serie: Serie;
   inventario: string;
   empresa:string;
+  lampara: Lampara;
   ubicacion: Ubicacion;
   usuarioId: string;
 }
@@ -28,6 +30,7 @@ export const useFormDatosInventario = () => {
     inventario:  "",
     empresa:"",
     ubicacion: null,
+    lampara: null,
     usuarioId: "",
   });
 

@@ -6,6 +6,7 @@ import {
   Serie,
   Ubicacion,
   Edificio,
+  Lampara,
 } from "../../../../../types";
 import { ActivoSimpleEdit } from "../../../../../types/Activo";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
@@ -31,6 +32,8 @@ const EditarActivoSimple = ({
     useState<Marca | null>(null);
   const [selectedInventarioModelo, setSelectedInventarioModelo] =
     useState<Modelo | null>(null);
+  const [selectedLampara, setSelectedLampara] =
+    useState<Lampara | null>(null);
   const [selectedInventarioSerie, setSelectedInventarioSerie] =
     useState<Serie | null>(null);
   const [selectedInventarioInv, setSelectedInventarioInv] =
@@ -123,6 +126,8 @@ const EditarActivoSimple = ({
       imagenRuta: image ? nuevaImagen : "",
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
       id_serie: selectedInventarioSerie?.id_serie ?? "",
+      observacion: "",
+      id_lampara: selectedLampara?.id_lampara ?? "",
     };
     try {
       await editarActivoSimple(equipoSimpleActivo.id_equipo, payload);

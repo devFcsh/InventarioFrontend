@@ -22,6 +22,11 @@ export type Inventario = {
   inventario: string;
 };
 
+export type Lampara = {
+  id_lampara: string;
+  nombre: string;
+} | null;
+
 export type Procesador = {
   id_procesador: string;
   nombre: string;
