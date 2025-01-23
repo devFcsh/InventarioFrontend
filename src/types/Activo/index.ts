@@ -55,7 +55,26 @@ export type ActivoComputadoraEdit = {
     id_ubicacion: string;
     id_serie: string;
     observacion: string;
+    id_lampara: string;
   };
+
+export type ActivoRedEdit = {
+  id_equipo: string;
+  id_periferico: string;
+  inventario: string;
+  id_usuario: string;
+  id_uso: string;
+  imagenRuta: string;
+  id_marca: string;
+  id_modelo: string;
+  id_edificio: string;
+  id_ubicacion: string;
+  id_serie: string;
+  observacion: string;
+  mac: string;
+  puertos: string;
+  puerto_ftp: string;
+};
 
   export type ActivoSimpleEditSend = {
     tipo: string;
@@ -64,7 +83,21 @@ export type ActivoComputadoraEdit = {
     imagenRuta: string | null;
     id_ubicacion: string;
     id_serie: string;
+    id_lampara: string;
     observacion: string;
+  };
+
+  export type ActivoRedEditSend = {
+    tipo: string;
+    inventario: string;
+    id_usuario: string;
+    imagenRuta: string | null;
+    id_ubicacion: string;
+    id_serie: string;
+    observacion: string;
+    mac: string;
+    puertos: string;
+    puerto_ftp: string;
   };
 
 export type ActivoComputadoraData = {
@@ -90,9 +123,23 @@ export type ActivoComputadoraData = {
     tipo: string;
     inventario: string;
     serie: number;     
+    idLampara: number;
     idUbicacion: number;
     idUsuario: number;
     imagenRuta: string;
     observacion: string;
+  };
+
+  export type ActivoRedData = {
+    tipo: string;
+    inventario: string;
+    serie: number;     
+    idUbicacion: number;
+    idUsuario: number;
+    imagenRuta: string;
+    observacion: string;
+    mac: string;
+    puertos: string;
+    puerto_ftp: string;
   };
   

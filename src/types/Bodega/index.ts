@@ -41,14 +41,39 @@ export type BodegaSimpleEdit = {
   id_marca: string;
   id_modelo: string;
   id_serie: string;
+  id_lampara: string;
   observacion: string;
+};
+
+export type BodegaRedEdit = {
+  id_equipo: string;
+  id_periferico: string;
+  inventario: string;
+  id_marca: string;
+  id_modelo: string;
+  id_serie: string;
+  observacion: string;
+  mac: string;
+  puertos: string;
+  puerto_ftp: string;
 };
 
 export type BodegaSimpleEditSend = {
   tipo: string;
   inventario: string;
   id_serie: string;
+  id_lampara: string;
   observacion: string;
+};
+
+export type BodegaRedEditSend = {
+  tipo: string;
+  inventario: string;
+  id_serie: string;
+  observacion: string;
+  mac: string;
+  puertos: string;
+  puerto_ftp: string;
 };
 
 export type BodegaComputadoraData = {
@@ -71,6 +96,17 @@ export type BodegaComputadoraData = {
     tipo: string;
     inventario: string;
     serie: number;
+    idLampara: number;
     observacion: string;
+  };
+
+  export type BodegarRedData = {
+    tipo: string;
+    inventario: string;
+    serie: number;
+    observacion: string;
+    mac: string;
+    puertos: string;
+    puerto_ftp: string;
   };
   
