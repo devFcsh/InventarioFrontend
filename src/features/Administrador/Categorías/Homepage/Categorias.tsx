@@ -18,6 +18,7 @@ const categorias = [
   "Marca",
   "Modelo",
   "Serie",
+  "Lampara",
   "Edificio",
   "Ubicación",
   "Sistema Operativo",
@@ -44,6 +45,8 @@ const itemsData = [
   { id: 13, categoria: "Disco" },
   { id: 14, categoria: "Procesador" },
   { id: 15, categoria: "Versión Office" },
+  { id: 16, categoria: "Lampara" },
+
 ];
 
 const Categorias = () => {

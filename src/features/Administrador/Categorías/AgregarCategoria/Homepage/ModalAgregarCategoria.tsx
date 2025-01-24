@@ -22,13 +22,14 @@ import { useAgregarProcesador } from "../hooks/useAgregarProcesador";
 import useEdificios from "@hooks/useEdificios";
 import { Edificio, Marca, Modelo, Periferico, SistemaOperativo } from "../../../../../types";
 import useSistemasOperativos from "@hooks/useSistemasOperativos";
-import useMarcas from "@hooks/useMarcas";
 import usePerifericos from "@hooks/usePerifericos";
-import useModelos from "@hooks/useModelos";
 import { useAgregarMarca } from "../hooks/useAgregarMarca";
 import { useAgregarModelo } from "../hooks/useAgregarModelo";
 import { useAgregarSerie } from "../hooks/useAgregarSerie";
 import { useAgregarUbicacion } from "../hooks/useAgregarUbicacion";
+import { useAgregarLampara } from "../hooks/useAgregarLampara";
+import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
+import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
 
 interface ModalAgregarCategoriaProps {
   open: boolean;
@@ -57,12 +58,17 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   const [capacidad, setCapacidad] = useState("");
   const [newOption, setNewOption] = useState<string>("");
 
-  const { modelos } = useModelos();
-  const { perifericos } = usePerifericos();
-  const { marcas } = useMarcas();
+  const { perifericos } = usePerifericos(); 
   const { edificios } = useEdificios();
   const { sistemasOperativos } = useSistemasOperativos();
 
+  const { marcas } = useMarcasPorPeriferico(selectedPeriferico?.id_periferico ?? "");
+  const { modelos } = useModelosPorMarcaPeriferico(
+  selectedMarca?.id_marca ?? "",
+  selectedPeriferico?.id_periferico ?? ""
+);
+
+  const { agregarLampara } = useAgregarLampara();
   const { agregarUso } = useAgregarUso();
   const { agregarDominio } = useAgregarDominio();
   const { agregarPeriferico } = useAgregarPeriferico();
@@ -108,6 +114,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
         return agregarModelo;
       case "Serie":
         return agregarSerie;
+      case "Lampara":
+        return agregarLampara;
       default:
         return null;
     }
@@ -134,31 +142,25 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
     }
 
     if (
-      !selectedSO?.id_sistemaoperativo.trim() && selectedCategoria === "Versión SO" ) {
+      !selectedSO?.id_sistemaoperativo && selectedCategoria === "Versión SO" ) {
       setError("Por favor, ingrese una opción válida.");
       return;
     }
 
     if (
-      !selectedEdificio?.id_edificio.trim() && selectedCategoria === "Ubicación" ) {
+      !selectedEdificio?.id_edificio && selectedCategoria === "Ubicación" ) {
       setError("Por favor, ingrese una opción válida.");
       return;
     }
 
     if (
-      !selectedPeriferico?.id_periferico.trim() && selectedCategoria === "Periférico" ) {
+      !selectedMarca?.id_marca && selectedCategoria === "Modelo" ) {
       setError("Por favor, ingrese una opción válida.");
       return;
     }
 
     if (
-      !selectedMarca?.id_marca.trim() && selectedCategoria === "Modelo" ) {
-      setError("Por favor, ingrese una opción válida.");
-      return;
-    }
-
-    if (
-      !selectedModelo?.id_modelo.trim() && selectedCategoria === "Serie" ) {
+      !selectedModelo?.id_modelo && (selectedCategoria === "Serie" || selectedCategoria === "Lampara") ) {
       setError("Por favor, ingrese una opción válida.");
       return;
     }
@@ -236,7 +238,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           edificioId: 0,
           modeloId: 0,
         });
-      } else if (selectedCategoria === "Serie") {
+      } else if (selectedCategoria === "Serie" || selectedCategoria === "Lampara") {
         result = await agregarFunc({
           nombre: newOption,
           modeloId: Number(selectedModelo?.id_modelo),
@@ -276,6 +278,15 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
       setSelectedModelo(null);
     }
   }, [open]);
+
+  const handleMarcaChange = (_, newMarca) => {
+    setSelectedMarca(newMarca);
+    setSelectedModelo(null); // Resetear el modelo cuando cambia la marca
+  };
+
+  const handleModeloChange = (_, newModelo) => {
+    setSelectedModelo(newModelo);
+  };
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -407,23 +418,18 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           </Box>
         ) : selectedCategoria === "Modelo" ? (
           <Box className="flex flex-col mt-2 gap-3">
-          <Autocomplete
+         <Autocomplete
               size="small"
               disablePortal
               options={perifericos}
               getOptionLabel={(option) => option?.nombre || ""}
-              value={selectedPeriferico}
               onChange={(_, newValue) => {
                 setSelectedPeriferico(newValue);
                 setSelectedMarca(null);
+                setSelectedModelo(null);
               }}
               renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Periférico"
-                  variant="outlined"
-                  fullWidth
-                />
+                <TextField {...params} label="Periférico" variant="outlined" fullWidth />
               )}
             />
             <Autocomplete
@@ -432,16 +438,9 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               options={marcas}
               getOptionLabel={(option) => option?.nombre || ""}
               value={selectedMarca}
-              onChange={(_, newValue) => {
-                setSelectedMarca(newValue);
-              }}
+              onChange={handleMarcaChange}
               renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Marca"
-                  variant="outlined"
-                  fullWidth
-                />
+                <TextField {...params} label="Marca" variant="outlined" fullWidth />
               )}
               disabled={!selectedPeriferico}
             />
@@ -453,27 +452,20 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               onChange={(e) => setNewOption(e.target.value)}
             />
           </Box>
-        ) : selectedCategoria === "Serie" ? (
+        ) : selectedCategoria === "Serie" || selectedCategoria === "Lampara" ? (
           <Box className="flex flex-col mt-2 gap-3">
            <Autocomplete
               size="small"
               disablePortal
               options={perifericos}
               getOptionLabel={(option) => option?.nombre || ""}
-              value={selectedPeriferico}
               onChange={(_, newValue) => {
                 setSelectedPeriferico(newValue);
                 setSelectedMarca(null);
                 setSelectedModelo(null);
-
               }}
               renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Periférico"
-                  variant="outlined"
-                  fullWidth
-                />
+                <TextField {...params} label="Periférico" variant="outlined" fullWidth />
               )}
             />
             <Autocomplete
@@ -482,16 +474,9 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               options={marcas}
               getOptionLabel={(option) => option?.nombre || ""}
               value={selectedMarca}
-              onChange={(_, newValue) => {
-                setSelectedMarca(newValue);
-              }}
+              onChange={handleMarcaChange}
               renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Marca"
-                  variant="outlined"
-                  fullWidth
-                />
+                <TextField {...params} label="Marca" variant="outlined" fullWidth />
               )}
               disabled={!selectedPeriferico}
             />
@@ -501,19 +486,14 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               options={modelos}
               getOptionLabel={(option) => option?.nombre || ""}
               value={selectedModelo}
-              onChange={(_, newValue) => setSelectedModelo(newValue)}
+              onChange={handleModeloChange}
               renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Modelo"
-                  variant="outlined"
-                  fullWidth
-                />
+                <TextField {...params} label="Modelo" variant="outlined" fullWidth />
               )}
-              disabled={!selectedPeriferico && !selectedMarca}
+              disabled={!selectedMarca}
             />
             <TextField
-              label="Nombre de Serie"
+              label={selectedCategoria === "Serie" ? "Nombre de Serie" : "Nombre de Lampara"}
               variant="outlined"
               fullWidth
               value={newOption}

@@ -30,6 +30,7 @@ import {
   Dominio,
   Procesador,
   RAM,
+  Lampara,
 } from "../../../../../types/index";
 import { useEditarDominio } from "../../AgregarCategoria/hooks/useEditarDominio";
 import { useEditarPeriferico } from "../../AgregarCategoria/hooks/useEditarPeriferico";
@@ -58,6 +59,9 @@ import { useEliminarProcesador } from "../../AgregarCategoria/hooks/useEliminarP
 import { useEliminarVersionOffice } from "../../AgregarCategoria/hooks/useEliminarVersionOffice";
 import { useEliminarModelo } from "../../AgregarCategoria/hooks/useEliminarModelo";
 import { useNavigate } from "react-router-dom";
+import useLamparas from "@hooks/useLamparas";
+import { useEditarLampara } from "../../AgregarCategoria/hooks/useEditarLampara";
+import { useEliminarLampara } from "../../AgregarCategoria/hooks/useEliminarLampara";
 
 type Opcion =
   | Uso
@@ -66,6 +70,7 @@ type Opcion =
   | Modelo
   | Periferico
   | Serie
+  | Lampara
   | Dominio
   | Edificio
   | Ubicacion
@@ -100,6 +105,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const { modelos } = useModelos();
   const { perifericos } = usePerifericos();
   const { series } = useSeries();
+  const { lamparas } = useLamparas();
   const { edificios } = useEdificios();
   const { sistemasOperativos } = useSistemasOperativos();
   const { ubicaciones } = useUbicacionesCompletas();
@@ -116,6 +122,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const { editarMarca } = useEditarMarca();
   const { editarModelo } = useEditarModelo();
   const { editarSerie } = useEditarSerie();
+  const { editarLampara } = useEditarLampara();
   const { editarSistemaOperativo } = useEditarSistemaOperativo();
   const { editarEdificio } = useEditarEdificio();
   const { editarUbicacion } = useEditarUbicacion();
@@ -130,6 +137,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const { eliminarMarca } = useEliminarMarca();
   const { eliminarModelo } = useEliminarModelo();
   const { eliminarSerie } = useEliminarSerie();
+  const { eliminarLampara } = useEliminarLampara();
   const { eliminarSistemaOperativo } = useEliminarSistemaOperativo();
   const { eliminarEdificio } = useEliminarEdificio();
   const { eliminarUbicacion } = useEliminarUbicacion();
@@ -154,6 +162,8 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
       ? modelos
       : selectedCategoria === "Serie"
       ? series
+      : selectedCategoria === "Lampara"
+      ? lamparas
       : selectedCategoria === "Periférico"
       ? perifericos
       : selectedCategoria === "Edificio"
@@ -223,6 +233,12 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
           case "Serie":
             editarSerie({
               id_serie: selectedOption.id_serie,
+              nuevoNombre: editedValue,
+            });
+            break;
+            case "Lampara":
+            editarLampara({
+              id_lampara: selectedOption.id_lampara,
               nuevoNombre: editedValue,
             });
             break;
@@ -335,6 +351,9 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
           case "Versión Office":
             await eliminarVersionOffice(elemento.id_versionoffice);
             break;
+            case "Lampara":
+              await eliminarLampara(elemento.id_lampara);
+              break;
           default:
             console.log(
               `No hay función para eliminar la categoría ${selectedCategoria}`
