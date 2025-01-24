@@ -215,6 +215,7 @@ const AgregarComputadoraActivo = ({
       idUbicacion: Number(selectedUbicacion?.id_ubicacion) ?? 0,
       idUsuario: parseInt(idUsuario, 10),
       imagenRuta: imagePath,
+      observacion: "",
     };
 
     try {

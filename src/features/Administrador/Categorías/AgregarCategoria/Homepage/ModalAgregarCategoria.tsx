@@ -279,13 +279,15 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
     }
   }, [open]);
 
-  const handleMarcaChange = (_, newMarca) => {
-    setSelectedMarca(newMarca);
-    setSelectedModelo(null); // Resetear el modelo cuando cambia la marca
+  const handleMarcaChange = (_event: React.SyntheticEvent<Element, Event>,
+    newValue: Marca | null) => {
+    setSelectedMarca(newValue);
+    setSelectedModelo(null);
   };
 
-  const handleModeloChange = (_, newModelo) => {
-    setSelectedModelo(newModelo);
+  const handleModeloChange = (_event: React.SyntheticEvent<Element, Event>,
+    newValue: Modelo | null) => {
+    setSelectedModelo(newValue);
   };
 
   return (
