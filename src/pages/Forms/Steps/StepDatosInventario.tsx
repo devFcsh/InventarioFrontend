@@ -11,7 +11,6 @@ import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferic
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import useUbicaciones from "@hooks/useUbicaciones";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
-import Textarea from '@mui/joy/Textarea';
 
 interface StepDatosInventarioProps {
   periferico: string;
