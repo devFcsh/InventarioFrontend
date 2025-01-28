@@ -1,6 +1,7 @@
 import { Box, TextField } from "@mui/material";
 
 interface StepInformacionGeneralProps {
+  periferico:string;
   informacionGeneralDataSAPForm: any;
   handleInformacionGeneralSAPChange: any;
   informacionGeneralSAPErrors: any;
@@ -8,6 +9,7 @@ interface StepInformacionGeneralProps {
 }
 
 export const StepInformacionGeneralSAP = ({
+  periferico,
   informacionGeneralDataSAPForm,
   handleInformacionGeneralSAPChange,
   informacionGeneralSAPErrors,
@@ -36,6 +38,8 @@ export const StepInformacionGeneralSAP = ({
               handleUniqueInformacionGeneralError("mac", e.target.value);
             }}
           />
+          {periferico!=="AP"?
+          <>
           <TextField
             label="Puertos"
             placeholder="Puertos"
@@ -72,6 +76,10 @@ export const StepInformacionGeneralSAP = ({
               handleUniqueInformacionGeneralError("puertoFTP", e.target.value);
             }}
           />
+          </>
+            
+          :""}
+          
         </div>
       </div>
     </Box>
