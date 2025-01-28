@@ -80,7 +80,7 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
       return;
     }
     
-    if(selectedPeriferico?.nombre!=="Switch" && selectedPeriferico?.nombre!=="AP"){
+    if(selectedPeriferico?.nombre!=="Switch" && selectedPeriferico?.nombre!=="AP" && selectedPeriferico?.nombre!=="Proyector"){
         if (!selectedUso) {
           setErrors({
             ...errors,
@@ -115,7 +115,7 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
           "Información general",
           "Cargar imagen"
         ];
-        state = { periferico: selectedPeriferico, perifericos, tipoInventario: "activo", steps, edificio: selectedEdificio, uso: selectedUso };
+        state = { periferico: selectedPeriferico, perifericos, tipoInventario: "activo", steps, edificio: selectedEdificio };
         navigate('/FormSAP', { state });
     }else {
       steps = [
@@ -187,7 +187,7 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
                 )}
               />
               {
-                selectedPeriferico?.nombre !== 'Switch' && selectedPeriferico?.nombre !== "AP"?
+                selectedPeriferico?.nombre !== 'Switch' && selectedPeriferico?.nombre !== "AP" && selectedPeriferico?.nombre !== "Proyector"?
                 <Autocomplete
                 size="small"
                 disablePortal
