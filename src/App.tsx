@@ -11,8 +11,9 @@ import Categorias from "./features/Administrador/Categorías/Homepage/Categorias
 import AgregarActivo from "./pages/AgregarActivo";
 import EditarActivo from "./pages/EditarActivo";
 import {EditarBodega} from "./pages/EditarBodega";
-import {FormLC} from "./pages/Forms/FormLC"
-import {FormPMTM} from "./pages/Forms/FormPMTM"
+import {FormLC} from "./pages/Forms/FormLC";
+import {FormPMTM} from "./pages/Forms/FormPMTM";
+import {FormSAP} from "./pages/Forms/FormSAP";
 import AgregarUsuario from "./features/Administrador/Usuarios/AgregarUsuario/Homepage/AgregarUsuario";
 import EditarUsuario from "./features/Administrador/Usuarios/EditarUsuario/Homepage/EditarUsuario";
 
@@ -97,6 +98,17 @@ const App: React.FC = () => {
               setCurrentSection={setCurrentSection}
             >
               <FormLC />
+            </Layout>
+          }
+        />
+        <Route
+          path="/FormSAP"
+          element={
+            <Layout
+              currentSection={currentSection}
+              setCurrentSection={setCurrentSection}
+            >
+              <FormSAP />
             </Layout>
           }
         />

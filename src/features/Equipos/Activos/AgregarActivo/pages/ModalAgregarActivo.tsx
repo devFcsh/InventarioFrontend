@@ -79,12 +79,19 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
       });
       return;
     }
-    if (!selectedUso) {
+    if(selectedPeriferico?.nombre!=="Switch"){
+        if (!selectedUso) {
+          setErrors({
+            ...errors,
+            usoError: "Por favor seleccionar el uso antes de continuar"
+          });
+          return;
+        }
+    }else{
       setErrors({
         ...errors,
-        usoError: "Por favor seleccionar el uso antes de continuar"
+        usoError: ""
       });
-      return;
     }
     setErrors({
       perifericoError: "",
@@ -101,7 +108,15 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
       ];
       state = { periferico: selectedPeriferico, perifericos, tipoInventario: "activo", steps, edificio: selectedEdificio, uso: selectedUso };
       navigate('/FormLC', { state });
-    } else {
+    } else if(selectedPeriferico.nombre === 'Switch' || selectedPeriferico.nombre === 'AP'){
+        steps = [
+          "Datos de inventario",
+          "Información general",
+          "Cargar imagen"
+        ];
+        state = { periferico: selectedPeriferico, perifericos, tipoInventario: "activo", steps, edificio: selectedEdificio, uso: selectedUso };
+        navigate('/FormSAP', { state });
+    }else {
       steps = [
         "Datos de inventario",
         "Cargar imagen",
@@ -170,7 +185,9 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
                   />
                 )}
               />
-              <Autocomplete
+              {
+                selectedPeriferico?.nombre !== 'Switch'?
+                <Autocomplete
                 size="small"
                 disablePortal
                 options={usos}
@@ -189,7 +206,10 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
                   />
                 )}
               />
-            </>
+
+                :""
+              }
+              </>
           )}
         </Box>
       </DialogContent>
