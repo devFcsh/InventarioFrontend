@@ -12,7 +12,7 @@ import {useCargarImagenErrors,useFormDataCargarImagen} from "./hooks/index.ts"
 import {StepCargarImagen} from "./Steps/StepCargarImagen.tsx"
 export const FormSAP = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(1);
   const location = useLocation();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const selectedPeriferico = location.state?.periferico as
@@ -106,6 +106,7 @@ export const FormSAP = () => {
         
       case 1:
         return <StepInformacionGeneralSAP
+          periferico={selectedPeriferico?.nombre ?? ""}
           informacionGeneralDataSAPForm={informacionGeneralDataSAPForm}
           handleInformacionGeneralSAPChange={handleInformacionGeneralSAPChange}
           informacionGeneralSAPErrors={informacionGeneralSAPErrors}
@@ -136,7 +137,6 @@ export const FormSAP = () => {
   };
   const handleAgregarEquipoActivo = async () => {
     setOpenModalObservation(false);
-    console.log(observation)
     const equipoData = {
       tipo: "activo",
       inventario: inventoryDataSAPForm.inventario || "",
@@ -146,8 +146,8 @@ export const FormSAP = () => {
       imagenRuta: imageData.imagePath,
       observacion: observation,
       mac: informacionGeneralDataSAPForm.mac || "",
-      puertos: informacionGeneralDataSAPForm.puertos || "",
-      puerto_ftp: informacionGeneralDataSAPForm.puertoFTP || "",
+      puertos: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertos,
+      puerto_ftp: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertoFTP,
       idLampara:0,
     };
 

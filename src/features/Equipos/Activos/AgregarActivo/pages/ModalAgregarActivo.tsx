@@ -79,7 +79,8 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
       });
       return;
     }
-    if(selectedPeriferico?.nombre!=="Switch"){
+    
+    if(selectedPeriferico?.nombre!=="Switch" && selectedPeriferico?.nombre!=="AP"){
         if (!selectedUso) {
           setErrors({
             ...errors,
@@ -186,7 +187,7 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
                 )}
               />
               {
-                selectedPeriferico?.nombre !== 'Switch'?
+                selectedPeriferico?.nombre !== 'Switch' && selectedPeriferico?.nombre !== "AP"?
                 <Autocomplete
                 size="small"
                 disablePortal
