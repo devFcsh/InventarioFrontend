@@ -17,6 +17,7 @@ import useMarcas from "@hooks/useMarcas.ts";
 import useModelos from "@hooks/useModelos.ts";
 import useSeries from "@hooks/useSeries.ts";
 import { useInventario } from "@hooks/useInventario.ts";
+import { usePasarActivoABodega } from "../hooks/usePasarActivoABodega.ts";
 
 
 const Activos = () => {
@@ -58,11 +59,12 @@ const Activos = () => {
 
   const { perifericos } = usePerifericos();
   const { edificios } = useEdificios();
-  const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
+  const { usos } = useUsos();
   const { marcas } = useMarcas();
   const { modelos } = useModelos();
   const { series } = useSeries();
   const { inventarios } = useInventario();
+  const { pasarActivoABodega } = usePasarActivoABodega();
 
   const location = useLocation();
   const filtros = {
@@ -140,6 +142,25 @@ const Activos = () => {
     }
   };
 
+  const pasarABodegaEquipo = async (equipoId: string) => {
+    if (equipoId) {
+      pasarActivoABodega(equipoId);
+      setShouldFetch(true);
+    }
+  };
+
+  const pasarABodegaEquipos = async (equipoIds: string[]) => {
+    try {
+      for (const id of equipoIds) {
+        await pasarActivoABodega(id);
+      }
+      setShouldFetch(true);
+      setSelectedItems([]);
+    } catch (error) {
+      console.error("Error al pasar a bodega los equipos", error);
+    }
+  };
+
   const bajaEquipo = async (equipoId: string) => {
     if (equipoId) {
       try {
@@ -155,7 +176,7 @@ const Activos = () => {
   const bajaEquipos = async (equipoIds: string[]) => {
     try {
       for (const id of equipoIds) {
-        await darDeBajaEquipo(id);
+        await darDeBajaEquipo(id, "baja");
       }
       setShouldFetch(true);
       setSelectedItems([]);
@@ -163,6 +184,27 @@ const Activos = () => {
       console.error("Error al dar de baja los equipos", error);
     }
   };
+
+  const handlePasarABodega = () => {
+    if (selectedItems.length === 0) {
+      console.log("Debe seleccionar al menos un elemento");
+      return;
+    }
+
+    setModalContent({
+      title: "Pasar a Bodega Equipos",
+      message:
+        "¿Estás seguro de que pasar a bodega los equipos seleccionados?",
+    });
+
+    setConfirmAction(() => async () => {
+      await pasarABodegaEquipos(selectedItems);
+      setOpenModal(false);
+    });
+
+    setOpenModal(true);
+  };
+
 
   const handleDelete = () => {
     if (selectedItems.length === 0) {
@@ -491,6 +533,13 @@ const Activos = () => {
                         onClick={handleBaja}
                         className="cursor-pointer"
                       />
+                      <Icon
+                        icon="lucide:warehouse"
+                        width="20"
+                        height="20"
+                        onClick={handlePasarABodega}
+                        className="cursor-pointer"
+                      />
                     </>
                   )}
                 </th>
@@ -573,7 +622,6 @@ const Activos = () => {
                       }
                       className="cursor-pointer"
                     />
-                    
                     <Link
                       to="/editarActivo"
                       state={{ equipoId: equipo.id_equipo, perifericos,equipoName: equipo.periferico }}
@@ -585,6 +633,20 @@ const Activos = () => {
                         className="cursor-pointer"
                       />
                     </Link>
+                      <Icon
+                        icon="lucide:warehouse"
+                        width="25"
+                        height="25"
+                        className="cursor-pointer"
+                        onClick={() =>
+                          handleOpenModal(
+                            equipo.id_equipo,
+                            "Pasar equipo a bodeg",
+                            `¿Estás seguro de que deseas pasar el equipo a bodega ${equipo.id_equipo}?`,
+                            pasarABodegaEquipo
+                          )
+                        }
+                      />
                   </td>
                 </tr>
               ))}
