@@ -1,7 +1,9 @@
 import { TextField, Box, Autocomplete, FormHelperText } from "@mui/material";
 import {
+  Lampara,
   Marca,
   Modelo,
+  Periferico,
   Serie,
   Ubicacion,
   Usuario,
@@ -11,9 +13,10 @@ import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferic
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import useUbicaciones from "@hooks/useUbicaciones";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
+import useLamparas from "@hooks/useLamparas";
 
 interface StepDatosInventarioProps {
-  periferico: string;
+  periferico: Periferico;
   uso: string;
   edificio:string;
   inventoryDataForm:any;
@@ -38,14 +41,17 @@ export const StepDatosInventario = ({
     loading: loadingUsuarios,
     error: errorUsuarios,
   } = useUsuariosPorUso(uso || "");
+  
 
-  const { marcas } = useMarcasPorPeriferico(periferico);
+  const { marcas } = useMarcasPorPeriferico(periferico?.id_periferico ?? "");
+  const { lamparas } = useLamparas();
+  console.log(lamparas)
   const { modelos } = useModelosPorMarcaPeriferico(
     inventoryDataForm.marca?.id_marca ?? "",
-    periferico
+    periferico?.id_periferico ?? ""
   );
   const { series } = useSeriesPorModelo(
-    periferico,
+    periferico?.id_periferico ?? "",
     inventoryDataForm.marca?.id_marca ?? "",
     inventoryDataForm.modelo?.id_modelo ?? ""
   );
@@ -56,7 +62,7 @@ export const StepDatosInventario = ({
       <div className="mt-8">
         <div className="grid grid-cols-2 gap-4">
         
-        {tipoInventario==="activo"?
+        {tipoInventario==="activo" && periferico?.nombre!=="Proyector"?
                   <Autocomplete
                   size="small"
                   disablePortal
@@ -80,7 +86,30 @@ export const StepDatosInventario = ({
                       fullWidth
                     />
                   )}
-                />:""}
+        />:""}
+        {periferico?.nombre==="Proyector"?
+        <Autocomplete
+        size="small"
+        disablePortal
+        options={lamparas}
+        value={inventoryDataForm.lampara}
+        onChange={(_, newValue: Lampara | null) => {
+          handleInventoryChange("lampara", newValue);
+          handleUniqueInventarioError("lampara",newValue,inventoryDataForm);
+        }}
+        getOptionLabel={(option) => option ? option.nombre : ""}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Lámpara"
+            variant="outlined"
+            error={!!inventoryErrors.lampara}
+            helperText={inventoryErrors.usuario? "Por favor seleccionar una lámpara" :""}
+            fullWidth
+          />
+        )}
+/>:""
+        }
 
 
           <Autocomplete

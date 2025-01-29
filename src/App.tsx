@@ -112,7 +112,7 @@ const App: React.FC = () => {
             </Layout>
           }
         />
-        {
+        
         <Route
           path="/FormPMTM"
           element={
@@ -124,7 +124,7 @@ const App: React.FC = () => {
             </Layout>
           }
         />
-        }
+
         <Route
           path="/editarActivo"
           element={

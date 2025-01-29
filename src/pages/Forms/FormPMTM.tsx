@@ -104,7 +104,7 @@ export const FormPMTM = () => {
     switch (stepIndex) {
       case 0:
         return <StepDatosInventario
-          periferico={selectedPeriferico?.id_periferico ?? ""}
+          periferico={selectedPeriferico}
           uso={selectedUso?.id_uso ?? ""}
           edificio={selectedEdificio?.id_edificio ?? ""}
           inventoryDataForm={inventoryDataForm}
