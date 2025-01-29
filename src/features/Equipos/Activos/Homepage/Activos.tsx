@@ -641,7 +641,7 @@ const Activos = () => {
                         onClick={() =>
                           handleOpenModal(
                             equipo.id_equipo,
-                            "Pasar equipo a bodeg",
+                            "Pasar equipo a bodega",
                             `¿Estás seguro de que deseas pasar el equipo a bodega ${equipo.id_equipo}?`,
                             pasarABodegaEquipo
                           )
