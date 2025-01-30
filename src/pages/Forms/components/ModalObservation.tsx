@@ -4,7 +4,7 @@ import { useState } from 'react';
 interface ModalProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: (observation: string) => void; // Modificamos para pasar la observación directamente
+  onConfirm: (observation: string) => void;
   title?: string;
   message?: string;
 }
@@ -30,9 +30,9 @@ export const ModalObservation: React.FC<ModalProps> = ({
 
   const handleConfirm = () => {
     if (addObservation && newObservation.length <= 200) {
-      onConfirm(newObservation); // Pasamos la observación directamente
+      onConfirm(newObservation);
     } else if (!addObservation) {
-      onConfirm(""); // Si no hay observación, pasamos string vacío
+      onConfirm("");
     } else {
       setErrorMensajeComponente("La observación no puede tener más de 200 caracteres.");
     }

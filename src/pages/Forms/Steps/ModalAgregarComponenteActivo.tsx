@@ -13,7 +13,7 @@ import { useState } from "react";
 import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import { Componente } from "../../../types/Activo/Componente/index.ts";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
-import { Marca, Modelo, Serie, Periferico, Inventario } from "../../../types/index.ts";
+import { Marca, Modelo, Serie, Periferico} from "../../../types/index.ts";
 import { useErrorsComponents } from '../hooks/useErrorsComponents.ts';
 
 interface ModalProps {

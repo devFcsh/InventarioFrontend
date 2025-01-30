@@ -38,6 +38,7 @@ import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 import useProcesadores from "@hooks/useProcesadores";
 import {validateIP} from "../../../../../pages/Forms/helpers/validateIP.ts"
+import { validateInventario } from "@pages/Forms/helpers/validateInventario.ts";
 
 interface EditarComputadoraActivoProps {
   equipo: ActivoComputadoraEdit;
@@ -68,7 +69,6 @@ const EditarComputadoraActivo = ({
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  
 
   const navigate = useNavigate();
   const [selectedRAM, setSelectedRAM] = useState<RAM | null>(null);
@@ -98,6 +98,14 @@ const EditarComputadoraActivo = ({
     serie: null,
     inventario: "",
   });
+  const [newObservation, setNewObservation] = useState<string>("");
+  const [errorMensajeComponente, setErrorMensajeComponente] = useState<string | null>(null);
+  const [empresa, setEmpresa] = useState<string | null>("");
+  const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
+  const [empresaNuevoComponente, setEmpresaNuevoComponente] = useState<string | null>("");
+  const [errorEmpresaNuevoComponente, setErrorEmpresaNuevoComponente] = useState<boolean>(false);
+  const [errorInventario, setErrorInventario] = useState<boolean>(false);
+  const [errorNuevoComponenteInventario, setErrorNuevoComponenteInventario] = useState<boolean>(false);
 
   const { uploadImage } = useSubirImagen();
   const { marcas } = useMarcasPorPeriferico(equipo?.id_periferico ?? "");
@@ -200,6 +208,8 @@ const EditarComputadoraActivo = ({
       setNombreEquipo(equipo.nombre_equipo);
       setDireccionIP(equipo.direccion_ip);
       setProtocolo(equipo.direccion_ip ? "0" : "1");
+      setNewObservation(equipo.observacion);
+      equipo.inventario.length===10?setEmpresa("EspolTech"):setEmpresa("Espol")
     }
   }, [equipo, marcas, modelos, series, ram, discos,procesadores, dominios, versionesOffice]);
 
@@ -246,7 +256,7 @@ const EditarComputadoraActivo = ({
     }
   };
 
-  const handleEditEquipo = async () => {
+  const handleEditEquipo = async (observationValue: string) => {
     let nuevaImagen = currentImagePath;
     
     if (image) {
@@ -274,6 +284,7 @@ const EditarComputadoraActivo = ({
       id_usuario: idUsuario ?? "",
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
       imagenRuta: image ? nuevaImagen : "",
+      observacion: observationValue
     };
     try {
       await editarActivo(equipo.id_equipo, payload);
@@ -310,7 +321,7 @@ const EditarComputadoraActivo = ({
 
   const handleModalConfirmEditar = async () => {
     setOpenModalEditar(false);
-    await handleEditEquipo();
+    await handleEditEquipo(newObservation);
   };
 
   const handleCancelar = () => {
@@ -356,6 +367,59 @@ const EditarComputadoraActivo = ({
     }else{
       setErrorDireccionIP(false);
       setDireccionIP("")
+    }
+  }
+
+  const handleObservation = (newObservation :string)=>{
+    setNewObservation(newObservation);
+    if(!(newObservation.length <= 200)){
+      setErrorMensajeComponente("La observación no puede tener más de 200 caracteres.");
+    }else{
+      setErrorMensajeComponente("");
+    }
+  }
+  const handleChangeEmpresa = (newEmpresa :string | null)=>{
+    setEmpresa(newEmpresa);
+    if(newEmpresa===null){
+      setErrorEmpresa(true);
+      setSelectedInventarioInv("")
+      setErrorInventario(true)
+    }else{
+      setErrorEmpresa(false);
+      !validateInventario(selectedInventarioInv,newEmpresa)?setErrorInventario(true):setErrorInventario(false)
+    }
+  }
+  const handleChangeEmpresaNuevoComponente = (newEmpresaNuevoComponente :string | null)=>{
+    setEmpresaNuevoComponente(newEmpresaNuevoComponente);
+    if(newEmpresaNuevoComponente===null){
+      setErrorEmpresaNuevoComponente(true);
+      setNuevoComponente({
+        ...nuevoComponente,
+        inventario: "",
+      })
+      setErrorNuevoComponenteInventario(true);
+    }else{
+      setErrorEmpresaNuevoComponente(false);
+      !validateInventario(nuevoComponente.inventario,newEmpresaNuevoComponente)?setErrorNuevoComponenteInventario(true):setErrorNuevoComponenteInventario(false)
+    }
+  }
+  const handleChangeInventario = (inventario :string)=>{
+    setSelectedInventarioInv(inventario)
+    if(empresa==="Espol"){
+      !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
+    }else if(empresa==="EspolTech"){
+      !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
+    }
+  }
+  const handleChangeNuevoComponenteInventario = (nuevoComponenteInventario :string)=>{
+    setNuevoComponente({
+      ...nuevoComponente,
+      inventario: nuevoComponenteInventario,
+    })
+    if(empresaNuevoComponente==="Espol"){
+      !validateInventario(nuevoComponenteInventario?nuevoComponenteInventario:"",empresaNuevoComponente)?setErrorNuevoComponenteInventario(true):setErrorNuevoComponenteInventario(false)
+    }else if(empresaNuevoComponente==="EspolTech"){
+      !validateInventario(nuevoComponenteInventario?nuevoComponenteInventario:"",empresaNuevoComponente)?setErrorNuevoComponenteInventario(true):setErrorNuevoComponenteInventario(false)
     }
   }
 
@@ -432,14 +496,50 @@ const EditarComputadoraActivo = ({
           )}
           disabled
         />
-        <TextField
-          label="Inventario"
-          variant="outlined"
-          fullWidth
-          size="small"
-          value={selectedInventarioInv}
-          onChange={(e) => setSelectedInventarioInv(e.target.value)}
-        />
+                  <Box
+            sx={{
+              display: "inline-flex",
+            }}
+          >
+            <Autocomplete
+              size="small"
+              disablePortal
+              sx={{ width: "50%" }}
+              options={["Espol","EspolTech"]}
+              getOptionLabel={(option) => (option ? option : "")}
+              value={empresa}
+              onChange={(event, newValue) => {
+                handleChangeEmpresa(newValue);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Empresa"
+                  variant="outlined"
+                  error={!!errorEmpresa}
+                  helperText={
+                    errorEmpresa
+                      ? "Por favor seleccionar una empresa"
+                      : ""
+                  }
+                  fullWidth
+                  sx={{ marginRight: 8, width: "100%" }}
+                />
+              )}
+            />
+          <TextField
+            label="Inventario"
+            placeholder="Inventario"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={selectedInventarioInv}
+            error={!!errorInventario}
+            helperText={errorInventario? "Por favor escribir un inventario válido" :""}
+            onChange={(e) => handleChangeInventario(e.target.value)}
+            disabled={empresa === ""}
+          />
+        </Box>
       </div>
 
       <h2 className="text-xl font-semibold mb-5">Información General</h2>
@@ -793,20 +893,51 @@ const EditarComputadoraActivo = ({
               )}
               disabled={!nuevoComponente.modelo}
             />
-            <TextField
-              label="Inventario"
-              placeholder="Inventario"
-              variant="outlined"
-              fullWidth
+             <Box
+            sx={{
+              display: "inline-flex",
+            }}
+          >
+            <Autocomplete
               size="small"
-              value={nuevoComponente.inventario}
-              onChange={(e) =>
-                setNuevoComponente({
-                  ...nuevoComponente,
-                  inventario: e.target.value,
-                })
-              }
+              disablePortal
+              sx={{ width: "50%" }}
+              options={["Espol","EspolTech"]}
+              getOptionLabel={(option) => (option ? option : "")}
+              value={empresaNuevoComponente}
+              onChange={(event, newValue) => {
+                handleChangeEmpresaNuevoComponente(newValue);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Empresa"
+                  variant="outlined"
+                  error={!!errorEmpresaNuevoComponente}
+                  helperText={
+                    errorEmpresaNuevoComponente
+                      ? "Por favor seleccionar una empresa"
+                      : ""
+                  }
+                  fullWidth
+                  sx={{ marginRight: 8, width: "100%" }}
+                />
+              )}
             />
+          <TextField
+            label="Inventario"
+            placeholder="Inventario"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={nuevoComponente.inventario}
+            error={!!errorNuevoComponenteInventario}
+            helperText={errorNuevoComponenteInventario? "Por favor escribir un inventario válido" :""}
+            onChange={(e) => handleChangeNuevoComponenteInventario(e.target.value)}
+            disabled={empresa === ""}
+              
+          />
+        </Box>
             <Button
               variant="contained"
               color="primary"
@@ -817,6 +948,22 @@ const EditarComputadoraActivo = ({
             </Button>
           </div>
         </div>
+      </div>
+      <div>
+        <h2 className="text-xl font-semibold mb-10">Observación</h2>
+        <TextField
+                label="Observación"
+                variant="outlined"
+                fullWidth
+                multiline
+                minRows={4}
+                value={newObservation}
+                onChange={(e) => {
+                  handleObservation(e.target.value)
+                }}
+                error={!!errorMensajeComponente}
+                helperText={errorMensajeComponente}
+          />
       </div>
       <div className="flex gap-4 mt-10">
         <Button

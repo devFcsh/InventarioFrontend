@@ -23,7 +23,6 @@ export const FormSAP = () => {
     | undefined;
   const [openModalObservation, setOpenModalObservation] = useState(false);
   const [observation, setObservation] = useState("")
-  const perifericos = location.state?.perifericos as Periferico[];
   const tipoInventario = location.state?.tipoInventario;
   const steps = location.state?.steps;
   const { agregarRedActivo } = useAgregarRedActivo();
@@ -166,16 +165,14 @@ export const FormSAP = () => {
       tipo: "bodega",
       inventario: inventoryDataSAPForm.inventario || "",
       serie: Number(inventoryDataSAPForm.serie?.id_serie) ?? 0,
-      nombreEquipo: informacionGeneralDataSAPForm.nombreEquipo || "",
-      direccionIp: informacionGeneralDataSAPForm.direccionIP,
-      versionso: Number(informacionGeneralDataSAPForm.versionSO?.id_versionso) ?? 0,
-      versionoffice: Number(informacionGeneralDataSAPForm.versionOffice?.id_versionoffice) ?? 0,
-      ram: Number(informacionGeneralDataSAPForm.ram?.id_ram) ?? 0,
-      disco: Number(informacionGeneralDataSAPForm.disco?.id_disco) ?? 0,
-      procesador: Number(informacionGeneralDataSAPForm.procesador?.id_procesador) ?? 0, 
-      antivirus: Number(informacionGeneralDataSAPForm.antivirus?.id_antivirus) ?? 0,
-      dominio: Number(informacionGeneralDataSAPForm.dominio?.id_dominio) ?? 0, 
-      observacion: observation
+      idUbicacion: Number(inventoryDataSAPForm.ubicacion?.id_ubicacion) ?? 0,
+      idUsuario: 1,
+      imagenRuta: imageData.imagePath,
+      observacion: observationValue,
+      mac: informacionGeneralDataSAPForm.mac || "",
+      puertos: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertos,
+      puerto_ftp: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertoFTP,
+      idLampara:0,
     };
     try {
       const equipoId = await agregarComputadoraBodega(bodegaComputadoraData);
