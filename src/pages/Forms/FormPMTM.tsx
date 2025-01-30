@@ -97,9 +97,7 @@ export const FormPMTM = () => {
       setOpenModalObservation(true);
     }
   };
-  const onAddObservation = (value: string)=>{
-    setObservation(value)
-  }
+
   const renderStepContent = (stepIndex: number) => {
     switch (stepIndex) {
       case 0:
@@ -115,14 +113,16 @@ export const FormPMTM = () => {
       case 1:
         return (
         <>
-          <ModalObservation 
-            open={openModalObservation}
-            onClose={() => setOpenModalObservation(false)}
-            onConfirm={handleAgregarEquipoActivo}
-            title="Agregar observación"
-            message="¿Desea agregar una observación al equipo?"
-            onAddObservation={onAddObservation}
-          />
+        <ModalObservation 
+          open={openModalObservation}
+          onClose={() => setOpenModalObservation(false)}
+          onConfirm={(observationValue) => {
+            setOpenModalObservation(false);
+            handleAgregarEquipoActivo(observationValue);
+          }}
+          title="Agregar observación"
+          message="¿Desea agregar una observación al equipo?"
+        />
           <StepCargarImagen
             imageData={imageData}
             handleImageChange={handleImageChange}
@@ -136,8 +136,7 @@ export const FormPMTM = () => {
     }
   };
 
-  const handleAgregarEquipoActivo = async () => {
-    setOpenModalObservation(false);
+  const handleAgregarEquipoActivo = async (observationValue: string) => {
     const equipoSimpleData = {
       tipo: "activo",
       inventario: inventoryDataForm.inventario || "",
@@ -146,10 +145,10 @@ export const FormPMTM = () => {
       idUsuario: selectedPeriferico?.nombre==="Proyector"?1: parseInt(inventoryDataForm.usuarioId || "", 10),
       imagenRuta: imageData.imagePath,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,
-      observacion: observation
+      observacion: observationValue
     };
     try {
-    if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData)) {
+      if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData)) {
         await agregarSimpleActivo(equipoSimpleData);
         setShowSuccessMessage(true);
         navigate("/activos", { state: { equipoAgregado: true } });
@@ -157,8 +156,7 @@ export const FormPMTM = () => {
     } catch (error) {
       alert("Error al agregar el componente");
     }
-
-  }
+  };
   
   const handleAgregarEquipoBodega = async () => {
     handleInventoryErrors(inventoryDataForm);
@@ -168,7 +166,6 @@ export const FormPMTM = () => {
       serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
       observacion: observation,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,
-
     };
     try {
     if (!Object.values(cargarImagenErrors).includes(true) && completeDatosInventario(inventoryDataForm) &&!error) {
