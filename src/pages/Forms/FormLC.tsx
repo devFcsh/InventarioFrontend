@@ -19,7 +19,7 @@ import { ModalObservation } from "./components/ModalObservation.tsx";
 
 export const FormLC = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(3);
+  const [activeStep, setActiveStep] = useState(0);
   const location = useLocation();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const selectedPeriferico = location.state?.periferico as
@@ -104,7 +104,7 @@ export const FormLC = () => {
       case 0:
         return (
           <StepDatosInventario
-            periferico={selectedPeriferico?.id_periferico ?? ""}
+            periferico={selectedPeriferico}
             uso={selectedUso?.id_uso ?? ""}
             edificio={selectedEdificio?.id_edificio ?? ""}
             inventoryDataForm={inventoryDataForm}
