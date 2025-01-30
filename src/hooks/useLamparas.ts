@@ -3,7 +3,7 @@ import { Lampara } from '../types';
 import clienteAxios from '.';
 
 const useLamparas = () => {
-  const [lamparas, setLamparas] = useState<Lampara[]>([]);
+  const [lamparasTotales, setLamparas] = useState<Lampara[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);  
 
@@ -22,7 +22,7 @@ const useLamparas = () => {
     fetchLamparas();
   }, []);
 
-  return { lamparas, loading, error };
+  return { lamparasTotales, loading, error };
 };
 
 export default useLamparas;

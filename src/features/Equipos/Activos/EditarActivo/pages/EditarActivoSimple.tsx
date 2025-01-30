@@ -19,15 +19,21 @@ import useEditarActivoSimple from "../hooks/useEditarActivoSimple";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario";
+import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
+import useLamparas from "@hooks/useLamparas";
 
 interface EditarActivoSimpleProps {
     equipoSimpleActivo: ActivoSimpleEdit;
     idUsuario: string | null;
+    perifericoName: string;
+    perifericoID: string;
 }
 
 const EditarActivoSimple = ({
-    equipoSimpleActivo,
-  idUsuario
+  perifericoName,
+  perifericoID,
+  equipoSimpleActivo,
+  idUsuario,
 }: EditarActivoSimpleProps) => {
   const [selectedInventarioMarca, setSelectedInventarioMarca] =
     useState<Marca | null>(null);
@@ -69,8 +75,18 @@ const EditarActivoSimple = ({
     selectedInventarioMarca?.id_marca ?? "",
     selectedInventarioModelo?.id_modelo ?? ""
   );
+  const { lamparas } = useLamparasPorModelo(
+    perifericoID,
+    selectedInventarioMarca?.id_marca ?? "",
+    selectedInventarioModelo?.id_modelo ?? ""
+  );
+  console.log(lamparas)
+  console.log(selectedInventarioMarca)
+  console.log(selectedInventarioModelo)
+  const [errorLampara, setErrorLampara] = useState(false);
   
   const { edificios } = useEdificios();
+  const { lamparasTotales } = useLamparas();
   const { ubicaciones } = useUbicaciones(selectedEdificio?.id_edificio ?? "");
   const { editarActivoSimple } = useEditarActivoSimple();
 
@@ -99,6 +115,11 @@ const EditarActivoSimple = ({
       );
       setNewObservation(equipoSimpleActivo.observacion);
       equipoSimpleActivo.inventario.length===10?setEmpresa("EspolTech"):setEmpresa("Espol")
+      setSelectedLampara(
+        lamparasTotales.find(
+          (lampara) => lampara?.id_lampara === equipoSimpleActivo?.id_lampara
+        ) || null
+      )
     }
   }, [equipoSimpleActivo, marcas, modelos, series]);
 
@@ -184,6 +205,14 @@ const EditarActivoSimple = ({
         !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
       }else if(empresa==="EspolTech"){
         !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
+      }
+    }
+    const handleLamparaChange = (lampara :Lampara)=>{
+      setSelectedLampara(lampara)
+      if(lampara===null){
+        setErrorLampara(true)
+      }else{
+        setErrorLampara(false)
       }
     }
 
@@ -325,6 +354,35 @@ const EditarActivoSimple = ({
             disabled={empresa === ""}
           />
         </Box>
+        {perifericoName === "Proyector" ? (
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={lamparas}
+              value={selectedLampara}
+              onChange={(_, newValue: Lampara | null) => {
+                handleLamparaChange(newValue)
+              }}
+              getOptionLabel={(option) => (option ? option.nombre : "")}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Lámpara"
+                  variant="outlined"
+                  error={!!errorLampara}
+                  helperText={
+                    errorLampara
+                      ? "Por favor seleccionar una lámpara"
+                      : ""
+                  }
+                  fullWidth
+                />
+              )}
+              disabled={!selectedInventarioModelo}
+            />
+          ) : (
+            ""
+          )}
       </div>
 
       <h2 className="text-xl font-semibold mb-5">Información General</h2>

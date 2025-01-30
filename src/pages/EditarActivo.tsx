@@ -225,6 +225,8 @@ const EditarActivo = () => {
   
           {perifericoId ? (
             <EditarActivoSimple
+            perifericoName={equipoName}
+            perifericoID={equipoId}
             equipoSimpleActivo={equipoSimpleActivo}
               idUsuario={selectedUsuario?.id_usuario || null}
             />

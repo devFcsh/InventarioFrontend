@@ -202,7 +202,7 @@ export const StepDatosInventario = ({
                   variant="outlined"
                   error={!!inventoryErrors.lampara}
                   helperText={
-                    inventoryErrors.usuario
+                    inventoryErrors.lampara
                       ? "Por favor seleccionar una lámpara"
                       : ""
                   }
