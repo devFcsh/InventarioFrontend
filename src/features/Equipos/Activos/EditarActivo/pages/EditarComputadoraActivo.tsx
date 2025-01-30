@@ -1,5 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Autocomplete, TextField, Button, Snackbar, Alert, Box, FormHelperText } from "@mui/material";
+import {
+  Autocomplete,
+  TextField,
+  Button,
+  Snackbar,
+  Alert,
+  Box,
+  FormHelperText,
+} from "@mui/material";
 import {
   Marca,
   Modelo,
@@ -37,7 +45,7 @@ import { useGestionarComponentes } from "../hooks/useGestionarComponentes";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 import useProcesadores from "@hooks/useProcesadores";
-import {validateIP} from "../../../../../pages/Forms/helpers/validateIP.ts"
+import { validateIP } from "../../../../../pages/Forms/helpers/validateIP.ts";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario.ts";
 
 interface EditarComputadoraActivoProps {
@@ -60,12 +68,15 @@ const EditarComputadoraActivo = ({
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
   const [errorDireccionIP, setErrorDireccionIP] = useState(false);
-  const [componentesState, setComponentesState] = useState<Componente[]>(componentes);
+  const [componentesState, setComponentesState] =
+    useState<Componente[]>(componentes);
   const [selectedSO, setSelectedSO] = useState<SistemaOperativo | null>(null);
   const [selectedVersionSO, setSelectedVersionSO] = useState<VersionSO | null>(
     null
   );
-  const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(null);
+  const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(
+    null
+  );
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -73,12 +84,15 @@ const EditarComputadoraActivo = ({
   const navigate = useNavigate();
   const [selectedRAM, setSelectedRAM] = useState<RAM | null>(null);
   const [selectedDisco, setSelectedDisco] = useState<Disco | null>(null);
-  const [selectedProcesador, setSelectedProcesador] = useState<Procesador | null>(null);
+  const [selectedProcesador, setSelectedProcesador] =
+    useState<Procesador | null>(null);
   const [selectedDominio, setSelectedDominio] = useState<Dominio | null>(null);
   const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
     null
   );
-  const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(null);
+  const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(
+    null
+  );
   const [selectedVersionOffice, setSelectedVersionOffice] =
     useState<VersionOffice | null>(null);
   const [selectedAntivirus, setSelectedAntivirus] = useState<Antivirus | null>(
@@ -99,13 +113,19 @@ const EditarComputadoraActivo = ({
     inventario: "",
   });
   const [newObservation, setNewObservation] = useState<string>("");
-  const [errorMensajeComponente, setErrorMensajeComponente] = useState<string | null>(null);
+  const [errorMensajeComponente, setErrorMensajeComponente] = useState<
+    string | null
+  >(null);
   const [empresa, setEmpresa] = useState<string | null>("");
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
-  const [empresaNuevoComponente, setEmpresaNuevoComponente] = useState<string | null>("");
-  const [errorEmpresaNuevoComponente, setErrorEmpresaNuevoComponente] = useState<boolean>(false);
+  const [empresaNuevoComponente, setEmpresaNuevoComponente] = useState<
+    string | null
+  >("");
+  const [errorEmpresaNuevoComponente, setErrorEmpresaNuevoComponente] =
+    useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
-  const [errorNuevoComponenteInventario, setErrorNuevoComponenteInventario] = useState<boolean>(false);
+  const [errorNuevoComponenteInventario, setErrorNuevoComponenteInventario] =
+    useState<boolean>(false);
 
   const { uploadImage } = useSubirImagen();
   const { marcas } = useMarcasPorPeriferico(equipo?.id_periferico ?? "");
@@ -181,7 +201,9 @@ const EditarComputadoraActivo = ({
         discos.find((disco) => disco?.id_disco === equipo.id_disco) || null
       );
       setSelectedProcesador(
-        procesadores.find((procesador) => procesador?.id_procesador === equipo.id_procesador) || null
+        procesadores.find(
+          (procesador) => procesador?.id_procesador === equipo.id_procesador
+        ) || null
       );
       setSelectedDominio(
         dominios.find((dominio) => dominio?.id_dominio === equipo.id_dominio) ||
@@ -193,7 +215,9 @@ const EditarComputadoraActivo = ({
         ) || null
       );
       setSelectedUbicacion(
-        ubicaciones.find((ubicacion) => ubicacion?.id_ubicacion === equipo.id_ubicacion) || null
+        ubicaciones.find(
+          (ubicacion) => ubicacion?.id_ubicacion === equipo.id_ubicacion
+        ) || null
       );
       setSelectedVersionOffice(
         versionesOffice.find(
@@ -209,9 +233,21 @@ const EditarComputadoraActivo = ({
       setDireccionIP(equipo.direccion_ip);
       setProtocolo(equipo.direccion_ip ? "0" : "1");
       setNewObservation(equipo.observacion);
-      equipo.inventario.length===10?setEmpresa("EspolTech"):setEmpresa("Espol")
+      equipo.inventario.length === 10
+        ? setEmpresa("EspolTech")
+        : setEmpresa("Espol");
     }
-  }, [equipo, marcas, modelos, series, ram, discos,procesadores, dominios, versionesOffice]);
+  }, [
+    equipo,
+    marcas,
+    modelos,
+    series,
+    ram,
+    discos,
+    procesadores,
+    dominios,
+    versionesOffice,
+  ]);
 
   const handleAddComponente = () => {
     if (
@@ -258,12 +294,12 @@ const EditarComputadoraActivo = ({
 
   const handleEditEquipo = async (observationValue: string) => {
     let nuevaImagen = currentImagePath;
-    
+
     if (image) {
       try {
         nuevaImagen = await uploadImage(image);
       } catch (error) {
-        alert('Error al cargar la imagen.');
+        alert("Error al cargar la imagen.");
         return;
       }
     }
@@ -284,7 +320,7 @@ const EditarComputadoraActivo = ({
       id_usuario: idUsuario ?? "",
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
       imagenRuta: image ? nuevaImagen : "",
-      observacion: observationValue
+      observacion: observationValue,
     };
     try {
       await editarActivo(equipo.id_equipo, payload);
@@ -304,7 +340,7 @@ const EditarComputadoraActivo = ({
         });
         setShowSuccessMessage(true);
         navigate("/activos", { state: { equipoEditado: true } });
-      }else{
+      } else {
         setShowSuccessMessage(true);
         navigate("/activos", { state: { equipoEditado: true } });
       }
@@ -344,7 +380,7 @@ const EditarComputadoraActivo = ({
       !selectedProcesador ||
       !selectedDominio ||
       !selectedUbicacion ||
-      !(protocolo==="0"?validateIP(direccionIP):true)
+      !(protocolo === "0" ? validateIP(direccionIP) : true)
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -352,76 +388,100 @@ const EditarComputadoraActivo = ({
     setErrorMensajeEquipo(null);
     return true;
   };
-  const handleIP = (value:string)=>{
+  const handleIP = (value: string) => {
     setDireccionIP(value);
-    if(!validateIP(value) && protocolo === "0"){
-      setErrorDireccionIP(true)
-    }else{
+    if (!validateIP(value) && protocolo === "0") {
+      setErrorDireccionIP(true);
+    } else {
       setErrorDireccionIP(false);
     }
-  }
-  const handleProtocolo = (value:string)=>{
+  };
+  const handleProtocolo = (value: string) => {
     setProtocolo(value);
-    if(value === "0" && !validateIP(direccionIP)){
-      setErrorDireccionIP(true)
-    }else{
+    if (value === "0" && !validateIP(direccionIP)) {
+      setErrorDireccionIP(true);
+    } else {
       setErrorDireccionIP(false);
-      setDireccionIP("")
+      setDireccionIP("");
     }
-  }
+  };
 
-  const handleObservation = (newObservation :string)=>{
+  const handleObservation = (newObservation: string) => {
     setNewObservation(newObservation);
-    if(!(newObservation.length <= 200)){
-      setErrorMensajeComponente("La observación no puede tener más de 200 caracteres.");
-    }else{
+    if (!(newObservation.length <= 200)) {
+      setErrorMensajeComponente(
+        "La observación no puede tener más de 200 caracteres."
+      );
+    } else {
       setErrorMensajeComponente("");
     }
-  }
-  const handleChangeEmpresa = (newEmpresa :string | null)=>{
+  };
+  const handleChangeEmpresa = (newEmpresa: string | null) => {
     setEmpresa(newEmpresa);
-    if(newEmpresa===null){
+    if (newEmpresa === null) {
       setErrorEmpresa(true);
-      setSelectedInventarioInv("")
-      setErrorInventario(true)
-    }else{
+      setSelectedInventarioInv("");
+      setErrorInventario(true);
+    } else {
       setErrorEmpresa(false);
-      !validateInventario(selectedInventarioInv,newEmpresa)?setErrorInventario(true):setErrorInventario(false)
+      !validateInventario(selectedInventarioInv, newEmpresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
     }
-  }
-  const handleChangeEmpresaNuevoComponente = (newEmpresaNuevoComponente :string | null)=>{
+  };
+  const handleChangeEmpresaNuevoComponente = (
+    newEmpresaNuevoComponente: string | null
+  ) => {
     setEmpresaNuevoComponente(newEmpresaNuevoComponente);
-    if(newEmpresaNuevoComponente===null){
+    if (newEmpresaNuevoComponente === null) {
       setErrorEmpresaNuevoComponente(true);
       setNuevoComponente({
         ...nuevoComponente,
         inventario: "",
-      })
+      });
       setErrorNuevoComponenteInventario(true);
-    }else{
+    } else {
       setErrorEmpresaNuevoComponente(false);
-      !validateInventario(nuevoComponente.inventario,newEmpresaNuevoComponente)?setErrorNuevoComponenteInventario(true):setErrorNuevoComponenteInventario(false)
+      !validateInventario(nuevoComponente.inventario, newEmpresaNuevoComponente)
+        ? setErrorNuevoComponenteInventario(true)
+        : setErrorNuevoComponenteInventario(false);
     }
-  }
-  const handleChangeInventario = (inventario :string)=>{
-    setSelectedInventarioInv(inventario)
-    if(empresa==="Espol"){
-      !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
-    }else if(empresa==="EspolTech"){
-      !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
+  };
+  const handleChangeInventario = (inventario: string) => {
+    setSelectedInventarioInv(inventario);
+    if (empresa === "Espol") {
+      !validateInventario(inventario ? inventario : "", empresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
+    } else if (empresa === "EspolTech") {
+      !validateInventario(inventario ? inventario : "", empresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
     }
-  }
-  const handleChangeNuevoComponenteInventario = (nuevoComponenteInventario :string)=>{
+  };
+  const handleChangeNuevoComponenteInventario = (
+    nuevoComponenteInventario: string
+  ) => {
     setNuevoComponente({
       ...nuevoComponente,
       inventario: nuevoComponenteInventario,
-    })
-    if(empresaNuevoComponente==="Espol"){
-      !validateInventario(nuevoComponenteInventario?nuevoComponenteInventario:"",empresaNuevoComponente)?setErrorNuevoComponenteInventario(true):setErrorNuevoComponenteInventario(false)
-    }else if(empresaNuevoComponente==="EspolTech"){
-      !validateInventario(nuevoComponenteInventario?nuevoComponenteInventario:"",empresaNuevoComponente)?setErrorNuevoComponenteInventario(true):setErrorNuevoComponenteInventario(false)
+    });
+    if (empresaNuevoComponente === "Espol") {
+      !validateInventario(
+        nuevoComponenteInventario ? nuevoComponenteInventario : "",
+        empresaNuevoComponente
+      )
+        ? setErrorNuevoComponenteInventario(true)
+        : setErrorNuevoComponenteInventario(false);
+    } else if (empresaNuevoComponente === "EspolTech") {
+      !validateInventario(
+        nuevoComponenteInventario ? nuevoComponenteInventario : "",
+        empresaNuevoComponente
+      )
+        ? setErrorNuevoComponenteInventario(true)
+        : setErrorNuevoComponenteInventario(false);
     }
-  }
+  };
 
   return (
     <div>
@@ -432,7 +492,7 @@ const EditarComputadoraActivo = ({
         title="Confirmar Editar Equipo"
         message="¿Está seguro de que desea editar este equipo?"
       />
-       <ModalConfirmation
+      <ModalConfirmation
         open={openModalCancelar}
         onClose={() => setOpenModalCancelar(false)}
         onConfirm={handleCancelar}
@@ -496,37 +556,35 @@ const EditarComputadoraActivo = ({
           )}
           disabled
         />
-                  <Box
-            sx={{
-              display: "inline-flex",
+        <Box
+          sx={{
+            display: "inline-flex",
+          }}
+        >
+          <Autocomplete
+            size="small"
+            disablePortal
+            sx={{ width: "50%" }}
+            options={["Espol", "EspolTech"]}
+            getOptionLabel={(option) => (option ? option : "")}
+            value={empresa}
+            onChange={(event, newValue) => {
+              handleChangeEmpresa(newValue);
             }}
-          >
-            <Autocomplete
-              size="small"
-              disablePortal
-              sx={{ width: "50%" }}
-              options={["Espol","EspolTech"]}
-              getOptionLabel={(option) => (option ? option : "")}
-              value={empresa}
-              onChange={(event, newValue) => {
-                handleChangeEmpresa(newValue);
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Empresa"
-                  variant="outlined"
-                  error={!!errorEmpresa}
-                  helperText={
-                    errorEmpresa
-                      ? "Por favor seleccionar una empresa"
-                      : ""
-                  }
-                  fullWidth
-                  sx={{ marginRight: 8, width: "100%" }}
-                />
-              )}
-            />
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Empresa"
+                variant="outlined"
+                error={!!errorEmpresa}
+                helperText={
+                  errorEmpresa ? "Por favor seleccionar una empresa" : ""
+                }
+                fullWidth
+                sx={{ marginRight: 8, width: "100%" }}
+              />
+            )}
+          />
           <TextField
             label="Inventario"
             placeholder="Inventario"
@@ -535,7 +593,9 @@ const EditarComputadoraActivo = ({
             size="small"
             value={selectedInventarioInv}
             error={!!errorInventario}
-            helperText={errorInventario? "Por favor escribir un inventario válido" :""}
+            helperText={
+              errorInventario ? "Por favor escribir un inventario válido" : ""
+            }
             onChange={(e) => handleChangeInventario(e.target.value)}
             disabled={empresa === ""}
           />
@@ -553,7 +613,7 @@ const EditarComputadoraActivo = ({
             setSelectedSO(newValue);
             setSelectedVersionSO(null);
           }}
-          getOptionLabel={(option) => option? option.nombre : ""}
+          getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -570,7 +630,7 @@ const EditarComputadoraActivo = ({
           options={versionesSO}
           value={selectedVersionSO}
           onChange={(_, newValue) => setSelectedVersionSO(newValue)}
-          getOptionLabel={(option) => option? option.nombre : ""}
+          getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -604,7 +664,7 @@ const EditarComputadoraActivo = ({
           options={versionesOffice}
           value={selectedVersionOffice}
           onChange={(_, newValue) => setSelectedVersionOffice(newValue)}
-          getOptionLabel={(option) => option? option.nombre : ""}
+          getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -631,7 +691,7 @@ const EditarComputadoraActivo = ({
           options={discos}
           value={selectedDisco}
           onChange={(_, newValue) => setSelectedDisco(newValue)}
-          getOptionLabel={(option) => option? option.capacidad : ""}
+          getOptionLabel={(option) => (option ? option.capacidad : "")}
           renderInput={(params) => (
             <TextField {...params} label="Disco" variant="outlined" fullWidth />
           )}
@@ -642,51 +702,58 @@ const EditarComputadoraActivo = ({
           options={procesadores}
           value={selectedProcesador}
           onChange={(_, newValue) => setSelectedProcesador(newValue)}
-          getOptionLabel={(option) => option? option.nombre : ""}
-          renderInput={(params) => (
-            <TextField {...params} label="Procesador" variant="outlined" fullWidth />
-          )}
-        />
-        <Box
-            sx={{
-              display: "inline-flex",
-            }}
-          >
-        <Autocomplete
-          size="small"
-          disablePortal
-          sx={{ width: "50%" }}
-          options={protocolos}
-          value={protocolos.find((p) => p.id === protocolo) || null}
-          onChange={(_, newValue) =>handleProtocolo(newValue?.id || "1")}
-          getOptionLabel={(option) => option.nombre}
+          getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Protocolo"
+              label="Procesador"
               variant="outlined"
               fullWidth
             />
           )}
         />
+        <Box
+          sx={{
+            display: "inline-flex",
+          }}
+        >
+          <Autocomplete
+            size="small"
+            disablePortal
+            sx={{ width: "50%" }}
+            options={protocolos}
+            value={protocolos.find((p) => p.id === protocolo) || null}
+            onChange={(_, newValue) => handleProtocolo(newValue?.id || "1")}
+            getOptionLabel={(option) => option.nombre}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Protocolo"
+                variant="outlined"
+                fullWidth
+              />
+            )}
+          />
 
-        <TextField
-          label="Dirección IP"
-          placeholder="Dirección IP"
-          variant="outlined"
-          fullWidth
-          size="small"
-          value={direccionIP}
-          error={!!errorDireccionIP}
-          onChange={(e) => {handleIP(e.target.value)}}
-          disabled={protocolo !== "0"}
-          sx={{ marginRight: 4, width: "50%" }}
-        />
-        {errorDireccionIP && (
-              <FormHelperText error sx={{ marginLeft: "auto", color: "green" }}>
-                Por favor escribir una dirección IP válida
-              </FormHelperText>
-        )}
+          <TextField
+            label="Dirección IP"
+            placeholder="Dirección IP"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={direccionIP}
+            error={!!errorDireccionIP}
+            onChange={(e) => {
+              handleIP(e.target.value);
+            }}
+            disabled={protocolo !== "0"}
+            sx={{ marginRight: 4, width: "50%" }}
+          />
+          {errorDireccionIP && (
+            <FormHelperText error sx={{ marginLeft: "auto", color: "green" }}>
+              Por favor escribir una dirección IP válida
+            </FormHelperText>
+          )}
         </Box>
         <TextField
           size="small"
@@ -702,7 +769,7 @@ const EditarComputadoraActivo = ({
           options={dominios}
           value={selectedDominio}
           onChange={(_, newValue) => setSelectedDominio(newValue)}
-          getOptionLabel={(option) => option? option.nombre : ""}
+          getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -721,7 +788,7 @@ const EditarComputadoraActivo = ({
             setSelectedEdificio(newValue);
             setSelectedUbicacion(null);
           }}
-          getOptionLabel={(option) => option? option.nombre : ""}
+          getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -738,9 +805,14 @@ const EditarComputadoraActivo = ({
           options={ubicaciones}
           value={selectedUbicacion}
           onChange={(_, newValue) => setSelectedUbicacion(newValue)}
-          getOptionLabel={(option) => option? option.nombre : ""}
+          getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
-            <TextField {...params} label="Ubicacion" variant="outlined" fullWidth />
+            <TextField
+              {...params}
+              label="Ubicacion"
+              variant="outlined"
+              fullWidth
+            />
           )}
           disabled={!selectedEdificio}
         />
@@ -795,7 +867,7 @@ const EditarComputadoraActivo = ({
                 </tr>
               </thead>
               <tbody>
-              {componentesState.map((comp, index) => (
+                {componentesState.map((comp, index) => (
                   <tr key={index}>
                     <td className="py-2 px-4 border">
                       {comp.periferico?.nombre}
@@ -893,51 +965,56 @@ const EditarComputadoraActivo = ({
               )}
               disabled={!nuevoComponente.modelo}
             />
-             <Box
-            sx={{
-              display: "inline-flex",
-            }}
-          >
-            <Autocomplete
-              size="small"
-              disablePortal
-              sx={{ width: "50%" }}
-              options={["Espol","EspolTech"]}
-              getOptionLabel={(option) => (option ? option : "")}
-              value={empresaNuevoComponente}
-              onChange={(event, newValue) => {
-                handleChangeEmpresaNuevoComponente(newValue);
+            <Box
+              sx={{
+                display: "inline-flex",
               }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Empresa"
-                  variant="outlined"
-                  error={!!errorEmpresaNuevoComponente}
-                  helperText={
-                    errorEmpresaNuevoComponente
-                      ? "Por favor seleccionar una empresa"
-                      : ""
-                  }
-                  fullWidth
-                  sx={{ marginRight: 8, width: "100%" }}
-                />
-              )}
-            />
-          <TextField
-            label="Inventario"
-            placeholder="Inventario"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={nuevoComponente.inventario}
-            error={!!errorNuevoComponenteInventario}
-            helperText={errorNuevoComponenteInventario? "Por favor escribir un inventario válido" :""}
-            onChange={(e) => handleChangeNuevoComponenteInventario(e.target.value)}
-            disabled={empresa === ""}
-              
-          />
-        </Box>
+            >
+              <Autocomplete
+                size="small"
+                disablePortal
+                sx={{ width: "50%" }}
+                options={["Espol", "EspolTech"]}
+                getOptionLabel={(option) => (option ? option : "")}
+                value={empresaNuevoComponente}
+                onChange={(event, newValue) => {
+                  handleChangeEmpresaNuevoComponente(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Empresa"
+                    variant="outlined"
+                    error={!!errorEmpresaNuevoComponente}
+                    helperText={
+                      errorEmpresaNuevoComponente
+                        ? "Por favor seleccionar una empresa"
+                        : ""
+                    }
+                    fullWidth
+                    sx={{ marginRight: 8, width: "100%" }}
+                  />
+                )}
+              />
+              <TextField
+                label="Inventario"
+                placeholder="Inventario"
+                variant="outlined"
+                fullWidth
+                size="small"
+                value={nuevoComponente.inventario}
+                error={!!errorNuevoComponenteInventario}
+                helperText={
+                  errorNuevoComponenteInventario
+                    ? "Por favor escribir un inventario válido"
+                    : ""
+                }
+                onChange={(e) =>
+                  handleChangeNuevoComponenteInventario(e.target.value)
+                }
+                disabled={empresa === ""}
+              />
+            </Box>
             <Button
               variant="contained"
               color="primary"
@@ -952,28 +1029,26 @@ const EditarComputadoraActivo = ({
       <div>
         <h2 className="text-xl font-semibold mb-10">Observación</h2>
         <TextField
-                label="Observación"
-                variant="outlined"
-                fullWidth
-                multiline
-                minRows={4}
-                value={newObservation}
-                onChange={(e) => {
-                  handleObservation(e.target.value)
-                }}
-                error={!!errorMensajeComponente}
-                helperText={errorMensajeComponente}
-          />
+          label="Observación"
+          variant="outlined"
+          fullWidth
+          multiline
+          minRows={4}
+          value={newObservation}
+          onChange={(e) => {
+            handleObservation(e.target.value);
+          }}
+          error={!!errorMensajeComponente}
+          helperText={errorMensajeComponente}
+        />
       </div>
       <div className="flex gap-4 mt-10">
         <Button
           variant="contained"
           sx={{
-            backgroundColor:
-              "#4CAF50",
+            backgroundColor: "#4CAF50",
             "&:hover": {
-              backgroundColor:
-                "#45a049"
+              backgroundColor: "#45a049",
             },
           }}
           onClick={handleConfirmEditarEquipo}
@@ -982,13 +1057,13 @@ const EditarComputadoraActivo = ({
           Editar Activo
         </Button>
         <Button
-                onClick={handleConfirmCancelar}
-                color="error"
-                variant="contained"
-                fullWidth
-              >
-                Cancelar
-              </Button>
+          onClick={handleConfirmCancelar}
+          color="error"
+          variant="contained"
+          fullWidth
+        >
+          Cancelar
+        </Button>
       </div>
       {errorMensajeEquipo && (
         <div className="text-red-500 mt-2">{errorMensajeEquipo}</div>

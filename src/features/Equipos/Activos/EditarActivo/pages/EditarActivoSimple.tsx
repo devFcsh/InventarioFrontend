@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Autocomplete, TextField, Button, Snackbar, Alert } from "@mui/material";
+import { Autocomplete, TextField, Button, Snackbar, Alert, Box } from "@mui/material";
 import {
   Marca,
   Modelo,
@@ -18,6 +18,7 @@ import useSubirImagen from "../../../../../hooks/useSubirImagen";
 import useEditarActivoSimple from "../hooks/useEditarActivoSimple";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
+import { validateInventario } from "@pages/Forms/helpers/validateInventario";
 
 interface EditarActivoSimpleProps {
     equipoSimpleActivo: ActivoSimpleEdit;
@@ -38,6 +39,11 @@ const EditarActivoSimple = ({
     useState<Serie | null>(null);
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
+  const [newObservation, setNewObservation] = useState<string>("");
+  const [errorMensajeComponente, setErrorMensajeComponente] = useState<string | null>(null);
+  const [empresa, setEmpresa] = useState<string | null>("");
+  const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
+  const [errorInventario, setErrorInventario] = useState<boolean>(false);
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(null);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
@@ -91,6 +97,8 @@ const EditarActivoSimple = ({
       setSelectedUbicacion(
         ubicaciones.find((ubicacion) => ubicacion?.id_ubicacion === equipoSimpleActivo.id_ubicacion) || null
       );
+      setNewObservation(equipoSimpleActivo.observacion);
+      equipoSimpleActivo.inventario.length===10?setEmpresa("EspolTech"):setEmpresa("Espol")
     }
   }, [equipoSimpleActivo, marcas, modelos, series]);
 
@@ -107,7 +115,7 @@ const EditarActivoSimple = ({
     }
   };
 
-  const handleEditEquipo = async () => {
+  const handleEditEquipo = async (observationValue : string) => {
     let nuevaImagen = currentImagePath;
     
     if (image) {
@@ -126,7 +134,7 @@ const EditarActivoSimple = ({
       imagenRuta: image ? nuevaImagen : "",
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
       id_serie: selectedInventarioSerie?.id_serie ?? "",
-      observacion: "",
+      observacion: observationValue,
       id_lampara: selectedLampara?.id_lampara ?? "",
     };
     try {
@@ -147,8 +155,37 @@ const EditarActivoSimple = ({
 
   const handleModalConfirmEditar = async () => {
     setOpenModalEditar(false);
-    await handleEditEquipo();
+    await handleEditEquipo(newObservation);
   };
+  const handleObservation = (newObservation :string)=>{
+    setNewObservation(newObservation);
+    if(!(newObservation.length <= 200)){
+      setErrorMensajeComponente("La observación no puede tener más de 200 caracteres.");
+    }else{
+      setErrorMensajeComponente("");
+    }
+  }
+
+  const handleChangeEmpresa = (newEmpresa :string | null)=>{
+      setEmpresa(newEmpresa);
+      if(newEmpresa===null){
+        setErrorEmpresa(true);
+        setSelectedInventarioInv("")
+        setErrorInventario(true)
+      }else{
+        setErrorEmpresa(false);
+        !validateInventario(selectedInventarioInv,newEmpresa)?setErrorInventario(true):setErrorInventario(false)
+      }
+    }
+
+    const handleChangeInventario = (inventario :string)=>{
+      setSelectedInventarioInv(inventario)
+      if(empresa==="Espol"){
+        !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
+      }else if(empresa==="EspolTech"){
+        !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
+      }
+    }
 
   const handleCancelar = () => {
     setOpenModalCancelar(false);
@@ -244,14 +281,50 @@ const EditarActivoSimple = ({
           )}
           disabled
         />
-        <TextField
-          label="Inventario"
-          variant="outlined"
-          fullWidth
-          size="small"
-          value={selectedInventarioInv}
-          onChange={(e) => setSelectedInventarioInv(e.target.value)}
-        />
+        <Box
+          sx={{
+            display: "inline-flex",
+          }}
+        >
+          <Autocomplete
+            size="small"
+            disablePortal
+            sx={{ width: "50%" }}
+            options={["Espol", "EspolTech"]}
+            getOptionLabel={(option) => (option ? option : "")}
+            value={empresa}
+            onChange={(event, newValue) => {
+              handleChangeEmpresa(newValue);
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Empresa"
+                variant="outlined"
+                error={!!errorEmpresa}
+                helperText={
+                  errorEmpresa ? "Por favor seleccionar una empresa" : ""
+                }
+                fullWidth
+                sx={{ marginRight: 8, width: "100%" }}
+              />
+            )}
+          />
+          <TextField
+            label="Inventario"
+            placeholder="Inventario"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={selectedInventarioInv}
+            error={!!errorInventario}
+            helperText={
+              errorInventario ? "Por favor escribir un inventario válido" : ""
+            }
+            onChange={(e) => handleChangeInventario(e.target.value)}
+            disabled={empresa === ""}
+          />
+        </Box>
       </div>
 
       <h2 className="text-xl font-semibold mb-5">Información General</h2>
@@ -322,6 +395,22 @@ const EditarActivoSimple = ({
             )}
           </div>
         </div>
+      </div>
+      <div>
+        <h2 className="text-xl font-semibold mb-10">Observación</h2>
+        <TextField
+                label="Observación"
+                variant="outlined"
+                fullWidth
+                multiline
+                minRows={4}
+                value={newObservation}
+                onChange={(e) => {
+                  handleObservation(e.target.value)
+                }}
+                error={!!errorMensajeComponente}
+                helperText={errorMensajeComponente}
+          />
       </div>
 
       <div className="flex gap-4 mt-10">
