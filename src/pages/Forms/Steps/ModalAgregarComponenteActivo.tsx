@@ -46,7 +46,10 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
   const filteredPerifericos = perifericos.filter(
     (p) =>
       p?.nombre.toLowerCase() !== "computadora" &&
-      p?.nombre.toLowerCase() !== "laptop"
+      p?.nombre.toLowerCase() !== "laptop" &&
+      p?.nombre.toLowerCase() !== "proyector" &&
+      p?.nombre.toLowerCase() !== "ap" &&
+      p?.nombre.toLowerCase() !== "switch" 
   );
   const { marcas: marcasComponente } = useMarcasPorPeriferico(
     nuevoComponente.periferico?.id_periferico ?? ""
