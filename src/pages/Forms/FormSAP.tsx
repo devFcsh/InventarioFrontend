@@ -33,7 +33,7 @@ export const FormSAP = () => {
   const { informacionGeneralDataSAPForm, handleInformacionGeneralSAPChange } = useFormDataInformacionGeneralSAP();
   const { imageData, handleImageChange, error } = useFormDataCargarImagen();
   const { inventorySAPErrors, completeDatosInventario, handleInventorySAPErrors, handleUniqueInventarioSAPError } = useInventoryErrorsSAP(tipoInventario);
-  const { informacionGeneralSAPErrors, handleInformacionGeneralSAPErrors, handleUniqueInformacionGeneralError, completeDatosInformacionGeneral } = useInformacionGeneralErrorSAP();
+  const { informacionGeneralSAPErrors, handleInformacionGeneralSAPErrors, handleUniqueInformacionGeneralError, completeDatosInformacionGeneral } = useInformacionGeneralErrorSAP(selectedPeriferico?.nombre);
   const { cargarImagenErrors, handleCargarImagenErrors, handleUniqueCargarImagenError, completeDatosCargarImagen } = useCargarImagenErrors();
 
   const handleNext = () => {

@@ -7,7 +7,7 @@ interface InformacionGeneralDataForm{
   puertoFTP: string;
 }
 
-export const useInformacionGeneralErrorSAP = () => {
+export const useInformacionGeneralErrorSAP = (periferico:string | undefined) => {
   const [informacionGeneralSAPErrors, setInformacionGeneralErrors] = useState<Record<string, boolean>>({
     "mac":false,
     "puertos":false,
@@ -15,8 +15,8 @@ export const useInformacionGeneralErrorSAP = () => {
   });
 
   const completeDatosInformacionGeneral = (dataForm: InformacionGeneralDataForm)=>{
-    if(dataForm.mac !=="" && dataForm.puertos !=="" 
-      && dataForm.puertoFTP!=="" && validateMAC(dataForm.mac)
+    if(dataForm.mac !=="" && (periferico==="AP"?true:dataForm.puertos !=="")
+      && (periferico==="AP"?true:(dataForm.puertoFTP!=="" && validateMAC(dataForm.mac)))
     ) return true
     return false;
   }
@@ -35,6 +35,13 @@ export const useInformacionGeneralErrorSAP = () => {
         }));
       }
     });
+    if(periferico==="AP"){
+      setInformacionGeneralErrors((prevErrors) => ({
+        ...prevErrors,
+        ["puertos"]: false,
+        ["puertoFTP"]: false,
+      }));
+    }
   };
 
   const handleUniqueInformacionGeneralError = (tipo: keyof InformacionGeneralDataForm, value: string | null) => {
@@ -56,6 +63,7 @@ export const useInformacionGeneralErrorSAP = () => {
         }));
       }
     }
+    console.log(informacionGeneralSAPErrors)
 
   };
 

@@ -36,16 +36,16 @@ export const useFormDatosInventario = () => {
 
   const handleInventoryChange = (
     field: keyof InventoryDataForm,
-    value: Usuario | Marca | Modelo | Serie | string  | Ubicacion | null
+    value: Usuario | Marca | Modelo | Serie | string  | Ubicacion | Lampara | null
   ) => {
     setInventoryDataForm((prevState) => ({
       ...prevState,
       [field]: value,
       ...(field === 'usuario' && value && typeof value !== 'string' && 'id_usuario' in value ? { usuarioId: value.id_usuario } : {}),
-      ...(field === 'marca' && value && typeof value !== 'string' && 'id_marca' in value ? { modelo: null, serie: null } : {}),
-      ...(field === 'modelo' && value && typeof value !== 'string' && 'id_modelo' in value ? { serie: null } : {}),
-      ...(field === 'marca' && value === null? { modelo: null, serie: null } : {}),
-      ...(field === 'modelo' && value === null? {serie: null } : {}),
+      ...(field === 'marca' && value && typeof value !== 'string' && 'id_marca' in value ? { modelo: null, serie: null,lampara:null } : {}),
+      ...(field === 'modelo' && value && typeof value !== 'string' && 'id_modelo' in value ? { serie: null,lampara:null } : {}),
+      ...(field === 'marca' && value === null? { modelo: null, serie: null, lampara:null } : {}),
+      ...(field === 'modelo' && value === null? {serie: null , lampara:null} : {}),
       ...(field === 'usuario' && value === null? { usuarioId: "" } : {}),
       ...(field === 'empresa' && value === null? { inventario: "" } : {}),
       ...(field === 'empresa' && value? { inventario: "" } : {}),

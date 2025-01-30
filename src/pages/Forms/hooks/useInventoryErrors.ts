@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Lampara,
   Marca,
   Modelo,
   Serie,
@@ -17,9 +18,10 @@ interface InventoryDataForm {
   empresa:string
   ubicacion: Ubicacion;
   usuarioId: string;
+  lampara:Lampara;
 }
 
-export const useInventoryErrors = (tipoInventario: string) => {
+export const useInventoryErrors = (tipoInventario: string,periferico:string | undefined) => {
   const [inventoryErrors, setInventoryErrors] = useState<Record<string, boolean>>({
     "usuario":false,
     "marca":false,
@@ -28,18 +30,20 @@ export const useInventoryErrors = (tipoInventario: string) => {
     "inventario":false,
     "empresa":false,
     "ubicacion":false,
+    "lampara":false
   });
 
   const completeDatosInventario = (dataForm: InventoryDataForm)=>{
     if(tipoInventario==="activo"){
-      if(dataForm.usuario!==null
+      if((periferico==="Proyector"?true:dataForm.usuario!==null)
         &&dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
         dataForm.inventario !==""  && dataForm.ubicacion!==null && dataForm.empresa!=""
+        && (periferico!=="Proyector"?true:dataForm.lampara!==null)
       ) return true
       return false;
     }else{
       if(dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
-        dataForm.inventario !==""
+        dataForm.inventario !=="" && (periferico!=="Proyector"?true:dataForm.lampara!==null)
       ) return true
       return false;
     }
@@ -54,6 +58,7 @@ export const useInventoryErrors = (tipoInventario: string) => {
       "inventario",
       "empresa",
       "ubicacion",
+      "lampara"
     ];
     if(tipoInventario==="activo"){
       fieldsToCheck.forEach((field) => {
@@ -76,9 +81,15 @@ export const useInventoryErrors = (tipoInventario: string) => {
         }
       });
     }
+    if(periferico==="Proyector"){
+      setInventoryErrors((prevErrors) => ({
+        ...prevErrors,
+        ["usuario"]: false
+      }));
+    }
   };
 
-  const handleUniqueInventarioError = (tipo: keyof InventoryDataForm, value: Usuario | Marca | Modelo | Serie | string  | Ubicacion | null,formData:InventoryDataForm) => {
+  const handleUniqueInventarioError = (tipo: keyof InventoryDataForm, value: Usuario | Marca | Modelo | Serie | string  | Ubicacion | Lampara | null,formData:InventoryDataForm) => {
     setInventoryErrors((prevErrors) => ({
       ...prevErrors,
       [tipo]: value === null || value === ""? true : false,

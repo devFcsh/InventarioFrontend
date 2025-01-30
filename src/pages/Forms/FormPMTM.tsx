@@ -36,7 +36,7 @@ export const FormPMTM = () => {
   const [observation, setObservation] = useState("")
   const { inventoryDataForm, handleInventoryChange } = useFormDatosInventario();
   const { imageData, handleImageChange, error} = useFormDataCargarImagen();
-  const { inventoryErrors, completeDatosInventario, handleInventoryErrors, handleUniqueInventarioError } = useInventoryErrors(tipoInventario);
+  const { inventoryErrors, completeDatosInventario, handleInventoryErrors, handleUniqueInventarioError } = useInventoryErrors(tipoInventario,selectedPeriferico?.nombre);
   const { cargarImagenErrors, handleCargarImagenErrors, handleUniqueCargarImagenError, completeDatosCargarImagen } = useCargarImagenErrors();
   const { agregarSimpleActivo } = useAgregarSimpleActivo();
   const {agregarSimpleBodega} = useAgregarSimpleBodega();
@@ -143,7 +143,7 @@ export const FormPMTM = () => {
       inventario: inventoryDataForm.inventario || "",
       serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
       idUbicacion: Number(inventoryDataForm.ubicacion?.id_ubicacion) ?? 0,
-      idUsuario: parseInt(inventoryDataForm.usuarioId || "", 10),
+      idUsuario: selectedPeriferico?.nombre==="Proyector"?1: parseInt(inventoryDataForm.usuarioId || "", 10),
       imagenRuta: imageData.imagePath,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,
       observacion: observation

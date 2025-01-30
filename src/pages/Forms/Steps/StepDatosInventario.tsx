@@ -13,16 +13,16 @@ import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferic
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import useUbicaciones from "@hooks/useUbicaciones";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
-import useLamparas from "@hooks/useLamparas";
+import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
 
 interface StepDatosInventarioProps {
   periferico: Periferico;
   uso: string;
-  edificio:string;
-  inventoryDataForm:any;
+  edificio: string;
+  inventoryDataForm: any;
   handleInventoryChange: any;
   inventoryErrors: any;
-  handleUniqueInventarioError:any;
+  handleUniqueInventarioError: any;
   tipoInventario: string;
 }
 
@@ -41,11 +41,13 @@ export const StepDatosInventario = ({
     loading: loadingUsuarios,
     error: errorUsuarios,
   } = useUsuariosPorUso(uso || "");
-  
 
   const { marcas } = useMarcasPorPeriferico(periferico?.id_periferico ?? "");
-  const { lamparas } = useLamparas();
-  console.log(lamparas)
+  const { lamparas } = useLamparasPorModelo(
+    periferico?.id_periferico ?? "",
+    inventoryDataForm.marca?.id_marca ?? "",
+    inventoryDataForm.modelo?.id_modelo ?? ""
+  );
   const { modelos } = useModelosPorMarcaPeriferico(
     inventoryDataForm.marca?.id_marca ?? "",
     periferico?.id_periferico ?? ""
@@ -61,56 +63,44 @@ export const StepDatosInventario = ({
     <Box>
       <div className="mt-8">
         <div className="grid grid-cols-2 gap-4">
-        
-        {tipoInventario==="activo" && periferico?.nombre!=="Proyector"?
-                  <Autocomplete
-                  size="small"
-                  disablePortal
-                  options={usuarios}
-                  loading={loadingUsuarios}
-                  value={
-                    usuarios.find((u) => u?.id_usuario === inventoryDataForm.usuarioId) ?? null
+          {tipoInventario === "activo" && periferico?.nombre !== "Proyector" ? (
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={usuarios}
+              loading={loadingUsuarios}
+              value={
+                usuarios.find(
+                  (u) => u?.id_usuario === inventoryDataForm.usuarioId
+                ) ?? null
+              }
+              onChange={(_, newValue: Usuario | null) => {
+                handleInventoryChange("usuario", newValue);
+                handleUniqueInventarioError(
+                  "usuario",
+                  newValue,
+                  inventoryDataForm
+                );
+              }}
+              getOptionLabel={(option) => (option ? option.nombre : "")}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Usuario"
+                  variant="outlined"
+                  error={!!inventoryErrors.usuario}
+                  helperText={
+                    inventoryErrors.usuario
+                      ? "Por favor seleccionar un usuario"
+                      : ""
                   }
-                  onChange={(_, newValue: Usuario | null) => {
-                    handleInventoryChange("usuario", newValue);
-                    handleUniqueInventarioError("usuario",newValue,inventoryDataForm);
-                  }}
-                  getOptionLabel={(option) => option ? option.nombre : ""}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Usuario"
-                      variant="outlined"
-                      error={!!inventoryErrors.usuario}
-                      helperText={inventoryErrors.usuario? "Por favor seleccionar un usuario" :""}
-                      fullWidth
-                    />
-                  )}
-        />:""}
-        {periferico?.nombre==="Proyector"?
-        <Autocomplete
-        size="small"
-        disablePortal
-        options={lamparas}
-        value={inventoryDataForm.lampara}
-        onChange={(_, newValue: Lampara | null) => {
-          handleInventoryChange("lampara", newValue);
-          handleUniqueInventarioError("lampara",newValue,inventoryDataForm);
-        }}
-        getOptionLabel={(option) => option ? option.nombre : ""}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Lámpara"
-            variant="outlined"
-            error={!!inventoryErrors.lampara}
-            helperText={inventoryErrors.usuario? "Por favor seleccionar una lámpara" :""}
-            fullWidth
-          />
-        )}
-/>:""
-        }
-
+                  fullWidth
+                />
+              )}
+            />
+          ) : (
+            ""
+          )}
 
           <Autocomplete
             size="small"
@@ -119,7 +109,7 @@ export const StepDatosInventario = ({
             getOptionLabel={(option: Marca) => option?.nombre || ""}
             onChange={(_, newValue: Marca | null) => {
               handleInventoryChange("marca", newValue);
-              handleUniqueInventarioError("marca",newValue,inventoryDataForm);
+              handleUniqueInventarioError("marca", newValue, inventoryDataForm);
             }}
             value={inventoryDataForm.marca}
             renderInput={(params) => (
@@ -128,7 +118,9 @@ export const StepDatosInventario = ({
                 label="Marca"
                 variant="outlined"
                 error={!!inventoryErrors.marca}
-                helperText={inventoryErrors.marca? "Por favor seleccionar una marca" :""}
+                helperText={
+                  inventoryErrors.marca ? "Por favor seleccionar una marca" : ""
+                }
                 fullWidth
               />
             )}
@@ -141,7 +133,11 @@ export const StepDatosInventario = ({
             getOptionLabel={(option: Modelo) => option?.nombre || ""}
             onChange={(_, newValue: Modelo | null) => {
               handleInventoryChange("modelo", newValue);
-              handleUniqueInventarioError("modelo",newValue,inventoryDataForm);
+              handleUniqueInventarioError(
+                "modelo",
+                newValue,
+                inventoryDataForm
+              );
             }}
             value={inventoryDataForm.modelo}
             renderInput={(params) => (
@@ -150,7 +146,11 @@ export const StepDatosInventario = ({
                 label="Modelo"
                 variant="outlined"
                 error={!!inventoryErrors.modelo}
-                helperText={inventoryErrors.modelo? "Por favor seleccionar un modelo" :""}
+                helperText={
+                  inventoryErrors.modelo
+                    ? "Por favor seleccionar un modelo"
+                    : ""
+                }
                 fullWidth
               />
             )}
@@ -163,7 +163,7 @@ export const StepDatosInventario = ({
             getOptionLabel={(option: Serie) => option?.nombre || ""}
             onChange={(_, newValue: Serie | null) => {
               handleInventoryChange("serie", newValue);
-              handleUniqueInventarioError("serie",newValue,inventoryDataForm);
+              handleUniqueInventarioError("serie", newValue, inventoryDataForm);
             }}
             value={inventoryDataForm.serie}
             renderInput={(params) => (
@@ -172,12 +172,48 @@ export const StepDatosInventario = ({
                 label="Serie"
                 variant="outlined"
                 error={!!inventoryErrors.serie}
-                helperText={inventoryErrors.serie? "Por favor seleccionar una serie" :""}
+                helperText={
+                  inventoryErrors.serie ? "Por favor seleccionar una serie" : ""
+                }
                 fullWidth
               />
             )}
             disabled={!inventoryDataForm.modelo}
           />
+          {periferico?.nombre === "Proyector" ? (
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={lamparas}
+              value={inventoryDataForm.lampara}
+              onChange={(_, newValue: Lampara | null) => {
+                handleInventoryChange("lampara", newValue);
+                handleUniqueInventarioError(
+                  "lampara",
+                  newValue,
+                  inventoryDataForm
+                );
+              }}
+              getOptionLabel={(option) => (option ? option.nombre : "")}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Lámpara"
+                  variant="outlined"
+                  error={!!inventoryErrors.lampara}
+                  helperText={
+                    inventoryErrors.usuario
+                      ? "Por favor seleccionar una lámpara"
+                      : ""
+                  }
+                  fullWidth
+                />
+              )}
+              disabled={!inventoryDataForm.modelo}
+            />
+          ) : (
+            ""
+          )}
           <Box
             sx={{
               display: "inline-flex",
@@ -187,12 +223,16 @@ export const StepDatosInventario = ({
               size="small"
               disablePortal
               sx={{ width: "50%" }}
-              options={["Espol","EspolTech"]}
+              options={["Espol", "EspolTech"]}
               getOptionLabel={(option) => (option ? option : "")}
               value={inventoryDataForm.empresa}
               onChange={(event, newValue) => {
                 handleInventoryChange("empresa", newValue);
-                handleUniqueInventarioError("empresa",newValue,inventoryDataForm);
+                handleUniqueInventarioError(
+                  "empresa",
+                  newValue,
+                  inventoryDataForm
+                );
               }}
               renderInput={(params) => (
                 <TextField
@@ -211,46 +251,64 @@ export const StepDatosInventario = ({
               )}
             />
             <TextField
-            label="Inventario"
-            placeholder="Inventario"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={inventoryDataForm.inventario}
-            error={!!inventoryErrors.inventario}
-            helperText={inventoryErrors.inventario? "Por favor escribir un inventario válido" :""}
-            onChange={(e) => {
-              handleInventoryChange("inventario", e.target.value);
-              handleUniqueInventarioError("inventario",e.target.value,inventoryDataForm);
-            }}
-            disabled={inventoryDataForm.empresa === ""}
-              
-          />
+              label="Inventario"
+              placeholder="Inventario"
+              variant="outlined"
+              fullWidth
+              size="small"
+              value={inventoryDataForm.inventario}
+              error={!!inventoryErrors.inventario}
+              helperText={
+                inventoryErrors.inventario
+                  ? "Por favor escribir un inventario válido"
+                  : ""
+              }
+              onChange={(e) => {
+                handleInventoryChange("inventario", e.target.value);
+                handleUniqueInventarioError(
+                  "inventario",
+                  e.target.value,
+                  inventoryDataForm
+                );
+              }}
+              disabled={inventoryDataForm.empresa === ""}
+            />
           </Box>
 
-          {tipoInventario==="activo"?
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={ubicaciones}
-            getOptionLabel={(option) => option ? option.nombre : ""}
-            value={inventoryDataForm.ubicacion}
-            onChange={(_, newValue: Ubicacion | null) => {
-              handleInventoryChange("ubicacion", newValue);
-              handleUniqueInventarioError("ubicacion",newValue,inventoryDataForm);
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Ubicación"
-                variant="outlined"
-                error={!!inventoryErrors.ubicacion}
-                helperText={inventoryErrors.ubicacion? "Por favor seleccionar una ubicación" :""}
-                fullWidth
-              />
-            )}
-            disabled={!edificio}
-          />:""}
+          {tipoInventario === "activo" ? (
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={ubicaciones}
+              getOptionLabel={(option) => (option ? option.nombre : "")}
+              value={inventoryDataForm.ubicacion}
+              onChange={(_, newValue: Ubicacion | null) => {
+                handleInventoryChange("ubicacion", newValue);
+                handleUniqueInventarioError(
+                  "ubicacion",
+                  newValue,
+                  inventoryDataForm
+                );
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Ubicación"
+                  variant="outlined"
+                  error={!!inventoryErrors.ubicacion}
+                  helperText={
+                    inventoryErrors.ubicacion
+                      ? "Por favor seleccionar una ubicación"
+                      : ""
+                  }
+                  fullWidth
+                />
+              )}
+              disabled={!edificio}
+            />
+          ) : (
+            ""
+          )}
         </div>
       </div>
     </Box>
