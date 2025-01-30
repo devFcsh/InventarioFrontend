@@ -12,7 +12,7 @@ import {useCargarImagenErrors,useFormDataCargarImagen} from "./hooks/index.ts"
 import {StepCargarImagen} from "./Steps/StepCargarImagen.tsx"
 export const FormSAP = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(0);
   const location = useLocation();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const selectedPeriferico = location.state?.periferico as
@@ -81,13 +81,11 @@ export const FormSAP = () => {
   };
   
   const handleModalBeforeAdd = () => {
+    handleCargarImagenErrors(imageData);
     if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData) && !error) {
       setOpenModalObservation(true);
     }
   };
-  const onAddObservation = (value: string)=>{
-    setObservation(value)
-  }
 
   const renderStepContent = (stepIndex: number) => {
     switch (stepIndex) {
@@ -115,14 +113,17 @@ export const FormSAP = () => {
       case 2:
         return (
         <>
-            <ModalObservation 
-            open={openModalObservation}
-            onClose={() => setOpenModalObservation(false)}
-            onConfirm={handleAgregarEquipoActivo}
-            title="Agregar observación"
-            message="¿Desea agregar una observación al equipo?"
-            onAddObservation={onAddObservation}
+            <ModalObservation
+              open={openModalObservation}
+              onClose={() => setOpenModalObservation(false)}
+              onConfirm={(observationValue) => {
+                setOpenModalObservation(false);
+                handleAgregarEquipoActivo(observationValue);
+              }}
+              title="Agregar observación"
+              message="¿Desea agregar una observación al equipo?"
             />
+
             <StepCargarImagen
             imageData={imageData}
             handleImageChange={handleImageChange}
@@ -135,8 +136,7 @@ export const FormSAP = () => {
         return <div>Paso no encontrado</div>;
     }
   };
-  const handleAgregarEquipoActivo = async () => {
-    setOpenModalObservation(false);
+  const handleAgregarEquipoActivo = async (observationValue: string) => {
     const equipoData = {
       tipo: "activo",
       inventario: inventoryDataSAPForm.inventario || "",
@@ -144,7 +144,7 @@ export const FormSAP = () => {
       idUbicacion: Number(inventoryDataSAPForm.ubicacion?.id_ubicacion) ?? 0,
       idUsuario: 1,
       imagenRuta: imageData.imagePath,
-      observacion: observation,
+      observacion: observationValue,
       mac: informacionGeneralDataSAPForm.mac || "",
       puertos: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertos,
       puerto_ftp: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertoFTP,

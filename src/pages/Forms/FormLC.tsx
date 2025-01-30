@@ -193,7 +193,6 @@ export const FormLC = () => {
     }
   };
   const handleAgregarEquipoActivo = async (observationValue: string) => {
-    setOpenModalObservation(false);
     const equipoData = {
       tipo: "activo",
       inventario: inventoryDataForm.inventario || "",
