@@ -13,6 +13,7 @@ import { useInventario } from "@hooks/useInventario.ts";
 import { filas } from "../../../../data";
 import { useEquiposBodegaFiltrados } from "../hooks/useEquiposBodegaFiltrados";
 import {ModalAgregarBodega} from "../../../../features/Equipos/Bodega/Pages/ModalAgregarBodega";
+import ModalPasarAActivo from "../Pages/ModalPasarAActivo";
 
 const Bodega = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
@@ -45,6 +46,9 @@ const Bodega = () => {
     title: "Confirmar",
     message: "¿Estás seguro de que deseas realizar esta acción?",
   });
+
+  const [openModalPasarAActivo, setOpenModalPasarAActivo] = useState<boolean>(false);
+  const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null);
 
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -115,6 +119,16 @@ const Bodega = () => {
       console.error("Error en la acción", error);
     }
     handleCloseModal();
+  };
+
+  const handleOpenModalPasarAActivo = (equipoId: string) => {
+    setSelectedEquipoId(equipoId);
+    setOpenModalPasarAActivo(true);
+  };
+
+  const handleCloseModalPasarAActivo = () => {
+    setOpenModalPasarAActivo(false);
+    setSelectedEquipoId(null);
   };
 
    /** 
@@ -546,6 +560,13 @@ const Bodega = () => {
                         className="cursor-pointer"
                       />
                     </Link>
+                    <Icon
+                      icon="icon-park-outline:upload-computer"
+                      width="25"
+                      height="25"
+                      className="cursor-pointer"
+                      onClick={() => handleOpenModalPasarAActivo(equipo.id_equipo)}
+                    />
                   </td>
                 </tr>
               ))}
@@ -592,6 +613,11 @@ const Bodega = () => {
           </button>
         </div>
       </nav>
+      <ModalPasarAActivo
+        equipoId={selectedEquipoId}
+        open={openModalPasarAActivo}
+        onClose={handleCloseModalPasarAActivo}
+      />
       <ModalConfirmation
         open={openModal}
         onClose={handleCloseModal}
