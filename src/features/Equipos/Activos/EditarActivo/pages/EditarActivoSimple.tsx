@@ -26,12 +26,10 @@ interface EditarActivoSimpleProps {
     equipoSimpleActivo: ActivoSimpleEdit;
     idUsuario: string | null;
     perifericoName: string;
-    perifericoID: string;
 }
 
 const EditarActivoSimple = ({
   perifericoName,
-  perifericoID,
   equipoSimpleActivo,
   idUsuario,
 }: EditarActivoSimpleProps) => {
@@ -76,7 +74,7 @@ const EditarActivoSimple = ({
     selectedInventarioModelo?.id_modelo ?? ""
   );
   const { lamparas } = useLamparasPorModelo(
-    perifericoID,
+    equipoSimpleActivo?.id_periferico ?? "",
     selectedInventarioMarca?.id_marca ?? "",
     selectedInventarioModelo?.id_modelo ?? ""
   );
@@ -252,7 +250,8 @@ const EditarActivoSimple = ({
     if (
       !selectedInventarioInv ||
       !selectedInventarioSerie ||
-      !selectedUbicacion
+      !selectedUbicacion || 
+      perifericoName!=="Proyector"?true:!selectedLampara
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -295,6 +294,7 @@ const EditarActivoSimple = ({
             setSelectedInventarioMarca(newValue);
             setSelectedInventarioModelo(null);
             setSelectedInventarioSerie(null);
+            setSelectedLampara(null);
           }}
           getOptionLabel={(option) => option?.nombre || ""}
           renderInput={(params) => (
