@@ -29,14 +29,21 @@ export const ModalObservation: React.FC<ModalProps> = ({
   };
 
   const handleConfirm = () => {
-    if (addObservation && newObservation.length <= 200) {
+    if (addObservation) {
       onConfirm(newObservation);
-    } else if (!addObservation) {
-      onConfirm("");
     } else {
-      setErrorMensajeComponente("La observación no puede tener más de 200 caracteres.");
+      onConfirm("");
     }
   };
+
+  const handleChangeNewObservation = (value : string)=>{
+    if(value.length <= 200){
+      setNewObservation(value)
+      setErrorMensajeComponente("");
+    }else{
+      setErrorMensajeComponente("La observación no puede tener más de 200 caracteres.");
+    }
+  }
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -57,7 +64,9 @@ export const ModalObservation: React.FC<ModalProps> = ({
                 multiline
                 minRows={4}
                 value={newObservation}
-                onChange={(e) => setNewObservation(e.target.value)}
+                onChange={(e) => {
+                  handleChangeNewObservation(e.target.value)
+                }}
                 error={!!errorMensajeComponente}
                 helperText={errorMensajeComponente}
               />
