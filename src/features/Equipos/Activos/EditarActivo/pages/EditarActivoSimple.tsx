@@ -80,9 +80,6 @@ const EditarActivoSimple = ({
     selectedInventarioMarca?.id_marca ?? "",
     selectedInventarioModelo?.id_modelo ?? ""
   );
-  console.log(lamparas)
-  console.log(selectedInventarioMarca)
-  console.log(selectedInventarioModelo)
   const [errorLampara, setErrorLampara] = useState(false);
   
   const { edificios } = useEdificios();
@@ -96,32 +93,59 @@ const EditarActivoSimple = ({
     if (equipoSimpleActivo) {
       setSelectedInventarioInv(equipoSimpleActivo.inventario);
       setCurrentImagePath(equipoSimpleActivo.imagenRuta);
+      setNewObservation(equipoSimpleActivo.observacion);
+      equipoSimpleActivo.inventario.length===10?setEmpresa("EspolTech"):setEmpresa("Espol")
+    }
+  }, [equipoSimpleActivo]);
+
+  useEffect(() => {
+    if (equipoSimpleActivo && marcas.length > 0) {
       setSelectedInventarioMarca(
         marcas.find((marca) => marca?.id_marca === equipoSimpleActivo.id_marca) || null
       );
+    }
+  }, [equipoSimpleActivo, marcas]);
+
+  useEffect(() => {
+    if (equipoSimpleActivo && modelos.length > 0) {
       setSelectedInventarioModelo(
         modelos.find((modelo) => modelo?.id_modelo === equipoSimpleActivo.id_modelo) || null
       );
+    }
+  }, [equipoSimpleActivo, modelos]);
+
+  useEffect(() => {
+    if (equipoSimpleActivo && series.length > 0) {
       setSelectedInventarioSerie(
         series.find((serie) => serie?.id_serie === equipoSimpleActivo.id_serie) || null
       );
+    }
+  }, [equipoSimpleActivo, series]);
+
+  useEffect(() => {
+    if (equipoSimpleActivo && edificios.length > 0) {
       setSelectedEdificio(
-        edificios.find(
-          (edificio) => edificio?.id_edificio === equipoSimpleActivo.id_edificio
-        ) || null
+        edificios.find((edificio) => edificio?.id_edificio === equipoSimpleActivo.id_edificio) || null
       );
+    }
+  }, [equipoSimpleActivo, edificios]);
+
+  useEffect(() => {
+    if (equipoSimpleActivo && ubicaciones.length > 0) {
       setSelectedUbicacion(
         ubicaciones.find((ubicacion) => ubicacion?.id_ubicacion === equipoSimpleActivo.id_ubicacion) || null
       );
-      setNewObservation(equipoSimpleActivo.observacion);
-      equipoSimpleActivo.inventario.length===10?setEmpresa("EspolTech"):setEmpresa("Espol")
-      setSelectedLampara(
-        lamparasTotales.find(
-          (lampara) => lampara?.id_lampara === equipoSimpleActivo?.id_lampara
-        ) || null
-      )
     }
-  }, [equipoSimpleActivo, marcas, modelos, series]);
+  }, [equipoSimpleActivo, ubicaciones]);
+
+  useEffect(() => {
+    if (equipoSimpleActivo && lamparasTotales.length > 0) {
+      setSelectedLampara(
+        lamparasTotales.find((lampara) => lampara?.id_lampara === equipoSimpleActivo.id_lampara) || null
+      );
+    }
+  }, [equipoSimpleActivo, lamparasTotales]);
+  
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -179,11 +203,11 @@ const EditarActivoSimple = ({
     await handleEditEquipo(newObservation);
   };
   const handleObservation = (newObservation :string)=>{
-    setNewObservation(newObservation);
-    if(!(newObservation.length <= 200)){
-      setErrorMensajeComponente("La observación no puede tener más de 200 caracteres.");
-    }else{
+    if(newObservation.length <= 200){
+      setNewObservation(newObservation);
       setErrorMensajeComponente("");
+    }else{
+      setErrorMensajeComponente("La observación no puede tener más de 200 caracteres.");
     }
   }
 
@@ -276,7 +300,6 @@ const EditarActivoSimple = ({
           renderInput={(params) => (
             <TextField {...params} label="Marca" variant="outlined" fullWidth />
           )}
-          disabled
         />
         <Autocomplete
           size="small"
@@ -296,7 +319,6 @@ const EditarActivoSimple = ({
               fullWidth
             />
           )}
-          disabled
         />
         <Autocomplete
           size="small"
@@ -308,7 +330,6 @@ const EditarActivoSimple = ({
           renderInput={(params) => (
             <TextField {...params} label="Serie" variant="outlined" fullWidth />
           )}
-          disabled
         />
         <Box
           sx={{
@@ -461,7 +482,7 @@ const EditarActivoSimple = ({
                 variant="outlined"
                 fullWidth
                 multiline
-                minRows={4}
+                minRows={2}
                 value={newObservation}
                 onChange={(e) => {
                   handleObservation(e.target.value)

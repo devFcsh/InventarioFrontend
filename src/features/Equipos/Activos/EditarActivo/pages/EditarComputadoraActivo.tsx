@@ -407,13 +407,13 @@ const EditarComputadoraActivo = ({
   };
 
   const handleObservation = (newObservation: string) => {
-    setNewObservation(newObservation);
-    if (!(newObservation.length <= 200)) {
+    if (newObservation.length <= 200) {
+      setNewObservation(newObservation);
+      setErrorMensajeComponente("");
+    } else {
       setErrorMensajeComponente(
         "La observación no puede tener más de 200 caracteres."
       );
-    } else {
-      setErrorMensajeComponente("");
     }
   };
   const handleChangeEmpresa = (newEmpresa: string | null) => {
@@ -1033,7 +1033,7 @@ const EditarComputadoraActivo = ({
           variant="outlined"
           fullWidth
           multiline
-          minRows={4}
+          minRows={2}
           value={newObservation}
           onChange={(e) => {
             handleObservation(e.target.value);

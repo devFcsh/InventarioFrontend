@@ -27,23 +27,29 @@ const EditarActivo = () => {
     const { equipo, componentes, loading, error } =
       useObtenerComputadora(equipoId);
     useEffect(() => {
-      if (equipo) {
+      if (equipo && perifericos.length > 0) {
         const selectedPeriferico = perifericos.find(
           (p) => p?.id_periferico === equipo.id_periferico
         );
-        const selectedUso = usos.find((uso) => uso?.id_uso === equipo.id_uso);
         setPerifericoId(selectedPeriferico?.id_periferico || null);
+      }
+    }, [equipo, perifericos]);
+
+    useEffect(() => {
+      if (equipo && usos.length > 0) {
+        const selectedUso = usos.find((uso) => uso?.id_uso === equipo.id_uso);
         setSelectedUso(selectedUso || null);
       }
-    }, [equipo, perifericos, usos]);
+    }, [equipo, usos]);
+
     useEffect(() => {
-      if (selectedUso && usuarios.length > 0) {
+      if (equipo && usuarios.length > 0) {
         const selectedUsuario = usuarios.find(
           (usuario) => usuario?.id_usuario === equipo?.id_usuario
         );
         setSelectedUsuario(selectedUsuario || null);
       }
-    }, [selectedUso, usuarios, equipo]);
+    }, [equipo, usuarios]);
 
     if (loading) return <CircularProgress />;
     if (error) return <div>Error al cargar los datos del equipo</div>;
@@ -140,23 +146,30 @@ const EditarActivo = () => {
   }else{
     const{ equipoSimpleActivo, loadingActivoSimple, errorActivoSimple} = useObtenerComputadoraActivo(equipoId)
     useEffect(() => {
-      if (equipoSimpleActivo) {
+      if (equipoSimpleActivo && perifericos.length > 0) {
         const selectedPeriferico = perifericos.find(
           (p) => p?.id_periferico === equipoSimpleActivo.id_periferico
         );
-        const selectedUso = usos.find((uso) => uso?.id_uso === equipoSimpleActivo.id_uso);
         setPerifericoId(selectedPeriferico?.id_periferico || null);
+      }
+    }, [equipoSimpleActivo, perifericos]);
+
+    useEffect(() => {
+      if (equipoSimpleActivo && usos.length > 0) {
+        const selectedUso = usos.find((uso) => uso?.id_uso === equipoSimpleActivo.id_uso);
         setSelectedUso(selectedUso || null);
       }
-    }, [equipoSimpleActivo, perifericos, usos]);
+    }, [equipoSimpleActivo, usos]);
+    
     useEffect(() => {
-      if (selectedUso && usuarios.length > 0) {
+      if (equipoSimpleActivo && usuarios.length > 0) {
         const selectedUsuario = usuarios.find(
           (usuario) => usuario?.id_usuario === equipoSimpleActivo?.id_usuario
         );
         setSelectedUsuario(selectedUsuario || null);
       }
-    }, [selectedUso, usuarios, equipoSimpleActivo]);
+    }, [equipoSimpleActivo, usuarios]);
+
     if (loadingActivoSimple) return <CircularProgress />;
     if (errorActivoSimple) return <div>Error al cargar los datos del equipo</div>;
     return (

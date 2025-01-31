@@ -87,6 +87,13 @@ export const useInventoryErrors = (tipoInventario: string,periferico:string | un
         ["usuario"]: false
       }));
     }
+    if(periferico!=="Proyector"){
+      setInventoryErrors((prevErrors) => ({
+        ...prevErrors,
+        ["lampara"]: false
+      }));
+    }
+    console.log(inventoryErrors)
   };
 
   const handleUniqueInventarioError = (tipo: keyof InventoryDataForm, value: Usuario | Marca | Modelo | Serie | string  | Ubicacion | Lampara | null,formData:InventoryDataForm) => {
