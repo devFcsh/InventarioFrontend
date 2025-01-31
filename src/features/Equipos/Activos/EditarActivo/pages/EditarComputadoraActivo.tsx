@@ -281,6 +281,16 @@ const EditarComputadoraActivo = ({
   }, [equipo, antivirus]);
 
   useEffect(() => {
+    if (equipo && versionesOffice.length > 0) {
+      setSelectedVersionOffice(
+        versionesOffice.find(
+          (version) => version?.id_versionoffice === equipo.id_versionoffice
+        ) || null
+      );
+    }
+  }, [equipo, versionesOffice]);
+
+  useEffect(() => {
     if (equipo) {
       setSelectedInventarioInv(equipo.inventario);
       setCurrentImagePath(equipo.imagenRuta);
