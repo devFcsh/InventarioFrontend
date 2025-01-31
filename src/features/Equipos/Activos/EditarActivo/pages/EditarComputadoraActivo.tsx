@@ -172,63 +172,118 @@ const EditarComputadoraActivo = ({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    if (equipo) {
-      setSelectedInventarioInv(equipo.inventario);
-      setCurrentImagePath(equipo.imagenRuta);
+    if (equipo && marcas.length > 0) {
       setSelectedInventarioMarca(
         marcas.find((marca) => marca?.id_marca === equipo.id_marca) || null
       );
+    }
+  }, [equipo, marcas]);
+
+  useEffect(() => {
+    if (equipo && modelos.length > 0) {
       setSelectedInventarioModelo(
         modelos.find((modelo) => modelo?.id_modelo === equipo.id_modelo) || null
       );
+    }
+  }, [equipo, modelos]);
+
+  useEffect(() => {
+    if (equipo && series.length > 0) {
       setSelectedInventarioSerie(
         series.find((serie) => serie?.id_serie === equipo.id_serie) || null
       );
+    }
+  }, [equipo, series]);
+
+  useEffect(() => {
+    if (equipo && sistemasOperativos.length > 0) {
       setSelectedSO(
         sistemasOperativos.find(
           (so) => so?.id_sistemaoperativo === equipo.id_sistemaoperativo
         ) || null
       );
+    }
+  }, [equipo, sistemasOperativos]);
+
+  useEffect(() => {
+    if (equipo && versionesSO.length > 0) {
       setSelectedVersionSO(
         versionesSO.find(
           (version) => version?.id_versionso === equipo.id_versionso
         ) || null
       );
+    }
+  }, [equipo, versionesSO]);
+
+  useEffect(() => {
+    if (equipo && ram.length > 0) {
       setSelectedRAM(
         ram.find((ramItem) => ramItem?.id_ram === equipo.id_ram) || null
       );
+    }
+  }, [equipo, ram]);
+
+  useEffect(() => {
+    if (equipo && discos.length > 0) {
       setSelectedDisco(
         discos.find((disco) => disco?.id_disco === equipo.id_disco) || null
       );
+    }
+  }, [equipo, discos]);
+
+  useEffect(() => {
+    if (equipo && procesadores.length > 0) {
       setSelectedProcesador(
         procesadores.find(
           (procesador) => procesador?.id_procesador === equipo.id_procesador
         ) || null
       );
+    }
+  }, [equipo, procesadores]);
+
+  useEffect(() => {
+    if (equipo && dominios.length > 0) {
       setSelectedDominio(
         dominios.find((dominio) => dominio?.id_dominio === equipo.id_dominio) ||
           null
       );
+    }
+  }, [equipo, dominios]);
+
+  useEffect(() => {
+    if (equipo && edificios.length > 0) {
       setSelectedEdificio(
         edificios.find(
           (edificio) => edificio?.id_edificio === equipo.id_edificio
         ) || null
       );
+    }
+  }, [equipo, edificios]);
+
+  useEffect(() => {
+    if (equipo && ubicaciones.length > 0) {
       setSelectedUbicacion(
         ubicaciones.find(
           (ubicacion) => ubicacion?.id_ubicacion === equipo.id_ubicacion
         ) || null
       );
-      setSelectedVersionOffice(
-        versionesOffice.find(
-          (version) => version?.id_versionoffice === equipo.id_versionoffice
-        ) || null
-      );
+    }
+  }, [equipo, ubicaciones]);
+
+  useEffect(() => {
+    if (equipo && antivirus.length > 0) {
       setSelectedAntivirus(
         antivirus.find(
           (av) => Number(av.id_antivirus) === equipo.id_antivirus
         ) || null
       );
+    }
+  }, [equipo, antivirus]);
+
+  useEffect(() => {
+    if (equipo) {
+      setSelectedInventarioInv(equipo.inventario);
+      setCurrentImagePath(equipo.imagenRuta);
       setNombreEquipo(equipo.nombre_equipo);
       setDireccionIP(equipo.direccion_ip);
       setProtocolo(equipo.direccion_ip ? "0" : "1");
@@ -237,17 +292,7 @@ const EditarComputadoraActivo = ({
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
-  }, [
-    equipo,
-    marcas,
-    modelos,
-    series,
-    ram,
-    discos,
-    procesadores,
-    dominios,
-    versionesOffice,
-  ]);
+  }, [equipo]);
 
   const handleAddComponente = () => {
     if (
@@ -522,7 +567,6 @@ const EditarComputadoraActivo = ({
           renderInput={(params) => (
             <TextField {...params} label="Marca" variant="outlined" fullWidth />
           )}
-          disabled
         />
         <Autocomplete
           size="small"
@@ -542,7 +586,6 @@ const EditarComputadoraActivo = ({
               fullWidth
             />
           )}
-          disabled
         />
         <Autocomplete
           size="small"
@@ -554,7 +597,6 @@ const EditarComputadoraActivo = ({
           renderInput={(params) => (
             <TextField {...params} label="Serie" variant="outlined" fullWidth />
           )}
-          disabled
         />
         <Box
           sx={{
