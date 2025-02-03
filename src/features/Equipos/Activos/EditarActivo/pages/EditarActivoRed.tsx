@@ -241,13 +241,19 @@ const EditarActivoRed = ({
     setOpenModalCancelar(true);
   };
   const validarCamposEquipo = () => {
+    console.log(!selectedInventarioInv)
+    console.log(!selectedInventarioSerie)
+    console.log(!selectedUbicacion)
+    console.log(!selectedMAC)
+    console.log(perifericoName!=="Switch"?true:!selectedPuertos)
+    console.log(perifericoName!=="Switch"?true:!selectedPuertoFTP)
     if (
       !selectedInventarioInv ||
       !selectedInventarioSerie ||
       !selectedUbicacion || 
       !selectedMAC || 
-      perifericoName!=="Switch"?true:!selectedPuertos || 
-      perifericoName!=="Switch"?true:!selectedPuertoFTP
+      perifericoName==="AP"?false:!selectedPuertos || 
+      perifericoName==="AP"?false:!selectedPuertoFTP
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -420,6 +426,7 @@ const EditarActivoRed = ({
             }
             onChange={(e) => handleMACChange(e.target.value)}
         />
+        {perifericoName === "Switch" ? (
         <TextField
             label="puertos"
             placeholder="Puertos"
@@ -428,7 +435,8 @@ const EditarActivoRed = ({
             size="small"
             value={selectedPuertos}
             onChange={(e) => setSelectedPuertos(e.target.value)}
-        />
+        />):""}
+        {perifericoName === "Switch" ? (
         <TextField
             label="puertoFTP"
             placeholder="Puerto FTP"
@@ -437,7 +445,7 @@ const EditarActivoRed = ({
             size="small"
             value={selectedPuertoFTP}
             onChange={(e) => setSelectedPuertoFTP(e.target.value)}
-        />
+        />):""}
 
       </div>
 

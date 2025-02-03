@@ -251,7 +251,7 @@ const EditarActivoSimple = ({
       !selectedInventarioInv ||
       !selectedInventarioSerie ||
       !selectedUbicacion || 
-      perifericoName!=="Proyector"?true:!selectedLampara
+      perifericoName!=="Proyector"?false:!selectedLampara
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;

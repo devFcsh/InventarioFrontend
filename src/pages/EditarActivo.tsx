@@ -158,7 +158,6 @@ const EditarActivo = () => {
 
     if (loadingActivoRed) return <CircularProgress />;
     if (errorActivoRed) return <div>Error al cargar los datos del equipo</div>;
-    console.log(equipoRedActivo)
     return (
       <div className="w-full max-w-7xl mx-auto p-4">
         <h1 className="text-2xl font-bold mb-10">Editar Activo</h1>
