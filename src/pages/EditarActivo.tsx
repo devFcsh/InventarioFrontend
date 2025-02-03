@@ -8,6 +8,8 @@ import useUsuariosPorUso from "../hooks/useUsuariosPorUso";
 import { useObtenerComputadora } from "../features/Equipos/Activos/EditarActivo/hooks/useComputadora";
 import { useObtenerComputadoraActivo } from "../features/Equipos/Activos/EditarActivo/hooks/useObtenerEquipoSimpleActivo";
 import EditarActivoSimple from "../features/Equipos/Activos/EditarActivo/pages/EditarActivoSimple";
+import { useObtenerRedActivo } from "../features/Equipos/Activos/EditarActivo/hooks/useObtenerEquipoRedActivo";
+import EditarActivoRed from "../features/Equipos/Activos/EditarActivo/pages/EditarActivoRed";
 
 const computadores: string[] = ["Laptop", "Computadora"];
 
@@ -126,6 +128,70 @@ const EditarActivo = () => {
               equipo={equipo}
               componentes={componentes}
               idUsuario={selectedUsuario?.id_usuario || null}
+            />
+          ) : (
+            perifericoId && (
+              /** 
+              <EditarOtroActivo
+                equipo={equipo}
+                componentes={componentes}
+                idUso={selectedUso?.id_uso || null}
+                idUsuario={selectedUsuario?.id_usuario || null}
+              />
+              */
+             <h1>Editando otro activo</h1>
+            )
+          )}
+        </div>
+      </div>
+    );
+  }else if(equipoName==="Switch" || equipoName==="AP"){
+    const{ equipoRedActivo, loadingActivoRed, errorActivoRed} = useObtenerRedActivo(equipoId)
+    useEffect(() => {
+      if (equipoRedActivo && perifericos.length > 0) {
+        const selectedPeriferico = perifericos.find(
+          (p) => p?.id_periferico === equipoRedActivo.id_periferico
+        );
+        setPerifericoId(selectedPeriferico?.id_periferico || null);
+      }
+    }, [equipoRedActivo, perifericos]);
+
+    if (loadingActivoRed) return <CircularProgress />;
+    if (errorActivoRed) return <div>Error al cargar los datos del equipo</div>;
+    console.log(equipoRedActivo)
+    return (
+      <div className="w-full max-w-7xl mx-auto p-4">
+        <h1 className="text-2xl font-bold mb-10">Editar Activo</h1>
+  
+        <div className="flex flex-col gap-4 mb-14">
+          <div className="mb-4">
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={perifericos}
+              value={
+                perifericos.find((p) => p?.id_periferico === perifericoId) ?? null
+              }
+              onChange={(event, newValue) =>
+                setPerifericoId(newValue ? newValue.id_periferico : null)
+              }
+              getOptionLabel={(option) => option?.nombre || ""}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Periférico"
+                  variant="outlined"
+                  fullWidth
+                />
+              )}
+              disabled
+            />
+          </div>
+
+          {perifericoId ? (
+            <EditarActivoRed 
+            perifericoName={equipoName}
+            equipoRedActivo={equipoRedActivo}
             />
           ) : (
             perifericoId && (
