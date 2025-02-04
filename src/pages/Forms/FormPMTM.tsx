@@ -1,11 +1,18 @@
 import { useState, Fragment } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Box, Stepper, Step, StepLabel, Button, Typography } from "@mui/material";
+import {
+  Box,
+  Stepper,
+  Step,
+  StepLabel,
+  Button,
+  Typography,
+} from "@mui/material";
 import { Edificio, Periferico, Uso } from "../../types";
 import { StepDatosInventario, StepCargarImagen } from "./Steps/index";
-import { useFormDatosInventario, useFormDataCargarImagen } from "./hooks/index"
+import { useFormDatosInventario, useFormDataCargarImagen } from "./hooks/index";
 import { useAgregarSimpleActivo } from "../../features/Equipos/Activos/AgregarActivo/hooks/useAgregarSimpleActivo";
-import { useInventoryErrors, useCargarImagenErrors } from './hooks/index';
+import { useInventoryErrors, useCargarImagenErrors } from "./hooks/index";
 import { useAgregarSimpleBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarSimpleBodega";
 import { useAgregarSimpleBaja } from "../../features/Equipos/Baja/AgregarEquipoBaja/hooks/useAgregarSimpleBaja";
 import { ModalObservation } from "./components/ModalObservation.tsx";
@@ -18,29 +25,33 @@ export const FormPMTM = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const tipoInventario = location.state?.tipoInventario;
-  if(tipoInventario==="baja" || tipoInventario==="bodega"){
-    steps = [
-      "Datos de inventario",
-    ];
+  if (tipoInventario === "baja" || tipoInventario === "bodega") {
+    steps = ["Datos de inventario"];
   }
   const selectedPeriferico = location.state?.periferico as
     | Periferico
     | undefined;
-  const selectedUso = location.state?.uso as
-    | Uso
-    | undefined;
-  const selectedEdificio = location.state?.edificio as
-    | Edificio
-    | undefined;
+  const selectedUso = location.state?.uso as Uso | undefined;
+  const selectedEdificio = location.state?.edificio as Edificio | undefined;
   const [openModalObservation, setOpenModalObservation] = useState(false);
-  const [observation, setObservation] = useState("")
+  const [observation, setObservation] = useState("");
   const { inventoryDataForm, handleInventoryChange } = useFormDatosInventario();
-  const { imageData, handleImageChange, error} = useFormDataCargarImagen();
-  const { inventoryErrors, completeDatosInventario, handleInventoryErrors, handleUniqueInventarioError } = useInventoryErrors(tipoInventario,selectedPeriferico?.nombre);
-  const { cargarImagenErrors, handleCargarImagenErrors, handleUniqueCargarImagenError, completeDatosCargarImagen } = useCargarImagenErrors();
+  const { imageData, handleImageChange, error } = useFormDataCargarImagen();
+  const {
+    inventoryErrors,
+    completeDatosInventario,
+    handleInventoryErrors,
+    handleUniqueInventarioError,
+  } = useInventoryErrors(tipoInventario, selectedPeriferico?.nombre);
+  const {
+    cargarImagenErrors,
+    handleCargarImagenErrors,
+    handleUniqueCargarImagenError,
+    completeDatosCargarImagen,
+  } = useCargarImagenErrors();
   const { agregarSimpleActivo } = useAgregarSimpleActivo();
-  const {agregarSimpleBodega} = useAgregarSimpleBodega();
-  const {agregarSimpleBaja} = useAgregarSimpleBaja();
+  const { agregarSimpleBodega } = useAgregarSimpleBodega();
+  const { agregarSimpleBaja } = useAgregarSimpleBaja();
   const stepStyle = {
     "& .Mui-active": {
       "&.MuiStepIcon-root": {
@@ -67,7 +78,10 @@ export const FormPMTM = () => {
   const handleNext = () => {
     if (activeStep === 0) {
       handleInventoryErrors(inventoryDataForm);
-      if (!Object.values(inventoryErrors).includes(true) && completeDatosInventario(inventoryDataForm)) {
+      if (
+        !Object.values(inventoryErrors).includes(true) &&
+        completeDatosInventario(inventoryDataForm)
+      ) {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
       }
     }
@@ -84,52 +98,97 @@ export const FormPMTM = () => {
     if (tipoInventario === "activo") {
       navigate("/activos");
     } else if (tipoInventario === "bodega") {
-      navigate("/bodega")
+      navigate("/bodega");
     } else {
       navigate("/bajas");
     }
   };
 
-
   const handleModalBeforeAdd = () => {
-    handleCargarImagenErrors(imageData);
-    if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData) &&!error) {
-      setOpenModalObservation(true);
+    if(tipoInventario==="activo"){
+      handleCargarImagenErrors(imageData);
+      if (
+        !Object.values(cargarImagenErrors).includes(true) &&
+        completeDatosCargarImagen(imageData) &&
+        !error
+      ) {
+        setOpenModalObservation(true);
+      }
+    }else{
+      handleInventoryErrors(inventoryDataForm);
+      if (
+        !Object.values(inventoryErrors).includes(true) &&
+        completeDatosInventario(inventoryDataForm)
+      ) {
+        setOpenModalObservation(true);
+      }
     }
   };
+
+  const handleAgregarEquipo = (observationValue: string)=>{
+    if(tipoInventario==="activo"){
+      handleAgregarEquipoActivo(observationValue);
+    }else if(tipoInventario==="bodega"){
+      handleAgregarEquipoBodega(observationValue);
+      
+    }else{
+      handleAgregarEquipoBaja(observationValue);
+
+    }
+  }
 
   const renderStepContent = (stepIndex: number) => {
     switch (stepIndex) {
       case 0:
-        return <StepDatosInventario
-          periferico={selectedPeriferico}
-          uso={selectedUso?.id_uso ?? ""}
-          edificio={selectedEdificio?.id_edificio ?? ""}
-          inventoryDataForm={inventoryDataForm}
-          handleInventoryChange={handleInventoryChange}
-          inventoryErrors={inventoryErrors}
-          handleUniqueInventarioError={handleUniqueInventarioError}
-          tipoInventario={tipoInventario} />;
+        return (
+          <>
+              <ModalObservation
+                open={openModalObservation}
+                onClose={() => setOpenModalObservation(false)}
+                onConfirm={(observationValue) => {
+                  setOpenModalObservation(false);
+                  handleAgregarEquipo(observationValue)
+                  
+                }}
+                title="Agregar observación"
+                message="¿Desea agregar una observación al equipo?"
+              />
+ 
+            <StepDatosInventario
+              periferico={selectedPeriferico}
+              uso={selectedUso?.id_uso ?? ""}
+              edificio={selectedEdificio?.id_edificio ?? ""}
+              inventoryDataForm={inventoryDataForm}
+              handleInventoryChange={handleInventoryChange}
+              inventoryErrors={inventoryErrors}
+              handleUniqueInventarioError={handleUniqueInventarioError}
+              tipoInventario={tipoInventario}
+            />
+          </>
+        );
       case 1:
         return (
-        <>
-        <ModalObservation 
-          open={openModalObservation}
-          onClose={() => setOpenModalObservation(false)}
-          onConfirm={(observationValue) => {
-            setOpenModalObservation(false);
-            handleAgregarEquipoActivo(observationValue);
-          }}
-          title="Agregar observación"
-          message="¿Desea agregar una observación al equipo?"
-        />
-          <StepCargarImagen
-            imageData={imageData}
-            handleImageChange={handleImageChange}
-            cargarImagenErrors={cargarImagenErrors}
-            handleUniqueCargarImagenError={handleUniqueCargarImagenError}
-            error={error}/>
-        </>
+          <>
+          <ModalObservation
+              open={openModalObservation}
+              onClose={() => setOpenModalObservation(false)}
+              onConfirm={(observationValue) => {
+                setOpenModalObservation(false);
+                handleAgregarEquipo(observationValue)
+                
+              }}
+              title="Agregar observación"
+              message="¿Desea agregar una observación al equipo?"
+            />
+ 
+            <StepCargarImagen
+              imageData={imageData}
+              handleImageChange={handleImageChange}
+              cargarImagenErrors={cargarImagenErrors}
+              handleUniqueCargarImagenError={handleUniqueCargarImagenError}
+              error={error}
+            />
+          </>
         );
       default:
         return <div>Paso no encontrado</div>;
@@ -142,13 +201,19 @@ export const FormPMTM = () => {
       inventario: inventoryDataForm.inventario || "",
       serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
       idUbicacion: Number(inventoryDataForm.ubicacion?.id_ubicacion) ?? 0,
-      idUsuario: selectedPeriferico?.nombre==="Proyector"?1: parseInt(inventoryDataForm.usuarioId || "", 10),
+      idUsuario:
+        selectedPeriferico?.nombre === "Proyector"
+          ? 1
+          : parseInt(inventoryDataForm.usuarioId || "", 10),
       imagenRuta: imageData.imagePath,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,
-      observacion: observationValue
+      observacion: observationValue,
     };
     try {
-      if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData)) {
+      if (
+        !Object.values(cargarImagenErrors).includes(true) &&
+        completeDatosCargarImagen(imageData)
+      ) {
         await agregarSimpleActivo(equipoSimpleData);
         setShowSuccessMessage(true);
         navigate("/activos", { state: { equipoAgregado: true } });
@@ -157,18 +222,22 @@ export const FormPMTM = () => {
       alert("Error al agregar el componente");
     }
   };
-  
-  const handleAgregarEquipoBodega = async () => {
+
+  const handleAgregarEquipoBodega = async (observationValue: string) => {
     handleInventoryErrors(inventoryDataForm);
     const bodegaSimpleData = {
       tipo: "bodega",
       inventario: inventoryDataForm.inventario || "",
       serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
-      observacion: observation,
+      observacion: observationValue,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,
     };
     try {
-    if (!Object.values(cargarImagenErrors).includes(true) && completeDatosInventario(inventoryDataForm) &&!error) {
+      if (
+        !Object.values(cargarImagenErrors).includes(true) &&
+        completeDatosInventario(inventoryDataForm) &&
+        !error
+      ) {
         await agregarSimpleBodega(bodegaSimpleData);
         setShowSuccessMessage(true);
         navigate("/bodega", { state: { equipoAgregado: true } });
@@ -176,19 +245,21 @@ export const FormPMTM = () => {
     } catch (error) {
       alert("Error al agregar el componente");
     }
-
-  }
-  const handleAgregarEquipoBaja = async () => {
+  };
+  const handleAgregarEquipoBaja = async (observationValue: string) => {
     handleInventoryErrors(inventoryDataForm);
     const bajaSimpleData = {
       tipo: "baja",
       inventario: inventoryDataForm.inventario || "",
       serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
-      observacion: observation,
+      observacion: observationValue,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,
     };
     try {
-    if (!Object.values(cargarImagenErrors).includes(true) && completeDatosInventario(inventoryDataForm)) {
+      if (
+        !Object.values(cargarImagenErrors).includes(true) &&
+        completeDatosInventario(inventoryDataForm)
+      ) {
         await agregarSimpleBaja(bajaSimpleData);
         setShowSuccessMessage(true);
         navigate("/bajas", { state: { equipoAgregado: true } });
@@ -196,9 +267,7 @@ export const FormPMTM = () => {
     } catch (error) {
       alert("Error al agregar el componente");
     }
-  }
-
-
+  };
 
   return (
     <Box
@@ -257,29 +326,24 @@ export const FormPMTM = () => {
                 Cancelar
               </Button>
 
-
-              {steps.length===1
-              ?"":<Button
-              variant="contained"
-              disabled={activeStep === 0}
-              onClick={handleBack}
-            >
-              Atrás
-            </Button>}
+              {steps.length === 1 ? (
+                ""
+              ) : (
+                <Button
+                  variant="contained"
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
+                >
+                  Atrás
+                </Button>
+              )}
 
               <Button
                 onClick={
                   activeStep === steps.length - 1
-                    ? tipoInventario === "activo"
-                      ? handleModalBeforeAdd
-                      : tipoInventario === "bodega"
-                        ? handleAgregarEquipoBodega
-                        : tipoInventario === "baja"
-                          ? handleAgregarEquipoBaja
-                          : handleNext
+                    ? handleModalBeforeAdd
                     : handleNext
                 }
-
                 variant="contained"
                 sx={{
                   backgroundColor:
@@ -290,17 +354,15 @@ export const FormPMTM = () => {
                   },
                 }}
               >
-                {
-                  activeStep === steps.length - 1
-                    ? tipoInventario === "activo"
-                      ? "Agregar Activo"
-                      : tipoInventario === "bodega"
-                        ? "Agregar Bodega"
-                        : tipoInventario === "baja"
-                          ? "Agregar Baja"
-                          : "Siguiente"
+                {activeStep === steps.length - 1
+                  ? tipoInventario === "activo"
+                    ? "Agregar Activo"
+                    : tipoInventario === "bodega"
+                    ? "Agregar Bodega"
+                    : tipoInventario === "baja"
+                    ? "Agregar Baja"
                     : "Siguiente"
-                }
+                  : "Siguiente"}
               </Button>
             </Box>
           </Fragment>
