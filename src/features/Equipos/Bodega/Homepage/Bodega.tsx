@@ -551,8 +551,9 @@ const Bodega = () => {
                     />
                     <Link
                       to="/editarBodega"
-                      state={{ equipoId: equipo.id_equipo, perifericos }}
+                      state={{ equipoId: equipo.id_equipo, perifericos,equipoName: equipo.periferico }}
                     >
+                      
                       <Icon
                         icon="mage:edit"
                         width="25"

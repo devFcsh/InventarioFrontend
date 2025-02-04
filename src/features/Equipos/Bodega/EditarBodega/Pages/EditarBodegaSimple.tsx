@@ -4,180 +4,124 @@ import {
   Marca,
   Modelo,
   Serie,
-  Ubicacion,
-  Edificio,
+  Lampara,
 } from "../../../../../types";
-import { ActivoRedEdit } from "../../../../../types/Activo";
+import { BodegaSimpleEdit } from "../../../../../types/Bodega/index";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
-import useEdificios from "../../../../../hooks/useEdificios";
-import useUbicaciones from "../../../../../hooks/useUbicaciones";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
-import useSubirImagen from "../../../../../hooks/useSubirImagen";
+import useEditarBodegaSimple from "../hooks/useEditarBodegaSimple";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario";
-import useEditarActivoRed from "../hooks/useEditarActivoRed";
-import { validateMAC } from "@pages/Forms/StepsSAP/helpers/validateMAC";
+import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
+import useLamparas from "@hooks/useLamparas";
 
-interface EditarActivoRedProps {
-    equipoRedActivo: ActivoRedEdit;
+interface EditarBodegaSimpleProps {
+    equipoSimpleBodega: BodegaSimpleEdit;
     perifericoName: string;
 }
 
-const EditarActivoRed = ({
+const EditarBodegaSimple = ({
   perifericoName,
-  equipoRedActivo,
-}: EditarActivoRedProps) => {
+  equipoSimpleBodega
+}: EditarBodegaSimpleProps) => {
   const [selectedInventarioMarca, setSelectedInventarioMarca] =
     useState<Marca | null>(null);
   const [selectedInventarioModelo, setSelectedInventarioModelo] =
     useState<Modelo | null>(null);
-
+  const [selectedLampara, setSelectedLampara] =
+    useState<Lampara | null>(null);
   const [selectedInventarioSerie, setSelectedInventarioSerie] =
     useState<Serie | null>(null);
-    
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
-    const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
-      null
-    );
-    const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(null);
-  const [selectedMAC, setSelectedMAC] =
-    useState<string>("");
-  const [selectedPuertos, setSelectedPuertos] =
-    useState<string>("");
-  const [selectedPuertoFTP, setSelectedPuertoFTP] =
-    useState<string>("");
-  const [empresa, setEmpresa] = useState<string | null>("");
-
   const [newObservation, setNewObservation] = useState<string>("");
   const [errorMensajeComponente, setErrorMensajeComponente] = useState<string | null>(null);
+  const [empresa, setEmpresa] = useState<string | null>("");
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
-  const [errorMAC, setErrorMAC] = useState<boolean>(false);
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(null);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   
-
   const navigate = useNavigate();
-  const [image, setImage] = useState<File | null>(null);
-  const [currentImagePath, setCurrentImagePath] = useState<string | null>(null);
-
-  const { uploadImage } = useSubirImagen();
-  const { marcas } = useMarcasPorPeriferico(equipoRedActivo?.id_periferico ?? "");
+  const { marcas } = useMarcasPorPeriferico(equipoSimpleBodega?.id_periferico ?? "");
   const { modelos } = useModelosPorMarcaPeriferico(
-    equipoRedActivo?.id_marca ?? "",
-    equipoRedActivo?.id_periferico ?? ""
+    selectedInventarioMarca?.id_marca ?? "",
+    equipoSimpleBodega?.id_periferico ?? ""
   );
   const { series } = useSeriesPorModelo(
-    equipoRedActivo?.id_periferico ?? "",
+    equipoSimpleBodega?.id_periferico ?? "",
     selectedInventarioMarca?.id_marca ?? "",
     selectedInventarioModelo?.id_modelo ?? ""
   );
+  const { lamparas } = useLamparasPorModelo(
+    equipoSimpleBodega?.id_periferico ?? "",
+    selectedInventarioMarca?.id_marca ?? "",
+    selectedInventarioModelo?.id_modelo ?? ""
+  );
+  const [errorLampara, setErrorLampara] = useState(false);
   
-  const { edificios } = useEdificios();
-  const { ubicaciones } = useUbicaciones(selectedEdificio?.id_edificio ?? "");
-  const { editarActivoRed } = useEditarActivoRed();
-
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { lamparasTotales } = useLamparas();
+  const { editarBodegaSimple } = useEditarBodegaSimple();
 
   useEffect(() => {
-    if (equipoRedActivo) {
-      setSelectedInventarioInv(equipoRedActivo.inventario);
-      setCurrentImagePath(equipoRedActivo.imagenRuta);
-      setNewObservation(equipoRedActivo.observacion);
-      setSelectedMAC(equipoRedActivo.mac);
-      setSelectedPuertos(equipoRedActivo.puertos);
-      setSelectedPuertoFTP(equipoRedActivo.puerto_ftp);
-      equipoRedActivo.inventario.length===10?setEmpresa("EspolTech"):setEmpresa("Espol")
+    if (equipoSimpleBodega) {
+      setSelectedInventarioInv(equipoSimpleBodega.inventario);
+      setNewObservation(equipoSimpleBodega.observacion);
+      equipoSimpleBodega.inventario.length===10?setEmpresa("EspolTech"):setEmpresa("Espol")
     }
-  }, [equipoRedActivo]);
+  }, [equipoSimpleBodega]);
 
   useEffect(() => {
-    if (equipoRedActivo && marcas.length > 0) {
+    if (equipoSimpleBodega && marcas.length > 0) {
       setSelectedInventarioMarca(
-        marcas.find((marca) => marca?.id_marca === equipoRedActivo.id_marca) || null
+        marcas.find((marca) => marca?.id_marca === equipoSimpleBodega.id_marca) || null
       );
     }
-  }, [equipoRedActivo, marcas]);
+  }, [equipoSimpleBodega, marcas]);
 
   useEffect(() => {
-    if (equipoRedActivo && modelos.length > 0) {
+    if (equipoSimpleBodega && modelos.length > 0) {
       setSelectedInventarioModelo(
-        modelos.find((modelo) => modelo?.id_modelo === equipoRedActivo.id_modelo) || null
+        modelos.find((modelo) => modelo?.id_modelo === equipoSimpleBodega.id_modelo) || null
       );
     }
-  }, [equipoRedActivo, modelos]);
+  }, [equipoSimpleBodega, modelos]);
 
   useEffect(() => {
-    if (equipoRedActivo && series.length > 0) {
+    if (equipoSimpleBodega && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipoRedActivo.id_serie) || null
+        series.find((serie) => serie?.id_serie === equipoSimpleBodega.id_serie) || null
       );
     }
-  }, [equipoRedActivo, series]);
+  }, [equipoSimpleBodega, series]);
+
 
   useEffect(() => {
-    if (equipoRedActivo && edificios.length > 0) {
-      setSelectedEdificio(
-        edificios.find((edificio) => edificio?.id_edificio === equipoRedActivo.id_edificio) || null
+    if (equipoSimpleBodega && lamparasTotales.length > 0) {
+      setSelectedLampara(
+        lamparasTotales.find((lampara) => lampara?.id_lampara === equipoSimpleBodega.id_lampara) || null
       );
     }
-  }, [equipoRedActivo, edificios]);
+  }, [equipoSimpleBodega, lamparasTotales]);
 
-  useEffect(() => {
-    if (equipoRedActivo && ubicaciones.length > 0) {
-      setSelectedUbicacion(
-        ubicaciones.find((ubicacion) => ubicacion?.id_ubicacion === equipoRedActivo.id_ubicacion) || null
-      );
-    }
-  }, [equipoRedActivo, ubicaciones]);
-  
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setImage(file);
-    }
-  };
-
-  const handleImageClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
 
   const handleEditEquipo = async (observationValue : string) => {
-    let nuevaImagen = currentImagePath;
-    
-    if (image) {
-      try {
-        nuevaImagen = await uploadImage(image);
-      } catch (error) {
-        alert('Error al cargar la imagen.');
-        return;
-      }
-    }
 
     const payload = {
-      tipo: "activo",
+      tipo: "bodega",
       inventario: selectedInventarioInv,
-      id_usuario: "1",
-      imagenRuta: image ? nuevaImagen : "",
-      id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
       id_serie: selectedInventarioSerie?.id_serie ?? "",
-      observacion: observationValue?? "",
-      mac: selectedMAC?? "",
-      puertos: selectedPuertos?? "",
-      puerto_ftp: selectedPuertoFTP?? "",
+      observacion: observationValue,
+      id_lampara: selectedLampara?.id_lampara ?? "",
     };
     try {
-      await editarActivoRed(equipoRedActivo.id_equipo, payload);
+      await editarBodegaSimple(equipoSimpleBodega.id_equipo, payload);
         setShowSuccessMessage(true);
-        navigate("/activos", { state: { equipoEditado: true } });
+        navigate("/bodega", { state: { equipoEditado: true } });
       
     } catch (error) {
       console.error("Error al actualizar equipo:", error);
@@ -223,18 +167,18 @@ const EditarActivoRed = ({
         !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
       }
     }
-    const handleMACChange = (MAC :string)=>{
-      setSelectedMAC(MAC)
-      if(MAC===null){
-        setErrorMAC(true);
+    const handleLamparaChange = (lampara :Lampara)=>{
+      setSelectedLampara(lampara)
+      if(lampara===null){
+        setErrorLampara(true)
       }else{
-        !validateMAC(MAC)?setErrorMAC(true):setErrorMAC(false)
-    }
+        setErrorLampara(false)
+      }
     }
 
   const handleCancelar = () => {
     setOpenModalCancelar(false);
-    navigate("/activos");
+    navigate("/bodega");
   };
 
   const handleConfirmCancelar = () => {
@@ -244,10 +188,7 @@ const EditarActivoRed = ({
     if (
       !selectedInventarioInv ||
       !selectedInventarioSerie ||
-      !selectedUbicacion || 
-      !selectedMAC || 
-      perifericoName==="AP"?false:!selectedPuertos || 
-      perifericoName==="AP"?false:!selectedPuertoFTP
+      perifericoName!=="Proyector"?false:!selectedLampara
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -290,6 +231,7 @@ const EditarActivoRed = ({
             setSelectedInventarioMarca(newValue);
             setSelectedInventarioModelo(null);
             setSelectedInventarioSerie(null);
+            setSelectedLampara(null);
           }}
           getOptionLabel={(option) => option?.nombre || ""}
           renderInput={(params) => (
@@ -370,110 +312,35 @@ const EditarActivoRed = ({
             disabled={empresa === ""}
           />
         </Box>
-      </div>
-
-      <h2 className="text-xl font-semibold mb-5">Información General</h2>
-      <div className="grid grid-cols-2 gap-4 mb-4">
-
-        <Autocomplete
-          size="small"
-          disablePortal
-          options={edificios}
-          value={selectedEdificio}
-          onChange={(_, newValue) => {
-            setSelectedEdificio(newValue);
-            setSelectedUbicacion(null);
-          }}
-          getOptionLabel={(option) => option? option.nombre : ""}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Edificio"
-              variant="outlined"
-              fullWidth
+        {perifericoName === "Proyector" ? (
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={lamparas}
+              value={selectedLampara}
+              onChange={(_, newValue: Lampara | null) => {
+                handleLamparaChange(newValue)
+              }}
+              getOptionLabel={(option) => (option ? option.nombre : "")}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Lámpara"
+                  variant="outlined"
+                  error={!!errorLampara}
+                  helperText={
+                    errorLampara
+                      ? "Por favor seleccionar una lámpara"
+                      : ""
+                  }
+                  fullWidth
+                />
+              )}
+              disabled={!selectedInventarioModelo}
             />
+          ) : (
+            ""
           )}
-        />
-
-        <Autocomplete
-          size="small"
-          disablePortal
-          options={ubicaciones}
-          value={selectedUbicacion}
-          onChange={(_, newValue) => setSelectedUbicacion(newValue)}
-          getOptionLabel={(option) => option? option.nombre : ""}
-          renderInput={(params) => (
-            <TextField {...params} label="Ubicacion" variant="outlined" fullWidth />
-          )}
-          disabled={!selectedEdificio}
-        />
-        <TextField
-            label="MAC"
-            placeholder="MAC"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={selectedMAC}
-            error={!!errorMAC}
-            helperText={
-              errorMAC ? "Por favor escribir un inventario válido" : ""
-            }
-            onChange={(e) => handleMACChange(e.target.value)}
-        />
-        {perifericoName === "Switch" ? (
-        <TextField
-            label="puertos"
-            placeholder="Puertos"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={selectedPuertos}
-            onChange={(e) => setSelectedPuertos(e.target.value)}
-        />):""}
-        {perifericoName === "Switch" ? (
-        <TextField
-            label="puertoFTP"
-            placeholder="Puerto FTP"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={selectedPuertoFTP}
-            onChange={(e) => setSelectedPuertoFTP(e.target.value)}
-        />):""}
-
-      </div>
-
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold mb-5">Cargar Imagen</h2>
-        <div className="flex flex-col items-center gap-4">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            ref={fileInputRef}
-            style={{ display: "none" }}
-          />
-          <div
-            onClick={handleImageClick}
-            className="w-full max-w-sm h-48 border border-dashed border-gray-300 flex items-center justify-center cursor-pointer"
-          >
-            {image ? (
-              <img
-                src={URL.createObjectURL(image)}
-                alt="Vista previa"
-                className="w-full h-full object-cover"
-              />
-            ) : equipoRedActivo.imagenRuta ? (
-              <img
-                src={`http://localhost:5000${equipoRedActivo.imagenRuta}`}
-                alt="Imagen del equipo"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <p className="text-gray-500">Haz clic para cargar una imagen</p>
-            )}
-          </div>
-        </div>
       </div>
 
       <div>
@@ -507,7 +374,7 @@ const EditarActivoRed = ({
           onClick={handleConfirmEditarEquipo}
           fullWidth
         >
-          Editar Activo
+          Editar Bodega
         </Button>
         <Button
                 onClick={handleConfirmCancelar}
@@ -525,4 +392,4 @@ const EditarActivoRed = ({
   );
 };
 
-export default EditarActivoRed;
+export default EditarBodegaSimple;

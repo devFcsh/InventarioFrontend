@@ -1,5 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Autocomplete, TextField, Button, Snackbar, Alert } from "@mui/material";
+import {
+  Autocomplete,
+  TextField,
+  Button,
+  Snackbar,
+  Alert,
+  Box,
+  FormHelperText,
+} from "@mui/material";
 import {
   Marca,
   Modelo,
@@ -13,7 +21,7 @@ import {
   Antivirus,
   Procesador,
 } from "../../../../../types";
-import { BodegaComputadoraEdit, BodegaComputadoraEditSend } from "../../../../../types/Bodega";
+import { BodegaComputadoraEdit } from "../../../../../types/Bodega";
 import { ComponenteBodega } from "../../../../../types/Bodega/Componente";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
 import useDiscos from "../../../../../hooks/useDiscos";
@@ -22,25 +30,28 @@ import useRam from "../../../../../hooks/useRam";
 import useSistemasOperativos from "../../../../../hooks/useSistemasOperativos";
 import useVersionesSO from "../../../../../hooks/useVersionesSO";
 import useVersionesOffice from "../../../../../hooks/useVersionesOffice";
-import { antivirus } from "../../../../../data";
+import { antivirus, protocolos } from "../../../../../data";
 import { Icon } from "@iconify/react";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
 import usePerifericos from "../../../../../hooks/usePerifericos";
-import {useEditarBodega} from "../hooks/useEditarBodega";
-import { useGestionarComponentesBodega } from "../hooks/useGestionarComponentesBodega";
+import {useEditarBodega} from "../hooks/useEditarBodega.ts";
+import { useGestionarComponentesBodega } from "../hooks/useGestionarComponentesBodega.ts";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 import useProcesadores from "@hooks/useProcesadores";
-import {validateIP} from "../../../../../pages/Forms/helpers/validateIP.ts"
+import { validateIP } from "../../../../../pages/Forms/helpers/validateIP.ts";
+import { validateInventario } from "@pages/Forms/helpers/validateInventario.ts";
+
+
 
 interface EditarComputadoraBodegaProps {
-  equipoBodega: BodegaComputadoraEdit;
+  equipo: BodegaComputadoraEdit;
   componentesBodega: ComponenteBodega[];
 }
 
-export const EditarComputadoraBodega = ({
-  equipoBodega,
+const EditarComputadoraBodega = ({
+  equipo,
   componentesBodega,
 }: EditarComputadoraBodegaProps) => {
   const [selectedInventarioMarca, setSelectedInventarioMarca] =
@@ -51,21 +62,25 @@ export const EditarComputadoraBodega = ({
     useState<Serie | null>(null);
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
-  const [componentesState, setComponentesState] = useState<ComponenteBodega[]>(componentesBodega);
+  const [errorDireccionIP, setErrorDireccionIP] = useState(false);
+  const [componentesState, setComponentesState] =
+    useState<ComponenteBodega[]>(componentesBodega);
   const [selectedSO, setSelectedSO] = useState<SistemaOperativo | null>(null);
   const [selectedVersionSO, setSelectedVersionSO] = useState<VersionSO | null>(
     null
   );
-  const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(null);
+  const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(
+    null
+  );
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  
 
   const navigate = useNavigate();
   const [selectedRAM, setSelectedRAM] = useState<RAM | null>(null);
   const [selectedDisco, setSelectedDisco] = useState<Disco | null>(null);
-  const [selectedProcesador, setSelectedProcesador] = useState<Procesador | null>(null);
+  const [selectedProcesador, setSelectedProcesador] =
+    useState<Procesador | null>(null);
   const [selectedDominio, setSelectedDominio] = useState<Dominio | null>(null);
   const [selectedVersionOffice, setSelectedVersionOffice] =
     useState<VersionOffice | null>(null);
@@ -73,6 +88,8 @@ export const EditarComputadoraBodega = ({
     null
   );
   const [nombreEquipo, setNombreEquipo] = useState<string>("");
+  const [protocolo, setProtocolo] = useState<string>("");
+  const [direccionIP, setDireccionIP] = useState<string>("");
 
   const [nuevoComponente, setNuevoComponente] = useState<ComponenteBodega>({
     id_componente: undefined,
@@ -82,14 +99,27 @@ export const EditarComputadoraBodega = ({
     serie: null,
     inventario: "",
   });
-
-  const { marcas } = useMarcasPorPeriferico(equipoBodega?.id_periferico ?? "");
+  const [newObservation, setNewObservation] = useState<string>("");
+  const [errorMensajeComponente, setErrorMensajeComponente] = useState<
+    string | null
+  >(null);
+  const [empresa, setEmpresa] = useState<string | null>("");
+  const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
+  const [empresaNuevoComponente, setEmpresaNuevoComponente] = useState<
+    string | null
+  >("");
+  const [errorEmpresaNuevoComponente, setErrorEmpresaNuevoComponente] =
+    useState<boolean>(false);
+  const [errorInventario, setErrorInventario] = useState<boolean>(false);
+  const [errorNuevoComponenteInventario, setErrorNuevoComponenteInventario] =
+    useState<boolean>(false);
+  const { marcas } = useMarcasPorPeriferico(equipo?.id_periferico ?? "");
   const { modelos } = useModelosPorMarcaPeriferico(
     selectedInventarioMarca?.id_marca ?? "",
-    equipoBodega?.id_periferico ?? ""
+    equipo?.id_periferico ?? ""
   );
   const { series } = useSeriesPorModelo(
-    equipoBodega?.id_periferico ?? "",
+    equipo?.id_periferico ?? "",
     selectedInventarioMarca?.id_marca ?? "",
     selectedInventarioModelo?.id_modelo ?? ""
   );
@@ -100,6 +130,7 @@ export const EditarComputadoraBodega = ({
   const { sistemasOperativos } = useSistemasOperativos();
   const { versionesSO } = useVersionesSO(selectedSO?.id_sistemaoperativo ?? "");
   const { versionesOffice } = useVersionesOffice();
+
   const { editarBodega } = useEditarBodega();
   const { gestionarComponentesBodega } = useGestionarComponentesBodega();
   const { perifericos } = usePerifericos();
@@ -125,53 +156,116 @@ export const EditarComputadoraBodega = ({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    if (equipoBodega) {
-      setSelectedInventarioInv(equipoBodega.inventario);
+    if (equipo && marcas.length > 0) {
       setSelectedInventarioMarca(
-        marcas.find((marca) => marca?.id_marca === equipoBodega.id_marca) || null
+        marcas.find((marca) => marca?.id_marca === equipo.id_marca) || null
       );
+    }
+  }, [equipo, marcas]);
+
+  useEffect(() => {
+    if (equipo && modelos.length > 0) {
       setSelectedInventarioModelo(
-        modelos.find((modelo) => modelo?.id_modelo === equipoBodega.id_modelo) || null
+        modelos.find((modelo) => modelo?.id_modelo === equipo.id_modelo) || null
       );
+    }
+  }, [equipo, modelos]);
+
+  useEffect(() => {
+    if (equipo && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipoBodega.id_serie) || null
+        series.find((serie) => serie?.id_serie === equipo.id_serie) || null
       );
+    }
+  }, [equipo, series]);
+
+  useEffect(() => {
+    if (equipo && sistemasOperativos.length > 0) {
       setSelectedSO(
         sistemasOperativos.find(
-          (so) => so?.id_sistemaoperativo === equipoBodega.id_sistemaoperativo
+          (so) => so?.id_sistemaoperativo === equipo.id_sistemaoperativo
         ) || null
       );
+    }
+  }, [equipo, sistemasOperativos]);
+
+  useEffect(() => {
+    if (equipo && versionesSO.length > 0) {
       setSelectedVersionSO(
         versionesSO.find(
-          (version) => version?.id_versionso === equipoBodega.id_versionso
+          (version) => version?.id_versionso === equipo.id_versionso
         ) || null
       );
+    }
+  }, [equipo, versionesSO]);
+
+  useEffect(() => {
+    if (equipo && ram.length > 0) {
       setSelectedRAM(
-        ram.find((ramItem) => ramItem?.id_ram === equipoBodega.id_ram) || null
+        ram.find((ramItem) => ramItem?.id_ram === equipo.id_ram) || null
       );
+    }
+  }, [equipo, ram]);
+
+  useEffect(() => {
+    if (equipo && discos.length > 0) {
       setSelectedDisco(
-        discos.find((disco) => disco?.id_disco === equipoBodega.id_disco) || null
+        discos.find((disco) => disco?.id_disco === equipo.id_disco) || null
       );
+    }
+  }, [equipo, discos]);
+
+  useEffect(() => {
+    if (equipo && procesadores.length > 0) {
       setSelectedProcesador(
-        procesadores.find((procesador) => procesador?.id_procesador === equipoBodega.id_procesador) || null
+        procesadores.find(
+          (procesador) => procesador?.id_procesador === equipo.id_procesador
+        ) || null
       );
+    }
+  }, [equipo, procesadores]);
+
+  useEffect(() => {
+    if (equipo && dominios.length > 0) {
       setSelectedDominio(
-        dominios.find((dominio) => dominio?.id_dominio === equipoBodega.id_dominio) ||
+        dominios.find((dominio) => dominio?.id_dominio === equipo.id_dominio) ||
           null
       );
-      setSelectedVersionOffice(
-        versionesOffice.find(
-          (version) => version?.id_versionoffice === equipoBodega.id_versionoffice
-        ) || null
-      );
+    }
+  }, [equipo, dominios]);
+
+  useEffect(() => {
+    if (equipo && antivirus.length > 0) {
       setSelectedAntivirus(
         antivirus.find(
-          (av) => Number(av.id_antivirus) === equipoBodega.id_antivirus
+          (av) => Number(av.id_antivirus) === equipo.id_antivirus
         ) || null
       );
-      setNombreEquipo(equipoBodega.nombre_equipo)
     }
-  }, [equipoBodega, marcas, modelos, series, ram, discos, procesadores,dominios, versionesOffice]);
+  }, [equipo, antivirus]);
+
+  useEffect(() => {
+    if (equipo && versionesOffice.length > 0) {
+      setSelectedVersionOffice(
+        versionesOffice.find(
+          (version) => version?.id_versionoffice === equipo.id_versionoffice
+        ) || null
+      );
+    }
+  }, [equipo, versionesOffice]);
+
+  useEffect(() => {
+    if (equipo) {
+      setSelectedInventarioInv(equipo.inventario);
+      setNombreEquipo(equipo.nombre_equipo);
+      setDireccionIP(equipo.direccion_ip);
+      setProtocolo(equipo.direccion_ip ? "0" : "1");
+      setNewObservation(equipo.observacion);
+      equipo.inventario.length === 10
+        ? setEmpresa("EspolTech")
+        : setEmpresa("Espol");
+    }
+  }, [equipo]);
 
   const handleAddComponente = () => {
     if (
@@ -203,40 +297,41 @@ export const EditarComputadoraBodega = ({
     setComponentesState(updatedComponentes);
   };
 
-  const handleEditEquipo = async () => {
+  const handleEditEquipo = async (observationValue: string) => {
 
-    const payload : BodegaComputadoraEdit = {
+    const payload = {
       tipo: "bodega",
-      inventario: selectedInventarioInv,
-      id_versionso: selectedVersionSO?.id_versionso?? "",
-      id_ram: selectedRAM?.id_ram?? "",
-      id_disco: selectedDisco?.id_disco?? "",
+      id_ram: selectedRAM?.id_ram ?? "",
+      id_disco: selectedDisco?.id_disco ?? "",
       id_procesador: selectedProcesador?.id_procesador ?? "",
-      id_dominio: selectedDominio?.id_dominio?? "",
-      id_versionoffice: selectedVersionOffice?.id_versionoffice?? "",
-      id_antivirus: selectedAntivirus?.id_antivirus,
+      id_versionso: selectedVersionSO?.id_versionso ?? "",
+      id_versionoffice: selectedVersionOffice?.id_versionoffice ?? "",
+      id_antivirus: selectedAntivirus?.id_antivirus ?? "",
+      id_dominio: selectedDominio?.id_dominio ?? "",
+      id_serie: selectedInventarioSerie?.id_serie ?? "",
+      inventario: selectedInventarioInv,
       nombre_equipo: nombreEquipo,
-      direccion_ip: "",
-      id_serie: selectedInventarioSerie?.id_serie?? "",
+      direccion_ip: protocolo === "0" ? direccionIP : "",
+      observacion: observationValue,
     };
     try {
-      await editarBodega(equipoBodega.id_equipo, payload);
+      await editarBodega(equipo.id_equipo, payload);
 
-      if (componentesState.length > 0 && equipoBodega.id_equipo) {
+      if (componentesState.length > 0 && equipo.id_equipo) {
         await gestionarComponentesBodega({
           tipo: "bodega",
-          equipoId: Number(equipoBodega.id_equipo),
+          equipoId: Number(equipo.id_equipo),
           componentes: componentesState.map((comp) => ({
             id_componente: comp.id_componente,
             inventario: comp.inventario,
             serieId: Number(comp.serie?.id_serie) ?? 0,
-          })),
+          }))
         });
         setShowSuccessMessage(true);
         navigate("/bodega", { state: { equipoEditado: true } });
-      }else{
+      } else {
         setShowSuccessMessage(true);
-        navigate("/bodega", { state: { equipoEditado: true } })
+        navigate("/bodega", { state: { equipoEditado: true } });
       }
     } catch (error) {
       console.error("Error al actualizar equipo:", error);
@@ -251,7 +346,7 @@ export const EditarComputadoraBodega = ({
 
   const handleModalConfirmEditar = async () => {
     setOpenModalEditar(false);
-    await handleEditEquipo();
+    await handleEditEquipo(newObservation);
   };
 
   const handleCancelar = () => {
@@ -272,13 +367,108 @@ export const EditarComputadoraBodega = ({
       !selectedRAM ||
       !selectedDisco ||
       !selectedProcesador ||
-      !selectedDominio
+      !selectedDominio ||
+      !(protocolo === "0" ? validateIP(direccionIP) : true)
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
     }
     setErrorMensajeEquipo(null);
     return true;
+  };
+  const handleIP = (value: string) => {
+    setDireccionIP(value);
+    if (!validateIP(value) && protocolo === "0") {
+      setErrorDireccionIP(true);
+    } else {
+      setErrorDireccionIP(false);
+    }
+  };
+  const handleProtocolo = (value: string) => {
+    setProtocolo(value);
+    if (value === "0" && !validateIP(direccionIP)) {
+      setErrorDireccionIP(true);
+    } else {
+      setErrorDireccionIP(false);
+      setDireccionIP("");
+    }
+  };
+
+  const handleObservation = (newObservation: string) => {
+    if (newObservation.length <= 200) {
+      setNewObservation(newObservation);
+      setErrorMensajeComponente("");
+    } else {
+      setErrorMensajeComponente(
+        "La observación no puede tener más de 200 caracteres."
+      );
+    }
+  };
+  const handleChangeEmpresa = (newEmpresa: string | null) => {
+    setEmpresa(newEmpresa);
+    if (newEmpresa === null) {
+      setErrorEmpresa(true);
+      setSelectedInventarioInv("");
+      setErrorInventario(true);
+    } else {
+      setErrorEmpresa(false);
+      !validateInventario(selectedInventarioInv, newEmpresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
+    }
+  };
+  const handleChangeEmpresaNuevoComponente = (
+    newEmpresaNuevoComponente: string | null
+  ) => {
+    setEmpresaNuevoComponente(newEmpresaNuevoComponente);
+    if (newEmpresaNuevoComponente === null) {
+      setErrorEmpresaNuevoComponente(true);
+      setNuevoComponente({
+        ...nuevoComponente,
+        inventario: "",
+      });
+      setErrorNuevoComponenteInventario(true);
+    } else {
+      setErrorEmpresaNuevoComponente(false);
+      !validateInventario(nuevoComponente.inventario, newEmpresaNuevoComponente)
+        ? setErrorNuevoComponenteInventario(true)
+        : setErrorNuevoComponenteInventario(false);
+    }
+  };
+  const handleChangeInventario = (inventario: string) => {
+    setSelectedInventarioInv(inventario);
+    if (empresa === "Espol") {
+      !validateInventario(inventario ? inventario : "", empresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
+    } else if (empresa === "EspolTech") {
+      !validateInventario(inventario ? inventario : "", empresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
+    }
+  };
+  const handleChangeNuevoComponenteInventario = (
+    nuevoComponenteInventario: string
+  ) => {
+    setNuevoComponente({
+      ...nuevoComponente,
+      inventario: nuevoComponenteInventario,
+    });
+    if (empresaNuevoComponente === "Espol") {
+      !validateInventario(
+        nuevoComponenteInventario ? nuevoComponenteInventario : "",
+        empresaNuevoComponente
+      )
+        ? setErrorNuevoComponenteInventario(true)
+        : setErrorNuevoComponenteInventario(false);
+    } else if (empresaNuevoComponente === "EspolTech") {
+      !validateInventario(
+        nuevoComponenteInventario ? nuevoComponenteInventario : "",
+        empresaNuevoComponente
+      )
+        ? setErrorNuevoComponenteInventario(true)
+        : setErrorNuevoComponenteInventario(false);
+    }
   };
 
   return (
@@ -290,7 +480,7 @@ export const EditarComputadoraBodega = ({
         title="Confirmar Editar Equipo"
         message="¿Está seguro de que desea editar este equipo?"
       />
-       <ModalConfirmation
+      <ModalConfirmation
         open={openModalCancelar}
         onClose={() => setOpenModalCancelar(false)}
         onConfirm={handleCancelar}
@@ -320,7 +510,6 @@ export const EditarComputadoraBodega = ({
           renderInput={(params) => (
             <TextField {...params} label="Marca" variant="outlined" fullWidth />
           )}
-          disabled
         />
         <Autocomplete
           size="small"
@@ -340,7 +529,6 @@ export const EditarComputadoraBodega = ({
               fullWidth
             />
           )}
-          disabled
         />
         <Autocomplete
           size="small"
@@ -352,18 +540,52 @@ export const EditarComputadoraBodega = ({
           renderInput={(params) => (
             <TextField {...params} label="Serie" variant="outlined" fullWidth />
           )}
-          disabled
         />
-        <TextField
-          label="Inventario"
-          variant="outlined"
-          fullWidth
-          size="small"
-          value={selectedInventarioInv}
-          onChange={(e) => setSelectedInventarioInv(e.target.value)}
-        />
+        <Box
+          sx={{
+            display: "inline-flex",
+          }}
+        >
+          <Autocomplete
+            size="small"
+            disablePortal
+            sx={{ width: "50%" }}
+            options={["Espol", "EspolTech"]}
+            getOptionLabel={(option) => (option ? option : "")}
+            value={empresa}
+            onChange={(event, newValue) => {
+              handleChangeEmpresa(newValue);
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Empresa"
+                variant="outlined"
+                error={!!errorEmpresa}
+                helperText={
+                  errorEmpresa ? "Por favor seleccionar una empresa" : ""
+                }
+                fullWidth
+                sx={{ marginRight: 8, width: "100%" }}
+              />
+            )}
+          />
+          <TextField
+            label="Inventario"
+            placeholder="Inventario"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={selectedInventarioInv}
+            error={!!errorInventario}
+            helperText={
+              errorInventario ? "Por favor escribir un inventario válido" : ""
+            }
+            onChange={(e) => handleChangeInventario(e.target.value)}
+            disabled={empresa === ""}
+          />
+        </Box>
       </div>
-
       <h2 className="text-xl font-semibold mb-5">Información General</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <Autocomplete
@@ -375,7 +597,7 @@ export const EditarComputadoraBodega = ({
             setSelectedSO(newValue);
             setSelectedVersionSO(null);
           }}
-          getOptionLabel={(option) => option? option.nombre : ""}
+          getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -392,7 +614,7 @@ export const EditarComputadoraBodega = ({
           options={versionesSO}
           value={selectedVersionSO}
           onChange={(_, newValue) => setSelectedVersionSO(newValue)}
-          getOptionLabel={(option) => option? option.nombre : ""}
+          getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -426,7 +648,7 @@ export const EditarComputadoraBodega = ({
           options={versionesOffice}
           value={selectedVersionOffice}
           onChange={(_, newValue) => setSelectedVersionOffice(newValue)}
-          getOptionLabel={(option) => option? option.nombre : ""}
+          getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -453,7 +675,7 @@ export const EditarComputadoraBodega = ({
           options={discos}
           value={selectedDisco}
           onChange={(_, newValue) => setSelectedDisco(newValue)}
-          getOptionLabel={(option) => option? option.capacidad : ""}
+          getOptionLabel={(option) => (option ? option.capacidad : "")}
           renderInput={(params) => (
             <TextField {...params} label="Disco" variant="outlined" fullWidth />
           )}
@@ -464,11 +686,59 @@ export const EditarComputadoraBodega = ({
           options={procesadores}
           value={selectedProcesador}
           onChange={(_, newValue) => setSelectedProcesador(newValue)}
-          getOptionLabel={(option) => option? option.nombre : ""}
+          getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
-            <TextField {...params} label="Procesador" variant="outlined" fullWidth />
+            <TextField
+              {...params}
+              label="Procesador"
+              variant="outlined"
+              fullWidth
+            />
           )}
         />
+        <Box
+          sx={{
+            display: "inline-flex",
+          }}
+        >
+          <Autocomplete
+            size="small"
+            disablePortal
+            sx={{ width: "50%" }}
+            options={protocolos}
+            value={protocolos.find((p) => p.id === protocolo) || null}
+            onChange={(_, newValue) => handleProtocolo(newValue?.id || "1")}
+            getOptionLabel={(option) => option.nombre}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Protocolo"
+                variant="outlined"
+                fullWidth
+              />
+            )}
+          />
+
+          <TextField
+            label="Dirección IP"
+            placeholder="Dirección IP"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={direccionIP}
+            error={!!errorDireccionIP}
+            onChange={(e) => {
+              handleIP(e.target.value);
+            }}
+            disabled={protocolo !== "0"}
+            sx={{ marginRight: 4, width: "50%" }}
+          />
+          {errorDireccionIP && (
+            <FormHelperText error sx={{ marginLeft: "auto", color: "green" }}>
+              Por favor escribir una dirección IP válida
+            </FormHelperText>
+          )}
+        </Box>
         <TextField
           size="small"
           label="Nombre Equipo"
@@ -483,7 +753,7 @@ export const EditarComputadoraBodega = ({
           options={dominios}
           value={selectedDominio}
           onChange={(_, newValue) => setSelectedDominio(newValue)}
-          getOptionLabel={(option) => option? option.nombre : ""}
+          getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -493,6 +763,7 @@ export const EditarComputadoraBodega = ({
             />
           )}
         />
+
       </div>
 
       <div className="mb-4">
@@ -511,7 +782,7 @@ export const EditarComputadoraBodega = ({
                 </tr>
               </thead>
               <tbody>
-              {componentesState.map((comp, index) => (
+                {componentesState.map((comp, index) => (
                   <tr key={index}>
                     <td className="py-2 px-4 border">
                       {comp.periferico?.nombre}
@@ -522,7 +793,7 @@ export const EditarComputadoraBodega = ({
                     <td className="py-2 px-4 border">{comp.inventario}</td>
                     <td className="py-2 px-1 border">
                       <Icon
-                        icon="weui:delete-outlined"
+                        icon="fluent-mdl2:disconnect-virtual-machine"
                         width="25"
                         height="25"
                         onClick={() => eliminarComponente(index)}
@@ -609,20 +880,56 @@ export const EditarComputadoraBodega = ({
               )}
               disabled={!nuevoComponente.modelo}
             />
-            <TextField
-              label="Inventario"
-              placeholder="Inventario"
-              variant="outlined"
-              fullWidth
-              size="small"
-              value={nuevoComponente.inventario}
-              onChange={(e) =>
-                setNuevoComponente({
-                  ...nuevoComponente,
-                  inventario: e.target.value,
-                })
-              }
-            />
+            <Box
+              sx={{
+                display: "inline-flex",
+              }}
+            >
+              <Autocomplete
+                size="small"
+                disablePortal
+                sx={{ width: "50%" }}
+                options={["Espol", "EspolTech"]}
+                getOptionLabel={(option) => (option ? option : "")}
+                value={empresaNuevoComponente}
+                onChange={(event, newValue) => {
+                  handleChangeEmpresaNuevoComponente(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Empresa"
+                    variant="outlined"
+                    error={!!errorEmpresaNuevoComponente}
+                    helperText={
+                      errorEmpresaNuevoComponente
+                        ? "Por favor seleccionar una empresa"
+                        : ""
+                    }
+                    fullWidth
+                    sx={{ marginRight: 8, width: "100%" }}
+                  />
+                )}
+              />
+              <TextField
+                label="Inventario"
+                placeholder="Inventario"
+                variant="outlined"
+                fullWidth
+                size="small"
+                value={nuevoComponente.inventario}
+                error={!!errorNuevoComponenteInventario}
+                helperText={
+                  errorNuevoComponenteInventario
+                    ? "Por favor escribir un inventario válido"
+                    : ""
+                }
+                onChange={(e) =>
+                  handleChangeNuevoComponenteInventario(e.target.value)
+                }
+                disabled={empresa === ""}
+              />
+            </Box>
             <Button
               variant="contained"
               color="primary"
@@ -634,15 +941,29 @@ export const EditarComputadoraBodega = ({
           </div>
         </div>
       </div>
+      <div>
+        <h2 className="text-xl font-semibold mb-10">Observación</h2>
+        <TextField
+          label="Observación"
+          variant="outlined"
+          fullWidth
+          multiline
+          minRows={2}
+          value={newObservation}
+          onChange={(e) => {
+            handleObservation(e.target.value);
+          }}
+          error={!!errorMensajeComponente}
+          helperText={errorMensajeComponente}
+        />
+      </div>
       <div className="flex gap-4 mt-10">
         <Button
           variant="contained"
           sx={{
-            backgroundColor:
-              "#4CAF50",
+            backgroundColor: "#4CAF50",
             "&:hover": {
-              backgroundColor:
-                "#45a049"
+              backgroundColor: "#45a049",
             },
           }}
           onClick={handleConfirmEditarEquipo}
@@ -651,13 +972,13 @@ export const EditarComputadoraBodega = ({
           Editar Bodega
         </Button>
         <Button
-                onClick={handleConfirmCancelar}
-                color="error"
-                variant="contained"
-                fullWidth
-              >
-                Cancelar
-              </Button>
+          onClick={handleConfirmCancelar}
+          color="error"
+          variant="contained"
+          fullWidth
+        >
+          Cancelar
+        </Button>
       </div>
       {errorMensajeEquipo && (
         <div className="text-red-500 mt-2">{errorMensajeEquipo}</div>
@@ -665,3 +986,5 @@ export const EditarComputadoraBodega = ({
     </div>
   );
 };
+
+export default EditarComputadoraBodega;

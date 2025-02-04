@@ -171,7 +171,7 @@ export const FormLC = () => {
               onClose={() => setOpenModalObservation(false)}
               onConfirm={(observationValue) => {
                 setOpenModalObservation(false);
-                handleAgregarEquipoActivo(observationValue);
+                tipoInventario==="Activo"?handleAgregarEquipoActivo(observationValue):handleAgregarEquipoBodega(observationValue);
               }}
               title="Agregar observación"
               message="¿Desea agregar una observación al equipo?"
@@ -239,7 +239,7 @@ export const FormLC = () => {
     }
   };
 
-  const handleAgregarEquipoBodega = async () => {
+  const handleAgregarEquipoBodega = async (observationValue: string) => {
     const bodegaComputadoraData = {
       tipo: "bodega",
       inventario: inventoryDataForm.inventario || "",
@@ -257,7 +257,7 @@ export const FormLC = () => {
       antivirus:
         Number(informacionGeneralDataForm.antivirus?.id_antivirus) ?? 0,
       dominio: Number(informacionGeneralDataForm.dominio?.id_dominio) ?? 0,
-      observacion: observation,
+      observacion: observationValue,
     };
     try {
       const equipoId = await agregarComputadoraBodega(bodegaComputadoraData);
@@ -362,7 +362,7 @@ export const FormLC = () => {
                   ? handleModalBeforeAdd
                   : activeStep - 1 === steps.length - 1 &&
                     tipoInventario === "bodega"
-                  ? handleAgregarEquipoBodega
+                  ? handleModalBeforeAdd
                   : handleNext
               }
               variant="contained"

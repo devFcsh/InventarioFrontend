@@ -79,7 +79,7 @@ export const ModalObservation: React.FC<ModalProps> = ({
         <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', gap: 2, pb: 2 }}>
           <Button onClick={onClose} color="error" variant="contained" size="large">Cancelar</Button>
           <Button onClick={handleConfirm} fullWidth variant="contained" sx={{ backgroundColor: "#4CAF50", "&:hover": { backgroundColor: "#45a049" } }}>
-            Agregar Activo
+            Finalizar
           </Button>
         </Box>
       </DialogActions>

@@ -4,7 +4,7 @@ import { BodegaSimpleEdit } from '../../../../../types/Bodega';
 import clienteAxios from '../../../../../hooks';
 
 
-export const useObtenerComputadoraBodega = (id: string) => {
+export const useObtenerEquipoSimpleBodega = (id: string) => {
   const [equipoSimpleBodega, setEquipoSimpleBodega] = useState<BodegaSimpleEdit | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);

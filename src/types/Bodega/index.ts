@@ -26,7 +26,7 @@ export type BodegaComputadoraEditSend = {
   id_disco: string;
   id_dominio: string;
   id_versionoffice: string;
-  id_antivirus: number;
+  id_antivirus: string;
   nombre_equipo: string;
   direccion_ip: string;
   id_serie: string;
