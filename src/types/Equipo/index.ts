@@ -10,6 +10,40 @@ export type Equipo = {
     edificio: string;
 };
 
+export type ExportarComputadora = {
+    id_equipo: string;
+    edificio: string;
+    ubicacion: string;
+    uso: string;
+    usuario: string;
+    direccion_ip: string;
+    nombre_equipo: string;
+    dominio: string;
+    sistema_operativo: string;
+    procesador: string;
+    tipo_ram: string;
+    capacidad_ram: string;
+    capacidad_disco: string;
+    marca: string;
+    modelo: string;
+    serie: string;
+    inventario: string; 
+    fecha_ultimo_cambio: string;
+    observacion: string;
+    mouse_marca: string; 
+    mouse_modelo: string; 
+    mouse_serie: string; 
+    mouse_inventario: string; 
+    teclado_marca: string;
+    teclado_modelo: string; 
+    teclado_serie: string; 
+    teclado_inventario: string;
+    monitor_marca: string;
+    monitor_modelo: string;
+    monitor_serie: string;
+    monitor_inventario: string;
+};
+
 export type EquipoBodega = {
     id_equipo: string;
     periferico: string;

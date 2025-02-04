@@ -18,6 +18,7 @@ import useModelos from "@hooks/useModelos.ts";
 import useSeries from "@hooks/useSeries.ts";
 import { useInventario } from "@hooks/useInventario.ts";
 import { usePasarActivoABodega } from "../hooks/usePasarActivoABodega.ts";
+import { useExportarComputadorasActivos } from "../hooks/useExportarComputadorasActivos.ts";
 
 
 const Activos = () => {
@@ -65,6 +66,8 @@ const Activos = () => {
   const { series } = useSeries();
   const { inventarios } = useInventario();
   const { pasarActivoABodega } = usePasarActivoABodega();
+  const { fetchTodosEquipos } = useExportarComputadorasActivos();
+
 
   const location = useLocation();
   const filtros = {
@@ -328,35 +331,90 @@ const Activos = () => {
     }
   };
 
-  const exportToExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(
-      equipos.map(
-        ({
-          periferico,
-          marca,
-          modelo,
-          serie,
-          inventario,
-          usuario,
-          uso,
-          edificio,
-        }) => ({
-          Periférico: periferico,
-          Marca: marca,
-          Modelo: modelo,
-          Serie: serie,
-          Inventario: inventario,
-          Usuario: usuario,
-          Uso: uso,
-          Ubicación: edificio,
-        })
-      )
-    );
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Datos");
-
-    XLSX.writeFile(wb, "datos_equipos.xlsx");
+  const exportToExcel = async () => {
+    try {
+      const allEquipos = await fetchTodosEquipos();
+  
+      if (!allEquipos.length) {
+        console.warn("No hay equipos para exportar");
+        return;
+      }
+  
+      const formattedEquipos = allEquipos.map(({ 
+        edificio, 
+        ubicacion, 
+        uso, 
+        usuario, 
+        direccion_ip, 
+        nombre_equipo, 
+        dominio, 
+        sistema_operativo, 
+        procesador, 
+        tipo_ram, 
+        capacidad_ram, 
+        capacidad_disco, 
+        marca, 
+        modelo, 
+        serie, 
+        inventario, 
+        fecha_ultimo_cambio, 
+        observacion, 
+        mouse_marca, 
+        mouse_modelo, 
+        mouse_serie, 
+        mouse_inventario, 
+        teclado_marca, 
+        teclado_modelo, 
+        teclado_serie, 
+        teclado_inventario, 
+        monitor_marca, 
+        monitor_modelo, 
+        monitor_serie, 
+        monitor_inventario 
+      }) => ({
+        edificio,
+        ubicacion,
+        uso,
+        usuario,
+        direccion_ip,
+        nombre_equipo,
+        dominio,
+        sistema_operativo,
+        procesador,
+        tipo_ram,
+        capacidad_ram,
+        capacidad_disco,
+        marca,
+        modelo,
+        serie,
+        inventario,
+        fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
+        observacion,
+        
+        mouse_marca: mouse_marca || '',
+        mouse_modelo: mouse_modelo || '',
+        mouse_serie: mouse_serie || '',
+        mouse_inventario: mouse_inventario || '',
+        teclado_marca: teclado_marca || '',
+        teclado_modelo: teclado_modelo || '',
+        teclado_serie: teclado_serie || '',
+        teclado_inventario: teclado_inventario || '',
+        monitor_marca: monitor_marca || '',
+        monitor_modelo: monitor_modelo || '',
+        monitor_serie: monitor_serie || '',
+        monitor_inventario: monitor_inventario || '',
+      }));
+  
+      const ws = XLSX.utils.json_to_sheet(formattedEquipos);
+  
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Datos Equipos");
+  
+      XLSX.writeFile(wb, "datos_equipos.xlsx");
+  
+    } catch (error) {
+      console.error("Error al exportar a Excel:", error);
+    }
   };
 
   const handleCloseSnackbar = () => {
