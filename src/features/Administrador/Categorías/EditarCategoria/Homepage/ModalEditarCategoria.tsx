@@ -47,7 +47,7 @@ import { useEditarProcesador } from "../../AgregarCategoria/hooks/useEditarProce
 import { useEditarVersionOffice } from "../../AgregarCategoria/hooks/useEditarVersionOffice";
 import { useEliminarDominio } from "../../AgregarCategoria/hooks/useEliminarDominio";
 import { useEliminarPeriferico } from "../../AgregarCategoria/hooks/useEliminarPeriferico";
-import { useEliminarUso } from "../../AgregarCategoria/hooks/useEliiminarUso";
+import { useEliminarUso } from "../../AgregarCategoria/hooks/useEliminarUso";
 import { useEliminarDisco } from "../../AgregarCategoria/hooks/useEliminarDisco";
 import { useEliminarMarca } from "../../AgregarCategoria/hooks/useEliminarMarca";
 import { useEliminarSerie } from "../../AgregarCategoria/hooks/useEliminarSerie";
@@ -62,6 +62,8 @@ import { useNavigate } from "react-router-dom";
 import useLamparas from "@hooks/useLamparas";
 import { useEditarLampara } from "../../AgregarCategoria/hooks/useEditarLampara";
 import { useEliminarLampara } from "../../AgregarCategoria/hooks/useEliminarLampara";
+import { useEditarRAM } from "../../AgregarCategoria/hooks/useEditarRam";
+import { useEliminarRAM } from "../../AgregarCategoria/hooks/useEliminarRam";
 
 type Opcion =
   | Uso
@@ -129,6 +131,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const { editarVersionSO } = useEditarVersionSO();
   const { editarProcesador } = useEditarProcesador();
   const { editarVersionOffice } = useEditarVersionOffice();
+  const { editarRAM } = useEditarRAM();
 
   const { eliminarDominio } = useEliminarDominio();
   const { eliminarPeriferico } = useEliminarPeriferico();
@@ -144,12 +147,13 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const { eliminarVersionSO } = useEliminarVersionSO();
   const { eliminarProcesador } = useEliminarProcesador();
   const { eliminarVersionOffice } = useEliminarVersionOffice();
+  const { eliminarRAM } = useEliminarRAM();
 
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState<Opcion | null>(null);
   const [editedValue, setEditedValue] = useState<string>("");
+  const [editedTipo, setEditedTipo] = useState<string>("");
   const navigate = useNavigate();
-
 
   const elementos: Opcion[] =
     selectedCategoria === "Uso"
@@ -186,7 +190,14 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
 
   const handleEditarCategoria = (elemento: Opcion) => {
     setSelectedOption(elemento);
-    setEditedValue(elemento?.nombre || "");
+    if (selectedCategoria === "RAM") {
+      setEditedValue(elemento?.capacidad || "");
+      setEditedTipo(elemento?.tipo || "");
+    } else if (selectedCategoria === "Disco") {
+      setEditedValue(elemento?.capacidad || "");
+    } else {
+      setEditedValue(elemento?.nombre || "");
+    }
     setOpenEditModal(true);
   };
 
@@ -198,6 +209,13 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             editarDominio({
               id_dominio: selectedOption.id_dominio,
               nuevoNombre: editedValue,
+            });
+            break;
+          case "RAM":
+            editarRAM({
+              id_ram: selectedOption.id_ram,
+              tipo: editedTipo,
+              capacidad: editedValue,
             });
             break;
           case "Periférico":
@@ -236,7 +254,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
               nuevoNombre: editedValue,
             });
             break;
-            case "Lampara":
+          case "Lampara":
             editarLampara({
               id_lampara: selectedOption.id_lampara,
               nuevoNombre: editedValue,
@@ -294,7 +312,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
         setSnackbarMessage("Opción editada correctamente");
         setSnackbarSeverity("success");
         navigate("/categorias");
-        
+
         setOpenSnackbar(true);
       } catch (error) {
         setSnackbarMessage("Error al editar la opción");
@@ -343,7 +361,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             await eliminarVersionSO(elemento.id_versionso);
             break;
           case "RAM":
-            await eliminarSerie(elemento.id_serie);
+            await eliminarRAM(elemento.id_ram);
             break;
           case "Procesador":
             await eliminarProcesador(elemento.id_procesador);
@@ -351,9 +369,9 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
           case "Versión Office":
             await eliminarVersionOffice(elemento.id_versionoffice);
             break;
-            case "Lampara":
-              await eliminarLampara(elemento.id_lampara);
-              break;
+          case "Lampara":
+            await eliminarLampara(elemento.id_lampara);
+            break;
           default:
             console.log(
               `No hay función para eliminar la categoría ${selectedCategoria}`
@@ -453,13 +471,34 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
         <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
           <div className="p-5">
             <h3 className="text-xl font-semibold mb-4">Editar Opción</h3>
-            <TextField
-              label="Nuevo Valor"
-              variant="outlined"
-              fullWidth
-              value={editedValue}
-              onChange={(e) => setEditedValue(e.target.value)}
-            />
+            {selectedCategoria === "RAM" ? (
+              <>
+                <TextField
+                  label="Nuevo Tipo"
+                  variant="outlined"
+                  fullWidth
+                  value={editedTipo}
+                  onChange={(e) => setEditedTipo(e.target.value)}
+                />
+                <div style={{ marginBottom: "1rem" }}></div>
+                <TextField
+                  label="Nueva Capacidad"
+                  variant="outlined"
+                  fullWidth
+                  value={editedValue}
+                  onChange={(e) => setEditedValue(e.target.value)}
+                  className="mt-3"
+                />
+              </>
+            ) : (
+              <TextField
+                label="Nuevo Valor"
+                variant="outlined"
+                fullWidth
+                value={editedValue}
+                onChange={(e) => setEditedValue(e.target.value)}
+              />
+            )}
             <div className="mt-4 flex justify-end gap-2">
               <button
                 className="py-2 px-4 bg-gray-300 rounded"
