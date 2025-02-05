@@ -4,9 +4,8 @@ import { StepDatosInventarioSAP, StepInformacionGeneralSAP } from "./StepsSAP/in
 import { useLocation, useNavigate } from "react-router-dom";
 import { Periferico, Edificio } from "../../types/index.ts";
 import { useAgregarRedActivo } from "../../features/Equipos/Activos/AgregarActivo/hooks/useAgregarRedActivo.ts";
+import { useAgregarRedBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarRedBodega.ts";
 import {useFormDatosInventarioSAP,useFormDataInformacionGeneralSAP,useInventoryErrorsSAP,useInformacionGeneralErrorSAP} from "./StepsSAP/hooks/index.ts"
-// import { useAgregarComputadoraBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarComputadoraBodega.ts";
-// import { useAgregarComponentesBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarComponentesBodega.ts";
 import { ModalObservation } from "./components/ModalObservation.tsx";
 import {useCargarImagenErrors,useFormDataCargarImagen} from "./hooks/index.ts"
 import {StepCargarImagen} from "./Steps/StepCargarImagen.tsx"
@@ -26,9 +25,8 @@ export const FormSAP = () => {
   const tipoInventario = location.state?.tipoInventario;
   const steps = location.state?.steps;
   const { agregarRedActivo } = useAgregarRedActivo();
-  // const { agregarComputadoraBodega } = useAgregarComputadoraBodega();
+  const { agregarRedBodega } = useAgregarRedBodega();
   const { inventoryDataSAPForm, handleInventorySAPChange } = useFormDatosInventarioSAP();
-  // const { agregarComponentesBodega } = useAgregarComponentesBodega();
   const { informacionGeneralDataSAPForm, handleInformacionGeneralSAPChange } = useFormDataInformacionGeneralSAP();
   const { imageData, handleImageChange, error } = useFormDataCargarImagen();
   const { inventorySAPErrors, completeDatosInventario, handleInventorySAPErrors, handleUniqueInventarioSAPError } = useInventoryErrorsSAP(tipoInventario);
@@ -80,9 +78,23 @@ export const FormSAP = () => {
   };
   
   const handleModalBeforeAdd = () => {
-    handleCargarImagenErrors(imageData);
-    if (!Object.values(cargarImagenErrors).includes(true) && completeDatosCargarImagen(imageData) && !error) {
-      setOpenModalObservation(true);
+    if(tipoInventario==="activo"){
+      handleCargarImagenErrors(imageData);
+      if (
+        !Object.values(cargarImagenErrors).includes(true) &&
+        completeDatosCargarImagen(imageData) &&
+        !error
+      ) {
+        setOpenModalObservation(true);
+      }
+    }else{
+      handleInformacionGeneralSAPErrors(informacionGeneralDataSAPForm);
+      if (
+        !Object.values(informacionGeneralSAPErrors).includes(true) &&
+        completeDatosInformacionGeneral(informacionGeneralDataSAPForm)
+      ) {
+        setOpenModalObservation(true);
+      }
     }
   };
 
@@ -102,26 +114,42 @@ export const FormSAP = () => {
         );
         
       case 1:
-        return <StepInformacionGeneralSAP
-          periferico={selectedPeriferico?.nombre ?? ""}
-          informacionGeneralDataSAPForm={informacionGeneralDataSAPForm}
-          handleInformacionGeneralSAPChange={handleInformacionGeneralSAPChange}
-          informacionGeneralSAPErrors={informacionGeneralSAPErrors}
-          handleUniqueInformacionGeneralError={handleUniqueInformacionGeneralError}
-        />;
+        return (
+          <>
+            <ModalObservation
+                open={openModalObservation}
+                onClose={() => setOpenModalObservation(false)}
+                onConfirm={(observationValue) => {
+                  setOpenModalObservation(false);
+                  handleAgregarEquipo(observationValue)
+                  
+                }}
+                title="Agregar observación"
+                message="¿Desea agregar una observación al equipo?"
+              />
+          <StepInformacionGeneralSAP
+            periferico={selectedPeriferico?.nombre ?? ""}
+            informacionGeneralDataSAPForm={informacionGeneralDataSAPForm}
+            handleInformacionGeneralSAPChange={handleInformacionGeneralSAPChange}
+            informacionGeneralSAPErrors={informacionGeneralSAPErrors}
+            handleUniqueInformacionGeneralError={handleUniqueInformacionGeneralError}
+          />
+
+          </>)
       case 2:
         return (
         <>
             <ModalObservation
-              open={openModalObservation}
-              onClose={() => setOpenModalObservation(false)}
-              onConfirm={(observationValue) => {
-                setOpenModalObservation(false);
-                handleAgregarEquipoActivo(observationValue);
-              }}
-              title="Agregar observación"
-              message="¿Desea agregar una observación al equipo?"
-            />
+                open={openModalObservation}
+                onClose={() => setOpenModalObservation(false)}
+                onConfirm={(observationValue) => {
+                  setOpenModalObservation(false);
+                  handleAgregarEquipo(observationValue)
+                  
+                }}
+                title="Agregar observación"
+                message="¿Desea agregar una observación al equipo?"
+              />
 
             <StepCargarImagen
             imageData={imageData}
@@ -135,6 +163,17 @@ export const FormSAP = () => {
         return <div>Paso no encontrado</div>;
     }
   };
+  const handleAgregarEquipo = (observationValue: string)=>{
+    if(tipoInventario==="activo"){
+      handleAgregarEquipoActivo(observationValue);
+    }else if(tipoInventario==="bodega"){
+      handleAgregarEquipoBodega(observationValue);
+      
+    }else{
+      handleAgregarEquipoBaja(observationValue);
+
+    }
+  }
   const handleAgregarEquipoActivo = async (observationValue: string) => {
     const equipoData = {
       tipo: "activo",
@@ -160,14 +199,11 @@ export const FormSAP = () => {
     }
   };
 
-  const handleAgregarEquipoBodega = async () => {
+  const handleAgregarEquipoBodega = async (observationValue: string) => {
     const bodegaComputadoraData = {
       tipo: "bodega",
       inventario: inventoryDataSAPForm.inventario || "",
       serie: Number(inventoryDataSAPForm.serie?.id_serie) ?? 0,
-      idUbicacion: Number(inventoryDataSAPForm.ubicacion?.id_ubicacion) ?? 0,
-      idUsuario: 1,
-      imagenRuta: imageData.imagePath,
       observacion: observationValue,
       mac: informacionGeneralDataSAPForm.mac || "",
       puertos: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertos,
@@ -175,7 +211,7 @@ export const FormSAP = () => {
       idLampara:0,
     };
     try {
-      const equipoId = await agregarComputadoraBodega(bodegaComputadoraData);
+      const equipoId = await agregarRedBodega(bodegaComputadoraData);
 
       setShowSuccessMessage(true);
       navigate("/bodega", { state: { equipoAgregado: true } });
@@ -256,39 +292,43 @@ export const FormSAP = () => {
                 Cancelar
               </Button>
 
-              <Button
-                variant="contained"
-                disabled={activeStep === 0}
-                onClick={handleBack}
-              >
-                Atrás
-              </Button>
+              {steps.length === 1 ? (
+                ""
+              ) : (
+                <Button
+                  variant="contained"
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
+                >
+                  Atrás
+                </Button>
+              )}
 
               <Button
                 onClick={
-                  (activeStep === steps.length - 1 && tipoInventario==="activo")?handleModalBeforeAdd
-                    : (activeStep-1 === steps.length - 1 && tipoInventario==="bodega")?handleAgregarEquipoBodega
-                      : handleNext
+                  activeStep === steps.length - 1
+                    ? handleModalBeforeAdd
+                    : handleNext
                 }
                 variant="contained"
                 sx={{
                   backgroundColor:
-                  (activeStep === steps.length - 1 && tipoInventario==="activo")?"#4CAF50" 
-                  : (activeStep-1 === steps.length - 1 && tipoInventario==="bodega")?"#4CAF50" :"#1976d2",
+                    activeStep === steps.length - 1 ? "#4CAF50" : "#1976d2",
                   "&:hover": {
                     backgroundColor:
-                    (activeStep === steps.length - 1 && tipoInventario==="activo")?
-                    "#45a049" : (activeStep-1 === steps.length - 1 && tipoInventario==="bodega")? "#45a049":"#1565c0",
+                      activeStep === steps.length - 1 ? "#45a049" : "#1565c0",
                   },
                 }}
               >
-                {
-              (activeStep === steps.length - 1 && tipoInventario==="activo")
-                      ? "Finalizar"
-                      : (activeStep-1 === steps.length - 1 && tipoInventario==="bodega")?
-                         "Agregar Bodega"
+                {activeStep === steps.length - 1
+                  ? tipoInventario === "activo"
+                    ? "Agregar Activo"
+                    : tipoInventario === "bodega"
+                    ? "Agregar Bodega"
+                    : tipoInventario === "baja"
+                    ? "Agregar Baja"
                     : "Siguiente"
-                }
+                  : "Siguiente"}
               </Button>
             </Box>
           </Fragment>

@@ -108,5 +108,6 @@ export type BodegaComputadoraData = {
     mac: string;
     puertos: string;
     puerto_ftp: string;
+    idLampara: number;
   };
   
