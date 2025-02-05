@@ -23,7 +23,7 @@ import { ModalObservation } from "./components/ModalObservation.tsx";
 
 export const FormLC = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(3);
+  const [activeStep, setActiveStep] = useState(0);
   const location = useLocation();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const selectedPeriferico = location.state?.periferico as
@@ -69,7 +69,9 @@ export const FormLC = () => {
     handleUniqueCargarImagenError,
     completeDatosCargarImagen,
   } = useCargarImagenErrors();
-
+  console.log(activeStep)
+  console.log(steps)
+  
   const handleNext = () => {
     if (activeStep === 0) {
       handleInventoryErrors(inventoryDataForm);
@@ -120,11 +122,21 @@ export const FormLC = () => {
       navigate("/bajas");
     }
   };
+  const handleAgregarEquipo = (observationValue: string)=>{
+    if(tipoInventario==="activo"){
+      handleAgregarEquipoActivo(observationValue);
+    }else if(tipoInventario==="bodega"){
+      handleAgregarEquipoBodega(observationValue);
+      
+    }else{
+      handleAgregarEquipoBaja(observationValue);
+
+    }
+  }
 
   const handleModalBeforeAdd = () => {
     setOpenModalObservation(true);
   };
-
 
   const renderStepContent = (stepIndex: number) => {
     switch (stepIndex) {
@@ -167,15 +179,16 @@ export const FormLC = () => {
         return (
           <>
             <ModalObservation
-              open={openModalObservation}
-              onClose={() => setOpenModalObservation(false)}
-              onConfirm={(observationValue) => {
-                setOpenModalObservation(false);
-                tipoInventario==="Activo"?handleAgregarEquipoActivo(observationValue):handleAgregarEquipoBodega(observationValue);
-              }}
-              title="Agregar observación"
-              message="¿Desea agregar una observación al equipo?"
-            />
+                open={openModalObservation}
+                onClose={() => setOpenModalObservation(false)}
+                onConfirm={(observationValue) => {
+                  setOpenModalObservation(false);
+                  handleAgregarEquipo(observationValue)
+                  
+                }}
+                title="Agregar observación"
+                message="¿Desea agregar una observación al equipo?"
+              />
             <StepComponentes
               perifericos={perifericos}
               componentes={componentes}
@@ -348,44 +361,48 @@ export const FormLC = () => {
               Cancelar
             </Button>
 
-            <Button
-              variant="contained"
-              disabled={activeStep === 0}
-              onClick={handleBack}
-            >
-              Atrás
-            </Button>
+            {steps.length === 1 ? (
+                ""
+              ) : (
+                <Button
+                  variant="contained"
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
+                >
+                  Atrás
+                </Button>
+              )}
 
             <Button
-              onClick={
-                activeStep === steps.length - 1 && tipoInventario === "activo"
-                  ? handleModalBeforeAdd
-                  : activeStep - 1 === steps.length - 1 &&
-                    tipoInventario === "bodega"
-                  ? handleModalBeforeAdd
-                  : handleNext
-              }
-              variant="contained"
-              sx={{
-                backgroundColor:
+                onClick={
                   activeStep === steps.length - 1 && tipoInventario === "activo"
-                    ? "#4CAF50"
+                    ? handleModalBeforeAdd
                     : activeStep - 1 === steps.length - 1 &&
                       tipoInventario === "bodega"
-                    ? "#4CAF50"
-                    : "#1976d2",
-                "&:hover": {
+                    ? handleModalBeforeAdd
+                    : handleNext
+                }
+                variant="contained"
+                sx={{
                   backgroundColor:
-                    activeStep === steps.length - 1 &&
-                    tipoInventario === "activo"
-                      ? "#45a049"
+                    activeStep === steps.length - 1 && tipoInventario === "activo"
+                      ? "#4CAF50"
                       : activeStep - 1 === steps.length - 1 &&
                         tipoInventario === "bodega"
-                      ? "#45a049"
-                      : "#1565c0",
-                },
-              }}
-            >
+                      ? "#4CAF50"
+                      : "#1976d2",
+                  "&:hover": {
+                    backgroundColor:
+                      activeStep === steps.length - 1 &&
+                      tipoInventario === "activo"
+                        ? "#45a049"
+                        : activeStep - 1 === steps.length - 1 &&
+                          tipoInventario === "bodega"
+                        ? "#45a049"
+                        : "#1565c0",
+                  },
+                }}
+              >
               {activeStep === steps.length - 1 && tipoInventario === "activo"
                 ? "Finalizar"
                 : activeStep - 1 === steps.length - 1 &&
