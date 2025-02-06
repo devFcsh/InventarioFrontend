@@ -133,11 +133,12 @@ export const StepInformacionGeneral = ({
                 : ""
             }
             onChange={(e) => {
-              handleInformacionGeneralChange("nombreEquipo", e.target.value);
-              handleUniqueInformacionGeneralError(
-                "nombreEquipo",
-                e.target.value
-              );
+              let value = e.target.value;
+              if (value !== null && value.length > 20) {
+                return
+              }
+              handleInformacionGeneralChange("nombreEquipo",value);
+              handleUniqueInformacionGeneralError("nombreEquipo",value);
             }}
           />
           <Autocomplete
