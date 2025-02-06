@@ -44,6 +44,63 @@ export type ExportarComputadora = {
     monitor_inventario: string;
 };
 
+export type ExportarAP = {
+    empresa: string;
+    inventario: string;
+    edificio: string;
+    ubicacion: string;
+    marca: string;
+    modelo: string;
+    serie: string;
+    mac: string;
+    fecha_ultimo_cambio: string;
+    observacion: string;
+}
+
+export type ExportarSwitch = {
+    empresa: string;
+    inventario: string;
+    edificio: string;
+    ubicacion: string;
+    marca: string;
+    modelo: string;
+    serie: string;
+    mac: string;
+    puertos: string;
+    puerto_ftp: string;
+    fecha_ultimo_cambio: string;
+    observacion: string;
+}
+
+export type ExportarProyector = {
+    empresa: string;
+    inventario: string;
+    edificio: string;
+    ubicacion: string;
+    marca: string;
+    modelo: string;
+    serie: string;
+    lampara: string;
+    fecha_ultimo_cambio: string;
+    observacion: string;
+}
+
+export type ExportarSimples = {
+    periferico: string;
+    edificio: string;
+    ubicacion: string;
+    uso: string;
+    usuario: string;
+    marca: string;
+    modelo: string;
+    serie: string;
+    inventario: string;
+    fecha_ultimo_cambio: string;
+    observacion: string;
+}
+
+
+
 export type EquipoBodega = {
     id_equipo: string;
     periferico: string;

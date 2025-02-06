@@ -18,8 +18,8 @@ import useModelos from "@hooks/useModelos.ts";
 import useSeries from "@hooks/useSeries.ts";
 import { useInventario } from "@hooks/useInventario.ts";
 import { usePasarActivoABodega } from "../hooks/usePasarActivoABodega.ts";
-import { useExportarComputadorasActivos } from "../hooks/useExportarComputadorasActivos.ts";
-
+import { useExportarEquiposActivos } from "../hooks/useExportarComputadorasActivos.ts";
+import { ExportarAP, ExportarComputadora, ExportarSimples, ExportarSwitch } from "../../../../types/Equipo/index.ts";
 
 const Activos = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
@@ -66,7 +66,7 @@ const Activos = () => {
   const { series } = useSeries();
   const { inventarios } = useInventario();
   const { pasarActivoABodega } = usePasarActivoABodega();
-  const { fetchTodosEquipos } = useExportarComputadorasActivos();
+  const { fetchTodosEquipos } = useExportarEquiposActivos();
 
 
   const location = useLocation();
@@ -331,84 +331,215 @@ const Activos = () => {
     }
   };
 
+
   const exportToExcel = async () => {
     try {
       const allEquipos = await fetchTodosEquipos();
   
-      if (!allEquipos.length) {
+      if (!allEquipos) {
         console.warn("No hay equipos para exportar");
         return;
       }
   
-      const formattedEquipos = allEquipos.map(({ 
-        edificio, 
-        ubicacion, 
-        uso, 
-        usuario, 
-        direccion_ip, 
-        nombre_equipo, 
-        dominio, 
-        sistema_operativo, 
-        procesador, 
-        tipo_ram, 
-        capacidad_ram, 
-        capacidad_disco, 
-        marca, 
-        modelo, 
-        serie, 
-        inventario, 
-        fecha_ultimo_cambio, 
-        observacion, 
-        mouse_marca, 
-        mouse_modelo, 
-        mouse_serie, 
-        mouse_inventario, 
-        teclado_marca, 
-        teclado_modelo, 
-        teclado_serie, 
-        teclado_inventario, 
-        monitor_marca, 
-        monitor_modelo, 
-        monitor_serie, 
-        monitor_inventario 
-      }) => ({
-        edificio,
-        ubicacion,
-        uso,
-        usuario,
-        direccion_ip,
-        nombre_equipo,
-        dominio,
-        sistema_operativo,
-        procesador,
-        tipo_ram,
-        capacidad_ram,
-        capacidad_disco,
-        marca,
-        modelo,
-        serie,
-        inventario,
-        fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
-        observacion,
-        
-        mouse_marca: mouse_marca || '',
-        mouse_modelo: mouse_modelo || '',
-        mouse_serie: mouse_serie || '',
-        mouse_inventario: mouse_inventario || '',
-        teclado_marca: teclado_marca || '',
-        teclado_modelo: teclado_modelo || '',
-        teclado_serie: teclado_serie || '',
-        teclado_inventario: teclado_inventario || '',
-        monitor_marca: monitor_marca || '',
-        monitor_modelo: monitor_modelo || '',
-        monitor_serie: monitor_serie || '',
-        monitor_inventario: monitor_inventario || '',
-      }));
+      const addIDColumn = (equipos: any[]) => {
+        return equipos.map((equipo, index) => ({
+          id: index + 1,
+          ...equipo,
+        }));
+      };
   
-      const ws = XLSX.utils.json_to_sheet(formattedEquipos);
+      const formatComputadora = (equipos: ExportarComputadora[]) => {
+        return addIDColumn(equipos.map(({
+          edificio,
+          ubicacion,
+          uso,
+          usuario,
+          direccion_ip,
+          nombre_equipo,
+          dominio,
+          sistema_operativo,
+          procesador,
+          tipo_ram,
+          capacidad_ram,
+          capacidad_disco,
+          marca,
+          modelo,
+          serie,
+          inventario,
+          fecha_ultimo_cambio,
+          observacion,
+          mouse_marca,
+          mouse_modelo,
+          mouse_serie,
+          mouse_inventario,
+          teclado_marca,
+          teclado_modelo,
+          teclado_serie,
+          teclado_inventario,
+          monitor_marca,
+          monitor_modelo,
+          monitor_serie,
+          monitor_inventario,
+        }) => ({
+          tipo: 'Computadora',
+          edificio,
+          ubicacion,
+          uso,
+          usuario,
+          direccion_ip,
+          nombre_equipo,
+          dominio,
+          sistema_operativo,
+          procesador,
+          tipo_ram,
+          capacidad_ram,
+          capacidad_disco,
+          marca,
+          modelo,
+          serie,
+          inventario,
+          fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
+          observacion,
+          mouse_marca: mouse_marca || '',
+          mouse_modelo: mouse_modelo || '',
+          mouse_serie: mouse_serie || '',
+          mouse_inventario: mouse_inventario || '',
+          teclado_marca: teclado_marca || '',
+          teclado_modelo: teclado_modelo || '',
+          teclado_serie: teclado_serie || '',
+          teclado_inventario: teclado_inventario || '',
+          monitor_marca: monitor_marca || '',
+          monitor_modelo: monitor_modelo || '',
+          monitor_serie: monitor_serie || '',
+          monitor_inventario: monitor_inventario || '',
+        })));
+      };
+  
+      const formatSwitch = (equipos: ExportarSwitch[]) => {
+        return addIDColumn(equipos.map(({
+          empresa,
+          inventario,
+          edificio,
+          ubicacion,
+          marca,
+          modelo,
+          serie,
+          mac,
+          puertos,
+          puerto_ftp,
+          fecha_ultimo_cambio,
+          observacion,
+        }) => ({
+          tipo: 'Switch',
+          empresa,
+          inventario,
+          edificio,
+          ubicacion,
+          marca,
+          modelo,
+          serie,
+          mac,
+          puertos,
+          puerto_ftp,
+          fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
+          observacion,
+        })));
+      };
+  
+      const formatAP = (equipos: ExportarAP[]) => {
+        return addIDColumn(equipos.map(({
+          empresa,
+          inventario,
+          edificio,
+          ubicacion,
+          marca,
+          modelo,
+          serie,
+          mac,
+          fecha_ultimo_cambio,
+          observacion,
+        }) => ({
+          tipo: 'AP',
+          empresa,
+          inventario,
+          edificio,
+          ubicacion,
+          marca,
+          modelo,
+          serie,
+          mac,
+          fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
+          observacion,
+        })));
+      };
+  
+      const formatProyector = (equipos: any[]) => {
+        return addIDColumn(equipos.map(({
+          empresa,
+          inventario,
+          edificio,
+          ubicacion,
+          marca,
+          modelo,
+          serie,
+          lampara,
+          fecha_ultimo_cambio,
+          observacion,
+        }) => ({
+          tipo: 'Proyector',
+          empresa,
+          inventario,
+          edificio,
+          ubicacion,
+          marca,
+          modelo,
+          serie,
+          lampara,
+          fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
+          observacion,
+        })));
+      };
+  
+      const formatEquiposSimples = (equipos: ExportarSimples[]) => {
+        return addIDColumn(equipos.map(({
+          periferico,
+          edificio,
+          ubicacion,
+          uso,
+          usuario,
+          marca,
+          modelo,
+          serie,
+          inventario,
+          fecha_ultimo_cambio,
+          observacion,
+        }) => ({
+          tipo: periferico,
+          edificio,
+          ubicacion,
+          uso,
+          usuario,
+          marca,
+          modelo,
+          serie,
+          inventario,
+          fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
+          observacion,
+        })));
+      };
+  
+      const wsComputadoras = XLSX.utils.json_to_sheet(formatComputadora(allEquipos.Computadoras));
+      const wsAP = XLSX.utils.json_to_sheet(formatAP(allEquipos.AP));
+      const wsSwitch = XLSX.utils.json_to_sheet(formatSwitch(allEquipos.Switch));
+      const wsProyector = XLSX.utils.json_to_sheet(formatProyector(allEquipos.Proyector));
+      const wsEquiposSimples = XLSX.utils.json_to_sheet(formatEquiposSimples(allEquipos.EquiposSimples));
   
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Datos Equipos");
+      XLSX.utils.book_append_sheet(wb, wsComputadoras, "Computadoras");
+      XLSX.utils.book_append_sheet(wb, wsAP, "AP");
+      XLSX.utils.book_append_sheet(wb, wsSwitch, "Switch");
+      XLSX.utils.book_append_sheet(wb, wsProyector, "Proyector");
+      XLSX.utils.book_append_sheet(wb, wsEquiposSimples, "Equipos Simples");
   
       XLSX.writeFile(wb, "datos_equipos.xlsx");
   
@@ -416,7 +547,8 @@ const Activos = () => {
       console.error("Error al exportar a Excel:", error);
     }
   };
-
+  
+  
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };

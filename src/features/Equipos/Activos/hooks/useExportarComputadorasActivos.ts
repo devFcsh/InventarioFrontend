@@ -1,24 +1,32 @@
 import { useState } from "react";
-import { ExportarComputadora } from "../../../../types/Equipo";
+import { ExportarComputadora, ExportarAP, ExportarSwitch, ExportarProyector, ExportarSimples } from "../../../../types/Equipo";
 import clienteAxios from "../../../../hooks";
 
-export const useExportarComputadorasActivos = () => {
-  const [equipos, setEquipos] = useState<ExportarComputadora[]>([]);
+interface ExportarEquiposResponse {
+  Computadoras: ExportarComputadora[];
+  AP: ExportarAP[];
+  Switch: ExportarSwitch[];
+  Proyector: ExportarProyector[];
+  EquiposSimples: ExportarSimples[];
+}
+
+export const useExportarEquiposActivos = () => {
+  const [equipos, setEquipos] = useState<ExportarEquiposResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTodosEquipos = async (): Promise<ExportarComputadora[]> => {
+  const fetchTodosEquipos = async (): Promise<ExportarEquiposResponse | null> => {
     setLoading(true);
     setError(null);
 
     try {
-      const { data } = await clienteAxios.get("/equipos/exportarComputadorasActivos");
+      const { data } = await clienteAxios.get("/equipos/exportarEquiposActivos");
       setEquipos(data);
-      return data; 
+      return data;
     } catch (err) {
       setError("Error al cargar los equipos: " + err);
       console.error(err);
-      return [];
+      return null;
     } finally {
       setLoading(false);
     }

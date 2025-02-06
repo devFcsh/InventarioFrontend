@@ -62,8 +62,8 @@ import { useNavigate } from "react-router-dom";
 import useLamparas from "@hooks/useLamparas";
 import { useEditarLampara } from "../../AgregarCategoria/hooks/useEditarLampara";
 import { useEliminarLampara } from "../../AgregarCategoria/hooks/useEliminarLampara";
-import { useEditarRAM } from "../../AgregarCategoria/hooks/useEditarRam";
-import { useEliminarRAM } from "../../AgregarCategoria/hooks/useEliminarRam";
+import { useEditarRAM } from "../../AgregarCategoria/hooks/useEditarRAM";
+import { useEliminarRAM } from "../../AgregarCategoria/hooks/useEliminarRAM";
 
 type Opcion =
   | Uso
@@ -107,7 +107,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const { modelos } = useModelos();
   const { perifericos } = usePerifericos();
   const { series } = useSeries();
-  const { lamparas } = useLamparas();
+  const { lamparasTotales } = useLamparas();
   const { edificios } = useEdificios();
   const { sistemasOperativos } = useSistemasOperativos();
   const { ubicaciones } = useUbicacionesCompletas();
@@ -167,7 +167,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
       : selectedCategoria === "Serie"
       ? series
       : selectedCategoria === "Lampara"
-      ? lamparas
+      ? lamparasTotales
       : selectedCategoria === "Periférico"
       ? perifericos
       : selectedCategoria === "Edificio"
