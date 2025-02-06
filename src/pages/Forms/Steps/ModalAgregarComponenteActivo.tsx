@@ -22,6 +22,7 @@ interface ModalProps {
   title?: string;
   perifericos: Periferico[];
   onAddComponent: (nuevoComponente: Componente) => void;
+  addedPerifericos: any;
 }
 
 export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
@@ -30,6 +31,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
   title = "Agregar activo",
   perifericos = [],
   onAddComponent,
+  addedPerifericos = [],
 }) => {
   const [nuevoComponente, setNuevoComponente] = useState<Componente>({
     periferico: null,
@@ -49,7 +51,8 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
       p?.nombre.toLowerCase() !== "laptop" &&
       p?.nombre.toLowerCase() !== "proyector" &&
       p?.nombre.toLowerCase() !== "ap" &&
-      p?.nombre.toLowerCase() !== "switch" 
+      p?.nombre.toLowerCase() !== "switch" &&
+      !addedPerifericos.some(added=> added?.periferico?.id_periferico === p?.id_periferico)
   );
   const { marcas: marcasComponente } = useMarcasPorPeriferico(
     nuevoComponente.periferico?.id_periferico ?? ""
@@ -309,11 +312,15 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 error={!!componentsErrors.inventario}
                 helperText={componentsErrors.inventario? "Por favor escribir un inventario válido" :""}
                 onChange={(e) => {
+                  let value = e.target.value;
+                  if (value !== null && value.length > 10) {
+                    return
+                  }
                   setNuevoComponente({
                     ...nuevoComponente,
-                    inventario: e.target.value,
+                    inventario: value,
                   })
-                  handleUniqueComponentsError("inventario",e.target.value,{
+                  handleUniqueComponentsError("inventario",value,{
                     ...nuevoComponente,
                     empresa
                   });

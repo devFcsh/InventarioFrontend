@@ -264,10 +264,14 @@ export const StepDatosInventario = ({
                   : ""
               }
               onChange={(e) => {
-                handleInventoryChange("inventario", e.target.value);
+                let value = e.target.value;
+                if (value !== null && value.length > 10) {
+                  return
+                }
+                handleInventoryChange("inventario", value);
                 handleUniqueInventarioError(
                   "inventario",
-                  e.target.value,
+                  value,
                   inventoryDataForm
                 );
               }}

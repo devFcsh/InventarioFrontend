@@ -52,6 +52,7 @@ export const StepComponentes: React.FC<FormProps> = ({
         title={modalContentComponentes.title}
         perifericos={perifericos}
         onAddComponent={handleAddComponents}
+        addedPerifericos={componentes}
       />
       <Snackbar
         open={showSuccessMessageComponentes}

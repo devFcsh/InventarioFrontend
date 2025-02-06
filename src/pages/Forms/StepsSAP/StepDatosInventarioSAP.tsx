@@ -155,9 +155,14 @@ export const StepDatosInventarioSAP = ({
             error={!!inventorySAPErrors.inventario}
             helperText={inventorySAPErrors.inventario? "Por favor escribir un inventario válido" :""}
             onChange={(e) => {
-              handleInventorySAPChange("inventario", e.target.value);
-              handleUniqueInventarioSAPError("inventario",e.target.value,inventoryDataSAPForm);
+              let value = e.target.value;
+              if (value !== null && value.length > 10) {
+                return
+              }
+              handleInventorySAPChange("inventario", value);
+              handleUniqueInventarioSAPError("inventario",value,inventoryDataSAPForm);
             }}
+
             disabled={inventoryDataSAPForm.empresa === ""}
               
           />
