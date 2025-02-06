@@ -63,8 +63,19 @@ export const useInformacionGeneralErrorSAP = (periferico:string | undefined) => 
         }));
       }
     }
-    console.log(informacionGeneralSAPErrors)
-
+    if (tipo === "puertos" || tipo === "puertoFTP") {
+      if (value !== null && /^\d+$/.test(value)) {
+        setInformacionGeneralErrors((prevErrors) => ({
+          ...prevErrors,
+          [tipo]: false
+        }));
+      } else {
+        setInformacionGeneralErrors((prevErrors) => ({
+          ...prevErrors,
+          [tipo]: true
+        }));
+      }
+    }
   };
 
   return { informacionGeneralSAPErrors,handleInformacionGeneralSAPErrors, handleUniqueInformacionGeneralError,completeDatosInformacionGeneral};

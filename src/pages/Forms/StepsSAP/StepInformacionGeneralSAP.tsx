@@ -34,9 +34,16 @@ export const StepInformacionGeneralSAP = ({
                 : ""
             }
             onChange={(e) => {
-              handleInformacionGeneralSAPChange("mac", e.target.value);
-              handleUniqueInformacionGeneralError("mac", e.target.value);
+              let value = e.target.value.toUpperCase();
+              
+              if (value !== null && value.length > 17) {
+                return
+              }
+            
+              handleInformacionGeneralSAPChange("mac", value);
+              handleUniqueInformacionGeneralError("mac", value);
             }}
+            
           />
           {periferico!=="AP"?
           <>
@@ -54,8 +61,14 @@ export const StepInformacionGeneralSAP = ({
                 : ""
             }
             onChange={(e) => {
-              handleInformacionGeneralSAPChange("puertos", e.target.value);
-              handleUniqueInformacionGeneralError("puertos", e.target.value);
+              let value = e.target.value;
+              
+              if (value !== null && value.length > 10) {
+                return
+              }
+            
+              handleInformacionGeneralSAPChange("puertos", value);
+              handleUniqueInformacionGeneralError("puertos", value);
             }}
           />
           <TextField
@@ -71,9 +84,16 @@ export const StepInformacionGeneralSAP = ({
                 ? "Por favor escribir un puerto FTP válido"
                 : ""
             }
+
             onChange={(e) => {
-              handleInformacionGeneralSAPChange("puertoFTP", e.target.value);
-              handleUniqueInformacionGeneralError("puertoFTP", e.target.value);
+              let value = e.target.value;
+              
+              if (value !== null && value.length > 10) {
+                return
+              }
+            
+              handleInformacionGeneralSAPChange("puertoFTP", value);
+              handleUniqueInformacionGeneralError("puertoFTP", value);
             }}
           />
           </>
