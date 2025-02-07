@@ -371,7 +371,13 @@ const EditarActivoSimple = ({
             helperText={
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
-            onChange={(e) => handleChangeInventario(e.target.value)}
+            onChange={(e) => {
+              let value = e.target.value;
+              if (value !== null && value.length > 20) {
+                return
+              }
+              handleChangeInventario(value)
+            }}
             disabled={empresa === ""}
           />
         </Box>
@@ -485,7 +491,11 @@ const EditarActivoSimple = ({
                 minRows={2}
                 value={newObservation}
                 onChange={(e) => {
-                  handleObservation(e.target.value)
+                  let value = e.target.value;
+                  if (value !== null && value.length > 200) {
+                    return
+                  }
+                  handleObservation(value)
                 }}
                 error={!!errorMensajeComponente}
                 helperText={errorMensajeComponente}

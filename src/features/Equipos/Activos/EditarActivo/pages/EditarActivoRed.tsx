@@ -56,6 +56,8 @@ const EditarActivoRed = ({
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
   const [errorMAC, setErrorMAC] = useState<boolean>(false);
+  const [errorPuertos, setErrorPuertos] = useState<boolean>(false);
+  const [errorPuertoFTP, setErrorPuertoFTP] = useState<boolean>(false);
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(null);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
@@ -231,6 +233,26 @@ const EditarActivoRed = ({
         !validateMAC(MAC)?setErrorMAC(true):setErrorMAC(false)
     }
     }
+    const handlePuertosChange = (puertos :string)=>{
+      setSelectedPuertos(puertos)      
+      if(puertos===null){
+        setErrorPuertos(true);
+      }else if(puertos !== null && /^\d+$/.test(puertos)){
+        setErrorPuertos(true)
+      }else{
+        setErrorPuertos(false)
+      }
+    }
+    const handlePuertoFTPChange = (puertoFTP :string)=>{
+      setSelectedPuertoFTP(puertoFTP)      
+      if(puertoFTP===null){
+        setErrorPuertoFTP(true);
+      }else if(puertoFTP !== null && /^\d+$/.test(puertoFTP)){
+        setErrorPuertoFTP(true)
+      }else{
+        setErrorPuertoFTP(false)
+      }
+    }
 
   const handleCancelar = () => {
     setOpenModalCancelar(false);
@@ -366,7 +388,13 @@ const EditarActivoRed = ({
             helperText={
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
-            onChange={(e) => handleChangeInventario(e.target.value)}
+            onChange={(e) => {
+              let value = e.target.value;
+              if (value !== null && value.length > 10) {
+                return
+              }
+              handleChangeInventario(value)
+            }}
             disabled={empresa === ""}
           />
         </Box>
@@ -418,7 +446,14 @@ const EditarActivoRed = ({
             helperText={
               errorMAC ? "Por favor escribir un inventario válido" : ""
             }
-            onChange={(e) => handleMACChange(e.target.value)}
+            onChange={(e) => {
+              let value = e.target.value.toUpperCase();
+              
+              if (value !== null && value.length > 17) {
+                return
+              }
+              handleMACChange(value)
+            }}
         />
         {perifericoName === "Switch" ? (
         <TextField
@@ -428,7 +463,18 @@ const EditarActivoRed = ({
             fullWidth
             size="small"
             value={selectedPuertos}
-            onChange={(e) => setSelectedPuertos(e.target.value)}
+            onChange={(e) => {
+              let value = e.target.value;
+              
+              if (value !== null && value.length > 10) {
+                return
+              }
+              handlePuertosChange(value)
+            }}
+            error={!!errorPuertos}
+            helperText={
+              errorPuertos ? "Por favor escribir una cantidad de puertos válidos" : ""
+            }
         />):""}
         {perifericoName === "Switch" ? (
         <TextField
@@ -438,7 +484,18 @@ const EditarActivoRed = ({
             fullWidth
             size="small"
             value={selectedPuertoFTP}
-            onChange={(e) => setSelectedPuertoFTP(e.target.value)}
+            error={!!errorPuertoFTP}
+            helperText={
+              errorPuertoFTP ? "Por favor escribir un puerto FTP válido" : ""
+            }
+            onChange={(e) => {
+              let value = e.target.value;
+              
+              if (value !== null && value.length > 10) {
+                return
+              }
+              handlePuertoFTPChange(value)
+            }}
         />):""}
 
       </div>
@@ -486,8 +543,14 @@ const EditarActivoRed = ({
                 minRows={2}
                 value={newObservation}
                 onChange={(e) => {
-                  handleObservation(e.target.value)
+                  let value = e.target.value;
+                  
+                  if (value !== null && value.length > 200) {
+                    return
+                  }
+                  handleObservation(value)
                 }}
+
                 error={!!errorMensajeComponente}
                 helperText={errorMensajeComponente}
           />

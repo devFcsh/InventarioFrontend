@@ -648,7 +648,13 @@ const EditarComputadoraActivo = ({
             helperText={
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
-            onChange={(e) => handleChangeInventario(e.target.value)}
+            onChange={(e) => {
+              let value = e.target.value;
+              if (value !== null && value.length > 10) {
+                return
+              }
+              handleChangeInventario(value)
+            }}
             disabled={empresa === ""}
           />
         </Box>
@@ -796,7 +802,11 @@ const EditarComputadoraActivo = ({
             value={direccionIP}
             error={!!errorDireccionIP}
             onChange={(e) => {
-              handleIP(e.target.value);
+              let value = e.target.value;
+              if (value !== null && value.length > 15) {
+                return
+              }
+              handleIP(value);
             }}
             disabled={protocolo !== "0"}
             sx={{ marginRight: 4, width: "50%" }}
@@ -811,7 +821,13 @@ const EditarComputadoraActivo = ({
           size="small"
           label="Nombre Equipo"
           value={nombreEquipo}
-          onChange={(e) => setNombreEquipo(e.target.value)}
+          onChange={(e) => {
+            let value = e.target.value;
+            if (value !== null && value.length > 20) {
+              return
+            }
+            setNombreEquipo(value)
+          }}
           fullWidth
           variant="outlined"
         />
@@ -1061,9 +1077,13 @@ const EditarComputadoraActivo = ({
                     ? "Por favor escribir un inventario válido"
                     : ""
                 }
-                onChange={(e) =>
-                  handleChangeNuevoComponenteInventario(e.target.value)
-                }
+                onChange={(e) => {
+                  let value = e.target.value;
+                  if (value !== null && value.length > 20) {
+                    return
+                  }
+                  handleChangeNuevoComponenteInventario(value)
+                }}
                 disabled={empresa === ""}
               />
             </Box>
@@ -1088,7 +1108,11 @@ const EditarComputadoraActivo = ({
           minRows={2}
           value={newObservation}
           onChange={(e) => {
-            handleObservation(e.target.value);
+            let value = e.target.value;
+            if (value !== null && value.length > 200) {
+              return
+            }
+            handleObservation(value)
           }}
           error={!!errorMensajeComponente}
           helperText={errorMensajeComponente}

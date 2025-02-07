@@ -217,12 +217,17 @@ export const StepInformacionGeneral = ({
               value={informacionGeneralDataForm.direccionIP}
               error={!!informacionGeneralErrors.direccionIP}
               onChange={(e) => {
-                handleInformacionGeneralChange("direccionIP", e.target.value);
+                let value = e.target.value;
+                if (value !== null && value.length > 15) {
+                  return
+                }
+                handleInformacionGeneralChange("direccionIP", value);
                 handleUniqueInformacionGeneralError(
                   "direccionIP",
-                  e.target.value
+                  value
                 );
               }}
+
               disabled={informacionGeneralDataForm.protocolo !== "0"}
             />
             {informacionGeneralErrors.direccionIP && (
