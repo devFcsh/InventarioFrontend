@@ -20,6 +20,7 @@ import { useInventario } from "@hooks/useInventario.ts";
 import { usePasarActivoABodega } from "../hooks/usePasarActivoABodega.ts";
 import { useExportarEquiposActivos } from "../hooks/useExportarComputadorasActivos.ts";
 import { ExportarAP, ExportarComputadora, ExportarSimples, ExportarSwitch } from "../../../../types/Equipo/index.ts";
+import { useNavigate } from "react-router-dom";
 
 const Activos = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
@@ -37,6 +38,7 @@ const Activos = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
+  const navigate = useNavigate();
   const [totalPages, setTotalPages] = useState<number>(1);
   const [modalContent, setModalContent] = useState<{
     title: string;
@@ -109,11 +111,13 @@ const Activos = () => {
     if (location.state && location.state.equipoAgregado) {
       setSnackbarMessage("¡Equipo agregado con éxito!");
       setOpenSnackbar(true);
+      navigate(location.pathname, { replace: true, state: {} });
     } else if (location.state && location.state.equipoEditado) {
       setSnackbarMessage("¡Equipo editado con éxito!");
       setOpenSnackbar(true);
+      navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state]);
+  }, [location.state,navigate]);
 
   const handleConfirm = async () => {
     try {

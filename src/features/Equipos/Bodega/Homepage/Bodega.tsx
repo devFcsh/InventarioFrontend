@@ -14,6 +14,9 @@ import { filas } from "../../../../data";
 import { useEquiposBodegaFiltrados } from "../hooks/useEquiposBodegaFiltrados";
 import {ModalAgregarBodega} from "../../../../features/Equipos/Bodega/Pages/ModalAgregarBodega";
 import ModalPasarAActivo from "../Pages/ModalPasarAActivo";
+import { useNavigate } from "react-router-dom";
+import { useEliminarComputadora } from "@hooks/useEliminarComputadora.ts";
+import { useDarDeBajaEquipo } from "../../Activos/hooks/useDarDeBajaEquipo";
 
 const Bodega = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
@@ -38,6 +41,7 @@ const Bodega = () => {
     title: "Agregar Bodega",
     message: "Seleccione el periférico a registrar",
   });
+  const { eliminarEquipo } = useEliminarComputadora();
   const [totalPages, setTotalPages] = useState<number>(1);
   const [modalContent, setModalContent] = useState<{
     title: string;
@@ -61,10 +65,12 @@ const Bodega = () => {
   const { modelos } = useModelos();
   const { series } = useSeries();
   const { inventarios } = useInventario();
-
+  
+    const { darDeBajaEquipo } = useDarDeBajaEquipo();
 
    
   const location = useLocation();
+  const navigate = useNavigate();
   
   const filtros = {
     perifericoId: selectedPeriferico?.id_periferico,
@@ -104,11 +110,13 @@ const Bodega = () => {
     if (location.state && location.state.equipoAgregado) {
       setSnackbarMessage("¡Equipo agregado con éxito!");
       setOpenSnackbar(true);
+      navigate(location.pathname, { replace: true, state: {} });
     } else if (location.state && location.state.equipoEditado) {
       setSnackbarMessage("¡Equipo editado con éxito!");
       setOpenSnackbar(true);
+      navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state]);
+  }, [location.state,navigate]);
 
   const handleConfirm = async () => {
     try {
@@ -131,7 +139,7 @@ const Bodega = () => {
     setSelectedEquipoId(null);
   };
 
-   /** 
+   
   const deleteEquipo = async (equipoId: string) => {
     if (equipoId) {
       await eliminarEquipo(equipoId);
@@ -155,7 +163,7 @@ const Bodega = () => {
   const bajaEquipo = async (equipoId: string) => {
     if (equipoId) {
       try {
-        await darDeBajaEquipo(equipoId);
+        await darDeBajaEquipo(equipoId,"bodega");
         console.log(`Equipo con ID ${equipoId} dado de baja`);
         setShouldFetch(true);
       } catch (error) {
@@ -167,7 +175,7 @@ const Bodega = () => {
   const bajaEquipos = async (equipoIds: string[]) => {
     try {
       for (const id of equipoIds) {
-        await darDeBajaEquipo(id);
+        await darDeBajaEquipo(id,"baja");
       }
       setShouldFetch(true);
       setSelectedItems([]);
@@ -195,9 +203,7 @@ const Bodega = () => {
 
     setOpenModal(true);
   };
-  */
 
-  /** 
   const handleOpenModal = (
     id: string,
     title: string,
@@ -228,7 +234,6 @@ const Bodega = () => {
     });
     setOpenModal(true);
   };
-  */
 
   const handlePerifericoChange = (
     _event: React.SyntheticEvent<Element, Event>,
@@ -485,14 +490,14 @@ const Bodega = () => {
                         icon="weui:delete-outlined"
                         width="20"
                         height="20"
-                        onClick={ /** handleDelete*/ () => {}}
+                        onClick={handleDelete}
                         className="cursor-pointer"
                       />
                       <Icon
                         icon="ph:arrow-fat-down-light"
                         width="20"
                         height="20"
-                        onClick={ /** handleBaja */ () => {}}
+                        onClick={handleBaja}
                         className="cursor-pointer"
                       />
                     </>
@@ -541,12 +546,28 @@ const Bodega = () => {
                       icon="ph:arrow-fat-down-light"
                       width="25"
                       height="25"
+                      onClick={() =>
+                        handleOpenModal(
+                          equipo.id_equipo,
+                          "Dar de baja equipo",
+                          `¿Estás seguro de que deseas dar de baja el equipo ${equipo.id_equipo}?`,
+                          bajaEquipo
+                        )
+                      }
                       className="cursor-pointer"
                     />
                     <Icon
                       icon="weui:delete-outlined"
                       width="25"
                       height="25"
+                      onClick={() =>
+                        handleOpenModal(
+                          equipo.id_equipo,
+                          "Eliminar equipo",
+                          `¿Estás seguro de que deseas eliminar el equipo ${equipo.id_equipo}?`,
+                          deleteEquipo
+                        )
+                      }
                       className="cursor-pointer"
                     />
                     <Link
