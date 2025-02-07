@@ -238,9 +238,9 @@ const EditarActivoRed = ({
       if(puertos===null){
         setErrorPuertos(true);
       }else if(puertos !== null && /^\d+$/.test(puertos)){
-        setErrorPuertos(true)
-      }else{
         setErrorPuertos(false)
+      }else{
+        setErrorPuertos(true)
       }
     }
     const handlePuertoFTPChange = (puertoFTP :string)=>{
@@ -248,9 +248,9 @@ const EditarActivoRed = ({
       if(puertoFTP===null){
         setErrorPuertoFTP(true);
       }else if(puertoFTP !== null && /^\d+$/.test(puertoFTP)){
-        setErrorPuertoFTP(true)
-      }else{
         setErrorPuertoFTP(false)
+      }else{
+        setErrorPuertoFTP(true)
       }
     }
 
