@@ -36,7 +36,7 @@ const EditarUsuario = () => {
     refetch: refetchEquipos,
   } = useEquiposPorUsuario(usuario?.id_usuario || "");
 
-  const { cambiarUsuario, loading: loadingCambio } = useCambiarUsuarioEquipo();
+  const { cambiarUsuario, loading: loadingCambio, error, success } = useCambiarUsuarioEquipo();
 
   const {
     editarUsuario,
@@ -86,21 +86,25 @@ const EditarUsuario = () => {
     setOpenModal(true);
   };
 
-  const handleConfirmarCambio = async (usuarioId: string) => {
-    if (equipoId) {
-      try {
-        await cambiarUsuario(equipoId, usuarioId);
+  useEffect(() => {
+    if (success) {
         setSnackbarMessage("Usuario cambiado correctamente al equipo");
-        setOpenSnackbar(true);
-        setOpenModal(false);
-
         refetchEquipos();
-      } catch (error) {
-        setSnackbarMessage("Error al cambiar el usuario del equipo");
-        setOpenSnackbar(true);
-      }
+        setOpenModal(false);
     }
-  };
+    if (error) {
+        setSnackbarMessage("No se puede cambiar de usuario a un componente");
+    }
+    if (success || error) {
+        setOpenSnackbar(true);
+    }
+}, [success, error]);
+
+const handleConfirmarCambio = async (usuarioId: string) => {
+    if (equipoId) {
+        await cambiarUsuario(equipoId, usuarioId);
+    }
+};
 
   if (loadingEquipos || loadingEdicion || loadingUsos) {
     return <div>Cargando...</div>;
@@ -199,7 +203,7 @@ const EditarUsuario = () => {
       >
         <Alert
           onClose={handleCloseSnackbar}
-          severity="success"
+          severity={success ? "success" : "error"}
           sx={{ width: "100%" }}
         >
           {snackbarMessage}
