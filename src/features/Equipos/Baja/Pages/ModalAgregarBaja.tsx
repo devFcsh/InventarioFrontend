@@ -26,12 +26,12 @@ export const ModalAgregarBaja: FC<ModalConfirmationProps> = ({
   perifericos = [],
   steps = []
 }) => {
+  const [selectedPeriferico, setSelectedPeriferico] =
+    useState<Periferico | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const hasPerifericos = Array.isArray(perifericos) && perifericos.length > 0;
 
-  const [selectedPeriferico, setSelectedPeriferico] =
-    useState<Periferico | null>(null);
 
   const handlePerifericoChange = (
     _event: SyntheticEvent<Element, Event>,
@@ -48,9 +48,21 @@ export const ModalAgregarBaja: FC<ModalConfirmationProps> = ({
     setError(null);
     let state = {}
     if (selectedPeriferico.nombre === 'Laptop' || selectedPeriferico.nombre === 'Computadora') {
-      state = { periferico: selectedPeriferico, perifericos, tipoInventario: "baja" };
+      steps = [
+        "Datos de inventario",
+        "Información general",
+        "Componentes",
+      ];
+      state = { periferico: selectedPeriferico, perifericos, tipoInventario: "baja",steps };
       navigate('/FormLC', { state });
-    } else {
+    } else if(selectedPeriferico.nombre === 'Switch' || selectedPeriferico.nombre === 'AP'){
+      steps = [
+        "Datos de inventario",
+        "Información general",
+      ];
+      state = { periferico: selectedPeriferico, perifericos, tipoInventario: "baja", steps};
+      navigate('/FormSAP', { state });
+  }else {
       steps = [
         "Datos de inventario",
       ];

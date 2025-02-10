@@ -13,6 +13,8 @@ import { useInventariosPorSerie } from "../../../../hooks/useInventariosPorSerie
 import { filas } from "../../../../data";
 import { useEquiposBajaFiltrados } from "../hooks/useEquiposBajaFiltrados";
 import {ModalAgregarBaja} from "../../Baja/Pages/ModalAgregarBaja"
+import { useEliminarComputadora } from "@hooks/useEliminarComputadora.ts";
+import { useNavigate } from "react-router-dom";
 
 const Bajas = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
@@ -46,7 +48,7 @@ const Bajas = () => {
     title: "Agregar Bajas",
     message: "Seleccione el periférico a registrar",
   });
-  
+  const { eliminarEquipo } = useEliminarComputadora();
   const handleOpenBajas = () => setOpenModalBajas(true);
   const handleCloseBajas = () => setOpenModalBajas(false);
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
@@ -74,6 +76,7 @@ const Bajas = () => {
   );
 
   
+  const navigate = useNavigate();
   const location = useLocation();
   
   const filtros = {
@@ -114,11 +117,13 @@ const Bajas = () => {
     if (location.state && location.state.equipoAgregado) {
       setSnackbarMessage("¡Equipo agregado con éxito!");
       setOpenSnackbar(true);
+      navigate(location.pathname, { replace: true, state: {} });
     } else if (location.state && location.state.equipoEditado) {
       setSnackbarMessage("¡Equipo editado con éxito!");
       setOpenSnackbar(true);
+      navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state]);
+  }, [location.state,navigate]);
 
   const handleConfirm = async () => {
     try {
@@ -131,7 +136,7 @@ const Bajas = () => {
     handleCloseModal();
   };
 
-   /** 
+  
   const deleteEquipo = async (equipoId: string) => {
     if (equipoId) {
       await eliminarEquipo(equipoId);
@@ -152,29 +157,6 @@ const Bajas = () => {
     }
   };
 
-  const bajaEquipo = async (equipoId: string) => {
-    if (equipoId) {
-      try {
-        await darDeBajaEquipo(equipoId);
-        console.log(`Equipo con ID ${equipoId} dado de baja`);
-        setShouldFetch(true);
-      } catch (error) {
-        console.error("Error al dar de baja el equipo", error);
-      }
-    }
-  };
-
-  const bajaEquipos = async (equipoIds: string[]) => {
-    try {
-      for (const id of equipoIds) {
-        await darDeBajaEquipo(id);
-      }
-      setShouldFetch(true);
-      setSelectedItems([]);
-    } catch (error) {
-      console.error("Error al dar de baja los equipos", error);
-    }
-  };
 
   const handleDelete = () => {
     if (selectedItems.length === 0) {
@@ -195,9 +177,8 @@ const Bajas = () => {
 
     setOpenModal(true);
   };
-  */
+  
 
-  /** 
   const handleOpenModal = (
     id: string,
     title: string,
@@ -210,35 +191,11 @@ const Bajas = () => {
   };
 
  
-  const handleBaja = () => {
-    setModalContent({
-      title: "Dar de Baja Equipos",
-      message:
-        "¿Estás seguro de que deseas dar de baja los equipos seleccionados?",
-    });
-    setConfirmAction(() => async () => {
-      if (selectedItems.length === 0) {
-        console.log("Debe seleccionar al menos un elemento");
-        return;
-      }
-      await bajaEquipos(selectedItems);
-      setSnackbarMessage("¡Equipos dados de baja con éxito!");
-      setOpenSnackbar(true);
-      setOpenModal(false);
-    });
-    setOpenModal(true);
-  };
-  */
-
   const handlePerifericoChange = (
     _event: React.SyntheticEvent<Element, Event>,
     newValue: Periferico | null
   ) => {
     setSelectedPeriferico(newValue);
-    setSelectedMarca(null);
-    setSelectedModelo(null);
-    setSelectedSerie(null);
-    setSelectedInventario(null);
   };
 
   const handleMarcaChange = (
@@ -246,9 +203,6 @@ const Bajas = () => {
     newValue: Marca | null
   ) => {
     setSelectedMarca(newValue);
-    setSelectedModelo(null);
-    setSelectedSerie(null);
-    setSelectedInventario(null);
   };
 
   const handleModeloChange = (
@@ -256,8 +210,6 @@ const Bajas = () => {
     newValue: Modelo | null
   ) => {
     setSelectedModelo(newValue);
-    setSelectedSerie(null);
-    setSelectedInventario(null);
   };
 
   const handleSerieChange = (
@@ -265,7 +217,6 @@ const Bajas = () => {
     newValue: Serie | null
   ) => {
     setSelectedSerie(newValue);
-    setSelectedInventario(null);
   };
 
   const handleBuscar = () => {
@@ -403,7 +354,6 @@ const Bajas = () => {
               <TextField {...params} label="Marca" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
-            disabled={!selectedPeriferico}
           />
           <Autocomplete
             size="small"
@@ -419,7 +369,6 @@ const Bajas = () => {
               <TextField {...params} label="Modelo" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
-            disabled={!selectedMarca}
           />
 
           <Autocomplete
@@ -436,7 +385,6 @@ const Bajas = () => {
               <TextField {...params} label="Serie" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
-            disabled={!selectedModelo}
           />
           <Autocomplete
             size="small"
@@ -452,7 +400,6 @@ const Bajas = () => {
               <TextField {...params} label="Inventario" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
-            disabled={!selectedSerie}
           />
 
           <div className="flex flex-col w-full md:w-1/5 md:flex-row gap-4 md:gap-2 lg:ml-2">
@@ -499,14 +446,7 @@ const Bajas = () => {
                         icon="weui:delete-outlined"
                         width="20"
                         height="20"
-                        onClick={ /** handleDelete*/ () => {}}
-                        className="cursor-pointer"
-                      />
-                      <Icon
-                        icon="ph:arrow-fat-down-light"
-                        width="20"
-                        height="20"
-                        onClick={ /** handleBaja */ () => {}}
+                        onClick={handleDelete}
                         className="cursor-pointer"
                       />
                     </>
@@ -551,29 +491,20 @@ const Bajas = () => {
                   <td className="px-4 py-2">{equipo.serie}</td>
                   <td className="px-4 py-2">{equipo.inventario}</td>
                   <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
-                    <Icon
-                      icon="ph:arrow-fat-down-light"
-                      width="25"
-                      height="25"
-                      className="cursor-pointer"
-                    />
-                    <Icon
+                  <Icon
                       icon="weui:delete-outlined"
                       width="25"
                       height="25"
+                      onClick={() =>
+                        handleOpenModal(
+                          equipo.id_equipo,
+                          "Eliminar equipo",
+                          `¿Estás seguro de que deseas eliminar el equipo ${equipo.id_equipo}?`,
+                          deleteEquipo
+                        )
+                      }
                       className="cursor-pointer"
                     />
-                    <Link
-                      to="/editarActivo"
-                      state={{ equipoId: equipo.id_equipo, perifericos }}
-                    >
-                      <Icon
-                        icon="mage:edit"
-                        width="25"
-                        height="25"
-                        className="cursor-pointer"
-                      />
-                    </Link>
                   </td>
                 </tr>
               ))}

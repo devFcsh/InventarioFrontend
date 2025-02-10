@@ -234,9 +234,8 @@ export const FormPMTM = () => {
     };
     try {
       if (
-        !Object.values(cargarImagenErrors).includes(true) &&
-        completeDatosInventario(inventoryDataForm) &&
-        !error
+        !Object.values(inventoryErrors).includes(true) &&
+        completeDatosInventario(inventoryDataForm)
       ) {
         await agregarSimpleBodega(bodegaSimpleData);
         setShowSuccessMessage(true);
@@ -257,7 +256,7 @@ export const FormPMTM = () => {
     };
     try {
       if (
-        !Object.values(cargarImagenErrors).includes(true) &&
+        !Object.values(inventoryErrors).includes(true) &&
         completeDatosInventario(inventoryDataForm)
       ) {
         await agregarSimpleBaja(bajaSimpleData);

@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Periferico, Edificio } from "../../types/index.ts";
 import { useAgregarRedActivo } from "../../features/Equipos/Activos/AgregarActivo/hooks/useAgregarRedActivo.ts";
 import { useAgregarRedBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarRedBodega.ts";
+import { useAgregarRedBaja } from "../../features/Equipos/Baja/AgregarEquipoBaja/hooks/useAgregarRedBaja.ts";
 import {useFormDatosInventarioSAP,useFormDataInformacionGeneralSAP,useInventoryErrorsSAP,useInformacionGeneralErrorSAP} from "./StepsSAP/hooks/index.ts"
 import { ModalObservation } from "./components/ModalObservation.tsx";
 import {useCargarImagenErrors,useFormDataCargarImagen} from "./hooks/index.ts"
@@ -26,6 +27,7 @@ export const FormSAP = () => {
   const steps = location.state?.steps;
   const { agregarRedActivo } = useAgregarRedActivo();
   const { agregarRedBodega } = useAgregarRedBodega();
+  const { agregarRedBaja } = useAgregarRedBaja();
   const { inventoryDataSAPForm, handleInventorySAPChange } = useFormDatosInventarioSAP();
   const { informacionGeneralDataSAPForm, handleInformacionGeneralSAPChange } = useFormDataInformacionGeneralSAP();
   const { imageData, handleImageChange, error } = useFormDataCargarImagen();
@@ -171,7 +173,6 @@ export const FormSAP = () => {
       
     }else{
       handleAgregarEquipoBaja(observationValue);
-
     }
   }
   const handleAgregarEquipoActivo = async (observationValue: string) => {
@@ -215,6 +216,26 @@ export const FormSAP = () => {
 
       setShowSuccessMessage(true);
       navigate("/bodega", { state: { equipoAgregado: true } });
+    } catch (error) {
+      alert("Error al agregar el equipo y componentes.");
+    }
+  }
+  const handleAgregarEquipoBaja = async (observationValue: string) => {
+    const bodegaComputadoraData = {
+      tipo: "baja",
+      inventario: inventoryDataSAPForm.inventario || "",
+      serie: Number(inventoryDataSAPForm.serie?.id_serie) ?? 0,
+      observacion: observationValue,
+      mac: informacionGeneralDataSAPForm.mac || "",
+      puertos: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertos,
+      puerto_ftp: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertoFTP,
+      idLampara:0,
+    };
+    try {
+      const equipoId = await agregarRedBaja(bodegaComputadoraData);
+
+      setShowSuccessMessage(true);
+      navigate("/bajas", { state: { equipoAgregado: true } });
     } catch (error) {
       alert("Error al agregar el equipo y componentes.");
     }

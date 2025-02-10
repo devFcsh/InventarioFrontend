@@ -41,3 +41,13 @@ export type BajaSimpleData = {
     observacion: string;
   };
   
+  export type BajaRedData = {
+    tipo: string;
+    inventario: string;
+    serie: number;
+    observacion: string;
+    mac: string;
+    puertos: string;
+    puerto_ftp: string;
+    idLampara: number;
+  };
