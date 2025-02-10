@@ -58,6 +58,10 @@ const EditarUsuario = () => {
         await editarUsuario(usuario.id_usuario, nombre, selectedUsoId);
         setSnackbarMessage("Usuario actualizado correctamente");
         setOpenSnackbar(true);
+  
+        setTimeout(() => {
+          navigate("/usuarios");
+        }, 1000);
       } else {
         setSnackbarMessage("Por favor, complete todos los campos.");
         setOpenSnackbar(true);
@@ -65,8 +69,13 @@ const EditarUsuario = () => {
     } catch (error) {
       setSnackbarMessage("Error al actualizar el usuario");
       setOpenSnackbar(true);
+  
+      setTimeout(() => {
+        navigate("/usuarios");
+      }, 1000);
     }
   };
+  
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);

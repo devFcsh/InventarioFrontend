@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Alert, Dialog, Snackbar, TextField } from "@mui/material";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import useUsos from "@hooks/useUsos";
@@ -153,7 +153,6 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const [selectedOption, setSelectedOption] = useState<Opcion | null>(null);
   const [editedValue, setEditedValue] = useState<string>("");
   const [editedTipo, setEditedTipo] = useState<string>("");
-  const navigate = useNavigate();
 
   const elementos: Opcion[] =
     selectedCategoria === "Uso"
@@ -186,7 +185,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
       ? procesadores
       : selectedCategoria === "Versión Office"
       ? versionesOffice
-      : [];
+      : []
 
   const handleEditarCategoria = (elemento: Opcion) => {
     setSelectedOption(elemento);
@@ -225,6 +224,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             });
             break;
           case "Uso":
+            console.log(selectedOption.id_uso + " "+editedValue)
             editarUso({
               id_uso: selectedOption.id_uso,
               nuevoNombre: editedValue,
@@ -311,9 +311,11 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
 
         setSnackbarMessage("Opción editada correctamente");
         setSnackbarSeverity("success");
-        navigate("/categorias");
-
         setOpenSnackbar(true);
+        onClose();
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } catch (error) {
         setSnackbarMessage("Error al editar la opción");
         setSnackbarSeverity("error");
@@ -381,6 +383,10 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
         setSnackbarMessage("Opción eliminada correctamente");
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
+        onClose();
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } catch (error) {
         setSnackbarMessage("Desligue la opción antes de eliminarla");
         setSnackbarSeverity("error");

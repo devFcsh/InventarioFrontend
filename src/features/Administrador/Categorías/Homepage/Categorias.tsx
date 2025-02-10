@@ -62,7 +62,7 @@ const Categorias = () => {
     string | null
   >(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [filteredItems, setFilteredItems] = useState(itemsData);
+  const [filteredItems, setFilteredItems] = useState([]);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
@@ -124,7 +124,19 @@ const Categorias = () => {
   const handleCloseModalAgregar = () => {
     setOpenModalAgregar(false);
     setError(null);
+    setSnackbarMessage("Categoría agregada exitosamente");
+    setSnackbarSeverity("success");
+    setOpenSnackbar(true);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
   };
+
+  const handleCloseCancelarModalAgregar = () => {
+    setOpenModalAgregar(false);
+    setError(null);
+  };
+  
 
   const handleOpenModalEditar = () => {
     setOpenModalEditar(true);
@@ -212,7 +224,7 @@ const Categorias = () => {
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {filteredItems.length === 0 ? (
-          <p>No hay items para mostrar.</p>
+          <p className="text-center text-gray-500 my-5">No hay datos disponibles. Presiona "Buscar" para cargar resultados.</p>
         ) : (
           <table className="w-full text-left text-sm text-gray-500">
             <thead className="text-xs uppercase bg-gray-50 text-gray-700">
@@ -313,6 +325,7 @@ const Categorias = () => {
         selectedCategoria={selectedItemCategoria}
         error={error}
         setError={setError}
+        handleCloseCancelarModalAgregar={handleCloseCancelarModalAgregar}
       />
       <ModalEditarCategoria
         open={openModalEditar}

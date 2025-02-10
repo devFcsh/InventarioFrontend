@@ -37,6 +37,7 @@ interface ModalAgregarCategoriaProps {
   selectedCategoria: string | null;
   error: string | null;
   setError: React.Dispatch<React.SetStateAction<string | null>>;
+  handleCloseCancelarModalAgregar: () => void;
 }
 
 const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
@@ -45,6 +46,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   selectedCategoria,
   error,
   setError,
+  handleCloseCancelarModalAgregar,
 }) => {
   const [selectedSO, setSeletedSO] = useState<SistemaOperativo | null>(null);
   const [selectedEdificio, setSeletedEdificio] = useState<Edificio | null>(
@@ -122,21 +124,21 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   };
 
   const handleAgregarOption = async () => {
-    
+
     if (
-      !capacidad.trim() && !ramTipo.trim() && selectedCategoria === "RAM") {
+      !capacidad && !ramTipo && selectedCategoria === "RAM") {
       setError("Por favor, ingrese una opción válida.");
       return;
     }
 
     if (
-      !capacidad.trim() && selectedCategoria === "Disco" ) {
+      !capacidad && selectedCategoria === "Disco" ) {
       setError("Por favor, ingrese una opción válida.");
       return;
     }
 
     if (
-      !newOption.trim() ) {
+      !newOption && selectedCategoria !== "Disco" && selectedCategoria !== "RAM") {
       setError("Por favor, ingrese una opción válida.");
       return;
     }
@@ -205,7 +207,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           marcaId: 0,
           modeloId: 0,
         });
-      } else if (selectedCategoria === "Ubicacion") {
+      } else if (selectedCategoria === "Ubicación") {
         result = await agregarFunc({
           nombre: newOption,
           edificioId: Number(selectedEdificio?.id_edificio),
@@ -261,7 +263,6 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           modeloId: 0,
         });
       }
-      console.log("Nueva opción agregada:", result);
       onClose();
     } catch (err) {
       setError("Error al agregar la opción.");
@@ -291,7 +292,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={handleCloseCancelarModalAgregar}>
       <DialogTitle>Agregar {selectedCategoria || "Elemento"}</DialogTitle>
       <DialogContent className="h-auto">
         {selectedCategoria === "RAM" ? (
@@ -299,6 +300,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
             <TextField
               label="Tipo de RAM"
               variant="outlined"
+              error={!!error}
+              helperText={error && "Por favor ingrese un tipo de ram"}
               fullWidth
               value={ramTipo}
               onChange={(e) => setRamTipo(e.target.value)}
@@ -306,6 +309,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
             <TextField
               label="Capacidad"
               variant="outlined"
+              error={!!error}
+              helperText={error && "Por favor ingrese una capacidad"}
               fullWidth
               value={capacidad}
               onChange={(e) => setCapacidad(e.target.value)}
@@ -316,12 +321,14 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           <TextField
             label="Capacidad"
             variant="outlined"
+            error={!!error}
+            helperText={error && "Por favor ingrese una capacidad"}
             fullWidth
             value={capacidad}
             onChange={(e) => setCapacidad(e.target.value)}
           />
           </Box>
-        ) : selectedCategoria === "Ubicacion" ? (
+        ) : selectedCategoria === "Ubicación" ? (
           <Box className="flex flex-col mt-2 gap-3">
             <Autocomplete
               size="small"
@@ -344,7 +351,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               )}
             />
             <TextField
-              label="Ubicacion"
+              label="Ubicación"
               variant="outlined"
               fullWidth
               disabled={!selectedEdificio}
@@ -405,6 +412,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
                   {...params}
                   label="Periférico"
                   variant="outlined"
+                  error={!!error}
+                  helperText={error && "Por favor seleccione un periférico"}
                   fullWidth
                 />
               )}
@@ -412,6 +421,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
             <TextField
               label="Nombre de Marca"
               variant="outlined"
+              error={!!error}
+              helperText={error && "Por favor ingrese una marca"}
               fullWidth
               disabled={!selectedPeriferico}
               value={newOption}
@@ -431,7 +442,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
                 setSelectedModelo(null);
               }}
               renderInput={(params) => (
-                <TextField {...params} label="Periférico" variant="outlined" fullWidth />
+                <TextField {...params} label="Periférico" variant="outlined" error={!!error}
+                helperText={error && "Por favor seleccionar un periférico"} fullWidth />
               )}
             />
             <Autocomplete
@@ -442,13 +454,16 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               value={selectedMarca}
               onChange={handleMarcaChange}
               renderInput={(params) => (
-                <TextField {...params} label="Marca" variant="outlined" fullWidth />
+                <TextField {...params} label="Marca" variant="outlined" error={!!error}
+                helperText={error && "Por favor seleccionar una marca"} fullWidth />
               )}
               disabled={!selectedPeriferico}
             />
             <TextField
               label="Nombre del Modelo"
               variant="outlined"
+              error={!!error}
+                  helperText={error && "Por favor ingrese un modelo"}
               fullWidth
               value={newOption}
               onChange={(e) => setNewOption(e.target.value)}
@@ -467,7 +482,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
                 setSelectedModelo(null);
               }}
               renderInput={(params) => (
-                <TextField {...params} label="Periférico" variant="outlined" fullWidth />
+                <TextField {...params} label="Periférico" variant="outlined" error={!!error}
+                helperText={error && "Por favor seleccionar un periférico"} fullWidth />
               )}
             />
             <Autocomplete
@@ -478,7 +494,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               value={selectedMarca}
               onChange={handleMarcaChange}
               renderInput={(params) => (
-                <TextField {...params} label="Marca" variant="outlined" fullWidth />
+                <TextField {...params} label="Marca" variant="outlined" error={!!error}
+                helperText={error && "Por favor seleccionar una marca"} fullWidth />
               )}
               disabled={!selectedPeriferico}
             />
@@ -490,13 +507,16 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               value={selectedModelo}
               onChange={handleModeloChange}
               renderInput={(params) => (
-                <TextField {...params} label="Modelo" variant="outlined" fullWidth />
+                <TextField {...params} label="Modelo" variant="outlined" error={!!error}
+                helperText={error && "Por favor seleccionar un modelo"} fullWidth />
               )}
               disabled={!selectedMarca}
             />
             <TextField
               label={selectedCategoria === "Serie" ? "Nombre de Serie" : "Nombre de Lampara"}
               variant="outlined"
+              error={!!error}
+                  helperText={error && "Por favor ingrese un nombre válido"}
               fullWidth
               value={newOption}
               onChange={(e) => setNewOption(e.target.value)}
@@ -517,7 +537,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+        <Button onClick={handleCloseCancelarModalAgregar} color="primary">
           Cancelar
         </Button>
         <Button onClick={handleAgregarOption} color="primary">

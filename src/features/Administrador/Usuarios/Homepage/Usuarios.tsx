@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Autocomplete, IconButton } from "@mui/material";
 import { TextField, Snackbar, Alert } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import useUsos from "@hooks/useUsos";
@@ -114,11 +114,9 @@ const Usuarios = () => {
           setOpenModal(false);
           setSnackbarMessage("Usuario eliminado con éxito.");
           setSnackbarSeverity("success"); 
-        } else if (result.tieneEquipos) {
-          setSnackbarMessage("No se puede eliminar el usuario porque tiene equipos asociados.");
-          setSnackbarSeverity("warning"); 
+          setShouldFetch(true);
         } else {
-          setSnackbarMessage("Error al eliminar el usuario.");
+          setSnackbarMessage("No se puede eliminar el usuario porque tiene equipos asociados.");
           setSnackbarSeverity("error"); 
         }
   
@@ -130,8 +128,6 @@ const Usuarios = () => {
       }
     }
   };
-  
-   
 
   const handleCancelDelete = () => {
     setOpenModal(false);
