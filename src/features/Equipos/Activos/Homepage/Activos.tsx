@@ -38,6 +38,7 @@ const Activos = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error" | "warning">("success"); 
   const navigate = useNavigate();
   const [totalPages, setTotalPages] = useState<number>(1);
   const [modalContent, setModalContent] = useState<{
@@ -80,7 +81,7 @@ const Activos = () => {
     inventario: selectedInventario?.inventario,
   };
 
-  const { eliminarEquipo } = useEliminarComputadora();
+  const { eliminarEquipo,success} = useEliminarComputadora();
   const { darDeBajaEquipo } = useDarDeBajaEquipo();
   const { equipos, totalCount, loading, error } = useEquiposFiltrados(
     filtros,
@@ -122,30 +123,60 @@ const Activos = () => {
   const handleConfirm = async () => {
     try {
       await confirmAction();
-      setSnackbarMessage("Operación completada con éxito.");
-      setOpenSnackbar(true);
     } catch (error) {
-      console.error("Error en la acción", error);
+      alert("Error en la acción");
     }
     handleCloseModal();
   };
 
   const deleteEquipo = async (equipoId: string) => {
     if (equipoId) {
-      await eliminarEquipo(equipoId);
-      setShouldFetch(true);
+      try{
+        const result = await eliminarEquipo(equipoId);
+        if(result){
+          setShouldFetch(true);
+          setSnackbarMessage("Operación completada con éxito");
+          setSnackbarSeverity("success"); 
+        }else{
+          setSnackbarMessage("No se puede eliminar el equipo porque el equipo esta asociado a una computadora");
+          setSnackbarSeverity("error"); 
+        } 
+        setOpenSnackbar(true); 
+      }catch(error){
+        setSnackbarMessage("Error al eliminar el equipo.");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
+      }
     }
+
   };
 
   const deleteEquipos = async (equipoIds: string[]) => {
     try {
+      const errors = [];
       for (const id of equipoIds) {
-        await eliminarEquipo(id);
+        const result = await eliminarEquipo(id);
+        if (!result) {
+          errors.push(id);
+        }
       }
+  
+      if (errors.length === 0) {
+        setSnackbarMessage("Operación completada con éxito");
+        setSnackbarSeverity("success"); 
+      } else {
+        setSnackbarMessage(`No se pudieron eliminar los equipos: ${errors.join(', ')}`);
+        setSnackbarSeverity("error"); 
+      }
+  
       setShouldFetch(true);
       setSelectedItems([]);
-    } catch (error) {
-      console.error("Error al eliminar los equipos", error);
+      setOpenSnackbar(true);
+    } 
+    catch(error){
+      setSnackbarMessage("Error al eliminar el equipo.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
   };
 
@@ -567,8 +598,13 @@ const Activos = () => {
       >
         <Alert
           onClose={handleCloseSnackbar}
-          severity="success"
+          severity={snackbarSeverity}
           sx={{ width: "100%" }}
+          iconMapping={{
+            success: <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />,
+            error: <Icon icon="fluent:error-circle-24-regular" width={20} height={20} />,
+            warning: <Icon icon="fluent:warning-24-regular" width={20} height={20} />
+          }}
         >
           {snackbarMessage}
         </Alert>
@@ -810,7 +846,7 @@ const Activos = () => {
                         handleOpenModal(
                           equipo.id_equipo,
                           "Eliminar equipo",
-                          `¿Estás seguro de que deseas eliminar el equipo ${equipo.id_equipo}?`,
+                          `¿Estás seguro de que deseas eliminar el equipo con inventario ${equipo.inventario}?`,
                           deleteEquipo
                         )
                       }
