@@ -49,6 +49,11 @@ const itemsData = [
 
 ];
 
+type FilteredItem = {
+  id: number;
+  categoria: string;
+};
+
 const Categorias = () => {
   
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(
@@ -62,7 +67,7 @@ const Categorias = () => {
     string | null
   >(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [filteredItems, setFilteredItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState<FilteredItem[]>([]);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
@@ -80,7 +85,7 @@ const Categorias = () => {
   };
 
   const handleBuscar = () => {
-    const filtered = itemsData.filter((item) =>
+    const filtered: FilteredItem[] = itemsData.filter((item) =>
       selectedCategoria ? item.categoria === selectedCategoria : true
     );
     setFilteredItems(filtered);

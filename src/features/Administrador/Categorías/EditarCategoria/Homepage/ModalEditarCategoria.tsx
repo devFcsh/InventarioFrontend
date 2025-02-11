@@ -58,7 +58,6 @@ import { useEliminarVersionSO } from "../../AgregarCategoria/hooks/useEliminarVe
 import { useEliminarProcesador } from "../../AgregarCategoria/hooks/useEliminarProcesador";
 import { useEliminarVersionOffice } from "../../AgregarCategoria/hooks/useEliminarVersionOffice";
 import { useEliminarModelo } from "../../AgregarCategoria/hooks/useEliminarModelo";
-import { useNavigate } from "react-router-dom";
 import useLamparas from "@hooks/useLamparas";
 import { useEditarLampara } from "../../AgregarCategoria/hooks/useEditarLampara";
 import { useEliminarLampara } from "../../AgregarCategoria/hooks/useEliminarLampara";

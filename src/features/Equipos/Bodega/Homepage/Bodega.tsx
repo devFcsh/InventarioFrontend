@@ -365,6 +365,7 @@ const Bodega = () => {
             onClose={handleCloseBodega}
             title={modalContentBodega.title}
             perifericos={perifericos}
+            steps={[]}
           />
         </div>
         <div className="flex flex-wrap gap-4 my-10">

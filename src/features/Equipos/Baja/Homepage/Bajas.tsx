@@ -321,6 +321,7 @@ const Bajas = () => {
             onClose={handleCloseBajas}
             title={modalContentBajas.title}
             perifericos={perifericos}
+            steps={[]}
           />
         </div>
         <div className="flex flex-wrap gap-4 my-10">

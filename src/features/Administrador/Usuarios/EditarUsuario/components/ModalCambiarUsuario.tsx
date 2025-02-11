@@ -53,8 +53,8 @@ const ModalCambiarUsuario: React.FC<ModalCambiarUsuarioProps> = ({
           <Autocomplete
             size="small"
             options={usos}
-            getOptionLabel={(option) => option.nombre || ""}
-            value={usos.find((uso) => uso.id_uso === selectedUso) || null}
+            getOptionLabel={(option) => option?.nombre || ""}
+            value={usos.find((uso) => uso?.id_uso === selectedUso) || null}
             onChange={handleUsoChange}
             renderInput={(params) => (
               <TextField {...params} label="Uso" variant="outlined" fullWidth />
@@ -65,8 +65,8 @@ const ModalCambiarUsuario: React.FC<ModalCambiarUsuarioProps> = ({
           <Autocomplete
             size="small"
             options={usuarios}
-            getOptionLabel={(option) => option.nombre || ""}
-            value={usuarios.find((usuario) => usuario.id_usuario === selectedUsuario) || null}
+            getOptionLabel={(option) => option?.nombre || ""}
+            value={usuarios.find((usuario) => usuario?.id_usuario === selectedUsuario) || null}
             onChange={handleUsuarioChange}
             renderInput={(params) => (
               <TextField {...params} label="Usuario" variant="outlined" fullWidth />

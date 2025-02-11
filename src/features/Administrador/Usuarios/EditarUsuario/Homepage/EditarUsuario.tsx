@@ -130,9 +130,9 @@ const handleConfirmarCambio = async (usuarioId: string) => {
           />
 
           <Autocomplete
-            value={usos.find((uso) => uso.id_uso === selectedUsoId) || null}
+            value={usos.find((uso) => uso?.id_uso === selectedUsoId) || null}
             options={usos}
-            getOptionLabel={(option) => option.nombre}
+            getOptionLabel={(option) => option?.nombre || ""}
             onChange={(e, newValue) => {
               setSelectedUsoId(newValue ? newValue.id_uso : null);
             }}

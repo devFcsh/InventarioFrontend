@@ -627,6 +627,7 @@ const Activos = () => {
             perifericos={perifericos}
             usos={usos}
             edificios={edificios}
+            steps={[]}
           />
 
         </div>
