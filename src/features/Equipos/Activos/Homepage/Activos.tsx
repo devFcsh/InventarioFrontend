@@ -118,7 +118,7 @@ const Activos = () => {
       setOpenSnackbar(true);
       navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state,navigate]);
+  }, [location.pathname, location.state, navigate]);
 
   const handleConfirm = async () => {
     try {

@@ -34,6 +34,7 @@ const Bodega = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error" | "warning">("success"); 
   const [modalContentBodega, setModalContentBodega] = useState<{
     title: string;
     message: string;
@@ -116,7 +117,7 @@ const Bodega = () => {
       setOpenSnackbar(true);
       navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state,navigate]);
+  }, [location.pathname, location.state, navigate]);
 
   const handleConfirm = async () => {
     try {
@@ -142,45 +143,103 @@ const Bodega = () => {
    
   const deleteEquipo = async (equipoId: string) => {
     if (equipoId) {
-      await eliminarEquipo(equipoId);
-      setShouldFetch(true);
+      try{
+        const result = await eliminarEquipo(equipoId);
+        if(result){
+          setShouldFetch(true);
+          setSnackbarMessage("Operación completada con éxito");
+          setSnackbarSeverity("success"); 
+        }else{
+          setSnackbarMessage("No se puede eliminar el equipo porque está asociado a una computadora");
+          setSnackbarSeverity("error"); 
+        } 
+        setOpenSnackbar(true); 
+      }catch(error){
+        setSnackbarMessage("Error al eliminar el equipo.");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
+      }
     }
+
   };
   
 
   const deleteEquipos = async (equipoIds: string[]) => {
     try {
+      const errors = [];
       for (const id of equipoIds) {
-        await eliminarEquipo(id);
+        const result = await eliminarEquipo(id);
+        if (!result) {
+          errors.push(id);
+        }
       }
+  
+      if (errors.length === 0) {
+        setSnackbarMessage("Operación completada con éxito");
+        setSnackbarSeverity("success"); 
+      } else {
+        setSnackbarMessage(`No se pudieron eliminar los equipos: ${errors.join(', ')} ya que están relacionados a una computadora`);
+        setSnackbarSeverity("error"); 
+      }
+  
       setShouldFetch(true);
       setSelectedItems([]);
-    } catch (error) {
-      console.error("Error al eliminar los equipos", error);
+      setOpenSnackbar(true);
+    } 
+    catch(error){
+      setSnackbarMessage("Error al eliminar el equipo.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
   };
+
 
   const bajaEquipo = async (equipoId: string) => {
     if (equipoId) {
-      try {
-        await darDeBajaEquipo(equipoId,"bodega");
-        console.log(`Equipo con ID ${equipoId} dado de baja`);
-        setShouldFetch(true);
-      } catch (error) {
-        console.error("Error al dar de baja el equipo", error);
+      try{
+        const result =  await darDeBajaEquipo(equipoId,"bodega");
+        if(result){
+          setShouldFetch(true);
+          setSnackbarMessage(`Equipo con ID ${equipoId} dado de baja`);
+          setSnackbarSeverity("success"); 
+        }else{
+          setSnackbarMessage("No se puede dar de baja porque el equipo está asociado a una computadora");
+          setSnackbarSeverity("error"); 
+        } 
+        setOpenSnackbar(true); 
+      }catch(error){
+        setSnackbarMessage("Error al dar de baja el equipo");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
       }
     }
   };
 
+
   const bajaEquipos = async (equipoIds: string[]) => {
     try {
+      const errors = [];
       for (const id of equipoIds) {
-        await darDeBajaEquipo(id,"baja");
+        const result =  await darDeBajaEquipo(id, "baja");
+        if (!result) {
+          errors.push(id);
+        }
       }
-      setShouldFetch(true);
+      if (errors.length === 0) {
+        setShouldFetch(true);
+        setSnackbarMessage("Operación completada con éxito");
+        setSnackbarSeverity("success"); 
+      } else {
+        setSnackbarMessage(`Error al dar de baja los equipos ${errors.join(', ')} ya que están relacionados a una computadora`);
+        setSnackbarSeverity("error"); 
+      }
       setSelectedItems([]);
-    } catch (error) {
-      console.error("Error al dar de baja los equipos", error);
+      setOpenSnackbar(true);
+    } 
+    catch(error){
+      setSnackbarMessage("Error al eliminar el equipo.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
   };
 
@@ -344,8 +403,13 @@ const Bodega = () => {
       >
         <Alert
           onClose={handleCloseSnackbar}
-          severity="success"
+          severity={snackbarSeverity}
           sx={{ width: "100%" }}
+          iconMapping={{
+            success: <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />,
+            error: <Icon icon="fluent:error-circle-24-regular" width={20} height={20} />,
+            warning: <Icon icon="fluent:warning-24-regular" width={20} height={20} />
+          }}
         >
           {snackbarMessage}
         </Alert>
