@@ -19,7 +19,7 @@ import useSeries from "@hooks/useSeries.ts";
 import { useInventario } from "@hooks/useInventario.ts";
 import { usePasarActivoABodega } from "../hooks/usePasarActivoABodega.ts";
 import { useExportarEquiposActivos } from "../hooks/useExportarComputadorasActivos.ts";
-import { ExportarAP, ExportarComputadora, ExportarSimples, ExportarSwitch } from "../../../../types/Equipo/index.ts";
+import { ExportarAP, ExportarComputadora, ExportarProyector, ExportarSimples, ExportarSwitch } from "../../../../types/Equipo/index.ts";
 import { useNavigate } from "react-router-dom";
 
 const Activos = () => {
@@ -561,7 +561,7 @@ const Activos = () => {
         })));
       };
   
-      const formatProyector = (equipos: any[]) => {
+      const formatProyector = (equipos: ExportarProyector[]) => {
         return addIDColumn(equipos.map(({
           empresa,
           inventario,
@@ -635,7 +635,6 @@ const Activos = () => {
       console.error("Error al exportar a Excel:", error);
     }
   };
-  
   
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
