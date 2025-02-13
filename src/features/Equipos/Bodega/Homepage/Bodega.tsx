@@ -464,7 +464,7 @@ const Bodega = () => {
             modelo,
             serie,
             mac,
-            puertos,
+            "puertos-10-100-1000": puertos,
             puerto_ftp,
             nombre_equipo,
             fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
