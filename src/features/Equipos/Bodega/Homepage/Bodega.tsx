@@ -17,6 +17,8 @@ import ModalPasarAActivo from "../Pages/ModalPasarAActivo";
 import { useNavigate } from "react-router-dom";
 import { useEliminarComputadora } from "@hooks/useEliminarComputadora.ts";
 import { useDarDeBajaEquipo } from "../../Activos/hooks/useDarDeBajaEquipo";
+import { useExportarEquiposBodega } from "../hooks/useExportarEquiposBodega";
+import { ExportarAP, ExportarComputadora, ExportarProyector, ExportarSimples, ExportarSwitch } from "../../../../types/Equipo/index";
 
 const Bodega = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
@@ -34,6 +36,7 @@ const Bodega = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error" | "warning">("success"); 
   const [modalContentBodega, setModalContentBodega] = useState<{
     title: string;
     message: string;
@@ -66,9 +69,9 @@ const Bodega = () => {
   const { series } = useSeries();
   const { inventarios } = useInventario();
   
-    const { darDeBajaEquipo } = useDarDeBajaEquipo();
-
-   
+  const { darDeBajaEquipo } = useDarDeBajaEquipo();
+  const { fetchTodosEquipos } = useExportarEquiposBodega();
+    
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -116,7 +119,7 @@ const Bodega = () => {
       setOpenSnackbar(true);
       navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state,navigate]);
+  }, [location.pathname, location.state, navigate]);
 
   const handleConfirm = async () => {
     try {
@@ -142,45 +145,103 @@ const Bodega = () => {
    
   const deleteEquipo = async (equipoId: string) => {
     if (equipoId) {
-      await eliminarEquipo(equipoId);
-      setShouldFetch(true);
+      try{
+        const result = await eliminarEquipo(equipoId);
+        if(result){
+          setShouldFetch(true);
+          setSnackbarMessage("Operación completada con éxito");
+          setSnackbarSeverity("success"); 
+        }else{
+          setSnackbarMessage("No se puede eliminar el equipo porque está asociado a una computadora");
+          setSnackbarSeverity("error"); 
+        } 
+        setOpenSnackbar(true); 
+      }catch(error){
+        setSnackbarMessage("Error al eliminar el equipo.");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
+      }
     }
+
   };
   
 
   const deleteEquipos = async (equipoIds: string[]) => {
     try {
+      const errors = [];
       for (const id of equipoIds) {
-        await eliminarEquipo(id);
+        const result = await eliminarEquipo(id);
+        if (!result) {
+          errors.push(id);
+        }
       }
+  
+      if (errors.length === 0) {
+        setSnackbarMessage("Operación completada con éxito");
+        setSnackbarSeverity("success"); 
+      } else {
+        setSnackbarMessage(`No se pudieron eliminar los equipos: ${errors.join(', ')} ya que están relacionados a una computadora`);
+        setSnackbarSeverity("error"); 
+      }
+  
       setShouldFetch(true);
       setSelectedItems([]);
-    } catch (error) {
-      console.error("Error al eliminar los equipos", error);
+      setOpenSnackbar(true);
+    } 
+    catch(error){
+      setSnackbarMessage("Error al eliminar el equipo.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
   };
+
 
   const bajaEquipo = async (equipoId: string) => {
     if (equipoId) {
-      try {
-        await darDeBajaEquipo(equipoId,"bodega");
-        console.log(`Equipo con ID ${equipoId} dado de baja`);
-        setShouldFetch(true);
-      } catch (error) {
-        console.error("Error al dar de baja el equipo", error);
+      try{
+        const result =  await darDeBajaEquipo(equipoId,"bodega");
+        if(result){
+          setShouldFetch(true);
+          setSnackbarMessage(`Equipo con ID ${equipoId} dado de baja`);
+          setSnackbarSeverity("success"); 
+        }else{
+          setSnackbarMessage("No se puede dar de baja porque el equipo está asociado a una computadora");
+          setSnackbarSeverity("error"); 
+        } 
+        setOpenSnackbar(true); 
+      }catch(error){
+        setSnackbarMessage("Error al dar de baja el equipo");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
       }
     }
   };
 
+
   const bajaEquipos = async (equipoIds: string[]) => {
     try {
+      const errors = [];
       for (const id of equipoIds) {
-        await darDeBajaEquipo(id,"baja");
+        const result =  await darDeBajaEquipo(id, "baja");
+        if (!result) {
+          errors.push(id);
+        }
       }
-      setShouldFetch(true);
+      if (errors.length === 0) {
+        setShouldFetch(true);
+        setSnackbarMessage("Operación completada con éxito");
+        setSnackbarSeverity("success"); 
+      } else {
+        setSnackbarMessage(`Error al dar de baja los equipos ${errors.join(', ')} ya que están relacionados a una computadora`);
+        setSnackbarSeverity("error"); 
+      }
       setSelectedItems([]);
-    } catch (error) {
-      console.error("Error al dar de baja los equipos", error);
+      setOpenSnackbar(true);
+    } 
+    catch(error){
+      setSnackbarMessage("Error al eliminar el equipo.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
   };
 
@@ -305,30 +366,193 @@ const Bodega = () => {
     }
   };
 
-  const exportToExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(
-      equiposBodega.map(
-        ({
-          periferico,
-          marca,
-          modelo,
-          serie,
-          inventario,
-        }) => ({
-          Periférico: periferico,
-          Marca: marca,
-          Modelo: modelo,
-          Serie: serie,
-          Inventario: inventario,
-        })
-      )
-    );
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Datos");
-
-    XLSX.writeFile(wb, "datos_equipos.xlsx");
-  };
+   const exportToExcel = async () => {
+      try {
+        const allEquipos = await fetchTodosEquipos();
+    
+        if (!allEquipos) {
+          console.warn("No hay equipos para exportar");
+          return;
+        }
+    
+        const addIDColumn = (equipos: any[]) => {
+          return equipos.map((equipo, index) => ({
+            id: index + 1,
+            ...equipo,
+          }));
+        };
+    
+        const formatComputadora = (equipos: ExportarComputadora[]) => {
+          return addIDColumn(equipos.map(({
+            direccion_ip,
+            nombre_equipo,
+            dominio,
+            sistema_operativo,
+            procesador,
+            tipo_ram,
+            capacidad_ram,
+            capacidad_disco,
+            marca,
+            modelo,
+            serie,
+            inventario,
+            fecha_ultimo_cambio,
+            observacion,
+            mouse_marca,
+            mouse_modelo,
+            mouse_serie,
+            mouse_inventario,
+            teclado_marca,
+            teclado_modelo,
+            teclado_serie,
+            teclado_inventario,
+            monitor_marca,
+            monitor_modelo,
+            monitor_serie,
+            monitor_inventario,
+          }) => ({
+            tipo: 'Computadora',
+            direccion_ip,
+            nombre_equipo,
+            dominio,
+            sistema_operativo,
+            procesador,
+            tipo_ram,
+            capacidad_ram,
+            capacidad_disco,
+            marca,
+            modelo,
+            serie,
+            inventario,
+            fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
+            observacion,
+            mouse_marca: mouse_marca || '',
+            mouse_modelo: mouse_modelo || '',
+            mouse_serie: mouse_serie || '',
+            mouse_inventario: mouse_inventario || '',
+            teclado_marca: teclado_marca || '',
+            teclado_modelo: teclado_modelo || '',
+            teclado_serie: teclado_serie || '',
+            teclado_inventario: teclado_inventario || '',
+            monitor_marca: monitor_marca || '',
+            monitor_modelo: monitor_modelo || '',
+            monitor_serie: monitor_serie || '',
+            monitor_inventario: monitor_inventario || '',
+          })));
+        };
+    
+        const formatSwitch = (equipos: ExportarSwitch[]) => {
+          return addIDColumn(equipos.map(({
+            empresa,
+            inventario,
+            marca,
+            modelo,
+            serie,
+            mac,
+            puertos,
+            puerto_ftp,
+            fecha_ultimo_cambio,
+            observacion,
+          }) => ({
+            tipo: 'Switch',
+            empresa,
+            inventario,
+            marca,
+            modelo,
+            serie,
+            mac,
+            puertos,
+            puerto_ftp,
+            fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
+            observacion,
+          })));
+        };
+    
+        const formatAP = (equipos: ExportarAP[]) => {
+          return addIDColumn(equipos.map(({
+            empresa,
+            inventario,
+            marca,
+            modelo,
+            serie,
+            mac,
+            fecha_ultimo_cambio,
+            observacion,
+          }) => ({
+            tipo: 'AP',
+            empresa,
+            inventario,
+            marca,
+            modelo,
+            serie,
+            mac,
+            fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
+            observacion,
+          })));
+        };
+    
+        const formatProyector = (equipos: ExportarProyector[]) => {
+          return addIDColumn(equipos.map(({
+            empresa,
+            inventario,
+            marca,
+            modelo,
+            serie,
+            lampara,
+            fecha_ultimo_cambio,
+            observacion,
+          }) => ({
+            tipo: 'Proyector',
+            empresa,
+            inventario,
+            marca,
+            modelo,
+            serie,
+            lampara,
+            fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
+            observacion,
+          })));
+        };
+    
+        const formatEquiposSimples = (equipos: ExportarSimples[]) => {
+          return addIDColumn(equipos.map(({
+            periferico,
+            marca,
+            modelo,
+            serie,
+            inventario,
+            fecha_ultimo_cambio,
+            observacion,
+          }) => ({
+            tipo: periferico,
+            marca,
+            modelo,
+            serie,
+            inventario,
+            fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
+            observacion,
+          })));
+        };
+    
+        const wsComputadoras = XLSX.utils.json_to_sheet(formatComputadora(allEquipos.Computadoras));
+        const wsAP = XLSX.utils.json_to_sheet(formatAP(allEquipos.AP));
+        const wsSwitch = XLSX.utils.json_to_sheet(formatSwitch(allEquipos.Switch));
+        const wsProyector = XLSX.utils.json_to_sheet(formatProyector(allEquipos.Proyector));
+        const wsEquiposSimples = XLSX.utils.json_to_sheet(formatEquiposSimples(allEquipos.EquiposSimples));
+    
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, wsComputadoras, "Computadoras");
+        XLSX.utils.book_append_sheet(wb, wsAP, "AP");
+        XLSX.utils.book_append_sheet(wb, wsSwitch, "Switch");
+        XLSX.utils.book_append_sheet(wb, wsProyector, "Proyector");
+        XLSX.utils.book_append_sheet(wb, wsEquiposSimples, "Equipos Simples");
+    
+        XLSX.writeFile(wb, "datos_equipos.xlsx");
+    
+      } catch (error) {
+        console.error("Error al exportar a Excel:", error);
+      }
+    };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -344,8 +568,13 @@ const Bodega = () => {
       >
         <Alert
           onClose={handleCloseSnackbar}
-          severity="success"
+          severity={snackbarSeverity}
           sx={{ width: "100%" }}
+          iconMapping={{
+            success: <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />,
+            error: <Icon icon="fluent:error-circle-24-regular" width={20} height={20} />,
+            warning: <Icon icon="fluent:warning-24-regular" width={20} height={20} />
+          }}
         >
           {snackbarMessage}
         </Alert>

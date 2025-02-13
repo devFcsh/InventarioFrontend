@@ -4,10 +4,13 @@ export const usePasarActivoABodega = () => {
     const pasarActivoABodega = async (equipoId: string) => {
         try {
             const response = await clienteAxios.put(`/equipos/activoabodega/${equipoId}`);
-            return response.data;
+            if (response.status === 200) {
+                return true;
+            } else {
+                return false;
+            }
         } catch (error) {
             console.error('Error al transferir el equipo a bodega', error);
-            throw error;
         }
     };
 

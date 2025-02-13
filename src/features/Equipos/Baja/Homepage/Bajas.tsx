@@ -33,6 +33,7 @@ const Bajas = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error" | "warning">("success"); 
   const [totalPages, setTotalPages] = useState<number>(1);
   const [modalContent, setModalContent] = useState<{
     title: string;
@@ -123,7 +124,7 @@ const Bajas = () => {
       setOpenSnackbar(true);
       navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state,navigate]);
+  }, [location.pathname, location.state, navigate]);
 
   const handleConfirm = async () => {
     try {
@@ -139,23 +140,56 @@ const Bajas = () => {
   
   const deleteEquipo = async (equipoId: string) => {
     if (equipoId) {
-      await eliminarEquipo(equipoId);
-      setShouldFetch(true);
+      try{
+        const result = await eliminarEquipo(equipoId);
+        if(result){
+          setShouldFetch(true);
+          setSnackbarMessage("Operación completada con éxito");
+          setSnackbarSeverity("success"); 
+        }else{
+          setSnackbarMessage("No se puede eliminar el equipo porque está asociado a una computadora");
+          setSnackbarSeverity("error"); 
+        } 
+        setOpenSnackbar(true); 
+      }catch(error){
+        setSnackbarMessage("Error al eliminar el equipo.");
+        setSnackbarSeverity("error");
+        setOpenSnackbar(true);
+      }
     }
+
   };
   
 
   const deleteEquipos = async (equipoIds: string[]) => {
     try {
+      const errors = [];
       for (const id of equipoIds) {
-        await eliminarEquipo(id);
+        const result = await eliminarEquipo(id);
+        if (!result) {
+          errors.push(id);
+        }
       }
+  
+      if (errors.length === 0) {
+        setSnackbarMessage("Operación completada con éxito");
+        setSnackbarSeverity("success"); 
+      } else {
+        setSnackbarMessage(`No se pudieron eliminar los equipos: ${errors.join(', ')} ya que están relacionados a una computadora`);
+        setSnackbarSeverity("error"); 
+      }
+  
       setShouldFetch(true);
       setSelectedItems([]);
-    } catch (error) {
-      console.error("Error al eliminar los equipos", error);
+      setOpenSnackbar(true);
+    } 
+    catch(error){
+      setSnackbarMessage("Error al eliminar el equipo.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
   };
+
 
 
   const handleDelete = () => {
@@ -300,8 +334,13 @@ const Bajas = () => {
       >
         <Alert
           onClose={handleCloseSnackbar}
-          severity="success"
+          severity={snackbarSeverity}
           sx={{ width: "100%" }}
+          iconMapping={{
+            success: <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />,
+            error: <Icon icon="fluent:error-circle-24-regular" width={20} height={20} />,
+            warning: <Icon icon="fluent:warning-24-regular" width={20} height={20} />
+          }}
         >
           {snackbarMessage}
         </Alert>
