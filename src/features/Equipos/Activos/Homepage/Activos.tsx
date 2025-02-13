@@ -131,19 +131,20 @@ const Activos = () => {
 
   const deleteEquipo = async (equipoId: string) => {
     if (equipoId) {
+      const inventario = equipos.filter((equipo) => equipoId===equipo.id_equipo)[0].inventario;
       try{
         const result = await eliminarEquipo(equipoId);
         if(result){
           setShouldFetch(true);
-          setSnackbarMessage("Operación completada con éxito");
+          setSnackbarMessage(`Equipo con inventario ${inventario} eliminado.`);
           setSnackbarSeverity("success"); 
         }else{
-          setSnackbarMessage("No se puede eliminar el equipo porque está asociado a una computadora");
+          setSnackbarMessage(`No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`);
           setSnackbarSeverity("error"); 
         } 
         setOpenSnackbar(true); 
       }catch(error){
-        setSnackbarMessage("Error al eliminar el equipo.");
+        setSnackbarMessage(`Error al eliminar el equipo con inventario ${inventario}.`);
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
@@ -153,19 +154,20 @@ const Activos = () => {
 
   const deleteEquipos = async (equipoIds: string[]) => {
     try {
-      const errors = [];
+      const errorsInventarios = [];
       for (const id of equipoIds) {
         const result = await eliminarEquipo(id);
+        const inventario = equipos.filter((equipo) => id===equipo.id_equipo)[0].inventario;
         if (!result) {
-          errors.push(id);
+          errorsInventarios.push(inventario);
         }
       }
   
-      if (errors.length === 0) {
+      if (errorsInventarios.length === 0) {
         setSnackbarMessage("Operación completada con éxito");
         setSnackbarSeverity("success"); 
       } else {
-        setSnackbarMessage(`No se pudieron eliminar los equipos: ${errors.join(', ')} ya que están relacionados a una computadora`);
+        setSnackbarMessage(`No se pudieron eliminar los equipos: ${errorsInventarios.join(', ')} ya que están relacionados a una computadora`);
         setSnackbarSeverity("error"); 
       }
   
@@ -174,7 +176,7 @@ const Activos = () => {
       setOpenSnackbar(true);
     } 
     catch(error){
-      setSnackbarMessage("Error al eliminar el equipo.");
+      setSnackbarMessage("Error al eliminar los equipos");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
     }
@@ -182,19 +184,20 @@ const Activos = () => {
 
   const pasarABodegaEquipo = async (equipoId: string) => {
     if (equipoId) {
+      const inventario = equipos.filter((equipo) => equipoId===equipo.id_equipo)[0].inventario;
       try{
         const result =  await pasarActivoABodega(equipoId);
         if(result){
           setShouldFetch(true);
-          setSnackbarMessage(`Equipo con ID ${equipoId} pasado a bodega`);
+          setSnackbarMessage(`Equipo con inventario ${inventario} pasado a bodega`);
           setSnackbarSeverity("success"); 
         }else{
-          setSnackbarMessage("No se puede pasar a bodega porque el equipo está asociado a una computadora");
+          setSnackbarMessage(`No se puede pasar a bodega el equipo con inventario ${inventario}porque el equipo está asociado a una computadora`);
           setSnackbarSeverity("error"); 
         } 
         setOpenSnackbar(true); 
       }catch(error){
-        setSnackbarMessage("Error al pasar a bodega el equipo");
+        setSnackbarMessage(`Error al pasar a bodega el equipo con inventario ${inventario}`);
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
@@ -202,20 +205,21 @@ const Activos = () => {
   };
 
   const pasarABodegaEquipos = async (equipoIds: string[]) => {
+    const errorsInventarios = [];
     try {
-      const errors = [];
       for (const id of equipoIds) {
         const result = await pasarActivoABodega(id);
+        const inventario = equipos.filter((equipo) => id===equipo.id_equipo)[0].inventario;
         if (!result) {
-          errors.push(id);
+          errorsInventarios.push(inventario);
         }
       }
   
-      if (errors.length === 0) {
+      if (errorsInventarios.length === 0) {
         setSnackbarMessage("Operación completada con éxito");
         setSnackbarSeverity("success"); 
       } else {
-        setSnackbarMessage(`No se pudieron pasar los equipos: ${errors.join(', ')} a bodega ya que están relacionados a una computadora`);
+        setSnackbarMessage(`No se pudieron pasar los equipos con inventarios: ${errorsInventarios.join(', ')} a bodega ya que están relacionados a una computadora`);
         setSnackbarSeverity("error"); 
       }
   
@@ -224,7 +228,7 @@ const Activos = () => {
       setOpenSnackbar(true);
     } 
     catch(error){
-      setSnackbarMessage("Error al pasar a bodega el equipo");
+      setSnackbarMessage("Error al pasar a bodega los equipos");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
     }
@@ -232,19 +236,20 @@ const Activos = () => {
 
   const bajaEquipo = async (equipoId: string) => {
     if (equipoId) {
+      const inventario = equipos.filter((equipo) => equipoId===equipo.id_equipo)[0].inventario;
       try{
         const result =  await darDeBajaEquipo(equipoId,"activo");
         if(result){
           setShouldFetch(true);
-          setSnackbarMessage(`Equipo con ID ${equipoId} dado de baja`);
+          setSnackbarMessage(`Equipo con inventario ${inventario} dado de baja`);
           setSnackbarSeverity("success"); 
         }else{
-          setSnackbarMessage("No se puede dar de baja porque el equipo está asociado a una computadora");
+          setSnackbarMessage(`No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora`);
           setSnackbarSeverity("error"); 
         } 
         setOpenSnackbar(true); 
       }catch(error){
-        setSnackbarMessage("Error al dar de baja el equipo");
+        setSnackbarMessage(`Error al dar de baja al equipo con inventario ${inventario}`);
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
@@ -252,27 +257,28 @@ const Activos = () => {
   };
 
   const bajaEquipos = async (equipoIds: string[]) => {
+    const errorsInventarios = [];
     try {
-      const errors = [];
       for (const id of equipoIds) {
         const result =  await darDeBajaEquipo(id, "baja");
+        const inventario = equipos.filter((equipo) => id===equipo.id_equipo)[0].inventario;
         if (!result) {
-          errors.push(id);
+          errorsInventarios.push(inventario);
         }
       }
-      if (errors.length === 0) {
+      if (errorsInventarios.length === 0) {
         setShouldFetch(true);
         setSnackbarMessage("Operación completada con éxito");
         setSnackbarSeverity("success"); 
       } else {
-        setSnackbarMessage(`Error al dar de baja los equipos ${errors.join(', ')} ya que están relacionados a una computadora`);
+        setSnackbarMessage(`Error al dar de baja los equipos con inventario ${errorsInventarios.join(', ')} ya que están relacionados a una computadora`);
         setSnackbarSeverity("error"); 
       }
       setSelectedItems([]);
       setOpenSnackbar(true);
     } 
     catch(error){
-      setSnackbarMessage("Error al eliminar el equipo.");
+      setSnackbarMessage("Error al dar de baja los equipos");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
     }
@@ -894,7 +900,7 @@ const Activos = () => {
                         handleOpenModal(
                           equipo.id_equipo,
                           "Dar de baja equipo",
-                          `¿Estás seguro de que deseas dar de baja el equipo ${equipo.id_equipo}?`,
+                          `¿Estás seguro de que deseas dar de baja el equipo ${equipo.inventario}?`,
                           bajaEquipo
                         )
                       }
@@ -934,7 +940,7 @@ const Activos = () => {
                           handleOpenModal(
                             equipo.id_equipo,
                             "Pasar equipo a bodega",
-                            `¿Estás seguro de que deseas pasar el equipo a bodega ${equipo.id_equipo}?`,
+                            `¿Estás seguro de que deseas pasar el equipo a bodega ${equipo.inventario}?`,
                             pasarABodegaEquipo
                           )
                         }
