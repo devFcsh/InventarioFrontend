@@ -12,6 +12,7 @@ export type Equipo = {
 
 export type ExportarComputadora = {
     id_equipo: string;
+    empresa: string;
     edificio: string;
     ubicacion: string;
     uso: string;
@@ -20,6 +21,7 @@ export type ExportarComputadora = {
     nombre_equipo: string;
     dominio: string;
     sistema_operativo: string;
+    version_sistema_operativo: string;
     procesador: string;
     tipo_ram: string;
     capacidad_ram: string;
@@ -89,6 +91,7 @@ export type ExportarProyector = {
 
 export type ExportarSimples = {
     periferico: string;
+    empresa: string;
     edificio: string;
     ubicacion: string;
     uso: string;
@@ -101,7 +104,16 @@ export type ExportarSimples = {
     observacion: string;
 }
 
-
+export type ExportarEquiposBaja = {
+    periferico: string;
+    empresa: string;
+    marca: string;
+    modelo: string;
+    serie: string;
+    inventario: string;
+    fecha_ultimo_cambio: string;
+    estado: string;
+}
 
 export type EquipoBodega = {
     id_equipo: string;

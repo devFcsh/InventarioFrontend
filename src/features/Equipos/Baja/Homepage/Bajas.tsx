@@ -15,6 +15,8 @@ import { useEquiposBajaFiltrados } from "../hooks/useEquiposBajaFiltrados";
 import {ModalAgregarBaja} from "../../Baja/Pages/ModalAgregarBaja"
 import { useEliminarComputadora } from "@hooks/useEliminarComputadora.ts";
 import { useNavigate } from "react-router-dom";
+import { useExportarEquiposBajas } from "../hooks/useExportarEquiposBajas";
+import { ExportarEquiposBaja } from "../../../../types/Equipo/index";
 
 const Bajas = () => {
   const [selectedPeriferico, setSelectedPeriferico] =
@@ -79,6 +81,8 @@ const Bajas = () => {
   
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { fetchTodosEquipos } = useExportarEquiposBajas();
   
   const filtros = {
     perifericoId: selectedPeriferico?.id_periferico,
@@ -295,30 +299,55 @@ const Bajas = () => {
     }
   };
 
-  const exportToExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(
-      equiposBaja.map(
-        ({
-          periferico,
-          marca,
-          modelo,
-          serie,
-          inventario,
-        }) => ({
-          Periférico: periferico,
-          Marca: marca,
-          Modelo: modelo,
-          Serie: serie,
-          Inventario: inventario,
-        })
-      )
-    );
+     const exportToExcel = async () => {
+        try {
+          const allEquipos = await fetchTodosEquipos();
+      
+          if (!allEquipos) {
+            console.warn("No hay equipos para exportar");
+            return;
+          }
+      
+          const addIDColumn = (equipos: any[]) => {
+            return equipos.map((equipo, index) => ({
+              id: index + 1,
+              ...equipo,
+            }));
+          };
 
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Datos");
-
-    XLSX.writeFile(wb, "datos_equipos.xlsx");
-  };
+          const formatEquiposSimples = (equipos: ExportarEquiposBaja[]) => {
+            return addIDColumn(equipos.map(({
+              periferico,
+              empresa,
+              marca,
+              modelo,
+              serie,
+              inventario,
+              fecha_ultimo_cambio,
+              estado,
+            }) => ({
+              tipo: periferico,
+              empresa,
+              inventario,
+              marca,
+              modelo,
+              serie,
+              fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
+              estado,
+            })));
+          };
+      
+          const wsEquiposSimples = XLSX.utils.json_to_sheet(formatEquiposSimples(allEquipos));
+      
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, wsEquiposSimples, "Equipos Simples");
+      
+          XLSX.writeFile(wb, "datos_equipos_baja.xlsx");
+      
+        } catch (error) {
+          console.error("Error al exportar a Excel:", error);
+        }
+      };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);

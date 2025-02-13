@@ -385,6 +385,7 @@ const Bodega = () => {
         const formatComputadora = (equipos: ExportarComputadora[]) => {
           return addIDColumn(equipos.map(({
             direccion_ip,
+            empresa,
             nombre_equipo,
             dominio,
             sistema_operativo,
@@ -412,6 +413,11 @@ const Bodega = () => {
             monitor_inventario,
           }) => ({
             tipo: 'Computadora',
+            empresa,
+            inventario,
+            marca,
+            modelo,
+            serie,
             direccion_ip,
             nombre_equipo,
             dominio,
@@ -420,10 +426,6 @@ const Bodega = () => {
             tipo_ram,
             capacidad_ram,
             capacidad_disco,
-            marca,
-            modelo,
-            serie,
-            inventario,
             fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
             observacion,
             mouse_marca: mouse_marca || '',
@@ -521,6 +523,7 @@ const Bodega = () => {
         const formatEquiposSimples = (equipos: ExportarSimples[]) => {
           return addIDColumn(equipos.map(({
             periferico,
+            empresa,
             marca,
             modelo,
             serie,
@@ -529,10 +532,11 @@ const Bodega = () => {
             observacion,
           }) => ({
             tipo: periferico,
+            empresa,
+            inventario,
             marca,
             modelo,
             serie,
-            inventario,
             fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
             observacion,
           })));
@@ -551,7 +555,7 @@ const Bodega = () => {
         XLSX.utils.book_append_sheet(wb, wsProyector, "Proyector");
         XLSX.utils.book_append_sheet(wb, wsEquiposSimples, "Equipos Simples");
     
-        XLSX.writeFile(wb, "datos_equipos.xlsx");
+        XLSX.writeFile(wb, "datos_equipos_bodega.xlsx");
     
       } catch (error) {
         console.error("Error al exportar a Excel:", error);

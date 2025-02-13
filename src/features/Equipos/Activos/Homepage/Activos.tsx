@@ -419,7 +419,6 @@ const Activos = () => {
     }
   };
 
-
   const exportToExcel = async () => {
     try {
       const allEquipos = await fetchTodosEquipos();
@@ -438,6 +437,7 @@ const Activos = () => {
   
       const formatComputadora = (equipos: ExportarComputadora[]) => {
         return addIDColumn(equipos.map(({
+          empresa,
           edificio,
           ubicacion,
           uso,
@@ -446,6 +446,7 @@ const Activos = () => {
           nombre_equipo,
           dominio,
           sistema_operativo,
+          version_sistema_operativo,
           procesador,
           tipo_ram,
           capacidad_ram,
@@ -470,6 +471,11 @@ const Activos = () => {
           monitor_inventario,
         }) => ({
           tipo: 'Computadora',
+          empresa,
+          inventario,
+          marca,
+          modelo,
+          serie,
           edificio,
           ubicacion,
           uso,
@@ -478,14 +484,11 @@ const Activos = () => {
           nombre_equipo,
           dominio,
           sistema_operativo,
+          version_sistema_operativo,
           procesador,
           tipo_ram,
           capacidad_ram,
           capacidad_disco,
-          marca,
-          modelo,
-          serie,
-          inventario,
           fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
           observacion,
           mouse_marca: mouse_marca || '',
@@ -522,12 +525,12 @@ const Activos = () => {
           tipo: 'Switch',
           empresa,
           inventario,
-          edificio,
-          ubicacion,
           marca,
           modelo,
           serie,
           mac,
+          edificio,
+          ubicacion,
           puertos,
           puerto_ftp,
           nombre_equipo,
@@ -553,12 +556,12 @@ const Activos = () => {
           tipo: 'AP',
           empresa,
           inventario,
-          edificio,
-          ubicacion,
           marca,
           modelo,
           serie,
           mac,
+          edificio,
+          ubicacion,
           nombre_equipo,
           fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
           observacion,
@@ -581,12 +584,12 @@ const Activos = () => {
           tipo: 'Proyector',
           empresa,
           inventario,
-          edificio,
-          ubicacion,
           marca,
           modelo,
           serie,
           lampara,
+          edificio,
+          ubicacion,
           fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
           observacion,
         })));
@@ -595,6 +598,7 @@ const Activos = () => {
       const formatEquiposSimples = (equipos: ExportarSimples[]) => {
         return addIDColumn(equipos.map(({
           periferico,
+          empresa,
           edificio,
           ubicacion,
           uso,
@@ -607,14 +611,15 @@ const Activos = () => {
           observacion,
         }) => ({
           tipo: periferico,
+          empresa,
+          inventario,
+          marca,
+          modelo,
+          serie,
           edificio,
           ubicacion,
           uso,
           usuario,
-          marca,
-          modelo,
-          serie,
-          inventario,
           fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
           observacion,
         })));
@@ -633,7 +638,7 @@ const Activos = () => {
       XLSX.utils.book_append_sheet(wb, wsProyector, "Proyector");
       XLSX.utils.book_append_sheet(wb, wsEquiposSimples, "Equipos Simples");
   
-      XLSX.writeFile(wb, "datos_equipos.xlsx");
+      XLSX.writeFile(wb, "datos_equipos_activos.xlsx");
   
     } catch (error) {
       console.error("Error al exportar a Excel:", error);
