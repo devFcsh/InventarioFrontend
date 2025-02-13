@@ -462,6 +462,7 @@ const Activos = () => {
           mac,
           puertos,
           puerto_ftp,
+          nombre_equipo,
           fecha_ultimo_cambio,
           observacion,
         }) => ({
@@ -476,6 +477,7 @@ const Activos = () => {
           mac,
           puertos,
           puerto_ftp,
+          nombre_equipo,
           fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
           observacion,
         })));
@@ -491,6 +493,7 @@ const Activos = () => {
           modelo,
           serie,
           mac,
+          nombre_equipo,
           fecha_ultimo_cambio,
           observacion,
         }) => ({
@@ -503,6 +506,7 @@ const Activos = () => {
           modelo,
           serie,
           mac,
+          nombre_equipo,
           fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
           observacion,
         })));

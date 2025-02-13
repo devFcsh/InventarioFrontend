@@ -53,6 +53,7 @@ export type ExportarAP = {
     modelo: string;
     serie: string;
     mac: string;
+    nombre_equipo: string;
     fecha_ultimo_cambio: string;
     observacion: string;
 }
@@ -68,6 +69,7 @@ export type ExportarSwitch = {
     mac: string;
     puertos: string;
     puerto_ftp: string;
+    nombre_equipo: string;
     fecha_ultimo_cambio: string;
     observacion: string;
 }
