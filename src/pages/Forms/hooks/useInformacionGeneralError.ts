@@ -25,7 +25,7 @@ interface InformacionGeneralDataForm{
   procesador: Procesador
 }
 
-export const useInformacionGeneralError = () => {
+export const useInformacionGeneralError = (dataform: InformacionGeneralDataForm) => {
   const [informacionGeneralErrors, setInformacionGeneralErrors] = useState<Record<string, boolean>>({
     "sistemaOperativo":false,
     "versionSO":false,
@@ -76,6 +76,12 @@ export const useInformacionGeneralError = () => {
           ["direccionIP"]: false,
         }));
       }
+      if(field==="nombreEquipo" && formData["nombreEquipo"].length!==14){
+        setInformacionGeneralErrors((prevErrors) => ({
+          ...prevErrors,
+          ["nombreEquipo"]: true
+        }));
+      }
     });
   };
 
@@ -104,7 +110,18 @@ export const useInformacionGeneralError = () => {
         ["direccionIP"]: false
       }));
     }
-
+    if(tipo==="nombreEquipo" && value?.toString().length===14){
+      setInformacionGeneralErrors((prevErrors) => ({
+        ...prevErrors,
+        ["nombreEquipo"]: false
+      }));
+    }else{
+      setInformacionGeneralErrors((prevErrors) => ({
+        ...prevErrors,
+        ["nombreEquipo"]: true
+      }));
+    }
+    
   };
 
   return { informacionGeneralErrors,handleInformacionGeneralErrors, handleUniqueInformacionGeneralError,completeDatosInformacionGeneral};

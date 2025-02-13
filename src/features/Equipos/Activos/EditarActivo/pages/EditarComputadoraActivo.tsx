@@ -118,6 +118,7 @@ const EditarComputadoraActivo = ({
   >(null);
   const [empresa, setEmpresa] = useState<string | null>("");
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
+  const [errorNombreEquipo, setErrorNombreEquipo] = useState<boolean>(false);
   const [empresaNuevoComponente, setEmpresaNuevoComponente] = useState<
     string | null
   >("");
@@ -429,6 +430,7 @@ const EditarComputadoraActivo = ({
       errorInventario ||
       !selectedInventarioSerie ||
       !nombreEquipo ||
+      errorNombreEquipo ||
       !selectedVersionSO ||
       !selectedVersionOffice ||
       !selectedRAM ||
@@ -538,6 +540,15 @@ const EditarComputadoraActivo = ({
         : setErrorNuevoComponenteInventario(false);
     }
   };
+
+  const handleNombreEquipo = (value: String)=>{
+    setNombreEquipo(value);
+    if (value.length===14) {
+      setErrorNombreEquipo(false);
+    } else {
+      setErrorNombreEquipo(true);
+    }
+  }
 
   return (
     <div>
@@ -824,12 +835,16 @@ const EditarComputadoraActivo = ({
           size="small"
           label="Nombre Equipo"
           value={nombreEquipo}
+          error={!!errorNombreEquipo}
+          helperText={
+            errorNombreEquipo ? "Por favor escribir un nombre de equipo válido" : ""
+          }
           onChange={(e) => {
             let value = e.target.value;
-            if (value !== null && value.length > 20) {
+            if (value !== null && value.length > 14) {
               return
             }
-            setNombreEquipo(value)
+            handleNombreEquipo(value)
           }}
           fullWidth
           variant="outlined"

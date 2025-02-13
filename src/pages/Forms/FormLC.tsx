@@ -62,7 +62,7 @@ export const FormLC = () => {
     handleInformacionGeneralErrors,
     handleUniqueInformacionGeneralError,
     completeDatosInformacionGeneral,
-  } = useInformacionGeneralError();
+  } = useInformacionGeneralError(informacionGeneralDataForm);
   const {
     cargarImagenErrors,
     handleCargarImagenErrors,
