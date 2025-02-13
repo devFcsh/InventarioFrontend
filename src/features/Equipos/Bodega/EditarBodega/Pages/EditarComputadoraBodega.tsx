@@ -983,7 +983,7 @@ const EditarComputadoraBodega = ({
           onClick={handleConfirmEditarEquipo}
           fullWidth
         >
-          Editar Bodega
+        Guardar Cambios
         </Button>
         <Button
           onClick={handleConfirmCancelar}

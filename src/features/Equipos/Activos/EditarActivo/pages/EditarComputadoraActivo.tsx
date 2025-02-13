@@ -1150,7 +1150,7 @@ const EditarComputadoraActivo = ({
           onClick={handleConfirmEditarEquipo}
           fullWidth
         >
-          Editar Activo
+          Guardar Cambios
         </Button>
         <Button
           onClick={handleConfirmCancelar}
