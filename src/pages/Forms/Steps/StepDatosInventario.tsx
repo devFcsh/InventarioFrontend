@@ -265,7 +265,9 @@ export const StepDatosInventario = ({
               }
               onChange={(e) => {
                 let value = e.target.value;
-                if (value !== null && value.length > 10) {
+                if (inventoryDataForm.empresa==="Espol" && value !== null && value.length > 6) {
+                  return
+                }else if(inventoryDataForm.empresa==="EspolTech" && value !== null && value.length > 10){
                   return
                 }
                 handleInventoryChange("inventario", value);

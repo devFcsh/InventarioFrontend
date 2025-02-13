@@ -426,6 +426,7 @@ const EditarComputadoraActivo = ({
   const validarCamposEquipo = () => {
     if (
       !selectedInventarioInv ||
+      errorInventario ||
       !selectedInventarioSerie ||
       !nombreEquipo ||
       !selectedVersionSO ||
@@ -650,7 +651,9 @@ const EditarComputadoraActivo = ({
             }
             onChange={(e) => {
               let value = e.target.value;
-              if (value !== null && value.length > 10) {
+              if (empresa==="Espol" && value !== null && value.length > 6) {
+                return
+              }else if(empresa==="EspolTech" && value !== null && value.length > 10){
                 return
               }
               handleChangeInventario(value)
@@ -1079,7 +1082,9 @@ const EditarComputadoraActivo = ({
                 }
                 onChange={(e) => {
                   let value = e.target.value;
-                  if (value !== null && value.length > 20) {
+                  if (empresaNuevoComponente==="Espol" && value !== null && value.length > 6) {
+                    return
+                  }else if(empresaNuevoComponente==="EspolTech" && value !== null && value.length > 10){
                     return
                   }
                   handleChangeNuevoComponenteInventario(value)

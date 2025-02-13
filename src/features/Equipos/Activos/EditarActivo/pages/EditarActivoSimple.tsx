@@ -231,7 +231,7 @@ const EditarActivoSimple = ({
     }
     const handleLamparaChange = (lampara :Lampara)=>{
       setSelectedLampara(lampara)
-      if(lampara===null){
+      if(!lampara){
         setErrorLampara(true)
       }else{
         setErrorLampara(false)
@@ -249,9 +249,10 @@ const EditarActivoSimple = ({
   const validarCamposEquipo = () => {
     if (
       !selectedInventarioInv ||
+      errorInventario ||
       !selectedInventarioSerie ||
-      !selectedUbicacion || 
-      perifericoName!=="Proyector"?false:!selectedLampara
+      !selectedUbicacion ||
+      (perifericoName!=="Proyector"?false:!selectedLampara)
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -373,7 +374,9 @@ const EditarActivoSimple = ({
             }
             onChange={(e) => {
               let value = e.target.value;
-              if (value !== null && value.length > 20) {
+              if (empresa==="Espol" && value !== null && value.length > 6) {
+                return
+              }else if(empresa==="EspolTech" && value !== null && value.length > 10){
                 return
               }
               handleChangeInventario(value)

@@ -187,8 +187,9 @@ const EditarBodegaSimple = ({
   const validarCamposEquipo = () => {
     if (
       !selectedInventarioInv ||
+      errorInventario ||
       !selectedInventarioSerie ||
-      perifericoName!=="Proyector"?false:!selectedLampara
+      (perifericoName!=="Proyector"?false:!selectedLampara)
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -308,7 +309,15 @@ const EditarBodegaSimple = ({
             helperText={
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
-            onChange={(e) => handleChangeInventario(e.target.value)}
+            onChange={(e) => {
+              let value = e.target.value;
+              if (empresa==="Espol" && value !== null && value.length > 6) {
+                return
+              }else if(empresa==="EspolTech" && value !== null && value.length > 10){
+                return
+              }
+              handleChangeInventario(value)
+            }}
             disabled={empresa === ""}
           />
         </Box>

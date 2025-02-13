@@ -128,9 +128,6 @@ export const FormLC = () => {
     }else if(tipoInventario==="bodega"){
       handleAgregarEquipoBodega(observationValue);
       
-    }else{
-      handleAgregarEquipoBaja(observationValue);
-
     }
   }
 

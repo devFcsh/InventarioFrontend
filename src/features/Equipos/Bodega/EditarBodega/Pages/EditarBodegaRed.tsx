@@ -188,8 +188,8 @@ const EditarBodegaRed = ({
       !selectedInventarioInv ||
       !selectedInventarioSerie ||
       !selectedMAC || 
-      perifericoName==="AP"?false:!selectedPuertos || 
-      perifericoName==="AP"?false:!selectedPuertoFTP
+      (perifericoName==="AP"?false:!selectedPuertos) || 
+      (perifericoName==="AP"?false:!selectedPuertoFTP)
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -308,7 +308,15 @@ const EditarBodegaRed = ({
             helperText={
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
-            onChange={(e) => handleChangeInventario(e.target.value)}
+            onChange={(e) => {
+              let value = e.target.value;
+              if (empresa==="Espol" && value !== null && value.length > 6) {
+                return
+              }else if(empresa==="EspolTech" && value !== null && value.length > 10){
+                return
+              }
+              handleChangeInventario(value)
+            }}
             disabled={empresa === ""}
           />
         </Box>

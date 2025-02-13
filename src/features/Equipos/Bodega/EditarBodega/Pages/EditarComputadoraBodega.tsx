@@ -581,7 +581,15 @@ const EditarComputadoraBodega = ({
             helperText={
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
-            onChange={(e) => handleChangeInventario(e.target.value)}
+            onChange={(e) => {
+              let value = e.target.value;
+              if (empresa==="Espol" && value !== null && value.length > 6) {
+                return
+              }else if(empresa==="EspolTech" && value !== null && value.length > 10){
+                return
+              }
+              handleChangeInventario(value)
+            }}
             disabled={empresa === ""}
           />
         </Box>
@@ -924,9 +932,15 @@ const EditarComputadoraBodega = ({
                     ? "Por favor escribir un inventario válido"
                     : ""
                 }
-                onChange={(e) =>
-                  handleChangeNuevoComponenteInventario(e.target.value)
-                }
+                onChange={(e) => {
+                  let value = e.target.value;
+                  if (empresaNuevoComponente==="Espol" && value !== null && value.length > 6) {
+                    return
+                  }else if(empresaNuevoComponente==="EspolTech" && value !== null && value.length > 10){
+                    return
+                  }
+                  handleChangeNuevoComponenteInventario(value)
+                }}
                 disabled={empresa === ""}
               />
             </Box>

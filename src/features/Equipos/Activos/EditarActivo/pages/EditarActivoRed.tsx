@@ -268,8 +268,8 @@ const EditarActivoRed = ({
       !selectedInventarioSerie ||
       !selectedUbicacion || 
       !selectedMAC || 
-      perifericoName==="AP"?false:!selectedPuertos || 
-      perifericoName==="AP"?false:!selectedPuertoFTP
+      (perifericoName==="AP"?false:!selectedPuertos) || 
+      (perifericoName==="AP"?false:!selectedPuertoFTP)
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -390,7 +390,9 @@ const EditarActivoRed = ({
             }
             onChange={(e) => {
               let value = e.target.value;
-              if (value !== null && value.length > 10) {
+              if (empresa==="Espol" && value !== null && value.length > 6) {
+                return
+              }else if(empresa==="EspolTech" && value !== null && value.length > 10){
                 return
               }
               handleChangeInventario(value)
