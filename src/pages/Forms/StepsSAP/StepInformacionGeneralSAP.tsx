@@ -48,7 +48,7 @@ export const StepInformacionGeneralSAP = ({
           {periferico!=="AP"?
           <>
           <TextField
-            label="Puertos"
+            label="Puertos 10-100-1000"
             placeholder="Puertos"
             variant="outlined"
             fullWidth
