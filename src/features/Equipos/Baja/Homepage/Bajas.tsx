@@ -140,19 +140,20 @@ const Bajas = () => {
   
   const deleteEquipo = async (equipoId: string) => {
     if (equipoId) {
+      const inventario = equiposBaja.filter((equipo) => equipoId===equipo.id_equipo)[0].inventario;
       try{
         const result = await eliminarEquipo(equipoId);
         if(result){
           setShouldFetch(true);
-          setSnackbarMessage("Operación completada con éxito");
+          setSnackbarMessage(`Equipo con inventario ${inventario} eliminado.`);
           setSnackbarSeverity("success"); 
         }else{
-          setSnackbarMessage("No se puede eliminar el equipo porque está asociado a una computadora");
+          setSnackbarMessage(`No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`);
           setSnackbarSeverity("error"); 
         } 
         setOpenSnackbar(true); 
       }catch(error){
-        setSnackbarMessage("Error al eliminar el equipo.");
+        setSnackbarMessage(`Error al eliminar el equipo con inventario ${inventario}.`);
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
@@ -539,7 +540,7 @@ const Bajas = () => {
                         handleOpenModal(
                           equipo.id_equipo,
                           "Eliminar equipo",
-                          `¿Estás seguro de que deseas eliminar el equipo ${equipo.id_equipo}?`,
+                          `¿Estás seguro de que deseas eliminar el equipo ${equipo.inventario}?`,
                           deleteEquipo
                         )
                       }
