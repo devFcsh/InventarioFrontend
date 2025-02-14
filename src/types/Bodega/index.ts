@@ -56,6 +56,7 @@ export type BodegaRedEdit = {
   mac: string;
   puertos: string;
   puerto_ftp: string;
+  nombre_equipo:string;
 };
 
 export type BodegaSimpleEditSend = {
@@ -74,6 +75,7 @@ export type BodegaRedEditSend = {
   mac: string;
   puertos: string;
   puerto_ftp: string;
+  nombre_equipo:string;
 };
 
 export type BodegaComputadoraData = {
@@ -109,5 +111,6 @@ export type BodegaComputadoraData = {
     puertos: string;
     puerto_ftp: string;
     idLampara: number;
+    nombre_equipo:string;
   };
   

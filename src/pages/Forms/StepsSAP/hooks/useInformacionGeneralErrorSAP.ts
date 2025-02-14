@@ -5,6 +5,7 @@ interface InformacionGeneralDataForm{
   mac: string;
   puertos: string;
   puertoFTP: string;
+  nombreEquipo: string;
 }
 
 export const useInformacionGeneralErrorSAP = (periferico:string | undefined) => {
@@ -12,10 +13,11 @@ export const useInformacionGeneralErrorSAP = (periferico:string | undefined) => 
     "mac":false,
     "puertos":false,
     "puertoFTP":false,
+    "nombreEquipo":false
   });
 
   const completeDatosInformacionGeneral = (dataForm: InformacionGeneralDataForm)=>{
-    if(dataForm.mac !=="" && (periferico==="AP"?true:dataForm.puertos !=="")
+    if(dataForm.nombreEquipo!== "" && dataForm.mac !=="" && (periferico==="AP"?true:dataForm.puertos !=="")
       && (periferico==="AP"?true:(dataForm.puertoFTP!=="" && validateMAC(dataForm.mac)))
     ) return true
     return false;
@@ -26,6 +28,7 @@ export const useInformacionGeneralErrorSAP = (periferico:string | undefined) => 
         "mac",
         "puertos",
         "puertoFTP",
+        "nombreEquipo"
     ];
     fieldsToCheck.forEach((field) => {
       if (formData[field] === null || formData[field] === "") {
@@ -75,6 +78,17 @@ export const useInformacionGeneralErrorSAP = (periferico:string | undefined) => 
           [tipo]: true
         }));
       }
+    }
+    if(value!==null && tipo==="nombreEquipo" && (value.length>10 || value.length<10)){
+      setInformacionGeneralErrors((prevErrors) => ({
+        ...prevErrors,
+        [tipo]: true
+      }));
+    }else if(value!==null && tipo==="nombreEquipo" && value.length===10){
+      setInformacionGeneralErrors((prevErrors) => ({
+        ...prevErrors,
+        [tipo]: false
+      }));
     }
   };
 

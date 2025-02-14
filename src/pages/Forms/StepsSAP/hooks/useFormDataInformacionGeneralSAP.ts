@@ -4,6 +4,7 @@ interface InformacionGeneralDataForm{
   mac: string;
   puertos: string;
   puertoFTP: string;
+  nombreEquipo:string;
 }
 
 
@@ -11,7 +12,8 @@ export const useFormDataInformacionGeneralSAP = () => {
   const [informacionGeneralDataSAPForm, setInformacionGeneralDataSAPForm] = useState<InformacionGeneralDataForm>({
     mac: "",
     puertos: "",
-    puertoFTP: ""
+    puertoFTP: "",
+    nombreEquipo: ""
   });
 
   const handleInformacionGeneralSAPChange = (
