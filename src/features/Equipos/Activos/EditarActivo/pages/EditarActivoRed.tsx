@@ -45,6 +45,8 @@ const EditarActivoRed = ({
     const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(null);
   const [selectedMAC, setSelectedMAC] =
     useState<string>("");
+  const [selectedNombreEquipo, setSelectedNombreEquipo] =
+    useState<string>("");
   const [selectedPuertos, setSelectedPuertos] =
     useState<string>("");
   const [selectedPuertoFTP, setSelectedPuertoFTP] =
@@ -56,6 +58,7 @@ const EditarActivoRed = ({
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
   const [errorMAC, setErrorMAC] = useState<boolean>(false);
+  const [errorNombreEquipo, setErrorNombreEquipo] = useState<boolean>(false);
   const [errorPuertos, setErrorPuertos] = useState<boolean>(false);
   const [errorPuertoFTP, setErrorPuertoFTP] = useState<boolean>(false);
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(null);
@@ -94,7 +97,8 @@ const EditarActivoRed = ({
       setSelectedMAC(equipoRedActivo.mac);
       setSelectedPuertos(equipoRedActivo.puertos);
       setSelectedPuertoFTP(equipoRedActivo.puerto_ftp);
-      equipoRedActivo.inventario.length===10?setEmpresa("EspolTech"):setEmpresa("Espol")
+      equipoRedActivo.inventario.length===10?setEmpresa("EspolTech"):setEmpresa("Espol");
+      setSelectedNombreEquipo(equipoRedActivo.nombre_equipo)
     }
   }, [equipoRedActivo]);
 
@@ -175,6 +179,7 @@ const EditarActivoRed = ({
       mac: selectedMAC?? "",
       puertos: selectedPuertos?? "",
       puerto_ftp: selectedPuertoFTP?? "",
+      nombre_equipo:selectedNombreEquipo??""
     };
     try {
       await editarActivoRed(equipoRedActivo.id_equipo, payload);
@@ -227,11 +232,21 @@ const EditarActivoRed = ({
     }
     const handleMACChange = (MAC :string)=>{
       setSelectedMAC(MAC)
-      if(MAC===null){
+      if(MAC===null || MAC===""){
         setErrorMAC(true);
       }else{
         !validateMAC(MAC)?setErrorMAC(true):setErrorMAC(false)
     }
+    }
+    const handleEquipoChange = (nombreEquipo :string)=>{
+      setSelectedNombreEquipo(nombreEquipo)
+      if(nombreEquipo===null || nombreEquipo===""){
+        setErrorNombreEquipo(true);
+      }else if(nombreEquipo!==null && (nombreEquipo.length<10 || nombreEquipo.length>10)){
+        setErrorNombreEquipo(true);
+      }else{
+        setErrorNombreEquipo(false);
+      }
     }
     const handlePuertosChange = (puertos :string)=>{
       setSelectedPuertos(puertos)      
@@ -265,13 +280,17 @@ const EditarActivoRed = ({
   const validarCamposEquipo = () => {
     if (
       !selectedInventarioInv ||
+      errorInventario ||
       !selectedInventarioSerie ||
       !selectedUbicacion || 
-      !selectedMAC || 
-      (perifericoName==="AP"?false:!selectedPuertos) || 
-      (perifericoName==="AP"?false:!selectedPuertoFTP)
+      !selectedMAC ||
+      errorMAC ||
+      !selectedNombreEquipo ||
+      errorNombreEquipo ||
+      (perifericoName==="AP"?false:(!selectedPuertos || errorPuertos)) || 
+      (perifericoName==="AP"?false:(!selectedPuertoFTP || errorPuertoFTP))
     ) {
-      setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
+      setErrorMensajeEquipo("Por favor verificar todos los campos del equipo.");
       return false;
     }
     setErrorMensajeEquipo(null);
@@ -404,6 +423,27 @@ const EditarActivoRed = ({
 
       <h2 className="text-xl font-semibold mb-5">Información General</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
+      <TextField
+            label="Nombre Equipo"
+            placeholder="Nombre Equipo"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={selectedNombreEquipo}
+            error={!!errorNombreEquipo}
+            helperText={
+              errorNombreEquipo
+                ? "Por favor escribir un nombre del equipo"
+                : ""
+            }
+            onChange={(e) => {
+              let value = e.target.value.toUpperCase();
+              if (value !== null && value.length > 10) {
+                return
+              }
+              handleEquipoChange(value)
+            }}
+          />
 
         <Autocomplete
           size="small"

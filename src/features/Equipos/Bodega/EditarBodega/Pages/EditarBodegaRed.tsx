@@ -34,7 +34,8 @@ const EditarBodegaRed = ({
     
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
-
+  const [selectedNombreEquipo, setSelectedNombreEquipo] =
+    useState<string>("");
   const [selectedMAC, setSelectedMAC] =
     useState<string>("");
   const [selectedPuertos, setSelectedPuertos] =
@@ -47,6 +48,7 @@ const EditarBodegaRed = ({
   const [errorMensajeComponente, setErrorMensajeComponente] = useState<string | null>(null);
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
+  const [errorNombreEquipo, setErrorNombreEquipo] = useState<boolean>(false);
   const [errorMAC, setErrorMAC] = useState<boolean>(false);
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(null);
   const [openModalEditar, setOpenModalEditar] = useState(false);
@@ -79,6 +81,7 @@ const EditarBodegaRed = ({
       setSelectedPuertos(equipoRedBodega.puertos);
       setSelectedPuertoFTP(equipoRedBodega.puerto_ftp);
       equipoRedBodega.inventario.length===10?setEmpresa("EspolTech"):setEmpresa("Espol")
+      setSelectedNombreEquipo(equipoRedBodega.nombre_equipo)
     }
   }, [equipoRedBodega]);
 
@@ -116,6 +119,7 @@ const EditarBodegaRed = ({
       mac: selectedMAC?? "",
       puertos: selectedPuertos?? "",
       puerto_ftp: selectedPuertoFTP?? "",
+      nombre_equipo: selectedNombreEquipo??""
     };
     try {
       await editarBodegaRed(equipoRedBodega.id_equipo, payload);
@@ -164,6 +168,16 @@ const EditarBodegaRed = ({
         !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
       }else if(empresa==="EspolTech"){
         !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
+      }
+    }
+    const handleEquipoChange = (nombreEquipo :string)=>{
+      setSelectedNombreEquipo(nombreEquipo)
+      if(nombreEquipo===null || nombreEquipo===""){
+        setErrorNombreEquipo(true);
+      }else if(nombreEquipo!==null && (nombreEquipo.length<10 || nombreEquipo.length>10)){
+        setErrorNombreEquipo(true);
+      }else{
+        setErrorNombreEquipo(false);
       }
     }
     const handleMACChange = (MAC :string)=>{
@@ -324,6 +338,27 @@ const EditarBodegaRed = ({
 
       <h2 className="text-xl font-semibold mb-5">Información General</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
+      <TextField
+            label="Nombre Equipo"
+            placeholder="Nombre Equipo"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={selectedNombreEquipo}
+            error={!!errorNombreEquipo}
+            helperText={
+              errorNombreEquipo
+                ? "Por favor escribir un nombre del equipo"
+                : ""
+            }
+            onChange={(e) => {
+              let value = e.target.value.toUpperCase();
+              if (value !== null && value.length > 10) {
+                return
+              }
+              handleEquipoChange(value)
+            }}
+          />
 
         <TextField
             label="MAC"
