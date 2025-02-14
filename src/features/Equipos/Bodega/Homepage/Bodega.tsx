@@ -596,13 +596,18 @@ const Bodega = () => {
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Bodega</h1>
+          <div className="relative group">
           <Icon
             icon="gridicons:add"
             width="30"
             height="30"
             className="text-green-900 hover:text-green-950"
-            onClick={handleOpenBodega}
+            onClick={handleOpenBodega}    
           />
+           <span className="absolute left-1/2 transform -translate-x-1/3 top-full mt-1 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                        Agregar equipo
+                      </span>
+                    </div>
           <ModalAgregarBodega
             open={openModalBodega}
             onClose={handleCloseBodega}
