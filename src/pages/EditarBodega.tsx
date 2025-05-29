@@ -19,6 +19,7 @@ export const EditarBodega = () => {
     perifericos,
     equipoName
   }: { equipoId: string; perifericos: Periferico[],equipoName:string } = location.state || {};
+  
   if(equipoName==="Computadora" || equipoName==="Laptop"){
     const { equipoBodega, componentesBodega, loading, error } =
       useObtenerComputadoraBodega(equipoId);
@@ -33,6 +34,7 @@ export const EditarBodega = () => {
 
     if (loading) return <CircularProgress />;
     if (error) return <div>Error al cargar los datos del equipo</div>;
+    
     return (
       <div className="w-full max-w-7xl mx-auto p-4">
         <h1 className="text-2xl font-bold mb-10">Editar Bodega</h1>
@@ -46,7 +48,7 @@ export const EditarBodega = () => {
               value={
                 perifericos.find((p) => p?.id_periferico === perifericoId) ?? null
               }
-              onChange={(event, newValue) =>
+              onChange={(_, newValue) =>
                 setPerifericoId(newValue ? newValue.id_periferico : null)
               }
               getOptionLabel={(option) => option?.nombre || ""}
@@ -67,10 +69,12 @@ export const EditarBodega = () => {
             perifericos.find((p) => p?.id_periferico === perifericoId)?.nombre ??
               ""
           ) ? (
-            <EditarComputadoraBodega
-              equipo={equipoBodega}
-              componentesBodega={componentesBodega}
-            />
+            equipoBodega && (
+              <EditarComputadoraBodega
+                equipo={equipoBodega}
+                componentesBodega={componentesBodega}
+              />
+            )
           ) : (
             perifericoId && (
               /** 
@@ -100,6 +104,7 @@ export const EditarBodega = () => {
 
     if (loading) return <CircularProgress />;
     if (error) return <div>Error al cargar los datos del equipo</div>;
+    
     return (
       <div className="w-full max-w-7xl mx-auto p-4">
         <h1 className="text-2xl font-bold mb-10">Editar Bodega</h1>
@@ -113,7 +118,7 @@ export const EditarBodega = () => {
               value={
                 perifericos.find((p) => p?.id_periferico === perifericoId) ?? null
               }
-              onChange={(event, newValue) =>
+              onChange={(_, newValue) =>
                 setPerifericoId(newValue ? newValue.id_periferico : null)
               }
               getOptionLabel={(option) => option?.nombre || ""}
@@ -129,10 +134,10 @@ export const EditarBodega = () => {
             />
           </div>
 
-          {perifericoId ? (
+          {perifericoId && equipoRedBodega ? (
             <EditarBodegaRed 
-            perifericoName={equipoName}
-            equipoRedBodega={equipoRedBodega}
+              perifericoName={equipoName}
+              equipoRedBodega={equipoRedBodega}
             />
           ) : (
             perifericoId && (
@@ -163,6 +168,7 @@ export const EditarBodega = () => {
 
     if (loading) return <CircularProgress />;
     if (error) return <div>Error al cargar los datos del equipo</div>;
+    
     return (
       <div className="w-full max-w-7xl mx-auto p-4">
         <h1 className="text-2xl font-bold mb-10">Editar Bodega</h1>
@@ -176,7 +182,7 @@ export const EditarBodega = () => {
               value={
                 perifericos.find((p) => p?.id_periferico === perifericoId) ?? null
               }
-              onChange={(event, newValue) =>
+              onChange={(_, newValue) =>
                 setPerifericoId(newValue ? newValue.id_periferico : null)
               }
               getOptionLabel={(option) => option?.nombre || ""}
@@ -192,10 +198,10 @@ export const EditarBodega = () => {
             />
           </div>  
   
-          {perifericoId ? (
+          {perifericoId && equipoSimpleBodega ? (
             <EditarBodegaSimple
-            perifericoName={equipoName}
-            equipoSimpleBodega={equipoSimpleBodega}
+              perifericoName={equipoName}
+              equipoSimpleBodega={equipoSimpleBodega}
             />
           ) : (
             perifericoId && (

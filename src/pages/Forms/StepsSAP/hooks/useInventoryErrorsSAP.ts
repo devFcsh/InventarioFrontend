@@ -71,7 +71,7 @@ export const useInventoryErrorsSAP = (tipoInventario: string) => {
     }
   };
 
-  const handleUniqueInventarioSAPError = (tipo: keyof InventoryDataForm, value:  Marca | Modelo | Serie | string  | Ubicacion | null,formData:InventoryDataForm) => {
+  const handleUniqueInventarioSAPError = (tipo: keyof InventoryDataForm, value:  any,formData:InventoryDataForm) => {
     setInventorySAPErrors((prevErrors) => ({
       ...prevErrors,
       [tipo]: value === null || value === ""? true : false,

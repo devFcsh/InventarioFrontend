@@ -25,14 +25,14 @@ export const FormLC = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const location = useLocation();
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [_, setShowSuccessMessage] = useState(false);
   const selectedPeriferico = location.state?.periferico as
     | Periferico
     | undefined;
   const selectedUso = location.state?.uso as Uso | undefined;
   const selectedEdificio = location.state?.edificio as Edificio | undefined;
   const [openModalObservation, setOpenModalObservation] = useState(false);
-  const [observation, setObservation] = useState("");
+  //const [observation, setObservation] = useState("");
   const perifericos = location.state?.perifericos as Periferico[];
   const tipoInventario = location.state?.tipoInventario;
   const steps = location.state?.steps;
@@ -86,7 +86,7 @@ export const FormLC = () => {
       handleInformacionGeneralErrors(informacionGeneralDataForm);
       if (
         !Object.values(informacionGeneralErrors).includes(true) &&
-        completeDatosInformacionGeneral(informacionGeneralDataForm)
+        completeDatosInformacionGeneral()
       ) {
         if (tipoInventario === "activo") {
           setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -140,7 +140,7 @@ export const FormLC = () => {
       case 0:
         return (
           <StepDatosInventario
-            periferico={selectedPeriferico}
+            periferico={selectedPeriferico ?? null}
             uso={selectedUso?.id_uso ?? ""}
             edificio={selectedEdificio?.id_edificio ?? ""}
             inventoryDataForm={inventoryDataForm}
@@ -184,7 +184,6 @@ export const FormLC = () => {
                   
                 }}
                 title="Agregar observación"
-                message="¿Desea agregar una observación al equipo?"
               />
             <StepComponentes
               perifericos={perifericos}
@@ -324,7 +323,7 @@ export const FormLC = () => {
     >
       <Box sx={{ width: "60%" }}>
         <Stepper activeStep={activeStep} alternativeLabel sx={stepStyle}>
-          {steps.map((label, index) => {
+          {steps.map((label:any, _:any) => {
             const stepProps: { completed?: boolean } = {};
             const labelProps: {
               optional?: React.ReactNode;

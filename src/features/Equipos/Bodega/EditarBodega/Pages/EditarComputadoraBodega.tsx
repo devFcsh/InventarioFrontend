@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import {
   Autocomplete,
   TextField,
@@ -153,7 +153,7 @@ const EditarComputadoraBodega = ({
     nuevoComponente.modelo?.id_modelo ?? ""
   );
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  //const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (equipo && marcas.length > 0) {
@@ -553,7 +553,7 @@ const EditarComputadoraBodega = ({
             options={["Espol", "EspolTech"]}
             getOptionLabel={(option) => (option ? option : "")}
             value={empresa}
-            onChange={(event, newValue) => {
+            onChange={(_, newValue) => {
               handleChangeEmpresa(newValue);
             }}
             renderInput={(params) => (
@@ -819,7 +819,7 @@ const EditarComputadoraBodega = ({
               disablePortal
               options={filteredPerifericos}
               getOptionLabel={(option) => option?.nombre || ""}
-              onChange={(e, newValue) =>
+              onChange={(_, newValue) =>
                 setNuevoComponente({ ...nuevoComponente, periferico: newValue })
               }
               value={nuevoComponente.periferico}
@@ -837,7 +837,7 @@ const EditarComputadoraBodega = ({
               disablePortal
               options={marcasComponente}
               getOptionLabel={(option) => option?.nombre || ""}
-              onChange={(e, newValue) =>
+              onChange={(_, newValue) =>
                 setNuevoComponente({ ...nuevoComponente, marca: newValue })
               }
               value={nuevoComponente.marca}
@@ -855,7 +855,7 @@ const EditarComputadoraBodega = ({
               disablePortal
               options={modelosComponente}
               getOptionLabel={(option) => option?.nombre || ""}
-              onChange={(e, newValue) =>
+              onChange={(_, newValue) =>
                 setNuevoComponente({ ...nuevoComponente, modelo: newValue })
               }
               value={nuevoComponente.modelo}
@@ -874,7 +874,7 @@ const EditarComputadoraBodega = ({
               disablePortal
               options={seriesComponente}
               getOptionLabel={(option) => option?.nombre || ""}
-              onChange={(e, newValue) =>
+              onChange={(_, newValue) =>
                 setNuevoComponente({ ...nuevoComponente, serie: newValue })
               }
               value={nuevoComponente.serie}
@@ -900,7 +900,7 @@ const EditarComputadoraBodega = ({
                 options={["Espol", "EspolTech"]}
                 getOptionLabel={(option) => (option ? option : "")}
                 value={empresaNuevoComponente}
-                onChange={(event, newValue) => {
+                onChange={(_, newValue) => {
                   handleChangeEmpresaNuevoComponente(newValue);
                 }}
                 renderInput={(params) => (

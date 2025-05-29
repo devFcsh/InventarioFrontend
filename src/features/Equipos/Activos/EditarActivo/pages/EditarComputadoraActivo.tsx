@@ -541,7 +541,7 @@ const EditarComputadoraActivo = ({
     }
   };
 
-  const handleNombreEquipo = (value: String)=>{
+  const handleNombreEquipo = (value: any)=>{
     setNombreEquipo(value);
     if (value.length===14) {
       setErrorNombreEquipo(false);
@@ -632,7 +632,7 @@ const EditarComputadoraActivo = ({
             options={["Espol", "EspolTech"]}
             getOptionLabel={(option) => (option ? option : "")}
             value={empresa}
-            onChange={(event, newValue) => {
+            onChange={(_, newValue) => {
               handleChangeEmpresa(newValue);
             }}
             renderInput={(params) => (
@@ -982,7 +982,7 @@ const EditarComputadoraActivo = ({
               disablePortal
               options={filteredPerifericos}
               getOptionLabel={(option) => option?.nombre || ""}
-              onChange={(e, newValue) =>
+              onChange={(_, newValue) =>
                 setNuevoComponente({ ...nuevoComponente, periferico: newValue })
               }
               value={nuevoComponente.periferico}
@@ -1000,7 +1000,7 @@ const EditarComputadoraActivo = ({
               disablePortal
               options={marcasComponente}
               getOptionLabel={(option) => option?.nombre || ""}
-              onChange={(e, newValue) =>
+              onChange={(_, newValue) =>
                 setNuevoComponente({ ...nuevoComponente, marca: newValue })
               }
               value={nuevoComponente.marca}
@@ -1018,7 +1018,7 @@ const EditarComputadoraActivo = ({
               disablePortal
               options={modelosComponente}
               getOptionLabel={(option) => option?.nombre || ""}
-              onChange={(e, newValue) =>
+              onChange={(_, newValue) =>
                 setNuevoComponente({ ...nuevoComponente, modelo: newValue })
               }
               value={nuevoComponente.modelo}
@@ -1037,7 +1037,7 @@ const EditarComputadoraActivo = ({
               disablePortal
               options={seriesComponente}
               getOptionLabel={(option) => option?.nombre || ""}
-              onChange={(e, newValue) =>
+              onChange={(_, newValue) =>
                 setNuevoComponente({ ...nuevoComponente, serie: newValue })
               }
               value={nuevoComponente.serie}
@@ -1063,7 +1063,7 @@ const EditarComputadoraActivo = ({
                 options={["Espol", "EspolTech"]}
                 getOptionLabel={(option) => (option ? option : "")}
                 value={empresaNuevoComponente}
-                onChange={(event, newValue) => {
+                onChange={(_, newValue) => {
                   handleChangeEmpresaNuevoComponente(newValue);
                 }}
                 renderInput={(params) => (

@@ -6,15 +6,13 @@ interface ModalProps {
   onClose: () => void;
   onConfirm: (observation: string) => void;
   title?: string;
-  message?: string;
 }
 
 export const ModalObservation: React.FC<ModalProps> = ({
   open,
   onClose,
   onConfirm,
-  title = "Agregar observación",
-  message,
+  title = "Agregar observación"
 }) => {
   const [newObservation, setNewObservation] = useState<string>("");
   const [addObservation, setAddObservation] = useState<boolean>(false);

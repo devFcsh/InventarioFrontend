@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef } from "react";
 import { Box } from "@mui/material";
 
 interface StepCargarImagenProps {

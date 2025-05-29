@@ -54,7 +54,7 @@ export const useErrorsComponents = () => {
     });
   };
 
-  const handleUniqueComponentsError = (tipo: keyof ComponentsData, value: Marca | Modelo | Serie | Periferico |string  | null,componentsData:ComponentsData) => {
+  const handleUniqueComponentsError = (tipo: keyof ComponentsData, value: any,componentsData:ComponentsData) => {
     setComponentsErrors((prevErrors) => ({
       ...prevErrors,
       [tipo]: value === null || value === ""? true : false,

@@ -18,6 +18,7 @@
     "@mui/material": "^6.1.4",
     "@vaadin/react-components": "^24.4.4",
     "axios": "^1.7.4",
+    "dotenv": "^16.5.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.25.1",

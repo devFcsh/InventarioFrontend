@@ -25,6 +25,7 @@ const EditarActivo = () => {
   }: { equipoId: string; perifericos: Periferico[],equipoName:string } = location.state || {};
   const { usos } = useUsos();
   const { usuarios } = useUsuariosPorUso(selectedUso?.id_uso || "");
+  
   if(equipoName==="Computadora" || equipoName==="Laptop"){
     const { equipo, componentes, loading, error } =
       useObtenerComputadora(equipoId);
@@ -68,7 +69,7 @@ const EditarActivo = () => {
               value={
                 perifericos.find((p) => p?.id_periferico === perifericoId) ?? null
               }
-              onChange={(event, newValue) =>
+              onChange={(_, newValue) =>
                 setPerifericoId(newValue ? newValue.id_periferico : null)
               }
               getOptionLabel={(option) => option?.nombre || ""}
@@ -90,7 +91,7 @@ const EditarActivo = () => {
               disablePortal
               options={usos}
               value={selectedUso}
-              onChange={(event, newValue) => {
+              onChange={(_, newValue) => {
                 setSelectedUso(newValue);
                 setSelectedUsuario(null);
               }}
@@ -105,7 +106,7 @@ const EditarActivo = () => {
               disablePortal
               options={usuarios}
               value={selectedUsuario}
-              onChange={(event, newValue) => setSelectedUsuario(newValue)}
+              onChange={(_, newValue) => setSelectedUsuario(newValue)}
               getOptionLabel={(option) =>option ? option.nombre : ""}
               renderInput={(params) => (
                 <TextField
@@ -124,11 +125,13 @@ const EditarActivo = () => {
             perifericos.find((p) => p?.id_periferico === perifericoId)?.nombre ??
               ""
           ) ? (
-            <EditarComputadoraActivo
-              equipo={equipo}
-              componentes={componentes}
-              idUsuario={selectedUsuario?.id_usuario || null}
-            />
+            equipo && (
+              <EditarComputadoraActivo
+                equipo={equipo}
+                componentes={componentes}
+                idUsuario={selectedUsuario?.id_usuario || null}
+              />
+            )
           ) : (
             perifericoId && (
               /** 
@@ -171,7 +174,7 @@ const EditarActivo = () => {
               value={
                 perifericos.find((p) => p?.id_periferico === perifericoId) ?? null
               }
-              onChange={(event, newValue) =>
+              onChange={(_, newValue) =>
                 setPerifericoId(newValue ? newValue.id_periferico : null)
               }
               getOptionLabel={(option) => option?.nombre || ""}
@@ -187,23 +190,11 @@ const EditarActivo = () => {
             />
           </div>
 
-          {perifericoId ? (
+          {perifericoId && equipoRedActivo && (
             <EditarActivoRed 
-            perifericoName={equipoName}
-            equipoRedActivo={equipoRedActivo}
+              perifericoName={equipoName}
+              equipoRedActivo={equipoRedActivo}
             />
-          ) : (
-            perifericoId && (
-              /** 
-              <EditarOtroActivo
-                equipo={equipo}
-                componentes={componentes}
-                idUso={selectedUso?.id_uso || null}
-                idUsuario={selectedUsuario?.id_usuario || null}
-              />
-              */
-             <h1>Editando otro activo</h1>
-            )
           )}
         </div>
       </div>
@@ -250,7 +241,7 @@ const EditarActivo = () => {
               value={
                 perifericos.find((p) => p?.id_periferico === perifericoId) ?? null
               }
-              onChange={(event, newValue) =>
+              onChange={(_, newValue) =>
                 setPerifericoId(newValue ? newValue.id_periferico : null)
               }
               getOptionLabel={(option) => option?.nombre || ""}
@@ -272,7 +263,7 @@ const EditarActivo = () => {
               disablePortal
               options={usos}
               value={selectedUso}
-              onChange={(event, newValue) => {
+              onChange={(_, newValue) => {
                 setSelectedUso(newValue);
                 setSelectedUsuario(null);
               }}
@@ -287,7 +278,7 @@ const EditarActivo = () => {
               disablePortal
               options={usuarios}
               value={selectedUsuario}
-              onChange={(event, newValue) => setSelectedUsuario(newValue)}
+              onChange={(_, newValue) => setSelectedUsuario(newValue)}
               getOptionLabel={(option) =>option ? option.nombre : ""}
               renderInput={(params) => (
                 <TextField
@@ -301,34 +292,17 @@ const EditarActivo = () => {
             />
           </div>
   
-          {perifericoId ? (
+          {perifericoId && equipoSimpleActivo && (
             <EditarActivoSimple
-            perifericoName={equipoName}
-            equipoSimpleActivo={equipoSimpleActivo}
+              perifericoName={equipoName}
+              equipoSimpleActivo={equipoSimpleActivo}
               idUsuario={selectedUsuario?.id_usuario || null}
             />
-          ) : (
-            perifericoId && (
-              /** 
-              <EditarOtroActivo
-                equipo={equipo}
-                componentes={componentes}
-                idUso={selectedUso?.id_uso || null}
-                idUsuario={selectedUsuario?.id_usuario || null}
-              />
-              */
-             <h1>Editando otro activo</h1>
-            )
           )}
         </div>
       </div>
     );
   }
 }
-
-
-
-
-
 
 export default EditarActivo;

@@ -37,7 +37,7 @@ const Bodega = () => {
     () => () => {}
   );
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error" | "warning">("success"); 
-  const [modalContentBodega, setModalContentBodega] = useState<{
+  const [modalContentBodega, _] = useState<{
     title: string;
     message: string;
   }>({
@@ -675,7 +675,7 @@ const Bodega = () => {
             disablePortal
             options={inventarios}
             getOptionLabel={(option) => option.inventario || ""}
-            onChange={(event, newValue) => setSelectedInventario(newValue)}
+            onChange={(_, newValue) => setSelectedInventario(newValue)}
             value={selectedInventario}
             isOptionEqualToValue={(option, value) =>
               option.inventario === value?.inventario

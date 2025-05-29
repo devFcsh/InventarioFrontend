@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Autocomplete, TextField, Button, Snackbar, Alert, Box } from "@mui/material";
 import {
   Marca,
@@ -69,7 +69,7 @@ const EditarBodegaRed = ({
 
   const { editarBodegaRed } = useEditarBodegaRed();
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  //const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (equipoRedBodega) {
@@ -280,7 +280,7 @@ const EditarBodegaRed = ({
             options={["Espol", "EspolTech"]}
             getOptionLabel={(option) => (option ? option : "")}
             value={empresa}
-            onChange={(event, newValue) => {
+            onChange={(_, newValue) => {
               handleChangeEmpresa(newValue);
             }}
             renderInput={(params) => (

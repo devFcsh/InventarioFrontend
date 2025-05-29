@@ -2,7 +2,7 @@ import { Alert, Autocomplete, Snackbar, TextField } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
 import { Periferico, Marca, Modelo, Serie, Inventario } from "../../../../types";
 import usePerifericos from "../../../../hooks/usePerifericos";
@@ -42,7 +42,7 @@ const Bajas = () => {
     title: "Confirmar",
     message: "¿Estás seguro de que deseas realizar esta acción?",
   });
-  const [modalContentBajas, setModalContentBajas] = useState<{
+  const [modalContentBajas, _] = useState<{
     title: string;
     message: string;
   }>({
@@ -432,7 +432,7 @@ const Bajas = () => {
             disablePortal
             options={inventarios}
             getOptionLabel={(option) => option.inventario || ""}
-            onChange={(event, newValue) => setSelectedInventario(newValue)}
+            onChange={(_, newValue) => setSelectedInventario(newValue)}
             value={selectedInventario}
             isOptionEqualToValue={(option, value) =>
               option.inventario === value?.inventario

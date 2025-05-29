@@ -598,7 +598,7 @@ const AgregarComputadoraActivo = ({
             options={protocolos}
             getOptionLabel={(option) => option.nombre}
             value={protocolos.find((p) => p.id === protocolo) || null}
-            onChange={(event, newValue) => {
+            onChange={(_, newValue) => {
               if (newValue) {
                 setProtocolo(newValue.id);
               } else {

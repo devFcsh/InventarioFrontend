@@ -52,7 +52,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
       p?.nombre.toLowerCase() !== "proyector" &&
       p?.nombre.toLowerCase() !== "ap" &&
       p?.nombre.toLowerCase() !== "switch" &&
-      !addedPerifericos.some(added=> added?.periferico?.id_periferico === p?.id_periferico)
+      !addedPerifericos.some((added:any)=> added?.periferico?.id_periferico === p?.id_periferico)
   );
   const { marcas: marcasComponente } = useMarcasPorPeriferico(
     nuevoComponente.periferico?.id_periferico ?? ""
@@ -279,7 +279,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 options={["Espol", "EspolTech"]}
                 getOptionLabel={(option) => (option ? option : "")}
                 value={empresa}
-                onChange={(_, newValue: string | null) => {
+                onChange={(_, newValue: any) => {
                   handleEmpresaChange(newValue)
                   handleUniqueComponentsError("empresa", newValue,{
                     ...nuevoComponente,

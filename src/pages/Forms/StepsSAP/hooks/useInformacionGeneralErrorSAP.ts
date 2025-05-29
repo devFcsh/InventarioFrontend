@@ -44,7 +44,7 @@ export const useInformacionGeneralErrorSAP = (periferico:string | undefined) => 
     }
   };
 
-  const handleUniqueInformacionGeneralError = (tipo: keyof InformacionGeneralDataForm, value: string | null) => {
+  const handleUniqueInformacionGeneralError = (tipo: keyof InformacionGeneralDataForm, value: any) => {
   
     setInformacionGeneralErrors((prevErrors) => ({
       ...prevErrors,

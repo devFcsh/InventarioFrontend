@@ -1,4 +1,4 @@
-import { TextField, Box, Autocomplete, FormHelperText } from "@mui/material";
+import { TextField, Box, Autocomplete } from "@mui/material";
 import {
   Lampara,
   Marca,
@@ -39,7 +39,7 @@ export const StepDatosInventario = ({
   const {
     usuarios,
     loading: loadingUsuarios,
-    error: errorUsuarios,
+    error: _,
   } = useUsuariosPorUso(uso || "");
 
   const { marcas } = useMarcasPorPeriferico(periferico?.id_periferico ?? "");
@@ -226,7 +226,7 @@ export const StepDatosInventario = ({
               options={["Espol", "EspolTech"]}
               getOptionLabel={(option) => (option ? option : "")}
               value={inventoryDataForm.empresa}
-              onChange={(event, newValue) => {
+              onChange={(_, newValue) => {
                 handleInventoryChange("empresa", newValue);
                 handleUniqueInventarioError(
                   "empresa",

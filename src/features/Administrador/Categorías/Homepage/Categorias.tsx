@@ -78,7 +78,7 @@ const Categorias = () => {
   const location = useLocation();
 
   const handleCategoriaChange = (
-    event: React.SyntheticEvent<Element, Event>,
+    _: React.SyntheticEvent<Element, Event>,
     newValue: string | null
   ) => {
     setSelectedCategoria(newValue);
@@ -93,7 +93,7 @@ const Categorias = () => {
   };
 
   const handleRowsPerPageChange = (
-    event: React.SyntheticEvent<Element, Event>,
+    _: React.SyntheticEvent<Element, Event>,
     newValue: { id: number; name: string } | null
   ) => {
     setRowsPerPage(parseInt(newValue?.name || "10", 10));
