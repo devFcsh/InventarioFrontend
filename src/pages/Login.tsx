@@ -1,6 +1,12 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const Login = () => {
+
+  useEffect(() => {
+      localStorage.setItem("rol", "consultor");
+  }, []);
+
   return (
     <>
       <div>Login</div>
