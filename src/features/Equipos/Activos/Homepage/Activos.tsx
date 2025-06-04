@@ -1,11 +1,15 @@
-import { Alert, Autocomplete, Snackbar, TextField } from "@mui/material";
+import {
+  Alert,
+  Autocomplete,
+  Snackbar,
+  TextField,
+} from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { Link, useLocation } from "react-router-dom";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
-import {ModalAgregarActivo} from "../../../../features/Equipos/Activos/AgregarActivo/pages/ModalAgregarActivo.tsx";
-import { Periferico, Marca, Modelo, Serie, Inventario } from "../../../../types";
+import { ModalAgregarActivo } from "../../../../features/Equipos/Activos/AgregarActivo/pages/ModalAgregarActivo.tsx";
 import usePerifericos from "../../../../hooks/usePerifericos";
 import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../../../../data";
@@ -19,17 +23,16 @@ import useSeries from "@hooks/useSeries.ts";
 import { useInventario } from "@hooks/useInventario.ts";
 import { usePasarActivoABodega } from "../hooks/usePasarActivoABodega.ts";
 import { useExportarEquiposActivos } from "../hooks/useExportarComputadorasActivos.ts";
-import { ExportarAP, ExportarComputadora, ExportarProyector, ExportarSimples, ExportarSwitch } from "../../../../types/Equipo/index.ts";
+import {
+  ExportarAP,
+  ExportarComputadora,
+  ExportarProyector,
+  ExportarSimples,
+  ExportarSwitch,
+} from "../../../../types/Equipo/index.ts";
 import { useNavigate } from "react-router-dom";
 
 const Activos = () => {
-  const [selectedPeriferico, setSelectedPeriferico] =
-    useState<Periferico | null>(null);
-  const [selectedMarca, setSelectedMarca] = useState<Marca | null>(null);
-  const [selectedModelo, setSelectedModelo] = useState<Modelo | null>(null);
-  const [selectedSerie, setSelectedSerie] = useState<Serie | null>(null);
-  const [selectedInventario, setSelectedInventario] =
-    useState<Inventario | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -38,7 +41,9 @@ const Activos = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error" | "warning">("success"); 
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "success" | "error" | "warning"
+  >("success");
   const navigate = useNavigate();
   const [totalPages, setTotalPages] = useState<number>(1);
   const [modalContent, setModalContent] = useState<{
@@ -57,6 +62,12 @@ const Activos = () => {
     message: "Seleccione el periférico a registrar",
   });
 
+  const [inputPeriferico, setInputPeriferico] = useState("");
+  const [inputMarca, setInputMarca] = useState("");
+  const [inputModelo, setInputModelo] = useState("");
+  const [inputSerie, setInputSerie] = useState("");
+  const [inputInventario, setInputInventario] = useState("");
+
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -71,17 +82,16 @@ const Activos = () => {
   const { pasarActivoABodega } = usePasarActivoABodega();
   const { fetchTodosEquipos } = useExportarEquiposActivos();
 
-
   const location = useLocation();
   const filtros = {
-    perifericoId: selectedPeriferico?.id_periferico,
-    marcaId: selectedMarca?.id_marca,
-    modeloId: selectedModelo?.id_modelo,
-    serieId: selectedSerie?.id_serie,
-    inventario: selectedInventario?.inventario,
+    perifericoId: inputPeriferico || "",
+    marcaId: inputMarca || "",
+    modeloId: inputModelo|| "",
+    serieId: inputSerie || "",
+    inventario: inputInventario || "",
   };
 
-  const { eliminarEquipo} = useEliminarComputadora();
+  const { eliminarEquipo } = useEliminarComputadora();
   const { darDeBajaEquipo } = useDarDeBajaEquipo();
   const { equipos, totalCount, loading, error } = useEquiposFiltrados(
     filtros,
@@ -131,25 +141,30 @@ const Activos = () => {
 
   const deleteEquipo = async (equipoId: string) => {
     if (equipoId) {
-      const inventario = equipos.filter((equipo) => equipoId===equipo.id_equipo)[0].inventario;
-      try{
+      const inventario = equipos.filter(
+        (equipo) => equipoId === equipo.id_equipo
+      )[0].inventario;
+      try {
         const result = await eliminarEquipo(equipoId);
-        if(result){
+        if (result) {
           setShouldFetch(true);
           setSnackbarMessage(`Equipo con inventario ${inventario} eliminado.`);
-          setSnackbarSeverity("success"); 
-        }else{
-          setSnackbarMessage(`No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`);
-          setSnackbarSeverity("error"); 
-        } 
-        setOpenSnackbar(true); 
-      }catch(error){
-        setSnackbarMessage(`Error al eliminar el equipo con inventario ${inventario}.`);
+          setSnackbarSeverity("success");
+        } else {
+          setSnackbarMessage(
+            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`
+          );
+          setSnackbarSeverity("error");
+        }
+        setOpenSnackbar(true);
+      } catch (error) {
+        setSnackbarMessage(
+          `Error al eliminar el equipo con inventario ${inventario}.`
+        );
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
     }
-
   };
 
   const deleteEquipos = async (equipoIds: string[]) => {
@@ -157,25 +172,30 @@ const Activos = () => {
       const errorsInventarios = [];
       for (const id of equipoIds) {
         const result = await eliminarEquipo(id);
-        const inventario = equipos.filter((equipo) => id===equipo.id_equipo)[0].inventario;
+        const inventario = equipos.filter(
+          (equipo) => id === equipo.id_equipo
+        )[0].inventario;
         if (!result) {
           errorsInventarios.push(inventario);
         }
       }
-  
+
       if (errorsInventarios.length === 0) {
         setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success"); 
+        setSnackbarSeverity("success");
       } else {
-        setSnackbarMessage(`No se pudieron eliminar los equipos: ${errorsInventarios.join(', ')} ya que están relacionados a una computadora`);
-        setSnackbarSeverity("error"); 
+        setSnackbarMessage(
+          `No se pudieron eliminar los equipos: ${errorsInventarios.join(
+            ", "
+          )} ya que están relacionados a una computadora`
+        );
+        setSnackbarSeverity("error");
       }
-  
+
       setShouldFetch(true);
       setSelectedItems([]);
       setOpenSnackbar(true);
-    } 
-    catch(error){
+    } catch (error) {
       setSnackbarMessage("Error al eliminar los equipos");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
@@ -184,20 +204,28 @@ const Activos = () => {
 
   const pasarABodegaEquipo = async (equipoId: string) => {
     if (equipoId) {
-      const inventario = equipos.filter((equipo) => equipoId===equipo.id_equipo)[0].inventario;
-      try{
-        const result =  await pasarActivoABodega(equipoId);
-        if(result){
+      const inventario = equipos.filter(
+        (equipo) => equipoId === equipo.id_equipo
+      )[0].inventario;
+      try {
+        const result = await pasarActivoABodega(equipoId);
+        if (result) {
           setShouldFetch(true);
-          setSnackbarMessage(`Equipo con inventario ${inventario} pasado a bodega`);
-          setSnackbarSeverity("success"); 
-        }else{
-          setSnackbarMessage(`No se puede pasar a bodega el equipo con inventario ${inventario}porque el equipo está asociado a una computadora`);
-          setSnackbarSeverity("error"); 
-        } 
-        setOpenSnackbar(true); 
-      }catch(error){
-        setSnackbarMessage(`Error al pasar a bodega el equipo con inventario ${inventario}`);
+          setSnackbarMessage(
+            `Equipo con inventario ${inventario} pasado a bodega`
+          );
+          setSnackbarSeverity("success");
+        } else {
+          setSnackbarMessage(
+            `No se puede pasar a bodega el equipo con inventario ${inventario}porque el equipo está asociado a una computadora`
+          );
+          setSnackbarSeverity("error");
+        }
+        setOpenSnackbar(true);
+      } catch (error) {
+        setSnackbarMessage(
+          `Error al pasar a bodega el equipo con inventario ${inventario}`
+        );
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
@@ -209,25 +237,30 @@ const Activos = () => {
     try {
       for (const id of equipoIds) {
         const result = await pasarActivoABodega(id);
-        const inventario = equipos.filter((equipo) => id===equipo.id_equipo)[0].inventario;
+        const inventario = equipos.filter(
+          (equipo) => id === equipo.id_equipo
+        )[0].inventario;
         if (!result) {
           errorsInventarios.push(inventario);
         }
       }
-  
+
       if (errorsInventarios.length === 0) {
         setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success"); 
+        setSnackbarSeverity("success");
       } else {
-        setSnackbarMessage(`No se pudieron pasar los equipos con inventarios: ${errorsInventarios.join(', ')} a bodega ya que están relacionados a una computadora`);
-        setSnackbarSeverity("error"); 
+        setSnackbarMessage(
+          `No se pudieron pasar los equipos con inventarios: ${errorsInventarios.join(
+            ", "
+          )} a bodega ya que están relacionados a una computadora`
+        );
+        setSnackbarSeverity("error");
       }
-  
+
       setShouldFetch(true);
       setSelectedItems([]);
       setOpenSnackbar(true);
-    } 
-    catch(error){
+    } catch (error) {
       setSnackbarMessage("Error al pasar a bodega los equipos");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
@@ -236,20 +269,28 @@ const Activos = () => {
 
   const bajaEquipo = async (equipoId: string) => {
     if (equipoId) {
-      const inventario = equipos.filter((equipo) => equipoId===equipo.id_equipo)[0].inventario;
-      try{
-        const result =  await darDeBajaEquipo(equipoId,"activo");
-        if(result){
+      const inventario = equipos.filter(
+        (equipo) => equipoId === equipo.id_equipo
+      )[0].inventario;
+      try {
+        const result = await darDeBajaEquipo(equipoId, "activo");
+        if (result) {
           setShouldFetch(true);
-          setSnackbarMessage(`Equipo con inventario ${inventario} dado de baja`);
-          setSnackbarSeverity("success"); 
-        }else{
-          setSnackbarMessage(`No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora`);
-          setSnackbarSeverity("error"); 
-        } 
-        setOpenSnackbar(true); 
-      }catch(error){
-        setSnackbarMessage(`Error al dar de baja al equipo con inventario ${inventario}`);
+          setSnackbarMessage(
+            `Equipo con inventario ${inventario} dado de baja`
+          );
+          setSnackbarSeverity("success");
+        } else {
+          setSnackbarMessage(
+            `No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora`
+          );
+          setSnackbarSeverity("error");
+        }
+        setOpenSnackbar(true);
+      } catch (error) {
+        setSnackbarMessage(
+          `Error al dar de baja al equipo con inventario ${inventario}`
+        );
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
@@ -260,8 +301,10 @@ const Activos = () => {
     const errorsInventarios = [];
     try {
       for (const id of equipoIds) {
-        const result =  await darDeBajaEquipo(id, "baja");
-        const inventario = equipos.filter((equipo) => id===equipo.id_equipo)[0].inventario;
+        const result = await darDeBajaEquipo(id, "baja");
+        const inventario = equipos.filter(
+          (equipo) => id === equipo.id_equipo
+        )[0].inventario;
         if (!result) {
           errorsInventarios.push(inventario);
         }
@@ -269,15 +312,18 @@ const Activos = () => {
       if (errorsInventarios.length === 0) {
         setShouldFetch(true);
         setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success"); 
+        setSnackbarSeverity("success");
       } else {
-        setSnackbarMessage(`Error al dar de baja los equipos con inventario ${errorsInventarios.join(', ')} ya que están relacionados a una computadora`);
-        setSnackbarSeverity("error"); 
+        setSnackbarMessage(
+          `Error al dar de baja los equipos con inventario ${errorsInventarios.join(
+            ", "
+          )} ya que están relacionados a una computadora`
+        );
+        setSnackbarSeverity("error");
       }
       setSelectedItems([]);
       setOpenSnackbar(true);
-    } 
-    catch(error){
+    } catch (error) {
       setSnackbarMessage("Error al dar de baja los equipos");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
@@ -292,8 +338,7 @@ const Activos = () => {
 
     setModalContent({
       title: "Pasar a Bodega Equipos",
-      message:
-        "¿Estás seguro de que pasar a bodega los equipos seleccionados?",
+      message: "¿Estás seguro de que pasar a bodega los equipos seleccionados?",
     });
 
     setConfirmAction(() => async () => {
@@ -303,7 +348,6 @@ const Activos = () => {
 
     setOpenModal(true);
   };
-
 
   const handleDelete = () => {
     if (selectedItems.length === 0) {
@@ -355,34 +399,6 @@ const Activos = () => {
     setOpenModal(true);
   };
 
-  const handlePerifericoChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Periferico | null
-  ) => {
-    setSelectedPeriferico(newValue);
-  };
-
-  const handleMarcaChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Marca | null
-  ) => {
-    setSelectedMarca(newValue);
-  };
-
-  const handleModeloChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Modelo | null
-  ) => {
-    setSelectedModelo(newValue);
-  };
-
-  const handleSerieChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Serie | null
-  ) => {
-    setSelectedSerie(newValue);
-  };
-
   const handleBuscar = () => {
     setCurrentPage(1);
     setShouldFetch(true);
@@ -425,227 +441,263 @@ const Activos = () => {
     }
   };
 
-
   const exportToExcel = async () => {
     try {
       const allEquipos = await fetchTodosEquipos();
-  
+
       if (!allEquipos) {
         console.warn("No hay equipos para exportar");
         return;
       }
-  
+
       const addIDColumn = (equipos: any[]) => {
         return equipos.map((equipo, index) => ({
           id: index + 1,
           ...equipo,
         }));
       };
-  
+
       const formatComputadora = (equipos: ExportarComputadora[]) => {
-        return addIDColumn(equipos.map(({
-          edificio,
-          ubicacion,
-          uso,
-          usuario,
-          direccion_ip,
-          nombre_equipo,
-          dominio,
-          sistema_operativo,
-          procesador,
-          tipo_ram,
-          capacidad_ram,
-          capacidad_disco,
-          marca,
-          modelo,
-          serie,
-          inventario,
-          fecha_ultimo_cambio,
-          observacion,
-          mouse_marca,
-          mouse_modelo,
-          mouse_serie,
-          mouse_inventario,
-          teclado_marca,
-          teclado_modelo,
-          teclado_serie,
-          teclado_inventario,
-          monitor_marca,
-          monitor_modelo,
-          monitor_serie,
-          monitor_inventario,
-        }) => ({
-          tipo: 'Computadora',
-          edificio,
-          ubicacion,
-          uso,
-          usuario,
-          direccion_ip,
-          nombre_equipo,
-          dominio,
-          sistema_operativo,
-          procesador,
-          tipo_ram,
-          capacidad_ram,
-          capacidad_disco,
-          marca,
-          modelo,
-          serie,
-          inventario,
-          fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
-          observacion,
-          mouse_marca: mouse_marca || '',
-          mouse_modelo: mouse_modelo || '',
-          mouse_serie: mouse_serie || '',
-          mouse_inventario: mouse_inventario || '',
-          teclado_marca: teclado_marca || '',
-          teclado_modelo: teclado_modelo || '',
-          teclado_serie: teclado_serie || '',
-          teclado_inventario: teclado_inventario || '',
-          monitor_marca: monitor_marca || '',
-          monitor_modelo: monitor_modelo || '',
-          monitor_serie: monitor_serie || '',
-          monitor_inventario: monitor_inventario || '',
-        })));
+        return addIDColumn(
+          equipos.map(
+            ({
+              edificio,
+              ubicacion,
+              uso,
+              usuario,
+              direccion_ip,
+              nombre_equipo,
+              dominio,
+              sistema_operativo,
+              procesador,
+              tipo_ram,
+              capacidad_ram,
+              capacidad_disco,
+              marca,
+              modelo,
+              serie,
+              inventario,
+              fecha_ultimo_cambio,
+              observacion,
+              mouse_marca,
+              mouse_modelo,
+              mouse_serie,
+              mouse_inventario,
+              teclado_marca,
+              teclado_modelo,
+              teclado_serie,
+              teclado_inventario,
+              monitor_marca,
+              monitor_modelo,
+              monitor_serie,
+              monitor_inventario,
+            }) => ({
+              tipo: "Computadora",
+              edificio,
+              ubicacion,
+              uso,
+              usuario,
+              direccion_ip,
+              nombre_equipo,
+              dominio,
+              sistema_operativo,
+              procesador,
+              tipo_ram,
+              capacidad_ram,
+              capacidad_disco,
+              marca,
+              modelo,
+              serie,
+              inventario,
+              fecha_ultimo_cambio: new Date(
+                fecha_ultimo_cambio
+              ).toLocaleString(),
+              observacion,
+              mouse_marca: mouse_marca || "",
+              mouse_modelo: mouse_modelo || "",
+              mouse_serie: mouse_serie || "",
+              mouse_inventario: mouse_inventario || "",
+              teclado_marca: teclado_marca || "",
+              teclado_modelo: teclado_modelo || "",
+              teclado_serie: teclado_serie || "",
+              teclado_inventario: teclado_inventario || "",
+              monitor_marca: monitor_marca || "",
+              monitor_modelo: monitor_modelo || "",
+              monitor_serie: monitor_serie || "",
+              monitor_inventario: monitor_inventario || "",
+            })
+          )
+        );
       };
-  
+
       const formatSwitch = (equipos: ExportarSwitch[]) => {
-        return addIDColumn(equipos.map(({
-          empresa,
-          inventario,
-          edificio,
-          ubicacion,
-          marca,
-          modelo,
-          serie,
-          mac,
-          puertos,
-          puerto_ftp,
-          nombre_equipo,
-          fecha_ultimo_cambio,
-          observacion,
-        }) => ({
-          tipo: 'Switch',
-          empresa,
-          inventario,
-          edificio,
-          ubicacion,
-          marca,
-          modelo,
-          serie,
-          mac,
-          puertos,
-          puerto_ftp,
-          nombre_equipo,
-          fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
-          observacion,
-        })));
+        return addIDColumn(
+          equipos.map(
+            ({
+              empresa,
+              inventario,
+              edificio,
+              ubicacion,
+              marca,
+              modelo,
+              serie,
+              mac,
+              puertos,
+              puerto_ftp,
+              nombre_equipo,
+              fecha_ultimo_cambio,
+              observacion,
+            }) => ({
+              tipo: "Switch",
+              empresa,
+              inventario,
+              edificio,
+              ubicacion,
+              marca,
+              modelo,
+              serie,
+              mac,
+              puertos,
+              puerto_ftp,
+              nombre_equipo,
+              fecha_ultimo_cambio: new Date(
+                fecha_ultimo_cambio
+              ).toLocaleString(),
+              observacion,
+            })
+          )
+        );
       };
-  
+
       const formatAP = (equipos: ExportarAP[]) => {
-        return addIDColumn(equipos.map(({
-          empresa,
-          inventario,
-          edificio,
-          ubicacion,
-          marca,
-          modelo,
-          serie,
-          mac,
-          nombre_equipo,
-          fecha_ultimo_cambio,
-          observacion,
-        }) => ({
-          tipo: 'AP',
-          empresa,
-          inventario,
-          edificio,
-          ubicacion,
-          marca,
-          modelo,
-          serie,
-          mac,
-          nombre_equipo,
-          fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
-          observacion,
-        })));
+        return addIDColumn(
+          equipos.map(
+            ({
+              empresa,
+              inventario,
+              edificio,
+              ubicacion,
+              marca,
+              modelo,
+              serie,
+              mac,
+              nombre_equipo,
+              fecha_ultimo_cambio,
+              observacion,
+            }) => ({
+              tipo: "AP",
+              empresa,
+              inventario,
+              edificio,
+              ubicacion,
+              marca,
+              modelo,
+              serie,
+              mac,
+              nombre_equipo,
+              fecha_ultimo_cambio: new Date(
+                fecha_ultimo_cambio
+              ).toLocaleString(),
+              observacion,
+            })
+          )
+        );
       };
-  
+
       const formatProyector = (equipos: ExportarProyector[]) => {
-        return addIDColumn(equipos.map(({
-          empresa,
-          inventario,
-          edificio,
-          ubicacion,
-          marca,
-          modelo,
-          serie,
-          lampara,
-          fecha_ultimo_cambio,
-          observacion,
-        }) => ({
-          tipo: 'Proyector',
-          empresa,
-          inventario,
-          edificio,
-          ubicacion,
-          marca,
-          modelo,
-          serie,
-          lampara,
-          fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
-          observacion,
-        })));
+        return addIDColumn(
+          equipos.map(
+            ({
+              empresa,
+              inventario,
+              edificio,
+              ubicacion,
+              marca,
+              modelo,
+              serie,
+              lampara,
+              fecha_ultimo_cambio,
+              observacion,
+            }) => ({
+              tipo: "Proyector",
+              empresa,
+              inventario,
+              edificio,
+              ubicacion,
+              marca,
+              modelo,
+              serie,
+              lampara,
+              fecha_ultimo_cambio: new Date(
+                fecha_ultimo_cambio
+              ).toLocaleString(),
+              observacion,
+            })
+          )
+        );
       };
-  
+
       const formatEquiposSimples = (equipos: ExportarSimples[]) => {
-        return addIDColumn(equipos.map(({
-          periferico,
-          edificio,
-          ubicacion,
-          uso,
-          usuario,
-          marca,
-          modelo,
-          serie,
-          inventario,
-          fecha_ultimo_cambio,
-          observacion,
-        }) => ({
-          tipo: periferico,
-          edificio,
-          ubicacion,
-          uso,
-          usuario,
-          marca,
-          modelo,
-          serie,
-          inventario,
-          fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
-          observacion,
-        })));
+        return addIDColumn(
+          equipos.map(
+            ({
+              periferico,
+              edificio,
+              ubicacion,
+              uso,
+              usuario,
+              marca,
+              modelo,
+              serie,
+              inventario,
+              fecha_ultimo_cambio,
+              observacion,
+            }) => ({
+              tipo: periferico,
+              edificio,
+              ubicacion,
+              uso,
+              usuario,
+              marca,
+              modelo,
+              serie,
+              inventario,
+              fecha_ultimo_cambio: new Date(
+                fecha_ultimo_cambio
+              ).toLocaleString(),
+              observacion,
+            })
+          )
+        );
       };
-  
-      const wsComputadoras = XLSX.utils.json_to_sheet(formatComputadora(allEquipos.Computadoras));
+
+      const wsComputadoras = XLSX.utils.json_to_sheet(
+        formatComputadora(allEquipos.Computadoras)
+      );
       const wsAP = XLSX.utils.json_to_sheet(formatAP(allEquipos.AP));
-      const wsSwitch = XLSX.utils.json_to_sheet(formatSwitch(allEquipos.Switch));
-      const wsProyector = XLSX.utils.json_to_sheet(formatProyector(allEquipos.Proyector));
-      const wsEquiposSimples = XLSX.utils.json_to_sheet(formatEquiposSimples(allEquipos.EquiposSimples));
-  
+      const wsSwitch = XLSX.utils.json_to_sheet(
+        formatSwitch(allEquipos.Switch)
+      );
+      const wsProyector = XLSX.utils.json_to_sheet(
+        formatProyector(allEquipos.Proyector)
+      );
+      const wsEquiposSimples = XLSX.utils.json_to_sheet(
+        formatEquiposSimples(allEquipos.EquiposSimples)
+      );
+
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, wsComputadoras, "Computadoras");
       XLSX.utils.book_append_sheet(wb, wsAP, "AP");
       XLSX.utils.book_append_sheet(wb, wsSwitch, "Switch");
       XLSX.utils.book_append_sheet(wb, wsProyector, "Proyector");
       XLSX.utils.book_append_sheet(wb, wsEquiposSimples, "Equipos Simples");
-  
+
       XLSX.writeFile(wb, "datos_equipos.xlsx");
-  
     } catch (error) {
       console.error("Error al exportar a Excel:", error);
     }
   };
-  
+
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
@@ -663,9 +715,19 @@ const Activos = () => {
           severity={snackbarSeverity}
           sx={{ width: "100%" }}
           iconMapping={{
-            success: <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />,
-            error: <Icon icon="fluent:error-circle-24-regular" width={20} height={20} />,
-            warning: <Icon icon="fluent:warning-24-regular" width={20} height={20} />
+            success: (
+              <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />
+            ),
+            error: (
+              <Icon
+                icon="fluent:error-circle-24-regular"
+                width={20}
+                height={20}
+              />
+            ),
+            warning: (
+              <Icon icon="fluent:warning-24-regular" width={20} height={20} />
+            ),
           }}
         >
           {snackbarMessage}
@@ -674,7 +736,7 @@ const Activos = () => {
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>
-          
+
           <Icon
             icon="gridicons:add"
             width="30"
@@ -691,19 +753,26 @@ const Activos = () => {
             edificios={edificios}
             steps={[]}
           />
-
         </div>
         <div className="flex flex-wrap gap-4 my-10">
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={perifericos}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handlePerifericoChange}
-            value={selectedPeriferico}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_periferico === value?.id_periferico
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputPeriferico}
+            onInputChange={(_, newInputValue) => {
+              setInputPeriferico(newInputValue);
+            }}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputPeriferico(newValue);
+              } else {
+                setInputPeriferico(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Periférico" variant="outlined" />
             )}
@@ -712,29 +781,42 @@ const Activos = () => {
 
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={marcas}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handleMarcaChange}
-            value={selectedMarca}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_marca === value?.id_marca
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputMarca}
+            onInputChange={(_, newInputValue) => setInputMarca(newInputValue)}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputMarca(newValue);
+              } else {
+                setInputMarca(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Marca" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
           />
+
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={modelos}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handleModeloChange}
-            value={selectedModelo}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_modelo === value?.id_modelo
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputModelo}
+            onInputChange={(_, newInputValue) => setInputModelo(newInputValue)}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputModelo(newValue);
+              } else {
+                setInputModelo(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Modelo" variant="outlined" />
             )}
@@ -743,29 +825,44 @@ const Activos = () => {
 
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={series}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handleSerieChange}
-            value={selectedSerie}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_serie === value?.id_serie
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputSerie}
+            onInputChange={(_, newInputValue) => setInputSerie(newInputValue)}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputSerie(newValue);
+              } else {
+                setInputSerie(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Serie" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
           />
+
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={inventarios}
-            getOptionLabel={(option) => option.inventario || ""}
-            onChange={(_, newValue) => setSelectedInventario(newValue)}
-            value={selectedInventario}
-            isOptionEqualToValue={(option, value) =>
-              option.inventario === value?.inventario
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option.inventario || ""
             }
+            inputValue={inputInventario}
+            onInputChange={(_, newInputValue) =>
+              setInputInventario(newInputValue)
+            }
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputInventario(newValue);
+              } else {
+                setInputInventario(newValue?.inventario || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Inventario" variant="outlined" />
             )}
@@ -917,7 +1014,11 @@ const Activos = () => {
                     />
                     <Link
                       to="/editarActivo"
-                      state={{ equipoId: equipo.id_equipo, perifericos,equipoName: equipo.periferico }}
+                      state={{
+                        equipoId: equipo.id_equipo,
+                        perifericos,
+                        equipoName: equipo.periferico,
+                      }}
                     >
                       <Icon
                         icon="mage:edit"
@@ -926,20 +1027,20 @@ const Activos = () => {
                         className="cursor-pointer"
                       />
                     </Link>
-                      <Icon
-                        icon="lucide:warehouse"
-                        width="25"
-                        height="25"
-                        className="cursor-pointer"
-                        onClick={() =>
-                          handleOpenModal(
-                            equipo.id_equipo,
-                            "Pasar equipo a bodega",
-                            `¿Estás seguro de que deseas pasar el equipo a bodega ${equipo.inventario}?`,
-                            pasarABodegaEquipo
-                          )
-                        }
-                      />
+                    <Icon
+                      icon="lucide:warehouse"
+                      width="25"
+                      height="25"
+                      className="cursor-pointer"
+                      onClick={() =>
+                        handleOpenModal(
+                          equipo.id_equipo,
+                          "Pasar equipo a bodega",
+                          `¿Estás seguro de que deseas pasar el equipo a bodega ${equipo.inventario}?`,
+                          pasarABodegaEquipo
+                        )
+                      }
+                    />
                   </td>
                 </tr>
               ))}
