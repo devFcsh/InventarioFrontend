@@ -3,6 +3,7 @@ import {
   Autocomplete,
   Snackbar,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
@@ -86,7 +87,7 @@ const Activos = () => {
   const filtros = {
     perifericoId: inputPeriferico || "",
     marcaId: inputMarca || "",
-    modeloId: inputModelo|| "",
+    modeloId: inputModelo || "",
     serieId: inputSerie || "",
     inventario: inputInventario || "",
   };
@@ -736,14 +737,17 @@ const Activos = () => {
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>
-
-          <Icon
-            icon="gridicons:add"
-            width="30"
-            height="30"
-            className="text-green-900 hover:text-green-950"
-            onClick={handleOpenActivos}
-          />
+          <Tooltip title="Agregar activo">
+            <span>
+              <Icon
+                icon="gridicons:add"
+                width="30"
+                height="30"
+                className="text-green-900 hover:text-green-950"
+                onClick={handleOpenActivos}
+              />
+            </span>
+          </Tooltip>
           <ModalAgregarActivo
             open={openModalActivos}
             onClose={handleCloseActivos}
@@ -909,27 +913,39 @@ const Activos = () => {
                   />
                   {selectedItems.length > 0 && (
                     <>
-                      <Icon
-                        icon="weui:delete-outlined"
-                        width="20"
-                        height="20"
-                        onClick={handleDelete}
-                        className="cursor-pointer"
-                      />
-                      <Icon
-                        icon="ph:arrow-fat-down-light"
-                        width="20"
-                        height="20"
-                        onClick={handleBaja}
-                        className="cursor-pointer"
-                      />
-                      <Icon
-                        icon="lucide:warehouse"
-                        width="20"
-                        height="20"
-                        onClick={handlePasarABodega}
-                        className="cursor-pointer"
-                      />
+                      <Tooltip title="Eliminar activos">
+                        <span>
+                          <Icon
+                            icon="weui:delete-outlined"
+                            width="20"
+                            height="20"
+                            onClick={handleDelete}
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="Dar de baja activos">
+                        <span>
+                          <Icon
+                            icon="ph:arrow-fat-down-light"
+                            width="20"
+                            height="20"
+                            onClick={handleBaja}
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="Pasar a bodega activos">
+                        <span>
+                          <Icon
+                            icon="lucide:warehouse"
+                            width="20"
+                            height="20"
+                            onClick={handlePasarABodega}
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
                     </>
                   )}
                 </th>
@@ -984,34 +1000,42 @@ const Activos = () => {
                   <td className="px-4 py-2">{equipo.uso}</td>
                   <td className="px-4 py-2">{equipo.edificio}</td>
                   <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
-                    <Icon
-                      icon="ph:arrow-fat-down-light"
-                      width="25"
-                      height="25"
-                      onClick={() =>
-                        handleOpenModal(
-                          equipo.id_equipo,
-                          "Dar de baja equipo",
-                          `¿Estás seguro de que deseas dar de baja el equipo ${equipo.inventario}?`,
-                          bajaEquipo
-                        )
-                      }
-                      className="cursor-pointer"
-                    />
-                    <Icon
-                      icon="weui:delete-outlined"
-                      width="25"
-                      height="25"
-                      onClick={() =>
-                        handleOpenModal(
-                          equipo.id_equipo,
-                          "Eliminar equipo",
-                          `¿Estás seguro de que deseas eliminar el equipo con inventario ${equipo.inventario}?`,
-                          deleteEquipo
-                        )
-                      }
-                      className="cursor-pointer"
-                    />
+                    <Tooltip title="Dar de baja activo">
+                      <span>
+                        <Icon
+                          icon="ph:arrow-fat-down-light"
+                          width="25"
+                          height="25"
+                          onClick={() =>
+                            handleOpenModal(
+                              equipo.id_equipo,
+                              "Dar de baja equipo",
+                              `¿Estás seguro de que deseas dar de baja el equipo ${equipo.inventario}?`,
+                              bajaEquipo
+                            )
+                          }
+                          className="cursor-pointer"
+                        />
+                      </span>
+                    </Tooltip>
+                    <Tooltip title="Eliminar activo">
+                      <span>
+                        <Icon
+                          icon="weui:delete-outlined"
+                          width="25"
+                          height="25"
+                          onClick={() =>
+                            handleOpenModal(
+                              equipo.id_equipo,
+                              "Eliminar equipo",
+                              `¿Estás seguro de que deseas eliminar el equipo con inventario ${equipo.inventario}?`,
+                              deleteEquipo
+                            )
+                          }
+                          className="cursor-pointer"
+                        />
+                      </span>
+                    </Tooltip>
                     <Link
                       to="/editarActivo"
                       state={{
@@ -1020,27 +1044,35 @@ const Activos = () => {
                         equipoName: equipo.periferico,
                       }}
                     >
-                      <Icon
-                        icon="mage:edit"
-                        width="25"
-                        height="25"
-                        className="cursor-pointer"
-                      />
+                      <Tooltip title="Editar activo">
+                        <span>
+                          <Icon
+                            icon="mage:edit"
+                            width="25"
+                            height="25"
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
                     </Link>
-                    <Icon
-                      icon="lucide:warehouse"
-                      width="25"
-                      height="25"
-                      className="cursor-pointer"
-                      onClick={() =>
-                        handleOpenModal(
-                          equipo.id_equipo,
-                          "Pasar equipo a bodega",
-                          `¿Estás seguro de que deseas pasar el equipo a bodega ${equipo.inventario}?`,
-                          pasarABodegaEquipo
-                        )
-                      }
-                    />
+                    <Tooltip title="Pasar a bodega activo">
+                      <span>
+                        <Icon
+                          icon="lucide:warehouse"
+                          width="25"
+                          height="25"
+                          className="cursor-pointer"
+                          onClick={() =>
+                            handleOpenModal(
+                              equipo.id_equipo,
+                              "Pasar equipo a bodega",
+                              `¿Estás seguro de que deseas pasar el equipo a bodega ${equipo.inventario}?`,
+                              pasarABodegaEquipo
+                            )
+                          }
+                        />
+                      </span>
+                    </Tooltip>
                   </td>
                 </tr>
               ))}
@@ -1061,7 +1093,15 @@ const Activos = () => {
                 disabled={currentPage === 1}
                 className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
               >
-                <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
+                <Tooltip title="Página Anterior">
+                  <span>
+                    <Icon
+                      icon="iconamoon:arrow-left-2"
+                      width="20"
+                      height="20"
+                    />
+                  </span>
+                </Tooltip>
               </button>
             </li>
             <li>
@@ -1075,7 +1115,15 @@ const Activos = () => {
                 disabled={currentPage === totalPages}
                 className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
               >
-                <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
+                <Tooltip title="Siguiente Página">
+                  <span>
+                    <Icon
+                      icon="iconamoon:arrow-right-2"
+                      width="20"
+                      height="20"
+                    />
+                  </span>
+                </Tooltip>
               </button>
             </li>
           </ul>
@@ -1083,7 +1131,11 @@ const Activos = () => {
             onClick={exportToExcel}
             className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
           >
-            <Icon icon="ph:export" width="20" height="20" />
+            <Tooltip title="Exportar a Excel">
+              <span>
+                <Icon icon="ph:export" width="20" height="20" />
+              </span>
+            </Tooltip>
           </button>
         </div>
       </nav>
