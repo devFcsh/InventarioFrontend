@@ -1,31 +1,27 @@
-import { Alert, Autocomplete, Snackbar, TextField } from "@mui/material";
+import { Alert, Autocomplete, Snackbar, TextField, Tooltip } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { useLocation } from "react-router-dom";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
-import { Periferico, Marca, Modelo, Serie, Inventario } from "../../../../types";
 import usePerifericos from "../../../../hooks/usePerifericos";
-import useMarcasPorPeriferico from "../../../../hooks/useMarcasPorPeriferico";
-import { useModelosPorMarcaPeriferico } from "../../../../hooks/useModelosPorMarcaPeriferico";
-import { useSeriesPorModelo } from "../../../../hooks/useSeriesPorModelo";
-import { useInventariosPorSerie } from "../../../../hooks/useInventariosPorSerie";
 import { filas } from "../../../../data";
 import { useEquiposBajaFiltrados } from "../hooks/useEquiposBajaFiltrados";
-import {ModalAgregarBaja} from "../../Baja/Pages/ModalAgregarBaja"
+import { ModalAgregarBaja } from "../../Baja/Pages/ModalAgregarBaja";
 import { useEliminarComputadora } from "@hooks/useEliminarComputadora.ts";
 import { useNavigate } from "react-router-dom";
+import useMarcas from "@hooks/useMarcas";
+import useModelos from "@hooks/useModelos";
+import useSeries from "@hooks/useSeries";
+import { useInventario } from "@hooks/useInventario";
 
 const Bajas = () => {
-  const [selectedPeriferico, setSelectedPeriferico] =
-  useState<Periferico | null>(null);
-  
+  const [inputPeriferico, setInputPeriferico] = useState("");
+  const [inputMarca, setInputMarca] = useState("");
+  const [inputModelo, setInputModelo] = useState("");
+  const [inputSerie, setInputSerie] = useState("");
+  const [inputInventario, setInputInventario] = useState("");
   const [openModalBajas, setOpenModalBajas] = useState<boolean>(false);
-  const [selectedMarca, setSelectedMarca] = useState<Marca | null>(null);
-  const [selectedModelo, setSelectedModelo] = useState<Modelo | null>(null);
-  const [selectedSerie, setSelectedSerie] = useState<Serie | null>(null);
-  const [selectedInventario, setSelectedInventario] =
-  useState<Inventario | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -33,7 +29,9 @@ const Bajas = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error" | "warning">("success"); 
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "success" | "error" | "warning"
+  >("success");
   const [totalPages, setTotalPages] = useState<number>(1);
   const [modalContent, setModalContent] = useState<{
     title: string;
@@ -57,37 +55,21 @@ const Bajas = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const { perifericos } = usePerifericos();
-  const { marcas } = useMarcasPorPeriferico(
-    selectedPeriferico?.id_periferico ?? ""
-  );
-  const { modelos } = useModelosPorMarcaPeriferico(
-    selectedMarca?.id_marca ?? "",
-    selectedPeriferico?.id_periferico ?? ""
-  );
-  const { series } = useSeriesPorModelo(
-    selectedPeriferico?.id_periferico ?? "",
-    selectedMarca?.id_marca ?? "",
-    selectedModelo?.id_modelo ?? ""
-  );
-  const { inventarios } = useInventariosPorSerie(
-    selectedPeriferico?.id_periferico ?? "",
-    selectedMarca?.id_marca ?? "",
-    selectedModelo?.id_modelo ?? "",
-    selectedSerie?.id_serie ?? ""
-  );
+  const { marcas } = useMarcas();
+  const { modelos } = useModelos();
+  const { series } = useSeries();
+  const { inventarios } = useInventario();
 
-  
   const navigate = useNavigate();
   const location = useLocation();
-  
-  const filtros = {
-    perifericoId: selectedPeriferico?.id_periferico,
-    marcaId: selectedMarca?.id_marca,
-    modeloId: selectedModelo?.id_modelo,
-    serieId: selectedSerie?.id_serie,
-    inventario: selectedInventario?.inventario,
-  };
 
+  const filtros = {
+    perifericoId: inputPeriferico || "",
+    marcaId: inputMarca || "",
+    modeloId: inputModelo || "",
+    serieId: inputSerie || "",
+    inventario: inputInventario || "",
+  };
   const { equiposBaja, totalCount, loading, error } = useEquiposBajaFiltrados(
     filtros,
     currentPage,
@@ -113,7 +95,6 @@ const Bajas = () => {
     setOpenModal(false);
   };
 
-  
   useEffect(() => {
     if (location.state && location.state.equipoAgregado) {
       setSnackbarMessage("¡Equipo agregado con éxito!");
@@ -137,30 +118,33 @@ const Bajas = () => {
     handleCloseModal();
   };
 
-  
   const deleteEquipo = async (equipoId: string) => {
     if (equipoId) {
-      const inventario = equiposBaja.filter((equipo) => equipoId===equipo.id_equipo)[0].inventario;
-      try{
+      const inventario = equiposBaja.filter(
+        (equipo) => equipoId === equipo.id_equipo
+      )[0].inventario;
+      try {
         const result = await eliminarEquipo(equipoId);
-        if(result){
+        if (result) {
           setShouldFetch(true);
           setSnackbarMessage(`Equipo con inventario ${inventario} eliminado.`);
-          setSnackbarSeverity("success"); 
-        }else{
-          setSnackbarMessage(`No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`);
-          setSnackbarSeverity("error"); 
-        } 
-        setOpenSnackbar(true); 
-      }catch(error){
-        setSnackbarMessage(`Error al eliminar el equipo con inventario ${inventario}.`);
+          setSnackbarSeverity("success");
+        } else {
+          setSnackbarMessage(
+            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`
+          );
+          setSnackbarSeverity("error");
+        }
+        setOpenSnackbar(true);
+      } catch (error) {
+        setSnackbarMessage(
+          `Error al eliminar el equipo con inventario ${inventario}.`
+        );
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
     }
-
   };
-  
 
   const deleteEquipos = async (equipoIds: string[]) => {
     try {
@@ -171,27 +155,28 @@ const Bajas = () => {
           errors.push(id);
         }
       }
-  
+
       if (errors.length === 0) {
         setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success"); 
+        setSnackbarSeverity("success");
       } else {
-        setSnackbarMessage(`No se pudieron eliminar los equipos: ${errors.join(', ')} ya que están relacionados a una computadora`);
-        setSnackbarSeverity("error"); 
+        setSnackbarMessage(
+          `No se pudieron eliminar los equipos: ${errors.join(
+            ", "
+          )} ya que están relacionados a una computadora`
+        );
+        setSnackbarSeverity("error");
       }
-  
+
       setShouldFetch(true);
       setSelectedItems([]);
       setOpenSnackbar(true);
-    } 
-    catch(error){
+    } catch (error) {
       setSnackbarMessage("Error al eliminar el equipo.");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
     }
   };
-
-
 
   const handleDelete = () => {
     if (selectedItems.length === 0) {
@@ -212,7 +197,6 @@ const Bajas = () => {
 
     setOpenModal(true);
   };
-  
 
   const handleOpenModal = (
     id: string,
@@ -223,35 +207,6 @@ const Bajas = () => {
     setModalContent({ title, message });
     setConfirmAction(() => () => action(id));
     setOpenModal(true);
-  };
-
- 
-  const handlePerifericoChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Periferico | null
-  ) => {
-    setSelectedPeriferico(newValue);
-  };
-
-  const handleMarcaChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Marca | null
-  ) => {
-    setSelectedMarca(newValue);
-  };
-
-  const handleModeloChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Modelo | null
-  ) => {
-    setSelectedModelo(newValue);
-  };
-
-  const handleSerieChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Serie | null
-  ) => {
-    setSelectedSerie(newValue);
   };
 
   const handleBuscar = () => {
@@ -298,21 +253,13 @@ const Bajas = () => {
 
   const exportToExcel = () => {
     const ws = XLSX.utils.json_to_sheet(
-      equiposBaja.map(
-        ({
-          periferico,
-          marca,
-          modelo,
-          serie,
-          inventario,
-        }) => ({
-          Periférico: periferico,
-          Marca: marca,
-          Modelo: modelo,
-          Serie: serie,
-          Inventario: inventario,
-        })
-      )
+      equiposBaja.map(({ periferico, marca, modelo, serie, inventario }) => ({
+        Periférico: periferico,
+        Marca: marca,
+        Modelo: modelo,
+        Serie: serie,
+        Inventario: inventario,
+      }))
     );
 
     const wb = XLSX.utils.book_new();
@@ -338,9 +285,19 @@ const Bajas = () => {
           severity={snackbarSeverity}
           sx={{ width: "100%" }}
           iconMapping={{
-            success: <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />,
-            error: <Icon icon="fluent:error-circle-24-regular" width={20} height={20} />,
-            warning: <Icon icon="fluent:warning-24-regular" width={20} height={20} />
+            success: (
+              <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />
+            ),
+            error: (
+              <Icon
+                icon="fluent:error-circle-24-regular"
+                width={20}
+                height={20}
+              />
+            ),
+            warning: (
+              <Icon icon="fluent:warning-24-regular" width={20} height={20} />
+            ),
           }}
         >
           {snackbarMessage}
@@ -349,6 +306,8 @@ const Bajas = () => {
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Bajas</h1>
+          <Tooltip title="Agregar Equipo">
+            <span>
           <Icon
             icon="gridicons:add"
             width="30"
@@ -356,6 +315,8 @@ const Bajas = () => {
             className="text-green-900 hover:text-green-950"
             onClick={handleOpenBajas}
           />
+          </span>
+          </Tooltip>
           <ModalAgregarBaja
             open={openModalBajas}
             onClose={handleCloseBajas}
@@ -367,14 +328,22 @@ const Bajas = () => {
         <div className="flex flex-wrap gap-4 my-10">
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={perifericos}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handlePerifericoChange}
-            value={selectedPeriferico}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_periferico === value?.id_periferico
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputPeriferico}
+            onInputChange={(_, newInputValue) => {
+              setInputPeriferico(newInputValue);
+            }}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputPeriferico(newValue);
+              } else {
+                setInputPeriferico(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Periférico" variant="outlined" />
             )}
@@ -383,29 +352,42 @@ const Bajas = () => {
 
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={marcas}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handleMarcaChange}
-            value={selectedMarca}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_marca === value?.id_marca
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputMarca}
+            onInputChange={(_, newInputValue) => setInputMarca(newInputValue)}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputMarca(newValue);
+              } else {
+                setInputMarca(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Marca" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
           />
+
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={modelos}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handleModeloChange}
-            value={selectedModelo}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_modelo === value?.id_modelo
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputModelo}
+            onInputChange={(_, newInputValue) => setInputModelo(newInputValue)}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputModelo(newValue);
+              } else {
+                setInputModelo(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Modelo" variant="outlined" />
             )}
@@ -414,29 +396,44 @@ const Bajas = () => {
 
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={series}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handleSerieChange}
-            value={selectedSerie}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_serie === value?.id_serie
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputSerie}
+            onInputChange={(_, newInputValue) => setInputSerie(newInputValue)}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputSerie(newValue);
+              } else {
+                setInputSerie(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Serie" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
           />
+
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={inventarios}
-            getOptionLabel={(option) => option.inventario || ""}
-            onChange={(_, newValue) => setSelectedInventario(newValue)}
-            value={selectedInventario}
-            isOptionEqualToValue={(option, value) =>
-              option.inventario === value?.inventario
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option.inventario || ""
             }
+            inputValue={inputInventario}
+            onInputChange={(_, newInputValue) =>
+              setInputInventario(newInputValue)
+            }
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputInventario(newValue);
+              } else {
+                setInputInventario(newValue?.inventario || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Inventario" variant="outlined" />
             )}
@@ -475,14 +472,18 @@ const Bajas = () => {
             <thead className="text-xs uppercase bg-gray-50 text-gray-700">
               <tr>
                 <th scope="col" className="flex items-center gap-2 px-4 py-3">
+                  <Tooltip title="Seleccionar Todos">
                   <input
                     type="checkbox"
                     onChange={handleSelectAllChange}
                     checked={selectedItems.length === equiposBaja.length}
                     className="mr-2"
                   />
+                  </Tooltip>
                   {selectedItems.length > 0 && (
                     <>
+                    <Tooltip title="Eliminar Equipos">
+                      <span>
                       <Icon
                         icon="weui:delete-outlined"
                         width="20"
@@ -490,6 +491,8 @@ const Bajas = () => {
                         onClick={handleDelete}
                         className="cursor-pointer"
                       />
+                      </span>
+                    </Tooltip>
                     </>
                   )}
                 </th>
@@ -532,7 +535,24 @@ const Bajas = () => {
                   <td className="px-4 py-2">{equipo.serie}</td>
                   <td className="px-4 py-2">{equipo.inventario}</td>
                   <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
-                  <Icon
+                    {/* <Tooltip title="Editar Equipo">
+                      <span>
+                        <Icon
+                          icon="gridicons:edit"
+                          width="25"
+                          height="25"
+                          className="cursor-pointer"
+                          onClick={() =>
+                            navigate(`/equipos/baja/${equipo.id_equipo}`, {
+                              state: { equipo },
+                            })
+                          }
+                        />
+                      </span>
+                    </Tooltip> */}
+                    <Tooltip title="Eliminar Equipo">
+                      <span>
+                    <Icon
                       icon="weui:delete-outlined"
                       width="25"
                       height="25"
@@ -546,6 +566,8 @@ const Bajas = () => {
                       }
                       className="cursor-pointer"
                     />
+                      </span>
+                    </Tooltip>
                   </td>
                 </tr>
               ))}
@@ -566,7 +588,11 @@ const Bajas = () => {
                 disabled={currentPage === 1}
                 className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
               >
+                <Tooltip title="Página Anterior">
+                  <span>
                 <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
+                  </span>
+                </Tooltip>
               </button>
             </li>
             <li>
@@ -580,7 +606,11 @@ const Bajas = () => {
                 disabled={currentPage === totalPages}
                 className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
               >
+                <Tooltip title="Siguiente Página">
+                  <span>
                 <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
+                  </span>
+                </Tooltip>
               </button>
             </li>
           </ul>
@@ -588,7 +618,11 @@ const Bajas = () => {
             onClick={exportToExcel}
             className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
           >
+            <Tooltip title="Exportar a Excel">
+                  <span>
             <Icon icon="ph:export" width="20" height="20" />
+                  </span>
+            </Tooltip>
           </button>
         </div>
       </nav>

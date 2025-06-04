@@ -905,12 +905,14 @@ const Activos = () => {
             <thead className="text-xs uppercase bg-gray-50 text-gray-700">
               <tr>
                 <th scope="col" className="flex items-center gap-2 px-4 py-3">
+                  <Tooltip title="Seleccionar todos">
                   <input
                     type="checkbox"
                     onChange={handleSelectAllChange}
                     checked={selectedItems.length === equipos.length}
                     className="mr-2"
                   />
+                  </Tooltip>
                   {selectedItems.length > 0 && (
                     <>
                       <Tooltip title="Eliminar activos">
@@ -935,7 +937,7 @@ const Activos = () => {
                           />
                         </span>
                       </Tooltip>
-                      <Tooltip title="Pasar a bodega activos">
+                      <Tooltip title="Pasar activos a bodega">
                         <span>
                           <Icon
                             icon="lucide:warehouse"
@@ -1055,7 +1057,7 @@ const Activos = () => {
                         </span>
                       </Tooltip>
                     </Link>
-                    <Tooltip title="Pasar a bodega activo">
+                    <Tooltip title="Pasar a bodega">
                       <span>
                         <Icon
                           icon="lucide:warehouse"

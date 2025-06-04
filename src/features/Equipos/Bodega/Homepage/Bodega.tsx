@@ -1,10 +1,15 @@
-import { Alert, Autocomplete, Snackbar, TextField } from "@mui/material";
+import {
+  Alert,
+  Autocomplete,
+  Snackbar,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { Link, useLocation } from "react-router-dom";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
-import { Periferico, Marca, Modelo, Serie, Inventario } from "../../../../types";
 import usePerifericos from "../../../../hooks/usePerifericos";
 import useMarcas from "@hooks/useMarcas.ts";
 import useModelos from "@hooks/useModelos.ts";
@@ -12,23 +17,27 @@ import useSeries from "@hooks/useSeries.ts";
 import { useInventario } from "@hooks/useInventario.ts";
 import { filas } from "../../../../data";
 import { useEquiposBodegaFiltrados } from "../hooks/useEquiposBodegaFiltrados";
-import {ModalAgregarBodega} from "../../../../features/Equipos/Bodega/Pages/ModalAgregarBodega";
+import { ModalAgregarBodega } from "../../../../features/Equipos/Bodega/Pages/ModalAgregarBodega";
 import ModalPasarAActivo from "../Pages/ModalPasarAActivo";
 import { useNavigate } from "react-router-dom";
 import { useEliminarComputadora } from "@hooks/useEliminarComputadora.ts";
 import { useDarDeBajaEquipo } from "../../Activos/hooks/useDarDeBajaEquipo";
 import { useExportarEquiposBodega } from "../hooks/useExportarEquiposBodega";
-import { ExportarAP, ExportarComputadora, ExportarProyector, ExportarSimples, ExportarSwitch } from "../../../../types/Equipo/index";
+import {
+  ExportarAP,
+  ExportarComputadora,
+  ExportarProyector,
+  ExportarSimples,
+  ExportarSwitch,
+} from "../../../../types/Equipo/index";
 
 const Bodega = () => {
-  const [selectedPeriferico, setSelectedPeriferico] =
-    useState<Periferico | null>(null);
-  const [selectedMarca, setSelectedMarca] = useState<Marca | null>(null);
+  const [inputPeriferico, setInputPeriferico] = useState("");
+  const [inputMarca, setInputMarca] = useState("");
+  const [inputModelo, setInputModelo] = useState("");
+  const [inputSerie, setInputSerie] = useState("");
+  const [inputInventario, setInputInventario] = useState("");
   const [openModalBodega, setOpenModalBodega] = useState<boolean>(false);
-  const [selectedModelo, setSelectedModelo] = useState<Modelo | null>(null);
-  const [selectedSerie, setSelectedSerie] = useState<Serie | null>(null);
-  const [selectedInventario, setSelectedInventario] =
-    useState<Inventario | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -36,7 +45,9 @@ const Bodega = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error" | "warning">("success"); 
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "success" | "error" | "warning"
+  >("success");
   const [modalContentBodega, _] = useState<{
     title: string;
     message: string;
@@ -54,7 +65,8 @@ const Bodega = () => {
     message: "¿Estás seguro de que deseas realizar esta acción?",
   });
 
-  const [openModalPasarAActivo, setOpenModalPasarAActivo] = useState<boolean>(false);
+  const [openModalPasarAActivo, setOpenModalPasarAActivo] =
+    useState<boolean>(false);
   const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null);
 
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
@@ -68,27 +80,23 @@ const Bodega = () => {
   const { modelos } = useModelos();
   const { series } = useSeries();
   const { inventarios } = useInventario();
-  
+
   const { darDeBajaEquipo } = useDarDeBajaEquipo();
   const { fetchTodosEquipos } = useExportarEquiposBodega();
-    
+
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   const filtros = {
-    perifericoId: selectedPeriferico?.id_periferico,
-    marcaId: selectedMarca?.id_marca,
-    modeloId: selectedModelo?.id_modelo,
-    serieId: selectedSerie?.id_serie,
-    inventario: selectedInventario?.inventario,
+    perifericoId: inputPeriferico || "",
+    marcaId: inputMarca || "",
+    modeloId: inputModelo || "",
+    serieId: inputSerie || "",
+    inventario: inputInventario || "",
   };
 
-  const { equiposBodega, totalCount, loading, error } = useEquiposBodegaFiltrados(
-    filtros,
-    currentPage,
-    rowsPerPage,
-    shouldFetch
-  );
+  const { equiposBodega, totalCount, loading, error } =
+    useEquiposBodegaFiltrados(filtros, currentPage, rowsPerPage, shouldFetch);
 
   useEffect(() => {
     if (totalCount > 0 && rowsPerPage > 0) {
@@ -108,7 +116,6 @@ const Bodega = () => {
     setOpenModal(false);
   };
 
-  
   useEffect(() => {
     if (location.state && location.state.equipoAgregado) {
       setSnackbarMessage("¡Equipo agregado con éxito!");
@@ -142,93 +149,107 @@ const Bodega = () => {
     setSelectedEquipoId(null);
   };
 
-   
   const deleteEquipo = async (equipoId: string) => {
     if (equipoId) {
-      const inventario = equiposBodega.filter((equipo) => equipoId===equipo.id_equipo)[0].inventario;
-      try{
+      const inventario = equiposBodega.filter(
+        (equipo) => equipoId === equipo.id_equipo
+      )[0].inventario;
+      try {
         const result = await eliminarEquipo(equipoId);
-        if(result){
+        if (result) {
           setShouldFetch(true);
           setSnackbarMessage(`Equipo con inventario ${inventario} eliminado.`);
-          setSnackbarSeverity("success"); 
-        }else{
-          setSnackbarMessage(`No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`);
-          setSnackbarSeverity("error"); 
-        } 
-        setOpenSnackbar(true); 
-      }catch(error){
-        setSnackbarMessage(`Error al eliminar el equipo con inventario ${inventario}.`);
+          setSnackbarSeverity("success");
+        } else {
+          setSnackbarMessage(
+            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`
+          );
+          setSnackbarSeverity("error");
+        }
+        setOpenSnackbar(true);
+      } catch (error) {
+        setSnackbarMessage(
+          `Error al eliminar el equipo con inventario ${inventario}.`
+        );
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
     }
-
   };
-  
 
   const deleteEquipos = async (equipoIds: string[]) => {
     const errorsInventarios = [];
     try {
       for (const id of equipoIds) {
         const result = await eliminarEquipo(id);
-        const inventario = equiposBodega.filter((equipo) => id===equipo.id_equipo)[0].inventario;
+        const inventario = equiposBodega.filter(
+          (equipo) => id === equipo.id_equipo
+        )[0].inventario;
         if (!result) {
           errorsInventarios.push(inventario);
         }
       }
-  
+
       if (errorsInventarios.length === 0) {
         setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success"); 
+        setSnackbarSeverity("success");
       } else {
-        
-        setSnackbarMessage(`No se pudieron eliminar los equipos: ${errorsInventarios.join(', ')} ya que están relacionados a una computadora`);
-        setSnackbarSeverity("error"); 
+        setSnackbarMessage(
+          `No se pudieron eliminar los equipos: ${errorsInventarios.join(
+            ", "
+          )} ya que están relacionados a una computadora`
+        );
+        setSnackbarSeverity("error");
       }
-  
+
       setShouldFetch(true);
       setSelectedItems([]);
       setOpenSnackbar(true);
-    } 
-    catch(error){
+    } catch (error) {
       setSnackbarMessage("Error al eliminar el equipo.");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
     }
   };
 
-
   const bajaEquipo = async (equipoId: string) => {
     if (equipoId) {
-      
-      const inventario = equiposBodega.filter((equipo) => equipoId===equipo.id_equipo)[0].inventario;
-      try{
-        const result =  await darDeBajaEquipo(equipoId,"bodega");
-        if(result){
+      const inventario = equiposBodega.filter(
+        (equipo) => equipoId === equipo.id_equipo
+      )[0].inventario;
+      try {
+        const result = await darDeBajaEquipo(equipoId, "bodega");
+        if (result) {
           setShouldFetch(true);
-          setSnackbarMessage(`Equipo con inventario ${inventario} dado de baja`);
-          setSnackbarSeverity("success"); 
-        }else{  
-          setSnackbarMessage(`No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora`);
-          setSnackbarSeverity("error"); 
-        } 
-        setOpenSnackbar(true); 
-      }catch(error){
-        setSnackbarMessage(`Error al dar de baja al equipo con inventario ${inventario}`);
+          setSnackbarMessage(
+            `Equipo con inventario ${inventario} dado de baja`
+          );
+          setSnackbarSeverity("success");
+        } else {
+          setSnackbarMessage(
+            `No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora`
+          );
+          setSnackbarSeverity("error");
+        }
+        setOpenSnackbar(true);
+      } catch (error) {
+        setSnackbarMessage(
+          `Error al dar de baja al equipo con inventario ${inventario}`
+        );
         setSnackbarSeverity("error");
         setOpenSnackbar(true);
       }
     }
   };
 
-
   const bajaEquipos = async (equipoIds: string[]) => {
     const errorsInventarios = [];
     try {
       for (const id of equipoIds) {
-        const result =  await darDeBajaEquipo(id, "baja"); 
-        const inventario = equiposBodega.filter((equipo) => id===equipo.id_equipo)[0].inventario;
+        const result = await darDeBajaEquipo(id, "baja");
+        const inventario = equiposBodega.filter(
+          (equipo) => id === equipo.id_equipo
+        )[0].inventario;
         if (!result) {
           errorsInventarios.push(inventario);
         }
@@ -236,15 +257,18 @@ const Bodega = () => {
       if (errorsInventarios.length === 0) {
         setShouldFetch(true);
         setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success"); 
+        setSnackbarSeverity("success");
       } else {
-        setSnackbarMessage(`Error al dar de baja los equipos con inventario ${errorsInventarios.join(', ')} ya que están relacionados a una computadora`);
-        setSnackbarSeverity("error"); 
+        setSnackbarMessage(
+          `Error al dar de baja los equipos con inventario ${errorsInventarios.join(
+            ", "
+          )} ya que están relacionados a una computadora`
+        );
+        setSnackbarSeverity("error");
       }
       setSelectedItems([]);
       setOpenSnackbar(true);
-    } 
-    catch(error){
+    } catch (error) {
       setSnackbarMessage("Error al dar de baja a los equipos.");
       setSnackbarSeverity("error");
       setOpenSnackbar(true);
@@ -282,7 +306,6 @@ const Bodega = () => {
     setOpenModal(true);
   };
 
- 
   const handleBaja = () => {
     setModalContent({
       title: "Dar de Baja Equipos",
@@ -300,34 +323,6 @@ const Bodega = () => {
       setOpenModal(false);
     });
     setOpenModal(true);
-  };
-
-  const handlePerifericoChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Periferico | null
-  ) => {
-    setSelectedPeriferico(newValue);
-  };
-
-  const handleMarcaChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Marca | null
-  ) => {
-    setSelectedMarca(newValue);
-  };
-
-  const handleModeloChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Modelo | null
-  ) => {
-    setSelectedModelo(newValue);
-  };
-
-  const handleSerieChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Serie | null
-  ) => {
-    setSelectedSerie(newValue);
   };
 
   const handleBuscar = () => {
@@ -372,197 +367,234 @@ const Bodega = () => {
     }
   };
 
-   const exportToExcel = async () => {
-      try {
-        const allEquipos = await fetchTodosEquipos();
-    
-        if (!allEquipos) {
-          console.warn("No hay equipos para exportar");
-          return;
-        }
-    
-        const addIDColumn = (equipos: any[]) => {
-          return equipos.map((equipo, index) => ({
-            id: index + 1,
-            ...equipo,
-          }));
-        };
-    
-        const formatComputadora = (equipos: ExportarComputadora[]) => {
-          return addIDColumn(equipos.map(({
-            direccion_ip,
-            nombre_equipo,
-            dominio,
-            sistema_operativo,
-            procesador,
-            tipo_ram,
-            capacidad_ram,
-            capacidad_disco,
-            marca,
-            modelo,
-            serie,
-            inventario,
-            fecha_ultimo_cambio,
-            observacion,
-            mouse_marca,
-            mouse_modelo,
-            mouse_serie,
-            mouse_inventario,
-            teclado_marca,
-            teclado_modelo,
-            teclado_serie,
-            teclado_inventario,
-            monitor_marca,
-            monitor_modelo,
-            monitor_serie,
-            monitor_inventario,
-          }) => ({
-            tipo: 'Computadora',
-            direccion_ip,
-            nombre_equipo,
-            dominio,
-            sistema_operativo,
-            procesador,
-            tipo_ram,
-            capacidad_ram,
-            capacidad_disco,
-            marca,
-            modelo,
-            serie,
-            inventario,
-            fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
-            observacion,
-            mouse_marca: mouse_marca || '',
-            mouse_modelo: mouse_modelo || '',
-            mouse_serie: mouse_serie || '',
-            mouse_inventario: mouse_inventario || '',
-            teclado_marca: teclado_marca || '',
-            teclado_modelo: teclado_modelo || '',
-            teclado_serie: teclado_serie || '',
-            teclado_inventario: teclado_inventario || '',
-            monitor_marca: monitor_marca || '',
-            monitor_modelo: monitor_modelo || '',
-            monitor_serie: monitor_serie || '',
-            monitor_inventario: monitor_inventario || '',
-          })));
-        };
-    
-        const formatSwitch = (equipos: ExportarSwitch[]) => {
-          return addIDColumn(equipos.map(({
-            empresa,
-            inventario,
-            marca,
-            modelo,
-            serie,
-            mac,
-            puertos,
-            puerto_ftp,
-            nombre_equipo,
-            fecha_ultimo_cambio,
-            observacion,
-          }) => ({
-            tipo: 'Switch',
-            empresa,
-            inventario,
-            marca,
-            modelo,
-            serie,
-            mac,
-            puertos,
-            puerto_ftp,
-            nombre_equipo,
-            fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
-            observacion,
-          })));
-        };
-    
-        const formatAP = (equipos: ExportarAP[]) => {
-          return addIDColumn(equipos.map(({
-            empresa,
-            inventario,
-            marca,
-            modelo,
-            serie,
-            mac,
-            nombre_equipo,
-            fecha_ultimo_cambio,
-            observacion,
-          }) => ({
-            tipo: 'AP',
-            empresa,
-            inventario,
-            marca,
-            modelo,
-            serie,
-            mac,
-            nombre_equipo,
-            fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
-            observacion,
-          })));
-        };
-    
-        const formatProyector = (equipos: ExportarProyector[]) => {
-          return addIDColumn(equipos.map(({
-            empresa,
-            inventario,
-            marca,
-            modelo,
-            serie,
-            lampara,
-            fecha_ultimo_cambio,
-            observacion,
-          }) => ({
-            tipo: 'Proyector',
-            empresa,
-            inventario,
-            marca,
-            modelo,
-            serie,
-            lampara,
-            fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
-            observacion,
-          })));
-        };
-    
-        const formatEquiposSimples = (equipos: ExportarSimples[]) => {
-          return addIDColumn(equipos.map(({
-            periferico,
-            marca,
-            modelo,
-            serie,
-            inventario,
-            fecha_ultimo_cambio,
-            observacion,
-          }) => ({
-            tipo: periferico,
-            marca,
-            modelo,
-            serie,
-            inventario,
-            fecha_ultimo_cambio: new Date(fecha_ultimo_cambio).toLocaleString(),
-            observacion,
-          })));
-        };
-    
-        const wsComputadoras = XLSX.utils.json_to_sheet(formatComputadora(allEquipos.Computadoras));
-        const wsAP = XLSX.utils.json_to_sheet(formatAP(allEquipos.AP));
-        const wsSwitch = XLSX.utils.json_to_sheet(formatSwitch(allEquipos.Switch));
-        const wsProyector = XLSX.utils.json_to_sheet(formatProyector(allEquipos.Proyector));
-        const wsEquiposSimples = XLSX.utils.json_to_sheet(formatEquiposSimples(allEquipos.EquiposSimples));
-    
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, wsComputadoras, "Computadoras");
-        XLSX.utils.book_append_sheet(wb, wsAP, "AP");
-        XLSX.utils.book_append_sheet(wb, wsSwitch, "Switch");
-        XLSX.utils.book_append_sheet(wb, wsProyector, "Proyector");
-        XLSX.utils.book_append_sheet(wb, wsEquiposSimples, "Equipos Simples");
-    
-        XLSX.writeFile(wb, "datos_equipos.xlsx");
-    
-      } catch (error) {
-        console.error("Error al exportar a Excel:", error);
+  const exportToExcel = async () => {
+    try {
+      const allEquipos = await fetchTodosEquipos();
+
+      if (!allEquipos) {
+        console.warn("No hay equipos para exportar");
+        return;
       }
-    };
+
+      const addIDColumn = (equipos: any[]) => {
+        return equipos.map((equipo, index) => ({
+          id: index + 1,
+          ...equipo,
+        }));
+      };
+
+      const formatComputadora = (equipos: ExportarComputadora[]) => {
+        return addIDColumn(
+          equipos.map(
+            ({
+              direccion_ip,
+              nombre_equipo,
+              dominio,
+              sistema_operativo,
+              procesador,
+              tipo_ram,
+              capacidad_ram,
+              capacidad_disco,
+              marca,
+              modelo,
+              serie,
+              inventario,
+              fecha_ultimo_cambio,
+              observacion,
+              mouse_marca,
+              mouse_modelo,
+              mouse_serie,
+              mouse_inventario,
+              teclado_marca,
+              teclado_modelo,
+              teclado_serie,
+              teclado_inventario,
+              monitor_marca,
+              monitor_modelo,
+              monitor_serie,
+              monitor_inventario,
+            }) => ({
+              tipo: "Computadora",
+              direccion_ip,
+              nombre_equipo,
+              dominio,
+              sistema_operativo,
+              procesador,
+              tipo_ram,
+              capacidad_ram,
+              capacidad_disco,
+              marca,
+              modelo,
+              serie,
+              inventario,
+              fecha_ultimo_cambio: new Date(
+                fecha_ultimo_cambio
+              ).toLocaleString(),
+              observacion,
+              mouse_marca: mouse_marca || "",
+              mouse_modelo: mouse_modelo || "",
+              mouse_serie: mouse_serie || "",
+              mouse_inventario: mouse_inventario || "",
+              teclado_marca: teclado_marca || "",
+              teclado_modelo: teclado_modelo || "",
+              teclado_serie: teclado_serie || "",
+              teclado_inventario: teclado_inventario || "",
+              monitor_marca: monitor_marca || "",
+              monitor_modelo: monitor_modelo || "",
+              monitor_serie: monitor_serie || "",
+              monitor_inventario: monitor_inventario || "",
+            })
+          )
+        );
+      };
+
+      const formatSwitch = (equipos: ExportarSwitch[]) => {
+        return addIDColumn(
+          equipos.map(
+            ({
+              empresa,
+              inventario,
+              marca,
+              modelo,
+              serie,
+              mac,
+              puertos,
+              puerto_ftp,
+              nombre_equipo,
+              fecha_ultimo_cambio,
+              observacion,
+            }) => ({
+              tipo: "Switch",
+              empresa,
+              inventario,
+              marca,
+              modelo,
+              serie,
+              mac,
+              puertos,
+              puerto_ftp,
+              nombre_equipo,
+              fecha_ultimo_cambio: new Date(
+                fecha_ultimo_cambio
+              ).toLocaleString(),
+              observacion,
+            })
+          )
+        );
+      };
+
+      const formatAP = (equipos: ExportarAP[]) => {
+        return addIDColumn(
+          equipos.map(
+            ({
+              empresa,
+              inventario,
+              marca,
+              modelo,
+              serie,
+              mac,
+              nombre_equipo,
+              fecha_ultimo_cambio,
+              observacion,
+            }) => ({
+              tipo: "AP",
+              empresa,
+              inventario,
+              marca,
+              modelo,
+              serie,
+              mac,
+              nombre_equipo,
+              fecha_ultimo_cambio: new Date(
+                fecha_ultimo_cambio
+              ).toLocaleString(),
+              observacion,
+            })
+          )
+        );
+      };
+
+      const formatProyector = (equipos: ExportarProyector[]) => {
+        return addIDColumn(
+          equipos.map(
+            ({
+              empresa,
+              inventario,
+              marca,
+              modelo,
+              serie,
+              lampara,
+              fecha_ultimo_cambio,
+              observacion,
+            }) => ({
+              tipo: "Proyector",
+              empresa,
+              inventario,
+              marca,
+              modelo,
+              serie,
+              lampara,
+              fecha_ultimo_cambio: new Date(
+                fecha_ultimo_cambio
+              ).toLocaleString(),
+              observacion,
+            })
+          )
+        );
+      };
+
+      const formatEquiposSimples = (equipos: ExportarSimples[]) => {
+        return addIDColumn(
+          equipos.map(
+            ({
+              periferico,
+              marca,
+              modelo,
+              serie,
+              inventario,
+              fecha_ultimo_cambio,
+              observacion,
+            }) => ({
+              tipo: periferico,
+              marca,
+              modelo,
+              serie,
+              inventario,
+              fecha_ultimo_cambio: new Date(
+                fecha_ultimo_cambio
+              ).toLocaleString(),
+              observacion,
+            })
+          )
+        );
+      };
+
+      const wsComputadoras = XLSX.utils.json_to_sheet(
+        formatComputadora(allEquipos.Computadoras)
+      );
+      const wsAP = XLSX.utils.json_to_sheet(formatAP(allEquipos.AP));
+      const wsSwitch = XLSX.utils.json_to_sheet(
+        formatSwitch(allEquipos.Switch)
+      );
+      const wsProyector = XLSX.utils.json_to_sheet(
+        formatProyector(allEquipos.Proyector)
+      );
+      const wsEquiposSimples = XLSX.utils.json_to_sheet(
+        formatEquiposSimples(allEquipos.EquiposSimples)
+      );
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, wsComputadoras, "Computadoras");
+      XLSX.utils.book_append_sheet(wb, wsAP, "AP");
+      XLSX.utils.book_append_sheet(wb, wsSwitch, "Switch");
+      XLSX.utils.book_append_sheet(wb, wsProyector, "Proyector");
+      XLSX.utils.book_append_sheet(wb, wsEquiposSimples, "Equipos Simples");
+
+      XLSX.writeFile(wb, "datos_equipos.xlsx");
+    } catch (error) {
+      console.error("Error al exportar a Excel:", error);
+    }
+  };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -581,9 +613,19 @@ const Bodega = () => {
           severity={snackbarSeverity}
           sx={{ width: "100%" }}
           iconMapping={{
-            success: <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />,
-            error: <Icon icon="fluent:error-circle-24-regular" width={20} height={20} />,
-            warning: <Icon icon="fluent:warning-24-regular" width={20} height={20} />
+            success: (
+              <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />
+            ),
+            error: (
+              <Icon
+                icon="fluent:error-circle-24-regular"
+                width={20}
+                height={20}
+              />
+            ),
+            warning: (
+              <Icon icon="fluent:warning-24-regular" width={20} height={20} />
+            ),
           }}
         >
           {snackbarMessage}
@@ -592,13 +634,17 @@ const Bodega = () => {
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Bodega</h1>
-          <Icon
-            icon="gridicons:add"
-            width="30"
-            height="30"
-            className="text-green-900 hover:text-green-950"
-            onClick={handleOpenBodega}
-          />
+          <Tooltip title="Agregar Equipo">
+            <span>
+              <Icon
+                icon="gridicons:add"
+                width="30"
+                height="30"
+                className="text-green-900 hover:text-green-950"
+                onClick={handleOpenBodega}
+              />
+            </span>
+          </Tooltip>
           <ModalAgregarBodega
             open={openModalBodega}
             onClose={handleCloseBodega}
@@ -610,14 +656,22 @@ const Bodega = () => {
         <div className="flex flex-wrap gap-4 my-10">
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={perifericos}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handlePerifericoChange}
-            value={selectedPeriferico}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_periferico === value?.id_periferico
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputPeriferico}
+            onInputChange={(_, newInputValue) => {
+              setInputPeriferico(newInputValue);
+            }}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputPeriferico(newValue);
+              } else {
+                setInputPeriferico(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Periférico" variant="outlined" />
             )}
@@ -626,29 +680,42 @@ const Bodega = () => {
 
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={marcas}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handleMarcaChange}
-            value={selectedMarca}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_marca === value?.id_marca
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputMarca}
+            onInputChange={(_, newInputValue) => setInputMarca(newInputValue)}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputMarca(newValue);
+              } else {
+                setInputMarca(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Marca" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
           />
+
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={modelos}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handleModeloChange}
-            value={selectedModelo}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_modelo === value?.id_modelo
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputModelo}
+            onInputChange={(_, newInputValue) => setInputModelo(newInputValue)}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputModelo(newValue);
+              } else {
+                setInputModelo(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Modelo" variant="outlined" />
             )}
@@ -657,29 +724,44 @@ const Bodega = () => {
 
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={series}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handleSerieChange}
-            value={selectedSerie}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_serie === value?.id_serie
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputSerie}
+            onInputChange={(_, newInputValue) => setInputSerie(newInputValue)}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputSerie(newValue);
+              } else {
+                setInputSerie(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Serie" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
           />
+
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={inventarios}
-            getOptionLabel={(option) => option.inventario || ""}
-            onChange={(_, newValue) => setSelectedInventario(newValue)}
-            value={selectedInventario}
-            isOptionEqualToValue={(option, value) =>
-              option.inventario === value?.inventario
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option.inventario || ""
             }
+            inputValue={inputInventario}
+            onInputChange={(_, newInputValue) =>
+              setInputInventario(newInputValue)
+            }
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputInventario(newValue);
+              } else {
+                setInputInventario(newValue?.inventario || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Inventario" variant="outlined" />
             )}
@@ -718,28 +800,38 @@ const Bodega = () => {
             <thead className="text-xs uppercase bg-gray-50 text-gray-700">
               <tr>
                 <th scope="col" className="flex items-center gap-2 px-4 py-3">
-                  <input
-                    type="checkbox"
-                    onChange={handleSelectAllChange}
-                    checked={selectedItems.length === equiposBodega.length}
-                    className="mr-2"
-                  />
+                  <Tooltip title="Seleccionar Todos">
+                    <input
+                      type="checkbox"
+                      onChange={handleSelectAllChange}
+                      checked={selectedItems.length === equiposBodega.length}
+                      className="mr-2"
+                    />
+                  </Tooltip>
                   {selectedItems.length > 0 && (
                     <>
-                      <Icon
-                        icon="weui:delete-outlined"
-                        width="20"
-                        height="20"
-                        onClick={handleDelete}
-                        className="cursor-pointer"
-                      />
-                      <Icon
-                        icon="ph:arrow-fat-down-light"
-                        width="20"
-                        height="20"
-                        onClick={handleBaja}
-                        className="cursor-pointer"
-                      />
+                      <Tooltip title="Eliminar Equipos">
+                        <span>
+                          <Icon
+                            icon="weui:delete-outlined"
+                            width="20"
+                            height="20"
+                            onClick={handleDelete}
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="Dar de Baja Equipos">
+                        <span>
+                          <Icon
+                            icon="ph:arrow-fat-down-light"
+                            width="20"
+                            height="20"
+                            onClick={handleBaja}
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
                     </>
                   )}
                 </th>
@@ -782,53 +874,74 @@ const Bodega = () => {
                   <td className="px-4 py-2">{equipo.serie}</td>
                   <td className="px-4 py-2">{equipo.inventario}</td>
                   <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
-                    <Icon
-                      icon="ph:arrow-fat-down-light"
-                      width="25"
-                      height="25"
-                      onClick={() =>
-                        handleOpenModal(
-                          equipo.id_equipo,
-                          "Dar de baja equipo",
-                          `¿Estás seguro de que deseas dar de baja el equipo ${equipo.inventario}?`,
-                          bajaEquipo
-                        )
-                      }
-                      className="cursor-pointer"
-                    />
-                    <Icon
-                      icon="weui:delete-outlined"
-                      width="25"
-                      height="25"
-                      onClick={() =>
-                        handleOpenModal(
-                          equipo.id_equipo,
-                          "Eliminar equipo",
-                          `¿Estás seguro de que deseas eliminar el equipo ${equipo.inventario}?`,
-                          deleteEquipo
-                        )
-                      }
-                      className="cursor-pointer"
-                    />
+                    <Tooltip title="Dar de baja equipo">
+                      <span>
+                        <Icon
+                          icon="ph:arrow-fat-down-light"
+                          width="25"
+                          height="25"
+                          onClick={() =>
+                            handleOpenModal(
+                              equipo.id_equipo,
+                              "Dar de baja equipo",
+                              `¿Estás seguro de que deseas dar de baja el equipo ${equipo.inventario}?`,
+                              bajaEquipo
+                            )
+                          }
+                          className="cursor-pointer"
+                        />
+                      </span>
+                    </Tooltip>
+                    <Tooltip title="Eliminar equipo">
+                      <span>
+                        <Icon
+                          icon="weui:delete-outlined"
+                          width="25"
+                          height="25"
+                          onClick={() =>
+                            handleOpenModal(
+                              equipo.id_equipo,
+                              "Eliminar equipo",
+                              `¿Estás seguro de que deseas eliminar el equipo ${equipo.inventario}?`,
+                              deleteEquipo
+                            )
+                          }
+                          className="cursor-pointer"
+                        />
+                      </span>
+                    </Tooltip>
                     <Link
                       to="/editarBodega"
-                      state={{ equipoId: equipo.id_equipo, perifericos,equipoName: equipo.periferico }}
+                      state={{
+                        equipoId: equipo.id_equipo,
+                        perifericos,
+                        equipoName: equipo.periferico,
+                      }}
                     >
-                      
-                      <Icon
-                        icon="mage:edit"
-                        width="25"
-                        height="25"
-                        className="cursor-pointer"
-                      />
+                      <Tooltip title="Editar equipo">
+                        <span>
+                          <Icon
+                            icon="mage:edit"
+                            width="25"
+                            height="25"
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
                     </Link>
-                    <Icon
-                      icon="icon-park-outline:upload-computer"
-                      width="25"
-                      height="25"
-                      className="cursor-pointer"
-                      onClick={() => handleOpenModalPasarAActivo(equipo.id_equipo)}
-                    />
+                    <Tooltip title="Pasar a Activo">
+                      <span>
+                        <Icon
+                          icon="icon-park-outline:upload-computer"
+                          width="25"
+                          height="25"
+                          className="cursor-pointer"
+                          onClick={() =>
+                            handleOpenModalPasarAActivo(equipo.id_equipo)
+                          }
+                        />
+                      </span>
+                    </Tooltip>
                   </td>
                 </tr>
               ))}
@@ -849,7 +962,15 @@ const Bodega = () => {
                 disabled={currentPage === 1}
                 className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
               >
-                <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
+                <Tooltip title="Página Anterior">
+                  <span>
+                    <Icon
+                      icon="iconamoon:arrow-left-2"
+                      width="20"
+                      height="20"
+                    />
+                  </span>
+                </Tooltip>
               </button>
             </li>
             <li>
@@ -863,7 +984,15 @@ const Bodega = () => {
                 disabled={currentPage === totalPages}
                 className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
               >
-                <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
+                <Tooltip title="Siguiente Página">
+                  <span>
+                    <Icon
+                      icon="iconamoon:arrow-right-2"
+                      width="20"
+                      height="20"
+                    />
+                  </span>
+                </Tooltip>
               </button>
             </li>
           </ul>
@@ -871,7 +1000,11 @@ const Bodega = () => {
             onClick={exportToExcel}
             className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
           >
-            <Icon icon="ph:export" width="20" height="20" />
+            <Tooltip title="Exportar a Excel">
+              <span>
+                <Icon icon="ph:export" width="20" height="20" />
+              </span>
+            </Tooltip>
           </button>
         </div>
       </nav>
