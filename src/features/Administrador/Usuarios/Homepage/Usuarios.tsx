@@ -170,7 +170,7 @@ const Usuarios = () => {
       </Snackbar>
       <div className="mb-4">
         <div className="flex gap-2 items-center">
-          <h1 className="text-2xl font-bold my-5">Consulta de Usuarios</h1>
+          <h1 className="text-2xl font-bold my-5">Consulta de Usuarios Responsables</h1>
           <Link to={{ pathname: "/agregarUsuario" }}>
             <Tooltip title="Agregar Usuario">
               <span>
@@ -238,9 +238,9 @@ const Usuarios = () => {
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {loading ? (
-          <p>Cargando usuarios...</p>
+          <p>Cargando usuarios responsables...</p>
         ) : error ? (
-          <p>Error al cargar los usuarios</p>
+          <p>Error al cargar los usuarios responsables</p>
         ) : (
           <table className="w-full text-left text-sm text-gray-500">
             <thead className="text-xs uppercase bg-gray-50 text-gray-700">
