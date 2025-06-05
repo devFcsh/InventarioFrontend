@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { Alert, Box, Button, Snackbar } from "@mui/material";
+import { Alert, Box, Button, Snackbar, Tooltip } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { ModalAgregarComponenteActivo } from "./ModalAgregarComponenteActivo.tsx";
 import { Periferico } from "../../../types/index.ts";
 
 interface FormProps {
   perifericos: Periferico[];
-  componentes:any;
-  handleAddComponents:any;
-  eliminarComponente:any;
-  showSuccessMessageComponentes:any;
-  setShowSuccessMessageComponentes:any;
+  componentes: any;
+  handleAddComponents: any;
+  eliminarComponente: any;
+  showSuccessMessageComponentes: any;
+  setShowSuccessMessageComponentes: any;
 }
 
 export const StepComponentes: React.FC<FormProps> = ({
@@ -19,7 +19,7 @@ export const StepComponentes: React.FC<FormProps> = ({
   handleAddComponents,
   eliminarComponente,
   showSuccessMessageComponentes,
-  setShowSuccessMessageComponentes
+  setShowSuccessMessageComponentes,
 }) => {
   const [openModalComponentes, setOpenModalComponentes] =
     useState<boolean>(false);
@@ -33,7 +33,6 @@ export const StepComponentes: React.FC<FormProps> = ({
   });
   const handleOpenModalComponentes = () => setOpenModalComponentes(true);
   const handleCloseModalComponentes = () => setOpenModalComponentes(false);
-
 
   return (
     <div className="mt-8">
@@ -75,7 +74,7 @@ export const StepComponentes: React.FC<FormProps> = ({
               </tr>
             </thead>
             <tbody>
-              {componentes.map((comp:any, index:any) => (
+              {componentes.map((comp: any, index: any) => (
                 <tr key={index}>
                   <td className="py-2 px-4 border">
                     {comp.periferico?.nombre}
@@ -85,13 +84,17 @@ export const StepComponentes: React.FC<FormProps> = ({
                   <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
                   <td className="py-2 px-4 border">{comp.inventario}</td>
                   <td className="py-2 px-1 border">
-                    <Icon
-                      icon="weui:delete-outlined"
-                      width="25"
-                      height="25"
-                      onClick={() => eliminarComponente(index)}
-                      className="cursor-pointer mx-auto"
-                    />
+                    <Tooltip title="Eliminar Componente">
+                      <span>
+                        <Icon
+                          icon="weui:delete-outlined"
+                          width="25"
+                          height="25"
+                          onClick={() => eliminarComponente(index)}
+                          className="cursor-pointer mx-auto"
+                        />
+                      </span>
+                    </Tooltip>
                   </td>
                 </tr>
               ))}

@@ -1,4 +1,10 @@
-import { Alert, Autocomplete, Snackbar, TextField, Tooltip } from "@mui/material";
+import {
+  Alert,
+  Autocomplete,
+  Snackbar,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
@@ -308,14 +314,14 @@ const Bajas = () => {
           <h1 className="text-2xl font-bold my-5">Consulta de Bajas</h1>
           <Tooltip title="Agregar Equipo">
             <span>
-          <Icon
-            icon="gridicons:add"
-            width="30"
-            height="30"
-            className="text-green-900 hover:text-green-950"
-            onClick={handleOpenBajas}
-          />
-          </span>
+              <Icon
+                icon="gridicons:add"
+                width="30"
+                height="30"
+                className="text-green-900 hover:text-green-950"
+                onClick={handleOpenBajas}
+              />
+            </span>
           </Tooltip>
           <ModalAgregarBaja
             open={openModalBajas}
@@ -473,26 +479,26 @@ const Bajas = () => {
               <tr>
                 <th scope="col" className="flex items-center gap-2 px-4 py-3">
                   <Tooltip title="Seleccionar Todos">
-                  <input
-                    type="checkbox"
-                    onChange={handleSelectAllChange}
-                    checked={selectedItems.length === equiposBaja.length}
-                    className="mr-2"
-                  />
+                    <input
+                      type="checkbox"
+                      onChange={handleSelectAllChange}
+                      checked={selectedItems.length === equiposBaja.length}
+                      className="mr-2"
+                    />
                   </Tooltip>
                   {selectedItems.length > 0 && (
                     <>
-                    <Tooltip title="Eliminar Equipos">
-                      <span>
-                      <Icon
-                        icon="weui:delete-outlined"
-                        width="20"
-                        height="20"
-                        onClick={handleDelete}
-                        className="cursor-pointer"
-                      />
-                      </span>
-                    </Tooltip>
+                      <Tooltip title="Eliminar Equipos">
+                        <span>
+                          <Icon
+                            icon="weui:delete-outlined"
+                            width="20"
+                            height="20"
+                            onClick={handleDelete}
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
                     </>
                   )}
                 </th>
@@ -552,20 +558,20 @@ const Bajas = () => {
                     </Tooltip> */}
                     <Tooltip title="Eliminar Equipo">
                       <span>
-                    <Icon
-                      icon="weui:delete-outlined"
-                      width="25"
-                      height="25"
-                      onClick={() =>
-                        handleOpenModal(
-                          equipo.id_equipo,
-                          "Eliminar equipo",
-                          `¿Estás seguro de que deseas eliminar el equipo ${equipo.inventario}?`,
-                          deleteEquipo
-                        )
-                      }
-                      className="cursor-pointer"
-                    />
+                        <Icon
+                          icon="weui:delete-outlined"
+                          width="25"
+                          height="25"
+                          onClick={() =>
+                            handleOpenModal(
+                              equipo.id_equipo,
+                              "Eliminar equipo",
+                              `¿Estás seguro de que deseas eliminar el equipo ${equipo.inventario}?`,
+                              deleteEquipo
+                            )
+                          }
+                          className="cursor-pointer"
+                        />
                       </span>
                     </Tooltip>
                   </td>
@@ -590,7 +596,11 @@ const Bajas = () => {
               >
                 <Tooltip title="Página Anterior">
                   <span>
-                <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
+                    <Icon
+                      icon="iconamoon:arrow-left-2"
+                      width="20"
+                      height="20"
+                    />
                   </span>
                 </Tooltip>
               </button>
@@ -608,22 +618,24 @@ const Bajas = () => {
               >
                 <Tooltip title="Siguiente Página">
                   <span>
-                <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
+                    <Icon
+                      icon="iconamoon:arrow-right-2"
+                      width="20"
+                      height="20"
+                    />
                   </span>
                 </Tooltip>
               </button>
             </li>
           </ul>
-          <button
-            onClick={exportToExcel}
-            className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-          >
-            <Tooltip title="Exportar a Excel">
-                  <span>
-            <Icon icon="ph:export" width="20" height="20" />
-                  </span>
-            </Tooltip>
-          </button>
+          <Tooltip title="Exportar a Excel">
+            <button
+              onClick={exportToExcel}
+              className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+            >
+              <Icon icon="ph:export" width="20" height="20" />
+            </button>
+          </Tooltip>
         </div>
       </nav>
       <ModalConfirmation

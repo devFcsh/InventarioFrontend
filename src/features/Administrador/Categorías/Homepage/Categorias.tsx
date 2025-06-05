@@ -4,6 +4,7 @@ import {
   TextField,
   Snackbar,
   Alert,
+  Tooltip,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
@@ -27,7 +28,7 @@ const categorias = [
   "Versión Office",
   "RAM",
   "Disco",
-  "Procesador"
+  "Procesador",
 ];
 
 const itemsData = [
@@ -46,7 +47,6 @@ const itemsData = [
   { id: 14, categoria: "Procesador" },
   { id: 15, categoria: "Versión Office" },
   { id: 16, categoria: "Lampara" },
-
 ];
 
 type FilteredItem = {
@@ -55,7 +55,6 @@ type FilteredItem = {
 };
 
 const Categorias = () => {
-  
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(
     null
   );
@@ -141,7 +140,6 @@ const Categorias = () => {
     setOpenModalAgregar(false);
     setError(null);
   };
-  
 
   const handleOpenModalEditar = () => {
     setOpenModalEditar(true);
@@ -229,7 +227,9 @@ const Categorias = () => {
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {filteredItems.length === 0 ? (
-          <p className="text-center text-gray-500 my-5">No hay datos disponibles. Presiona "Buscar" para cargar resultados.</p>
+          <p className="text-center text-gray-500 my-5">
+            No hay datos disponibles. Presiona "Buscar" para cargar resultados.
+          </p>
         ) : (
           <table className="w-full text-left text-sm text-gray-500">
             <thead className="text-xs uppercase bg-gray-50 text-gray-700">
@@ -255,26 +255,34 @@ const Categorias = () => {
                   >
                     <td className="px-4 py-2">{item.categoria}</td>
                     <td className="px-4 py-3 flex items-center gap-2">
-                        <Icon
-                          icon="mage:edit"
-                          width="30"
-                          height="30"
-                          className="cursor-pointer"
-                          onClick={() => {
-                            setSelectedItemCategoria(item.categoria);
-                            handleOpenModalEditar();
-                          }}
-                        />
-                      <Icon
-                        icon="gridicons:add"
-                        width="30"
-                        height="30"
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setSelectedItemCategoria(item.categoria);
-                          handleOpenModalAgregar();
-                        }}
-                      />
+                      <Tooltip title="Editar Subcategorías">
+                        <span>
+                          <Icon
+                            icon="mage:edit"
+                            width="30"
+                            height="30"
+                            className="cursor-pointer"
+                            onClick={() => {
+                              setSelectedItemCategoria(item.categoria);
+                              handleOpenModalEditar();
+                            }}
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="Agregar Subcategoría">
+                        <span>
+                          <Icon
+                            icon="gridicons:add"
+                            width="30"
+                            height="30"
+                            className="cursor-pointer"
+                            onClick={() => {
+                              setSelectedItemCategoria(item.categoria);
+                              handleOpenModalAgregar();
+                            }}
+                          />
+                        </span>
+                      </Tooltip>
                     </td>
                   </tr>
                 ))}
@@ -299,13 +307,21 @@ const Categorias = () => {
         <div className="flex flex-col md:flex-row items-center gap-2">
           <ul className="inline-flex items-center -space-x-px">
             <li>
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-              >
-                <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
-              </button>
+              <Tooltip title="Página Anterior">
+                <span>
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                  >
+                    <Icon
+                      icon="iconamoon:arrow-left-2"
+                      width="20"
+                      height="20"
+                    />
+                  </button>
+                </span>
+              </Tooltip>
             </li>
             <li>
               <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
@@ -313,13 +329,21 @@ const Categorias = () => {
               </div>
             </li>
             <li>
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-              >
-                <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
-              </button>
+              <Tooltip title="Siguiente Página">
+                <span>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                  >
+                    <Icon
+                      icon="iconamoon:arrow-right-2"
+                      width="20"
+                      height="20"
+                    />
+                  </button>
+                </span>
+              </Tooltip>
             </li>
           </ul>
         </div>

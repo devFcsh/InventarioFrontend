@@ -4,6 +4,7 @@ import {
   Button,
   Snackbar,
   Alert,
+  Tooltip,
 } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
@@ -73,7 +74,9 @@ const AgregarComputadoraActivo = ({
   const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
     null
   );
-  const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(null);
+  const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(
+    null
+  );
   const [selectedVersionOffice, setSelectedVersionOffice] =
     useState<VersionOffice | null>(null);
   const [selectedAntivirus, setSelectedAntivirus] = useState<Antivirus | null>(
@@ -738,13 +741,17 @@ const AgregarComputadoraActivo = ({
                     <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
                     <td className="py-2 px-4 border">{comp.inventario}</td>
                     <td className="py-2 px-1 border">
-                      <Icon
-                        icon="weui:delete-outlined"
-                        width="25"
-                        height="25"
-                        onClick={() => eliminarComponente(index)}
-                        className="cursor-pointer mx-auto"
-                      />
+                      <Tooltip title="Eliminar Componente">
+                        <span>
+                          <Icon
+                            icon="weui:delete-outlined"
+                            width="25"
+                            height="25"
+                            onClick={() => eliminarComponente(index)}
+                            className="cursor-pointer mx-auto"
+                          />
+                        </span>
+                      </Tooltip>
                     </td>
                   </tr>
                 ))}

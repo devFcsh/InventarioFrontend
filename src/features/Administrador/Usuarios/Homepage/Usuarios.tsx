@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Autocomplete, IconButton } from "@mui/material";
+import { Autocomplete, IconButton, Tooltip } from "@mui/material";
 import { TextField, Snackbar, Alert } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
@@ -18,7 +18,9 @@ const Usuarios = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error" | "warning">("success"); 
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "success" | "error" | "warning"
+  >("success");
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
   const [totalPages, setTotalPages] = useState<number>(1);
 
@@ -109,18 +111,20 @@ const Usuarios = () => {
     if (usuarioToDelete) {
       try {
         const result = await eliminarUsuario(usuarioToDelete.id_usuario);
-        
+
         if (result.success) {
           setOpenModal(false);
           setSnackbarMessage("Usuario eliminado con éxito.");
-          setSnackbarSeverity("success"); 
+          setSnackbarSeverity("success");
           setShouldFetch(true);
         } else {
-          setSnackbarMessage("No se puede eliminar el usuario porque tiene equipos asociados.");
-          setSnackbarSeverity("error"); 
+          setSnackbarMessage(
+            "No se puede eliminar el usuario porque tiene equipos asociados."
+          );
+          setSnackbarSeverity("error");
         }
-  
-        setOpenSnackbar(true); 
+
+        setOpenSnackbar(true);
       } catch (error) {
         setSnackbarMessage("Error al eliminar el usuario.");
         setSnackbarSeverity("error");
@@ -135,7 +139,7 @@ const Usuarios = () => {
 
   return (
     <div className="flex flex-col p-4">
-     <Snackbar
+      <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
@@ -146,9 +150,19 @@ const Usuarios = () => {
           severity={snackbarSeverity}
           sx={{ width: "100%" }}
           iconMapping={{
-            success: <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />,
-            error: <Icon icon="fluent:error-circle-24-regular" width={20} height={20} />,
-            warning: <Icon icon="fluent:warning-24-regular" width={20} height={20} />
+            success: (
+              <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />
+            ),
+            error: (
+              <Icon
+                icon="fluent:error-circle-24-regular"
+                width={20}
+                height={20}
+              />
+            ),
+            warning: (
+              <Icon icon="fluent:warning-24-regular" width={20} height={20} />
+            ),
           }}
         >
           {snackbarMessage}
@@ -158,12 +172,16 @@ const Usuarios = () => {
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Usuarios</h1>
           <Link to={{ pathname: "/agregarUsuario" }}>
-            <Icon
-              icon="gridicons:add"
-              width="30"
-              height="30"
-              className="text-green-900 hover:text-green-950"
-            />
+            <Tooltip title="Agregar Usuario">
+              <span>
+                <Icon
+                  icon="gridicons:add"
+                  width="30"
+                  height="30"
+                  className="text-green-900 hover:text-green-950"
+                />
+              </span>
+            </Tooltip>
           </Link>
         </div>
         <div className="flex flex-wrap gap-4 my-10">
@@ -248,24 +266,32 @@ const Usuarios = () => {
                   <td className="px-4 py-2">{usuario.nombre}</td>
                   <td className="px-4 py-3 flex items-center gap-2">
                     <IconButton onClick={() => handleDeleteClick(usuario)}>
-                      <Icon
-                        icon="weui:delete-outlined"
-                        width="25"
-                        height="25"
-                        className="cursor-pointer"
-                      />
+                      <Tooltip title="Eliminar Usuario">
+                        <span>
+                          <Icon
+                            icon="weui:delete-outlined"
+                            width="25"
+                            height="25"
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
                     </IconButton>
                     <td className="px-4 py-3 flex items-center gap-2">
                       <Link
                         to={{ pathname: "/editarUsuario" }}
                         state={{ usuario }}
                       >
-                        <Icon
-                          icon="mage:edit"
-                          width="25"
-                          height="25"
-                          className="cursor-pointer"
-                        />
+                        <Tooltip title="Editar Usuario">
+                          <span>
+                            <Icon
+                              icon="mage:edit"
+                              width="25"
+                              height="25"
+                              className="cursor-pointer"
+                            />
+                          </span>
+                        </Tooltip>
                       </Link>
                     </td>
                   </td>
@@ -292,13 +318,21 @@ const Usuarios = () => {
         <div className="flex flex-col md:flex-row items-center gap-2">
           <ul className="inline-flex items-center -space-x-px">
             <li>
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-              >
-                <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
-              </button>
+              <Tooltip title="Página Anterior">
+                <span>
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                  >
+                    <Icon
+                      icon="iconamoon:arrow-left-2"
+                      width="20"
+                      height="20"
+                    />
+                  </button>
+                </span>
+              </Tooltip>
             </li>
             <li>
               <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
@@ -306,13 +340,21 @@ const Usuarios = () => {
               </div>
             </li>
             <li>
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-              >
-                <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
-              </button>
+              <Tooltip title="Siguiente Página">
+                <span>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                  >
+                    <Icon
+                      icon="iconamoon:arrow-right-2"
+                      width="20"
+                      height="20"
+                    />
+                  </button>
+                </span>
+              </Tooltip>
             </li>
           </ul>
         </div>

@@ -996,16 +996,16 @@ const Bodega = () => {
               </button>
             </li>
           </ul>
-          <button
-            onClick={exportToExcel}
-            className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-          >
-            <Tooltip title="Exportar a Excel">
+          <Tooltip title="Exportar a Excel">
+            <button
+              onClick={exportToExcel}
+              className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+            >
               <span>
                 <Icon icon="ph:export" width="20" height="20" />
               </span>
-            </Tooltip>
-          </button>
+            </button>
+          </Tooltip>
         </div>
       </nav>
       <ModalPasarAActivo

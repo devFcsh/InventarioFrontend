@@ -6,6 +6,7 @@ import {
   Snackbar,
   Alert,
   Autocomplete,
+  Tooltip,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import useEquiposPorUsuario from "../hooks/useEquiposPorUsuario";
@@ -36,7 +37,12 @@ const EditarUsuario = () => {
     refetch: refetchEquipos,
   } = useEquiposPorUsuario(usuario?.id_usuario || "");
 
-  const { cambiarUsuario, loading: loadingCambio, error, success } = useCambiarUsuarioEquipo();
+  const {
+    cambiarUsuario,
+    loading: loadingCambio,
+    error,
+    success,
+  } = useCambiarUsuarioEquipo();
 
   const {
     editarUsuario,
@@ -58,7 +64,7 @@ const EditarUsuario = () => {
         await editarUsuario(usuario.id_usuario, nombre, selectedUsoId);
         setSnackbarMessage("Usuario actualizado correctamente");
         setOpenSnackbar(true);
-  
+
         setTimeout(() => {
           navigate("/usuarios");
         }, 1000);
@@ -69,13 +75,12 @@ const EditarUsuario = () => {
     } catch (error) {
       setSnackbarMessage("Error al actualizar el usuario");
       setOpenSnackbar(true);
-  
+
       setTimeout(() => {
         navigate("/usuarios");
       }, 1000);
     }
   };
-  
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -88,23 +93,23 @@ const EditarUsuario = () => {
 
   useEffect(() => {
     if (success) {
-        setSnackbarMessage("Usuario cambiado correctamente al equipo");
-        refetchEquipos();
-        setOpenModal(false);
+      setSnackbarMessage("Usuario cambiado correctamente al equipo");
+      refetchEquipos();
+      setOpenModal(false);
     }
     if (error) {
-        setSnackbarMessage("No se puede cambiar de usuario a un componente");
+      setSnackbarMessage("No se puede cambiar de usuario a un componente");
     }
     if (success || error) {
-        setOpenSnackbar(true);
+      setOpenSnackbar(true);
     }
-}, [success, error]);
+  }, [success, error]);
 
-const handleConfirmarCambio = async (usuarioId: string) => {
+  const handleConfirmarCambio = async (usuarioId: string) => {
     if (equipoId) {
-        await cambiarUsuario(equipoId, usuarioId);
+      await cambiarUsuario(equipoId, usuarioId);
     }
-};
+  };
 
   if (loadingEquipos || loadingEdicion || loadingUsos) {
     return <div>Cargando...</div>;
@@ -179,13 +184,19 @@ const handleConfirmarCambio = async (usuarioId: string) => {
                     <td className="py-2 px-4 border">{equipo.serie}</td>
                     <td className="py-2 px-4 border">{equipo.inventario}</td>
                     <td className="py-2 px-4 border">
-                      <Icon
-                        icon="material-symbols:compare-arrows-rounded"
-                        width="25"
-                        height="25"
-                        className="cursor-pointer"
-                        onClick={() => handleCambiarUsuario(equipo.id_equipo)}
-                      />
+                      <Tooltip title="Asignar a otro usuario">
+                        <span>
+                          <Icon
+                            icon="material-symbols:compare-arrows-rounded"
+                            width="25"
+                            height="25"
+                            className="cursor-pointer"
+                            onClick={() =>
+                              handleCambiarUsuario(equipo.id_equipo)
+                            }
+                          />
+                        </span>
+                      </Tooltip>
                     </td>
                   </tr>
                 ))

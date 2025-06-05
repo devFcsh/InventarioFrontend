@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const Login = () => {
 
   useEffect(() => {
-      localStorage.setItem("rol", "consultor");
+      localStorage.setItem("rol", "administrador");
   }, []);
 
   return (

@@ -7,6 +7,7 @@ import {
   Alert,
   Box,
   FormHelperText,
+  Tooltip,
 } from "@mui/material";
 import {
   Marca,
@@ -541,14 +542,14 @@ const EditarComputadoraActivo = ({
     }
   };
 
-  const handleNombreEquipo = (value: any)=>{
+  const handleNombreEquipo = (value: any) => {
     setNombreEquipo(value);
-    if (value.length===14) {
+    if (value.length === 14) {
       setErrorNombreEquipo(false);
     } else {
       setErrorNombreEquipo(true);
     }
-  }
+  };
 
   return (
     <div>
@@ -662,12 +663,16 @@ const EditarComputadoraActivo = ({
             }
             onChange={(e) => {
               let value = e.target.value;
-              if (empresa==="Espol" && value !== null && value.length > 6) {
-                return
-              }else if(empresa==="EspolTech" && value !== null && value.length > 10){
-                return
+              if (empresa === "Espol" && value !== null && value.length > 6) {
+                return;
+              } else if (
+                empresa === "EspolTech" &&
+                value !== null &&
+                value.length > 10
+              ) {
+                return;
               }
-              handleChangeInventario(value)
+              handleChangeInventario(value);
             }}
             disabled={empresa === ""}
           />
@@ -818,7 +823,7 @@ const EditarComputadoraActivo = ({
             onChange={(e) => {
               let value = e.target.value;
               if (value !== null && value.length > 15) {
-                return
+                return;
               }
               handleIP(value);
             }}
@@ -837,14 +842,16 @@ const EditarComputadoraActivo = ({
           value={nombreEquipo}
           error={!!errorNombreEquipo}
           helperText={
-            errorNombreEquipo ? "Por favor escribir un nombre de equipo válido" : ""
+            errorNombreEquipo
+              ? "Por favor escribir un nombre de equipo válido"
+              : ""
           }
           onChange={(e) => {
             let value = e.target.value;
             if (value !== null && value.length > 14) {
-              return
+              return;
             }
-            handleNombreEquipo(value)
+            handleNombreEquipo(value);
           }}
           fullWidth
           variant="outlined"
@@ -963,13 +970,17 @@ const EditarComputadoraActivo = ({
                     <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
                     <td className="py-2 px-4 border">{comp.inventario}</td>
                     <td className="py-2 px-1 border">
-                      <Icon
-                        icon="fluent-mdl2:disconnect-virtual-machine"
-                        width="25"
-                        height="25"
-                        onClick={() => eliminarComponente(index)}
-                        className="cursor-pointer mx-auto"
-                      />
+                      <Tooltip title="Desligar Componente">
+                        <span>
+                          <Icon
+                            icon="fluent-mdl2:disconnect-virtual-machine"
+                            width="25"
+                            height="25"
+                            onClick={() => eliminarComponente(index)}
+                            className="cursor-pointer mx-auto"
+                          />
+                        </span>
+                      </Tooltip>
                     </td>
                   </tr>
                 ))}
@@ -1097,12 +1108,20 @@ const EditarComputadoraActivo = ({
                 }
                 onChange={(e) => {
                   let value = e.target.value;
-                  if (empresaNuevoComponente==="Espol" && value !== null && value.length > 6) {
-                    return
-                  }else if(empresaNuevoComponente==="EspolTech" && value !== null && value.length > 10){
-                    return
+                  if (
+                    empresaNuevoComponente === "Espol" &&
+                    value !== null &&
+                    value.length > 6
+                  ) {
+                    return;
+                  } else if (
+                    empresaNuevoComponente === "EspolTech" &&
+                    value !== null &&
+                    value.length > 10
+                  ) {
+                    return;
                   }
-                  handleChangeNuevoComponenteInventario(value)
+                  handleChangeNuevoComponenteInventario(value);
                 }}
                 disabled={empresa === ""}
               />
@@ -1130,9 +1149,9 @@ const EditarComputadoraActivo = ({
           onChange={(e) => {
             let value = e.target.value;
             if (value !== null && value.length > 200) {
-              return
+              return;
             }
-            handleObservation(value)
+            handleObservation(value);
           }}
           error={!!errorMensajeComponente}
           helperText={errorMensajeComponente}

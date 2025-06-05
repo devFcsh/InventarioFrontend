@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { Alert, Dialog, Snackbar, TextField } from "@mui/material";
+import { Alert, Dialog, Snackbar, TextField, Tooltip } from "@mui/material";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import useUsos from "@hooks/useUsos";
 import useDiscos from "@hooks/useDiscos";
@@ -90,21 +90,36 @@ interface ModalEditarCategoriaProps {
 }
 
 // Type guards corregidos con null checks
-const isRAM = (obj: Opcion | null): obj is RAM => obj !== null && 'id_ram' in obj;
-const isDisco = (obj: Opcion | null): obj is Disco => obj !== null && 'id_disco' in obj;
-const isDominio = (obj: Opcion | null): obj is Dominio => obj !== null && 'id_dominio' in obj;
-const isPeriferico = (obj: Opcion | null): obj is Periferico => obj !== null && 'id_periferico' in obj;
-const isUso = (obj: Opcion | null): obj is Uso => obj !== null && 'id_uso' in obj;
-const isMarca = (obj: Opcion | null): obj is Marca => obj !== null && 'id_marca' in obj;
-const isModelo = (obj: Opcion | null): obj is Modelo => obj !== null && 'id_modelo' in obj;
-const isSerie = (obj: Opcion | null): obj is Serie => obj !== null && 'id_serie' in obj;
-const isLampara = (obj: Opcion | null): obj is Lampara => obj !== null && 'id_lampara' in obj;
-const isSistemaOperativo = (obj: Opcion | null): obj is SistemaOperativo => obj !== null && 'id_sistemaoperativo' in obj;
-const isEdificio = (obj: Opcion | null): obj is Edificio => obj !== null && 'id_edificio' in obj;
-const isUbicacion = (obj: Opcion | null): obj is Ubicacion => obj !== null && 'id_ubicacion' in obj;
-const isVersionSO = (obj: Opcion | null): obj is VersionSO => obj !== null && 'id_versionso' in obj;
-const isProcesador = (obj: Opcion | null): obj is Procesador => obj !== null && 'id_procesador' in obj;
-const isVersionOffice = (obj: Opcion | null): obj is VersionOffice => obj !== null && 'id_versionoffice' in obj;
+const isRAM = (obj: Opcion | null): obj is RAM =>
+  obj !== null && "id_ram" in obj;
+const isDisco = (obj: Opcion | null): obj is Disco =>
+  obj !== null && "id_disco" in obj;
+const isDominio = (obj: Opcion | null): obj is Dominio =>
+  obj !== null && "id_dominio" in obj;
+const isPeriferico = (obj: Opcion | null): obj is Periferico =>
+  obj !== null && "id_periferico" in obj;
+const isUso = (obj: Opcion | null): obj is Uso =>
+  obj !== null && "id_uso" in obj;
+const isMarca = (obj: Opcion | null): obj is Marca =>
+  obj !== null && "id_marca" in obj;
+const isModelo = (obj: Opcion | null): obj is Modelo =>
+  obj !== null && "id_modelo" in obj;
+const isSerie = (obj: Opcion | null): obj is Serie =>
+  obj !== null && "id_serie" in obj;
+const isLampara = (obj: Opcion | null): obj is Lampara =>
+  obj !== null && "id_lampara" in obj;
+const isSistemaOperativo = (obj: Opcion | null): obj is SistemaOperativo =>
+  obj !== null && "id_sistemaoperativo" in obj;
+const isEdificio = (obj: Opcion | null): obj is Edificio =>
+  obj !== null && "id_edificio" in obj;
+const isUbicacion = (obj: Opcion | null): obj is Ubicacion =>
+  obj !== null && "id_ubicacion" in obj;
+const isVersionSO = (obj: Opcion | null): obj is VersionSO =>
+  obj !== null && "id_versionso" in obj;
+const isProcesador = (obj: Opcion | null): obj is Procesador =>
+  obj !== null && "id_procesador" in obj;
+const isVersionOffice = (obj: Opcion | null): obj is VersionOffice =>
+  obj !== null && "id_versionoffice" in obj;
 
 const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   open,
@@ -201,7 +216,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
       ? procesadores
       : selectedCategoria === "Versión Office"
       ? versionesOffice
-      : []
+      : [];
 
   const handleEditarCategoria = (elemento: Opcion) => {
     setSelectedOption(elemento);
@@ -210,7 +225,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
       setEditedTipo(elemento?.tipo || "");
     } else if (selectedCategoria === "Disco" && isDisco(elemento)) {
       setEditedValue(elemento?.capacidad || "");
-    } else if (elemento && 'nombre' in elemento) {
+    } else if (elemento && "nombre" in elemento) {
       setEditedValue(elemento.nombre || "");
     }
     setOpenEditModal(true);
@@ -247,7 +262,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             break;
           case "Uso":
             if (isUso(selectedOption)) {
-              console.log(selectedOption.id_uso + " " + editedValue)
+              console.log(selectedOption.id_uso + " " + editedValue);
               editarUso({
                 id_uso: Number(selectedOption.id_uso),
                 nuevoNombre: editedValue,
@@ -406,7 +421,9 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             break;
           case "Sistema Operativo":
             if (isSistemaOperativo(elemento)) {
-              await eliminarSistemaOperativo(Number(elemento.id_sistemaoperativo));
+              await eliminarSistemaOperativo(
+                Number(elemento.id_sistemaoperativo)
+              );
             }
             break;
           case "Edificio":
@@ -510,36 +527,48 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
                   elementos.map((elemento, index) => (
                     <tr key={index}>
                       <td className="py-2 px-4 border">
-                        {elemento && selectedCategoria === "RAM" && isRAM(elemento)
+                        {elemento &&
+                        selectedCategoria === "RAM" &&
+                        isRAM(elemento)
                           ? elemento.capacidad
-                          : elemento && selectedCategoria === "Disco" && isDisco(elemento)
+                          : elemento &&
+                            selectedCategoria === "Disco" &&
+                            isDisco(elemento)
                           ? elemento.capacidad
-                          : elemento && 'nombre' in elemento
+                          : elemento && "nombre" in elemento
                           ? elemento.nombre
-                          : ''}
+                          : ""}
                       </td>
                       {selectedCategoria === "RAM" ? (
                         <td className="py-2 px-4 border">
-                          {elemento && isRAM(elemento) ? elemento.tipo : ''}
+                          {elemento && isRAM(elemento) ? elemento.tipo : ""}
                         </td>
                       ) : (
                         <></>
                       )}
                       <td className="py-2 px-3 border flex gap-2 items-center">
-                        <Icon
-                          icon="mage:edit"
-                          width="25"
-                          height="25"
-                          className="cursor-pointer"
-                          onClick={() => handleEditarCategoria(elemento)}
-                        />
-                        <Icon
-                          icon="weui:delete-outlined"
-                          width="25"
-                          height="25"
-                          className="cursor-pointer"
-                          onClick={() => handleEliminarCategoria(elemento)}
-                        />
+                        <Tooltip title="Editar Subcategoría">
+                          <span>
+                            <Icon
+                              icon="mage:edit"
+                              width="25"
+                              height="25"
+                              className="cursor-pointer"
+                              onClick={() => handleEditarCategoria(elemento)}
+                            />
+                          </span>
+                        </Tooltip>
+                        <Tooltip title="Eliminar Subcategoría">
+                          <span>
+                            <Icon
+                              icon="weui:delete-outlined"
+                              width="25"
+                              height="25"
+                              className="cursor-pointer"
+                              onClick={() => handleEliminarCategoria(elemento)}
+                            />
+                          </span>
+                        </Tooltip>
                       </td>
                     </tr>
                   ))

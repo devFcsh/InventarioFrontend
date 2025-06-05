@@ -7,6 +7,7 @@ import {
   Alert,
   Box,
   FormHelperText,
+  Tooltip,
 } from "@mui/material";
 import {
   Marca,
@@ -800,6 +801,8 @@ const EditarComputadoraBodega = ({
                     <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
                     <td className="py-2 px-4 border">{comp.inventario}</td>
                     <td className="py-2 px-1 border">
+                      <Tooltip title="Eliminar Componente">
+                        <span>
                       <Icon
                         icon="fluent-mdl2:disconnect-virtual-machine"
                         width="25"
@@ -807,6 +810,8 @@ const EditarComputadoraBodega = ({
                         onClick={() => eliminarComponente(index)}
                         className="cursor-pointer mx-auto"
                       />
+                      </span>
+                    </Tooltip>
                     </td>
                   </tr>
                 ))}
