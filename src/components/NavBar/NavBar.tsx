@@ -2,7 +2,7 @@ import "./NavBar.css";
 import logoFCSH from "../../assets/logoFCSH.png";
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { NavBarItems } from "./NavBarItems";
@@ -12,6 +12,16 @@ import { Link } from "react-router-dom";
 
 export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSection }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [rol, setRol] = useState<string>("");
+
+   useEffect(() => {
+      const rol = localStorage.getItem("rol");
+      if (rol) {
+        setRol(rol);
+      } else {
+        setRol("consultor");
+      }
+    }, []);
 
   return (
     <div>
@@ -54,7 +64,8 @@ export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSectio
         <NavBarItems 
           currentSection={currentSection} 
           setCurrentSection={setCurrentSection} 
-          setIsDrawerOpen={setIsDrawerOpen} 
+          setIsDrawerOpen={setIsDrawerOpen}
+          rol={rol} 
         />
       </MuiDrawer>
     </div>
