@@ -4,7 +4,9 @@ import NotFound from "./pages/NotFound";
 import Activos from "./features/Equipos/Activos/Homepage/Activos";
 import Bajas from "./features/Equipos/Baja/Homepage/Bajas";
 import Login from "./pages/Login";
+import LoginFailed from "./pages/LoginFailed";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Bodega from "./features/Equipos/Bodega/Homepage/Bodega";
 import Usuarios from "./features/Administrador/Usuarios/Homepage/Usuarios";
 import Categorias from "./features/Administrador/Categorías/Homepage/Categorias";
@@ -23,150 +25,180 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
+        {/* Rutas públicas */}
         <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/login/failed" element={<LoginFailed />} />
+
+        {/* Rutas protegidas */}
         <Route
           path="/usuarios"
           element={
-            <Layout
-              currentSection={currentSection}
-              setCurrentSection={setCurrentSection}
-            >
-              <Usuarios />
-            </Layout>
+            <ProtectedRoute>
+              <Layout
+                currentSection={currentSection}
+                setCurrentSection={setCurrentSection}
+              >
+                <Usuarios />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/categorias"
           element={
-            <Layout
-              currentSection={currentSection}
-              setCurrentSection={setCurrentSection}
-            >
-              <Categorias />
-            </Layout>
+            <ProtectedRoute>
+              <Layout
+                currentSection={currentSection}
+                setCurrentSection={setCurrentSection}
+              >
+                <Categorias />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/activos"
           element={
-            <Layout
-              currentSection={currentSection}
-              setCurrentSection={setCurrentSection}
-            >
-              <Activos />
-            </Layout>
+            <ProtectedRoute>
+              <Layout
+                currentSection={currentSection}
+                setCurrentSection={setCurrentSection}
+              >
+                <Activos />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/bajas"
           element={
-            <Layout
-              currentSection={currentSection}
-              setCurrentSection={setCurrentSection}
-            >
-              <Bajas />
-            </Layout>
+            <ProtectedRoute>
+              <Layout
+                currentSection={currentSection}
+                setCurrentSection={setCurrentSection}
+              >
+                <Bajas />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/bodega"
           element={
-            <Layout
-              currentSection={currentSection}
-              setCurrentSection={setCurrentSection}
-            >
-              <Bodega />
-            </Layout>
+            <ProtectedRoute>
+              <Layout
+                currentSection={currentSection}
+                setCurrentSection={setCurrentSection}
+              >
+                <Bodega />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/agregarActivo"
           element={
-            <Layout
-              currentSection={currentSection}
-              setCurrentSection={setCurrentSection}
-            >
-              <AgregarActivo />
-            </Layout>
+            <ProtectedRoute>
+              <Layout
+                currentSection={currentSection}
+                setCurrentSection={setCurrentSection}
+              >
+                <AgregarActivo />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/FormLC"
           element={
-            <Layout
-              currentSection={currentSection}
-              setCurrentSection={setCurrentSection}
-            >
-              <FormLC />
-            </Layout>
+            <ProtectedRoute>
+              <Layout
+                currentSection={currentSection}
+                setCurrentSection={setCurrentSection}
+              >
+                <FormLC />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/FormSAP"
           element={
-            <Layout
-              currentSection={currentSection}
-              setCurrentSection={setCurrentSection}
-            >
-              <FormSAP />
-            </Layout>
+            <ProtectedRoute>
+              <Layout
+                currentSection={currentSection}
+                setCurrentSection={setCurrentSection}
+              >
+                <FormSAP />
+              </Layout>
+            </ProtectedRoute>
           }
         />
-        
         <Route
           path="/FormPMTM"
           element={
-            <Layout
-              currentSection={currentSection}
-              setCurrentSection={setCurrentSection}
-            >
-              <FormPMTM />
-            </Layout>
+            <ProtectedRoute>
+              <Layout
+                currentSection={currentSection}
+                setCurrentSection={setCurrentSection}
+              >
+                <FormPMTM />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/editarActivo"
           element={
-            <Layout
-              currentSection={currentSection}
-              setCurrentSection={setCurrentSection}
-            >
-              <EditarActivo />
-            </Layout>
+            <ProtectedRoute>
+              <Layout
+                currentSection={currentSection}
+                setCurrentSection={setCurrentSection}
+              >
+                <EditarActivo />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/editarBodega"
           element={
-            <Layout
-              currentSection={currentSection}
-              setCurrentSection={setCurrentSection}
-            >
-              <EditarBodega />
-            </Layout>
+            <ProtectedRoute>
+              <Layout
+                currentSection={currentSection}
+                setCurrentSection={setCurrentSection}
+              >
+                <EditarBodega />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/agregarUsuario"
           element={
-            <Layout
-              currentSection={currentSection}
-              setCurrentSection={setCurrentSection}
-            >
-              <AgregarUsuario />
-            </Layout>
+            <ProtectedRoute>
+              <Layout
+                currentSection={currentSection}
+                setCurrentSection={setCurrentSection}
+              >
+                <AgregarUsuario />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/editarUsuario"
           element={
-            <Layout
-              currentSection={currentSection}
-              setCurrentSection={setCurrentSection}
-            >
-              <EditarUsuario />
-            </Layout>
+            <ProtectedRoute>
+              <Layout
+                currentSection={currentSection}
+                setCurrentSection={setCurrentSection}
+              >
+                <EditarUsuario />
+              </Layout>
+            </ProtectedRoute>
           }
         />
 

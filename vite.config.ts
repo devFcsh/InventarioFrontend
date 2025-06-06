@@ -1,8 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import { fileURLToPath, URL } from "url";
+import dotenv from 'dotenv';
 
-// https://vitejs.dev/config/
+dotenv.config();
+
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -14,13 +16,8 @@ export default defineConfig({
     },
   },
   server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',  // La URL de tu backend
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ''),  // Opcional: si tu backend no usa /api como prefijo
-      },
-    },
+    host: '0.0.0.0', // Permitir acceso externo
+    port: 5173,
+    // Eliminar proxy ya que usas URLs completas
   },
 });
