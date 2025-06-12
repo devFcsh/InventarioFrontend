@@ -56,9 +56,7 @@ const EditarActivoRed = ({
   const [selectedPuertos, setSelectedPuertos] = useState<string>("");
   const [selectedPuertoFTP, setSelectedPuertoFTP] = useState<string>("");
   const [empresa, setEmpresa] = useState<string | null>("");
-  const [nombreEquipo, setNombreEquipo] = useState<string>(
-    equipoRedActivo.nombreEquipo ?? ""
-  );
+  const [nombreEquipo, setNombreEquipo] = useState<string>("");
 
   const [newObservation, setNewObservation] = useState<string>("");
   const [errorMensajeComponente, setErrorMensajeComponente] = useState<

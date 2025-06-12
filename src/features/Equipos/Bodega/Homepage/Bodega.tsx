@@ -1,7 +1,5 @@
 import {
-  Alert,
   Autocomplete,
-  Snackbar,
   TextField,
   Tooltip,
 } from "@mui/material";
@@ -30,6 +28,7 @@ import {
   ExportarSimples,
   ExportarSwitch,
 } from "../../../../types/Equipo/index";
+import { useSnackbar } from "@context/SnackbarContext";
 
 const Bodega = () => {
   const [inputPeriferico, setInputPeriferico] = useState("");
@@ -45,9 +44,6 @@ const Bodega = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
-  const [snackbarSeverity, setSnackbarSeverity] = useState<
-    "success" | "error" | "warning"
-  >("success");
   const [modalContentBodega, _] = useState<{
     title: string;
     message: string;
@@ -69,9 +65,8 @@ const Bodega = () => {
     useState<boolean>(false);
   const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null);
 
+  const { showMessage } = useSnackbar();
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
   const handleOpenBodega = () => setOpenModalBodega(true);
   const handleCloseBodega = () => setOpenModalBodega(false);
 
@@ -118,12 +113,10 @@ const Bodega = () => {
 
   useEffect(() => {
     if (location.state && location.state.equipoAgregado) {
-      setSnackbarMessage("¡Equipo agregado con éxito!");
-      setOpenSnackbar(true);
+      showMessage("¡Equipo agregado con éxito!", "success");
       navigate(location.pathname, { replace: true, state: {} });
     } else if (location.state && location.state.equipoEditado) {
-      setSnackbarMessage("¡Equipo editado con éxito!");
-      setOpenSnackbar(true);
+      showMessage("¡Equipo editado con éxito!", "success");
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location.pathname, location.state, navigate]);
@@ -131,10 +124,9 @@ const Bodega = () => {
   const handleConfirm = async () => {
     try {
       await confirmAction();
-      setSnackbarMessage("Operación completada con éxito.");
-      setOpenSnackbar(true);
+      showMessage("Operación completada con éxito.", "success");
     } catch (error) {
-      console.error("Error en la acción", error);
+      showMessage("Error en la acción", "error");
     }
     handleCloseModal();
   };
@@ -158,21 +150,14 @@ const Bodega = () => {
         const result = await eliminarEquipo(equipoId);
         if (result) {
           setShouldFetch(true);
-          setSnackbarMessage(`Equipo con inventario ${inventario} eliminado.`);
-          setSnackbarSeverity("success");
+          showMessage(`Equipo con inventario ${inventario} eliminado.`, "success");
         } else {
-          setSnackbarMessage(
-            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`
-          );
-          setSnackbarSeverity("error");
+          showMessage(
+            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`, "error");
         }
-        setOpenSnackbar(true);
       } catch (error) {
-        setSnackbarMessage(
-          `Error al eliminar el equipo con inventario ${inventario}.`
-        );
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
+        showMessage(
+          `Error al eliminar el equipo con inventario ${inventario}.`, "error");
       }
     }
   };
@@ -191,24 +176,17 @@ const Bodega = () => {
       }
 
       if (errorsInventarios.length === 0) {
-        setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success");
+        showMessage("Operación completada con éxito", "success");
       } else {
-        setSnackbarMessage(
+        showMessage(
           `No se pudieron eliminar los equipos: ${errorsInventarios.join(
             ", "
-          )} ya que están relacionados a una computadora`
-        );
-        setSnackbarSeverity("error");
+          )} ya que están relacionados a una computadora`, "error");
       }
 
-      setShouldFetch(true);
       setSelectedItems([]);
-      setOpenSnackbar(true);
     } catch (error) {
-      setSnackbarMessage("Error al eliminar el equipo.");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
+      showMessage("Error al eliminar el equipo.", "error");
     }
   };
 
@@ -221,23 +199,15 @@ const Bodega = () => {
         const result = await darDeBajaEquipo(equipoId, "bodega");
         if (result) {
           setShouldFetch(true);
-          setSnackbarMessage(
-            `Equipo con inventario ${inventario} dado de baja`
-          );
-          setSnackbarSeverity("success");
+          showMessage(
+            `Equipo con inventario ${inventario} dado de baja`, "success");
         } else {
-          setSnackbarMessage(
-            `No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora`
-          );
-          setSnackbarSeverity("error");
+          showMessage(
+            `No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora`, "error");
         }
-        setOpenSnackbar(true);
       } catch (error) {
-        setSnackbarMessage(
-          `Error al dar de baja al equipo con inventario ${inventario}`
-        );
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
+        showMessage(
+          `Error al dar de baja al equipo con inventario ${inventario}`, "error");
       }
     }
   };
@@ -256,22 +226,16 @@ const Bodega = () => {
       }
       if (errorsInventarios.length === 0) {
         setShouldFetch(true);
-        setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success");
+        showMessage("Operación completada con éxito", "success");
       } else {
-        setSnackbarMessage(
+        showMessage(
           `Error al dar de baja los equipos con inventario ${errorsInventarios.join(
             ", "
-          )} ya que están relacionados a una computadora`
-        );
-        setSnackbarSeverity("error");
+          )} ya que están relacionados a una computadora`, "error");
       }
       setSelectedItems([]);
-      setOpenSnackbar(true);
     } catch (error) {
-      setSnackbarMessage("Error al dar de baja a los equipos.");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
+      showMessage("Error al dar de baja a los equipos.", "error");
     }
   };
 
@@ -318,8 +282,7 @@ const Bodega = () => {
         return;
       }
       await bajaEquipos(selectedItems);
-      setSnackbarMessage("¡Equipos dados de baja con éxito!");
-      setOpenSnackbar(true);
+      showMessage("¡Equipos dados de baja con éxito!", "success");
       setOpenModal(false);
     });
     setOpenModal(true);
@@ -596,41 +559,8 @@ const Bodega = () => {
     }
   };
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-  };
-
   return (
     <div className="flex flex-col p-4">
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-          iconMapping={{
-            success: (
-              <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />
-            ),
-            error: (
-              <Icon
-                icon="fluent:error-circle-24-regular"
-                width={20}
-                height={20}
-              />
-            ),
-            warning: (
-              <Icon icon="fluent:warning-24-regular" width={20} height={20} />
-            ),
-          }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Bodega</h1>

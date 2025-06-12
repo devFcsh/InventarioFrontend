@@ -580,7 +580,7 @@ const EditarComputadoraActivo = ({
     }
   };
 
-  const handleNombreEquipo = (value: any) => {
+  const handleNombreEquipo = (value: string) => {
     setNombreEquipo(value);
     if (value.length === 14) {
       setErrorNombreEquipo(false);
