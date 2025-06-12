@@ -25,7 +25,7 @@ interface InformacionGeneralDataForm{
   procesador: Procesador
 }
 
-export const useInformacionGeneralError = (dataform: InformacionGeneralDataForm) => {
+export const useInformacionGeneralError = (_: InformacionGeneralDataForm) => {
   const [informacionGeneralErrors, setInformacionGeneralErrors] = useState<Record<string, boolean>>({
     "sistemaOperativo":false,
     "versionSO":false,

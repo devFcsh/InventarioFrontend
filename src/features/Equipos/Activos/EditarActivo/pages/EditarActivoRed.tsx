@@ -379,7 +379,7 @@ const EditarActivoRed = ({
             options={["Espol", "EspolTech"]}
             getOptionLabel={(option) => (option ? option : "")}
             value={empresa}
-            onChange={(event, newValue) => {
+            onChange={(_, newValue) => {
               handleChangeEmpresa(newValue);
             }}
             renderInput={(params) => (

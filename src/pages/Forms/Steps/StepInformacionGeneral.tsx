@@ -182,7 +182,7 @@ export const StepInformacionGeneral = ({
                   (p) => p.id === informacionGeneralDataForm.protocolo
                 ) || null
               }
-              onChange={(event, newValue) => {
+              onChange={(_, newValue) => {
                 if (newValue) {
                   handleInformacionGeneralChange("protocolo", newValue.id);
                   handleUniqueInformacionGeneralError("protocolo", newValue.id);

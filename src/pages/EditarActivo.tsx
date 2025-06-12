@@ -68,7 +68,7 @@ const EditarActivo = () => {
               value={
                 perifericos.find((p) => p?.id_periferico === perifericoId) ?? null
               }
-              onChange={(event, newValue) =>
+              onChange={(_, newValue) =>
                 setPerifericoId(newValue ? newValue.id_periferico : null)
               }
               getOptionLabel={(option) => option?.nombre || ""}
@@ -90,7 +90,7 @@ const EditarActivo = () => {
               disablePortal
               options={usos}
               value={selectedUso}
-              onChange={(event, newValue) => {
+              onChange={(_, newValue) => {
                 setSelectedUso(newValue);
                 setSelectedUsuario(null);
               }}
@@ -105,7 +105,7 @@ const EditarActivo = () => {
               disablePortal
               options={usuarios}
               value={selectedUsuario}
-              onChange={(event, newValue) => setSelectedUsuario(newValue)}
+              onChange={(_, newValue) => setSelectedUsuario(newValue)}
               getOptionLabel={(option) =>option ? option.nombre : ""}
               renderInput={(params) => (
                 <TextField
@@ -171,7 +171,7 @@ const EditarActivo = () => {
               value={
                 perifericos.find((p) => p?.id_periferico === perifericoId) ?? null
               }
-              onChange={(event, newValue) =>
+              onChange={(_, newValue) =>
                 setPerifericoId(newValue ? newValue.id_periferico : null)
               }
               getOptionLabel={(option) => option?.nombre || ""}
@@ -250,7 +250,7 @@ const EditarActivo = () => {
               value={
                 perifericos.find((p) => p?.id_periferico === perifericoId) ?? null
               }
-              onChange={(event, newValue) =>
+              onChange={(_, newValue) =>
                 setPerifericoId(newValue ? newValue.id_periferico : null)
               }
               getOptionLabel={(option) => option?.nombre || ""}
@@ -272,7 +272,7 @@ const EditarActivo = () => {
               disablePortal
               options={usos}
               value={selectedUso}
-              onChange={(event, newValue) => {
+              onChange={(_, newValue) => {
                 setSelectedUso(newValue);
                 setSelectedUsuario(null);
               }}
@@ -287,7 +287,7 @@ const EditarActivo = () => {
               disablePortal
               options={usuarios}
               value={selectedUsuario}
-              onChange={(event, newValue) => setSelectedUsuario(newValue)}
+              onChange={(_, newValue) => setSelectedUsuario(newValue)}
               getOptionLabel={(option) =>option ? option.nombre : ""}
               renderInput={(params) => (
                 <TextField

@@ -28,12 +28,12 @@ const ModalCambiarUsuario: React.FC<ModalCambiarUsuarioProps> = ({
     }
   }, [open]);
 
-  const handleUsoChange = (event: React.SyntheticEvent<Element, Event>, newValue: Uso | null) => {
+  const handleUsoChange = (_: React.SyntheticEvent<Element, Event>, newValue: Uso | null) => {
     setSelectedUso(newValue ? newValue.id_uso : null);
     setSelectedUsuario(null); 
   };
 
-  const handleUsuarioChange = (event: React.SyntheticEvent<Element, Event>, newValue: Usuario | null) => {
+  const handleUsuarioChange = (_: React.SyntheticEvent<Element, Event>, newValue: Usuario | null) => {
     setSelectedUsuario(newValue ? newValue.id_usuario : null);
   };
 

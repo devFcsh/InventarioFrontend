@@ -23,7 +23,7 @@ export const FormPMTM = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeStep, setActiveStep] = useState(0);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [_, setShowSuccessMessage] = useState(false);
   const tipoInventario = location.state?.tipoInventario;
   if (tipoInventario === "baja" || tipoInventario === "bodega") {
     steps = ["Datos de inventario"];
@@ -34,7 +34,6 @@ export const FormPMTM = () => {
   const selectedUso = location.state?.uso as Uso | undefined;
   const selectedEdificio = location.state?.edificio as Edificio | undefined;
   const [openModalObservation, setOpenModalObservation] = useState(false);
-  const [observation, setObservation] = useState("");
   const { inventoryDataForm, handleInventoryChange } = useFormDatosInventario();
   const { imageData, handleImageChange, error } = useFormDataCargarImagen();
   const {
@@ -281,7 +280,7 @@ export const FormPMTM = () => {
     >
       <Box sx={{ width: "60%" }}>
         <Stepper activeStep={activeStep} alternativeLabel sx={stepStyle}>
-          {steps.map((label, index) => {
+          {steps.map((label, _) => {
             const stepProps: { completed?: boolean } = {};
             const labelProps: {
               optional?: React.ReactNode;

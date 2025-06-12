@@ -14,7 +14,7 @@ export const ModalObservation: React.FC<ModalProps> = ({
   onClose,
   onConfirm,
   title = "Agregar observación",
-  message,
+
 }) => {
   const [newObservation, setNewObservation] = useState<string>("");
   const [addObservation, setAddObservation] = useState<boolean>(false);

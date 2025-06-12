@@ -22,7 +22,7 @@ const AgregarUsuario = () => {
 
   const navigate = useNavigate();
 
-  const handleUsoChange = (event: any, newValue: Uso | null) => {
+  const handleUsoChange = (_: any, newValue: Uso | null) => {
     if (newValue) {
       setSelectedUsoId(newValue.id_uso);
     } else {

@@ -63,7 +63,7 @@ const Activos = () => {
     message: "¿Estás seguro de que deseas realizar esta acción?",
   });
 
-  const [modalContentActivos, setModalContentActivos] = useState<{
+  const [modalContentActivos, _] = useState<{
     title: string;
     message: string;
   }>({
@@ -864,7 +864,7 @@ const Activos = () => {
             disablePortal
             options={inventarios}
             getOptionLabel={(option) => option.inventario || ""}
-            onChange={(event, newValue) => setSelectedInventario(newValue)}
+            onChange={(_, newValue) => setSelectedInventario(newValue)}
             value={selectedInventario}
             isOptionEqualToValue={(option, value) =>
               option.inventario === value?.inventario

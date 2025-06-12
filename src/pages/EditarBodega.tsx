@@ -46,7 +46,7 @@ export const EditarBodega = () => {
               value={
                 perifericos.find((p) => p?.id_periferico === perifericoId) ?? null
               }
-              onChange={(event, newValue) =>
+              onChange={(_, newValue) =>
                 setPerifericoId(newValue ? newValue.id_periferico : null)
               }
               getOptionLabel={(option) => option?.nombre || ""}
@@ -113,7 +113,7 @@ export const EditarBodega = () => {
               value={
                 perifericos.find((p) => p?.id_periferico === perifericoId) ?? null
               }
-              onChange={(event, newValue) =>
+              onChange={(_, newValue) =>
                 setPerifericoId(newValue ? newValue.id_periferico : null)
               }
               getOptionLabel={(option) => option?.nombre || ""}
@@ -176,7 +176,7 @@ export const EditarBodega = () => {
               value={
                 perifericos.find((p) => p?.id_periferico === perifericoId) ?? null
               }
-              onChange={(event, newValue) =>
+              onChange={(_, newValue) =>
                 setPerifericoId(newValue ? newValue.id_periferico : null)
               }
               getOptionLabel={(option) => option?.nombre || ""}

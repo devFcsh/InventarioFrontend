@@ -125,7 +125,7 @@ export const StepDatosInventarioSAP = ({
               options={["Espol","EspolTech"]}
               getOptionLabel={(option) => (option ? option : "")}
               value={inventoryDataSAPForm.empresa}
-              onChange={(event, newValue) => {
+              onChange={(_, newValue) => {
                 handleInventorySAPChange("empresa", newValue);
                 handleUniqueInventarioSAPError("empresa",newValue,inventoryDataSAPForm);
               }}

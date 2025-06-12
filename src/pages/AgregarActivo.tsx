@@ -29,7 +29,7 @@ const AgregarActivo = () => {
     (p) => p?.id_periferico === perifericoId
   );
 
-  const handleUsoChange = (event: any, newValue: Uso | null) => {
+  const handleUsoChange = (_: any, newValue: Uso | null) => {
     if (newValue) {
       setSelectedUsoId(newValue.id_uso);
     } else {
@@ -49,7 +49,7 @@ const AgregarActivo = () => {
             disablePortal
             options={perifericos}
             value={selectedPeriferico ?? null}
-            onChange={(event, newValue) =>
+            onChange={(_, newValue) =>
               setPerifericoId(newValue ? newValue.id_periferico : null)
             }
             getOptionLabel={(option) => option?.nombre || ""}
@@ -97,7 +97,7 @@ const AgregarActivo = () => {
             value={
               usuarios.find((u) => u?.id_usuario === selectedUsuarioId) ?? null
             }
-            onChange={(event, newValue: Usuario | null) =>
+            onChange={(_, newValue: Usuario | null) =>
               setSelectedUsuarioId(newValue ? newValue.id_usuario : null)
             }
             getOptionLabel={(option) => option?.nombre || ""}

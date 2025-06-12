@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Autocomplete, IconButton } from "@mui/material";
 import { TextField, Snackbar, Alert } from "@mui/material";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import useUsos from "@hooks/useUsos";
@@ -61,7 +61,7 @@ const Usuarios = () => {
   }, [shouldFetch]);
 
   const handleUsoChange = (
-    event: React.SyntheticEvent<Element, Event>,
+    _: React.SyntheticEvent<Element, Event>,
     newValue: Uso | null
   ) => {
     setSelectedUso(newValue ? newValue.id_uso : null);
@@ -69,7 +69,7 @@ const Usuarios = () => {
   };
 
   const handleUsuarioChange = (
-    event: React.SyntheticEvent<Element, Event>,
+    _: React.SyntheticEvent<Element, Event>,
     newValue: Usuario | null
   ) => {
     setSelectedUsuario(newValue ? newValue.id_usuario : null);

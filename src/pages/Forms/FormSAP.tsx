@@ -14,7 +14,7 @@ export const FormSAP = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const location = useLocation();
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [_, setShowSuccessMessage] = useState(false);
   const selectedPeriferico = location.state?.periferico as
     | Periferico
     | undefined;
@@ -22,7 +22,6 @@ export const FormSAP = () => {
     | Edificio
     | undefined;
   const [openModalObservation, setOpenModalObservation] = useState(false);
-  const [observation, setObservation] = useState("")
   const tipoInventario = location.state?.tipoInventario;
   const steps = location.state?.steps;
   const { agregarRedActivo } = useAgregarRedActivo();
@@ -192,7 +191,7 @@ export const FormSAP = () => {
     };
 
     try {
-      const equipoId = await agregarRedActivo(equipoData);
+       await agregarRedActivo(equipoData);
 
       setShowSuccessMessage(true);
       navigate("/activos", { state: { equipoAgregado: true } });
@@ -214,7 +213,7 @@ export const FormSAP = () => {
       nombre_equipo:informacionGeneralDataSAPForm.nombreEquipo || "",
     };
     try {
-      const equipoId = await agregarRedBodega(bodegaComputadoraData);
+      await agregarRedBodega(bodegaComputadoraData);
 
       setShowSuccessMessage(true);
       navigate("/bodega", { state: { equipoAgregado: true } });
@@ -235,7 +234,7 @@ export const FormSAP = () => {
       nombre_equipo:informacionGeneralDataSAPForm.nombreEquipo || "",
     };
     try {
-      const equipoId = await agregarRedBaja(bodegaComputadoraData);
+     await agregarRedBaja(bodegaComputadoraData);
 
       setShowSuccessMessage(true);
       navigate("/bajas", { state: { equipoAgregado: true } });
@@ -282,7 +281,7 @@ export const FormSAP = () => {
     >
       <Box sx={{ width: "60%" }}>
         <Stepper activeStep={activeStep} alternativeLabel sx={stepStyle}>
-          {steps.map((label, index) => {
+          {steps.map((label:any, _:any) => {
             const stepProps: { completed?: boolean } = {};
             const labelProps: {
               optional?: React.ReactNode;

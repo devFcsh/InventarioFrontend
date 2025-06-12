@@ -44,7 +44,7 @@ const Bajas = () => {
     title: "Confirmar",
     message: "¿Estás seguro de que deseas realizar esta acción?",
   });
-  const [modalContentBajas, setModalContentBajas] = useState<{
+  const [modalContentBajas, _] = useState<{
     title: string;
     message: string;
   }>({
@@ -461,7 +461,7 @@ const Bajas = () => {
             disablePortal
             options={inventarios}
             getOptionLabel={(option) => option.inventario || ""}
-            onChange={(event, newValue) => setSelectedInventario(newValue)}
+            onChange={(_, newValue) => setSelectedInventario(newValue)}
             value={selectedInventario}
             isOptionEqualToValue={(option, value) =>
               option.inventario === value?.inventario

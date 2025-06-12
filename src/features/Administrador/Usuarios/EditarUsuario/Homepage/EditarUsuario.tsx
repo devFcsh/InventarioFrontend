@@ -133,7 +133,7 @@ const handleConfirmarCambio = async (usuarioId: string) => {
             value={usos.find((uso) => uso?.id_uso === selectedUsoId) || null}
             options={usos}
             getOptionLabel={(option) => option?.nombre || ""}
-            onChange={(e, newValue) => {
+            onChange={(_, newValue) => {
               setSelectedUsoId(newValue ? newValue.id_uso : null);
             }}
             renderInput={(params) => (
