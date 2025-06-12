@@ -357,8 +357,18 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 }
                 onChange={(e) => {
                   let value = e.target.value;
-                  if (value !== null && value.length > 10) {
-                    return;
+                  if (
+                    empresa === "Espol" &&
+                    value !== null &&
+                    value.length > 6
+                  ) {
+                    value = value.slice(0, 6);
+                  } else if (
+                    empresa === "EspolTech" &&
+                    value !== null &&
+                    value.length > 10
+                  ) {
+                    value = value.slice(0, 10);
                   }
                   setNuevoComponente({
                     ...nuevoComponente,

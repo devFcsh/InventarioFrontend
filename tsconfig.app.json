@@ -28,6 +28,7 @@
       "@pages/*": ["pages/*"],
       "@types/*": ["types/*"],
       "@data/*": ["data/*"],
+      "@context/*": ["context/*"],
     }
   },
   "include": ["src"]

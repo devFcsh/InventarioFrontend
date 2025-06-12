@@ -36,15 +36,13 @@ import { Icon } from "@iconify/react";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
 import usePerifericos from "../../../../../hooks/usePerifericos";
-import {useEditarBodega} from "../hooks/useEditarBodega.ts";
+import { useEditarBodega } from "../hooks/useEditarBodega.ts";
 import { useGestionarComponentesBodega } from "../hooks/useGestionarComponentesBodega.ts";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 import useProcesadores from "@hooks/useProcesadores";
 import { validateIP } from "../../../../../pages/Forms/helpers/validateIP.ts";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario.ts";
-
-
 
 interface EditarComputadoraBodegaProps {
   equipo: BodegaComputadoraEdit;
@@ -136,11 +134,29 @@ const EditarComputadoraBodega = ({
   const { gestionarComponentesBodega } = useGestionarComponentesBodega();
   const { perifericos } = usePerifericos();
 
-  const filteredPerifericos = perifericos.filter(
-    (p) =>
-      p?.nombre.toLowerCase() !== "computadora" &&
-      p?.nombre.toLowerCase() !== "laptop"
-  );
+  const filteredPerifericos = perifericos.filter((p) => {
+    const nombre = p?.nombre?.toLowerCase();
+    if (nombre !== "mouse" && nombre !== "teclado" && nombre !== "monitor") {
+      return false;
+    }
+    if (
+      (nombre === "mouse" || nombre === "teclado") &&
+      componentesState.some(
+        (comp) => comp.periferico?.nombre?.toLowerCase() === nombre
+      )
+    ) {
+      return false;
+    }
+    if (
+      nombre === "monitor" &&
+      componentesState.filter(
+        (comp) => comp.periferico?.nombre?.toLowerCase() === "monitor"
+      ).length >= 2
+    ) {
+      return false;
+    }
+    return true;
+  });
   const { marcas: marcasComponente } = useMarcasPorPeriferico(
     nuevoComponente.periferico?.id_periferico ?? ""
   );
@@ -269,6 +285,26 @@ const EditarComputadoraBodega = ({
   }, [equipo]);
 
   const handleAddComponente = () => {
+    const nombre = nuevoComponente.periferico?.nombre?.toLowerCase();
+    const cantidad = componentesState.filter(
+      (comp) => comp.periferico?.nombre?.toLowerCase() === nombre
+    ).length;
+
+    if (
+      (nombre === "teclado" && cantidad >= 1) ||
+      (nombre === "mouse" && cantidad >= 1) ||
+      (nombre === "monitor" && cantidad >= 2)
+    ) {
+      alert(
+        nombre === "monitor"
+          ? "Solo puedes agregar hasta 2 Monitores."
+          : `Solo puedes agregar un ${
+              nombre.charAt(0).toUpperCase() + nombre.slice(1)
+            }.`
+      );
+      return;
+    }
+
     if (
       nuevoComponente.periferico &&
       nuevoComponente.marca &&
@@ -299,7 +335,6 @@ const EditarComputadoraBodega = ({
   };
 
   const handleEditEquipo = async (observationValue: string) => {
-
     const payload = {
       tipo: "bodega",
       id_ram: selectedRAM?.id_ram ?? "",
@@ -326,7 +361,7 @@ const EditarComputadoraBodega = ({
             id_componente: comp.id_componente,
             inventario: comp.inventario,
             serieId: Number(comp.serie?.id_serie) ?? 0,
-          }))
+          })),
         });
         setShowSuccessMessage(true);
         navigate("/bodega", { state: { equipoEditado: true } });
@@ -584,12 +619,16 @@ const EditarComputadoraBodega = ({
             }
             onChange={(e) => {
               let value = e.target.value;
-              if (empresa==="Espol" && value !== null && value.length > 6) {
-                return
-              }else if(empresa==="EspolTech" && value !== null && value.length > 10){
-                return
+              if (empresa === "Espol" && value !== null && value.length > 6) {
+                return;
+              } else if (
+                empresa === "EspolTech" &&
+                value !== null &&
+                value.length > 10
+              ) {
+                return;
               }
-              handleChangeInventario(value)
+              handleChangeInventario(value);
             }}
             disabled={empresa === ""}
           />
@@ -772,7 +811,6 @@ const EditarComputadoraBodega = ({
             />
           )}
         />
-
       </div>
 
       <div className="mb-4">
@@ -803,15 +841,15 @@ const EditarComputadoraBodega = ({
                     <td className="py-2 px-1 border">
                       <Tooltip title="Eliminar Componente">
                         <span>
-                      <Icon
-                        icon="fluent-mdl2:disconnect-virtual-machine"
-                        width="25"
-                        height="25"
-                        onClick={() => eliminarComponente(index)}
-                        className="cursor-pointer mx-auto"
-                      />
-                      </span>
-                    </Tooltip>
+                          <Icon
+                            icon="fluent-mdl2:disconnect-virtual-machine"
+                            width="25"
+                            height="25"
+                            onClick={() => eliminarComponente(index)}
+                            className="cursor-pointer mx-auto"
+                          />
+                        </span>
+                      </Tooltip>
                     </td>
                   </tr>
                 ))}
@@ -939,12 +977,20 @@ const EditarComputadoraBodega = ({
                 }
                 onChange={(e) => {
                   let value = e.target.value;
-                  if (empresaNuevoComponente==="Espol" && value !== null && value.length > 6) {
-                    return
-                  }else if(empresaNuevoComponente==="EspolTech" && value !== null && value.length > 10){
-                    return
+                  if (
+                    empresaNuevoComponente === "Espol" &&
+                    value !== null &&
+                    value.length > 6
+                  ) {
+                    return;
+                  } else if (
+                    empresaNuevoComponente === "EspolTech" &&
+                    value !== null &&
+                    value.length > 10
+                  ) {
+                    return;
                   }
-                  handleChangeNuevoComponenteInventario(value)
+                  handleChangeNuevoComponenteInventario(value);
                 }}
                 disabled={empresa === ""}
               />

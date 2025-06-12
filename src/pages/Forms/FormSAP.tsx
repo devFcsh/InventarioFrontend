@@ -185,6 +185,7 @@ export const FormSAP = () => {
       puertos: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertos,
       puerto_ftp: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertoFTP,
       idLampara:0,
+      nombreEquipo: informacionGeneralDataSAPForm.nombreEquipo || "",
     };
 
     try {

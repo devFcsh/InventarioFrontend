@@ -1,7 +1,7 @@
 import { Box, TextField } from "@mui/material";
 
 interface StepInformacionGeneralProps {
-  periferico:string;
+  periferico: string;
   informacionGeneralDataSAPForm: any;
   handleInformacionGeneralSAPChange: any;
   informacionGeneralSAPErrors: any;
@@ -15,7 +15,6 @@ export const StepInformacionGeneralSAP = ({
   informacionGeneralSAPErrors,
   handleUniqueInformacionGeneralError,
 }: StepInformacionGeneralProps) => {
-
   return (
     <Box>
       <div className="mt-8">
@@ -35,71 +34,91 @@ export const StepInformacionGeneralSAP = ({
             }
             onChange={(e) => {
               let value = e.target.value.toUpperCase();
-              
+
               if (value !== null && value.length > 17) {
-                return
+                return;
               }
-            
+
               handleInformacionGeneralSAPChange("mac", value);
               handleUniqueInformacionGeneralError("mac", value);
             }}
-            
           />
-          {periferico!=="AP"?
-          <>
           <TextField
-            label="Puertos 10-100-1000"
-            placeholder="Puertos"
+            label="Nombre Equipo"
+            placeholder="Nombre Equipo"
             variant="outlined"
             fullWidth
             size="small"
-            value={informacionGeneralDataSAPForm.puertos}
-            error={!!informacionGeneralSAPErrors.puertos}
+            value={informacionGeneralDataSAPForm.nombreEquipo}
+            error={!!informacionGeneralSAPErrors.nombreEquipo}
             helperText={
-              informacionGeneralSAPErrors.puertos
-                ? "Por favor escribir un puerto válido"
+              informacionGeneralSAPErrors.nombreEquipo
+                ? "Por favor escribir un nombre de equipo válido"
                 : ""
             }
             onChange={(e) => {
               let value = e.target.value;
-              
               if (value !== null && value.length > 10) {
-                return
+                value = value.slice(0, 10);
               }
-            
-              handleInformacionGeneralSAPChange("puertos", value);
-              handleUniqueInformacionGeneralError("puertos", value);
+              handleInformacionGeneralSAPChange("nombreEquipo", value);
+              handleUniqueInformacionGeneralError("nombreEquipo", value);
             }}
           />
-          <TextField
-            label="Puerto FTP"
-            placeholder="Puerto FTP"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={informacionGeneralDataSAPForm.puertoFTP}
-            error={!!informacionGeneralSAPErrors.puertoFTP}
-            helperText={
-              informacionGeneralSAPErrors.puertoFTP
-                ? "Por favor escribir un puerto FTP válido"
-                : ""
-            }
+          {periferico !== "AP" ? (
+            <>
+              <TextField
+                label="Puertos 10-100-1000"
+                placeholder="Puertos"
+                variant="outlined"
+                fullWidth
+                size="small"
+                value={informacionGeneralDataSAPForm.puertos}
+                error={!!informacionGeneralSAPErrors.puertos}
+                helperText={
+                  informacionGeneralSAPErrors.puertos
+                    ? "Por favor escribir un puerto válido"
+                    : ""
+                }
+                onChange={(e) => {
+                  let value = e.target.value;
 
-            onChange={(e) => {
-              let value = e.target.value;
-              
-              if (value !== null && value.length > 10) {
-                return
-              }
-            
-              handleInformacionGeneralSAPChange("puertoFTP", value);
-              handleUniqueInformacionGeneralError("puertoFTP", value);
-            }}
-          />
-          </>
-            
-          :""}
-          
+                  if (value !== null && value.length > 10) {
+                    return;
+                  }
+
+                  handleInformacionGeneralSAPChange("puertos", value);
+                  handleUniqueInformacionGeneralError("puertos", value);
+                }}
+              />
+              <TextField
+                label="Puerto FTP"
+                placeholder="Puerto FTP"
+                variant="outlined"
+                fullWidth
+                size="small"
+                value={informacionGeneralDataSAPForm.puertoFTP}
+                error={!!informacionGeneralSAPErrors.puertoFTP}
+                helperText={
+                  informacionGeneralSAPErrors.puertoFTP
+                    ? "Por favor escribir un puerto FTP válido"
+                    : ""
+                }
+                onChange={(e) => {
+                  let value = e.target.value;
+
+                  if (value !== null && value.length > 10) {
+                    return;
+                  }
+
+                  handleInformacionGeneralSAPChange("puertoFTP", value);
+                  handleUniqueInformacionGeneralError("puertoFTP", value);
+                }}
+              />
+            </>
+          ) : (
+            ""
+          )}
         </div>
       </div>
     </Box>

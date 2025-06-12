@@ -1,7 +1,5 @@
 import {
-  Alert,
   Autocomplete,
-  Snackbar,
   TextField,
   Tooltip,
 } from "@mui/material";
@@ -32,6 +30,7 @@ import {
   ExportarSwitch,
 } from "../../../../types/Equipo/index.ts";
 import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "@context/SnackbarContext.tsx";
 
 const Activos = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -42,9 +41,6 @@ const Activos = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
-  const [snackbarSeverity, setSnackbarSeverity] = useState<
-    "success" | "error" | "warning"
-  >("success");
   const navigate = useNavigate();
   const [totalPages, setTotalPages] = useState<number>(1);
   const [modalContent, setModalContent] = useState<{
@@ -70,9 +66,8 @@ const Activos = () => {
   const [inputInventario, setInputInventario] = useState("");
 
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
 
+  const { showMessage } = useSnackbar();
   const { perifericos } = usePerifericos();
   const { edificios } = useEdificios();
   const { usos } = useUsos();
@@ -121,12 +116,10 @@ const Activos = () => {
 
   useEffect(() => {
     if (location.state && location.state.equipoAgregado) {
-      setSnackbarMessage("¡Equipo agregado con éxito!");
-      setOpenSnackbar(true);
+      showMessage("¡Equipo agregado con éxito!", "success");
       navigate(location.pathname, { replace: true, state: {} });
     } else if (location.state && location.state.equipoEditado) {
-      setSnackbarMessage("¡Equipo editado con éxito!");
-      setOpenSnackbar(true);
+      showMessage("¡Equipo editado con éxito!", "success");
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location.pathname, location.state, navigate]);
@@ -149,21 +142,12 @@ const Activos = () => {
         const result = await eliminarEquipo(equipoId);
         if (result) {
           setShouldFetch(true);
-          setSnackbarMessage(`Equipo con inventario ${inventario} eliminado.`);
-          setSnackbarSeverity("success");
+          showMessage(`Equipo con inventario ${inventario} eliminado.`, "success");
         } else {
-          setSnackbarMessage(
-            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`
-          );
-          setSnackbarSeverity("error");
+          showMessage(`No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`, "error");
         }
-        setOpenSnackbar(true);
       } catch (error) {
-        setSnackbarMessage(
-          `Error al eliminar el equipo con inventario ${inventario}.`
-        );
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
+        showMessage(`Error al eliminar el equipo con inventario ${inventario}.`, "error");
       }
     }
   };
@@ -182,24 +166,18 @@ const Activos = () => {
       }
 
       if (errorsInventarios.length === 0) {
-        setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success");
+        showMessage("Operación completada con éxito", "success");
       } else {
-        setSnackbarMessage(
+        showMessage(
           `No se pudieron eliminar los equipos: ${errorsInventarios.join(
             ", "
-          )} ya que están relacionados a una computadora`
-        );
-        setSnackbarSeverity("error");
+          )} ya que están relacionados a una computadora`, "error");
       }
 
       setShouldFetch(true);
       setSelectedItems([]);
-      setOpenSnackbar(true);
     } catch (error) {
-      setSnackbarMessage("Error al eliminar los equipos");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
+      showMessage("Error al eliminar los equipos", "error");
     }
   };
 
@@ -212,23 +190,18 @@ const Activos = () => {
         const result = await pasarActivoABodega(equipoId);
         if (result) {
           setShouldFetch(true);
-          setSnackbarMessage(
+          showMessage(
             `Equipo con inventario ${inventario} pasado a bodega`
-          );
-          setSnackbarSeverity("success");
+          , "success");
         } else {
-          setSnackbarMessage(
+          showMessage(
             `No se puede pasar a bodega el equipo con inventario ${inventario}porque el equipo está asociado a una computadora`
-          );
-          setSnackbarSeverity("error");
+          , "error");
         }
-        setOpenSnackbar(true);
       } catch (error) {
-        setSnackbarMessage(
+        showMessage(
           `Error al pasar a bodega el equipo con inventario ${inventario}`
-        );
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
+        , "error");
       }
     }
   };
@@ -247,24 +220,19 @@ const Activos = () => {
       }
 
       if (errorsInventarios.length === 0) {
-        setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success");
+        showMessage("Operación completada con éxito", "success");
       } else {
-        setSnackbarMessage(
+        showMessage(
           `No se pudieron pasar los equipos con inventarios: ${errorsInventarios.join(
             ", "
           )} a bodega ya que están relacionados a una computadora`
-        );
-        setSnackbarSeverity("error");
+        , "error");
       }
 
       setShouldFetch(true);
       setSelectedItems([]);
-      setOpenSnackbar(true);
     } catch (error) {
-      setSnackbarMessage("Error al pasar a bodega los equipos");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
+      showMessage("Error al pasar a bodega los equipos", "error");
     }
   };
 
@@ -277,23 +245,16 @@ const Activos = () => {
         const result = await darDeBajaEquipo(equipoId, "activo");
         if (result) {
           setShouldFetch(true);
-          setSnackbarMessage(
+          showMessage(
             `Equipo con inventario ${inventario} dado de baja`
-          );
-          setSnackbarSeverity("success");
+          , "success");
         } else {
-          setSnackbarMessage(
-            `No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora`
-          );
-          setSnackbarSeverity("error");
+          showMessage(
+            `No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora`, "error");
         }
-        setOpenSnackbar(true);
       } catch (error) {
-        setSnackbarMessage(
-          `Error al dar de baja al equipo con inventario ${inventario}`
-        );
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
+        showMessage(
+          `Error al dar de baja al equipo con inventario ${inventario}`, "error");
       }
     }
   };
@@ -312,22 +273,17 @@ const Activos = () => {
       }
       if (errorsInventarios.length === 0) {
         setShouldFetch(true);
-        setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success");
+        showMessage("Operación completada con éxito", "success");
       } else {
-        setSnackbarMessage(
+        showMessage(
           `Error al dar de baja los equipos con inventario ${errorsInventarios.join(
             ", "
           )} ya que están relacionados a una computadora`
-        );
-        setSnackbarSeverity("error");
+        , "error");
       }
       setSelectedItems([]);
-      setOpenSnackbar(true);
     } catch (error) {
-      setSnackbarMessage("Error al dar de baja los equipos");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
+      showMessage("Error al dar de baja los equipos", "error");
     }
   };
 
@@ -699,41 +655,8 @@ const Activos = () => {
     }
   };
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-  };
-
   return (
     <div className="flex flex-col p-4">
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-          iconMapping={{
-            success: (
-              <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />
-            ),
-            error: (
-              <Icon
-                icon="fluent:error-circle-24-regular"
-                width={20}
-                height={20}
-              />
-            ),
-            warning: (
-              <Icon icon="fluent:warning-24-regular" width={20} height={20} />
-            ),
-          }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>

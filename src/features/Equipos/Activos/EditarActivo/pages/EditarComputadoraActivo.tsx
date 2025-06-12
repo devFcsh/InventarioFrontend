@@ -153,11 +153,29 @@ const EditarComputadoraActivo = ({
   const { gestionarComponentes } = useGestionarComponentes();
   const { perifericos } = usePerifericos();
 
-  const filteredPerifericos = perifericos.filter(
-    (p) =>
-      p?.nombre.toLowerCase() !== "computadora" &&
-      p?.nombre.toLowerCase() !== "laptop"
-  );
+  const filteredPerifericos = perifericos.filter((p) => {
+    const nombre = p?.nombre?.toLowerCase();
+    if (nombre !== "mouse" && nombre !== "teclado" && nombre !== "monitor") {
+      return false;
+    }
+    if (
+      (nombre === "mouse" || nombre === "teclado") &&
+      componentesState.some(
+        (comp) => comp.periferico?.nombre?.toLowerCase() === nombre
+      )
+    ) {
+      return false;
+    }
+    if (
+      nombre === "monitor" &&
+      componentesState.filter(
+        (comp) => comp.periferico?.nombre?.toLowerCase() === "monitor"
+      ).length >= 2
+    ) {
+      return false;
+    }
+    return true;
+  });
   const { marcas: marcasComponente } = useMarcasPorPeriferico(
     nuevoComponente.periferico?.id_periferico ?? ""
   );
@@ -307,6 +325,26 @@ const EditarComputadoraActivo = ({
   }, [equipo]);
 
   const handleAddComponente = () => {
+    const nombre = nuevoComponente.periferico?.nombre?.toLowerCase();
+    const cantidad = componentesState.filter(
+      (comp) => comp.periferico?.nombre?.toLowerCase() === nombre
+    ).length;
+
+    if (
+      (nombre === "teclado" && cantidad >= 1) ||
+      (nombre === "mouse" && cantidad >= 1) ||
+      (nombre === "monitor" && cantidad >= 2)
+    ) {
+      alert(
+        nombre === "monitor"
+          ? "Solo puedes agregar hasta 2 Monitores."
+          : `Solo puedes agregar un ${
+              nombre.charAt(0).toUpperCase() + nombre.slice(1)
+            }.`
+      );
+      return;
+    }
+
     if (
       nuevoComponente.periferico &&
       nuevoComponente.marca &&
@@ -848,7 +886,7 @@ const EditarComputadoraActivo = ({
           }
           onChange={(e) => {
             let value = e.target.value;
-            if (value !== null && value.length > 14) {
+            if (value !== null && value.length > 10) {
               return;
             }
             handleNombreEquipo(value);
