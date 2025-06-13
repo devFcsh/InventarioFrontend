@@ -541,7 +541,7 @@ const EditarComputadoraActivo = ({
     }
   };
 
-  const handleNombreEquipo = (value: String)=>{
+  const handleNombreEquipo = (value: any)=>{
     setNombreEquipo(value);
     if (value.length===14) {
       setErrorNombreEquipo(false);
@@ -962,8 +962,7 @@ const EditarComputadoraActivo = ({
                     <td className="py-2 px-4 border">{comp.modelo?.nombre}</td>
                     <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
                     <td className="py-2 px-4 border">{comp.inventario}</td>
-                    <td className="py-5 px-1 border">
-                    <div className="relative group">
+                    <td className="py-2 px-1 border">
                       <Icon
                         icon="fluent-mdl2:disconnect-virtual-machine"
                         width="25"
@@ -971,10 +970,6 @@ const EditarComputadoraActivo = ({
                         onClick={() => eliminarComponente(index)}
                         className="cursor-pointer mx-auto"
                       />
-                      <span className="absolute left-1/2 transform -translate-x-1/2 top-full mt-1 text-xs bg-white text-gray-500 border border-gray-300 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10">
-      Desligar componente
-    </span>
-                   </div>
                     </td>
                   </tr>
                 ))}
@@ -1155,7 +1150,7 @@ const EditarComputadoraActivo = ({
           onClick={handleConfirmEditarEquipo}
           fullWidth
         >
-          Guardar Cambios
+          Editar Activo
         </Button>
         <Button
           onClick={handleConfirmCancelar}

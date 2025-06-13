@@ -54,7 +54,7 @@ export const useInformacionGeneralErrorSAP = (periferico:string | undefined) => 
       [tipo]: value === null || value === "" ? true : false,
     }));
     if (tipo === "mac") {
-      if (!validateMAC(value)) {
+      if (!validateMAC(value ||"")) {
         setInformacionGeneralErrors((prevErrors) => ({
           ...prevErrors,
           ["mac"]: true

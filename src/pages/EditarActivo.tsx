@@ -25,6 +25,7 @@ const EditarActivo = () => {
   }: { equipoId: string; perifericos: Periferico[],equipoName:string } = location.state || {};
   const { usos } = useUsos();
   const { usuarios } = useUsuariosPorUso(selectedUso?.id_uso || "");
+  
   if(equipoName==="Computadora" || equipoName==="Laptop"){
     const { equipo, componentes, loading, error } =
       useObtenerComputadora(equipoId);
@@ -124,11 +125,13 @@ const EditarActivo = () => {
             perifericos.find((p) => p?.id_periferico === perifericoId)?.nombre ??
               ""
           ) ? (
-            <EditarComputadoraActivo
-              equipo={equipo}
-              componentes={componentes}
-              idUsuario={selectedUsuario?.id_usuario || null}
-            />
+            equipo && (
+              <EditarComputadoraActivo
+                equipo={equipo}
+                componentes={componentes}
+                idUsuario={selectedUsuario?.id_usuario || null}
+              />
+            )
           ) : (
             perifericoId && (
               /** 
@@ -187,23 +190,11 @@ const EditarActivo = () => {
             />
           </div>
 
-          {perifericoId ? (
+          {perifericoId && equipoRedActivo && (
             <EditarActivoRed 
-            perifericoName={equipoName}
-            equipoRedActivo={equipoRedActivo}
+              perifericoName={equipoName}
+              equipoRedActivo={equipoRedActivo}
             />
-          ) : (
-            perifericoId && (
-              /** 
-              <EditarOtroActivo
-                equipo={equipo}
-                componentes={componentes}
-                idUso={selectedUso?.id_uso || null}
-                idUsuario={selectedUsuario?.id_usuario || null}
-              />
-              */
-             <h1>Editando otro activo</h1>
-            )
           )}
         </div>
       </div>
@@ -301,34 +292,17 @@ const EditarActivo = () => {
             />
           </div>
   
-          {perifericoId ? (
+          {perifericoId && equipoSimpleActivo && (
             <EditarActivoSimple
-            perifericoName={equipoName}
-            equipoSimpleActivo={equipoSimpleActivo}
+              perifericoName={equipoName}
+              equipoSimpleActivo={equipoSimpleActivo}
               idUsuario={selectedUsuario?.id_usuario || null}
             />
-          ) : (
-            perifericoId && (
-              /** 
-              <EditarOtroActivo
-                equipo={equipo}
-                componentes={componentes}
-                idUso={selectedUso?.id_uso || null}
-                idUsuario={selectedUsuario?.id_usuario || null}
-              />
-              */
-             <h1>Editando otro activo</h1>
-            )
           )}
         </div>
       </div>
     );
   }
 }
-
-
-
-
-
 
 export default EditarActivo;

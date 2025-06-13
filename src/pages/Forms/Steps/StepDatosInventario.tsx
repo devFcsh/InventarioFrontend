@@ -16,7 +16,7 @@ import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
 
 interface StepDatosInventarioProps {
-  periferico: Periferico;
+  periferico?: Periferico;
   uso: string;
   edificio: string;
   inventoryDataForm: any;

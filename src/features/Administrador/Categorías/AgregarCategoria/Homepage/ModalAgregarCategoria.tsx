@@ -173,9 +173,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
       return;
     }
     try {
-      let result;
       if (selectedCategoria === "RAM") {
-        result = await agregarFunc({
+        await agregarFunc({
           tipo: ramTipo,
           capacidad: capacidad,
           nombre: "",
@@ -186,7 +185,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           modeloId: 0,
         });
       } else if (selectedCategoria === "Disco") {
-        result = await agregarFunc({
+        await agregarFunc({
           capacidad: capacidad,
           nombre: "",
           tipo: "",
@@ -197,7 +196,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           modeloId: 0,
         });
       } else if (selectedCategoria === "Versión SO") {
-        result = await agregarFunc({
+        await agregarFunc({
           nombre: newOption,
           sistemaoperativoId: Number(selectedSO?.id_sistemaoperativo),
           capacidad: "",
@@ -208,7 +207,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           modeloId: 0,
         });
       } else if (selectedCategoria === "Ubicación") {
-        result = await agregarFunc({
+        await agregarFunc({
           nombre: newOption,
           edificioId: Number(selectedEdificio?.id_edificio),
           sistemaoperativoId: 0,
@@ -219,7 +218,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           modeloId: 0,
         });
       } else if (selectedCategoria === "Marca") {
-        result = await agregarFunc({
+        await agregarFunc({
           nombre: newOption,
           perifericoId: Number(selectedPeriferico?.id_periferico),
           sistemaoperativoId: 0,
@@ -230,7 +229,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           modeloId: 0,
         });
       } else if (selectedCategoria === "Modelo") {
-        result = await agregarFunc({
+        await agregarFunc({
           nombre: newOption,
           marcaId: Number(selectedMarca?.id_marca),
           sistemaoperativoId: 0,
@@ -241,7 +240,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           modeloId: 0,
         });
       } else if (selectedCategoria === "Serie" || selectedCategoria === "Lampara") {
-        result = await agregarFunc({
+        await agregarFunc({
           nombre: newOption,
           modeloId: Number(selectedModelo?.id_modelo),
           edificioId: 0,
@@ -252,7 +251,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
           marcaId: 0,
         });
       } else {
-        result = await agregarFunc({
+        await agregarFunc({
           nombre: newOption,
           tipo: "",
           capacidad: "",

@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { Alert, Dialog, Snackbar, TextField } from "@mui/material";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import useUsos from "@hooks/useUsos";
@@ -88,6 +88,23 @@ interface ModalEditarCategoriaProps {
   error: string | null;
   setError: React.Dispatch<React.SetStateAction<string | null>>;
 }
+
+// Type guards corregidos con null checks
+const isRAM = (obj: Opcion | null): obj is RAM => obj !== null && 'id_ram' in obj;
+const isDisco = (obj: Opcion | null): obj is Disco => obj !== null && 'id_disco' in obj;
+const isDominio = (obj: Opcion | null): obj is Dominio => obj !== null && 'id_dominio' in obj;
+const isPeriferico = (obj: Opcion | null): obj is Periferico => obj !== null && 'id_periferico' in obj;
+const isUso = (obj: Opcion | null): obj is Uso => obj !== null && 'id_uso' in obj;
+const isMarca = (obj: Opcion | null): obj is Marca => obj !== null && 'id_marca' in obj;
+const isModelo = (obj: Opcion | null): obj is Modelo => obj !== null && 'id_modelo' in obj;
+const isSerie = (obj: Opcion | null): obj is Serie => obj !== null && 'id_serie' in obj;
+const isLampara = (obj: Opcion | null): obj is Lampara => obj !== null && 'id_lampara' in obj;
+const isSistemaOperativo = (obj: Opcion | null): obj is SistemaOperativo => obj !== null && 'id_sistemaoperativo' in obj;
+const isEdificio = (obj: Opcion | null): obj is Edificio => obj !== null && 'id_edificio' in obj;
+const isUbicacion = (obj: Opcion | null): obj is Ubicacion => obj !== null && 'id_ubicacion' in obj;
+const isVersionSO = (obj: Opcion | null): obj is VersionSO => obj !== null && 'id_versionso' in obj;
+const isProcesador = (obj: Opcion | null): obj is Procesador => obj !== null && 'id_procesador' in obj;
+const isVersionOffice = (obj: Opcion | null): obj is VersionOffice => obj !== null && 'id_versionoffice' in obj;
 
 const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   open,
@@ -188,13 +205,13 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
 
   const handleEditarCategoria = (elemento: Opcion) => {
     setSelectedOption(elemento);
-    if (selectedCategoria === "RAM") {
+    if (selectedCategoria === "RAM" && isRAM(elemento)) {
       setEditedValue(elemento?.capacidad || "");
       setEditedTipo(elemento?.tipo || "");
-    } else if (selectedCategoria === "Disco") {
+    } else if (selectedCategoria === "Disco" && isDisco(elemento)) {
       setEditedValue(elemento?.capacidad || "");
-    } else {
-      setEditedValue(elemento?.nombre || "");
+    } else if (elemento && 'nombre' in elemento) {
+      setEditedValue(elemento.nombre || "");
     }
     setOpenEditModal(true);
   };
@@ -204,102 +221,126 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
       try {
         switch (selectedCategoria) {
           case "Dominio":
-            editarDominio({
-              id_dominio: selectedOption.id_dominio,
-              nuevoNombre: editedValue,
-            });
+            if (isDominio(selectedOption)) {
+              editarDominio({
+                id_dominio: Number(selectedOption.id_dominio),
+                nuevoNombre: editedValue,
+              });
+            }
             break;
           case "RAM":
-            editarRAM({
-              id_ram: selectedOption.id_ram,
-              tipo: editedTipo,
-              capacidad: editedValue,
-            });
+            if (isRAM(selectedOption)) {
+              editarRAM({
+                id_ram: Number(selectedOption.id_ram),
+                tipo: editedTipo,
+                capacidad: editedValue,
+              });
+            }
             break;
           case "Periférico":
-            editarPeriferico({
-              id_periferico: selectedOption.id_periferico,
-              nuevoNombre: editedValue,
-            });
+            if (isPeriferico(selectedOption)) {
+              editarPeriferico({
+                id_periferico: Number(selectedOption.id_periferico),
+                nuevoNombre: editedValue,
+              });
+            }
             break;
           case "Uso":
-            console.log(selectedOption.id_uso + " "+editedValue)
-            editarUso({
-              id_uso: selectedOption.id_uso,
-              nuevoNombre: editedValue,
-            });
+            if (isUso(selectedOption)) {
+              console.log(selectedOption.id_uso + " " + editedValue)
+              editarUso({
+                id_uso: Number(selectedOption.id_uso),
+                nuevoNombre: editedValue,
+              });
+            }
             break;
           case "Disco":
-            editarDisco({
-              id_disco: selectedOption.id_disco,
-              nuevoNombre: editedValue,
-            });
+            if (isDisco(selectedOption)) {
+              editarDisco({
+                id_disco: Number(selectedOption.id_disco),
+                nuevoNombre: editedValue,
+              });
+            }
             break;
           case "Marca":
-            editarMarca({
-              id_marca: selectedOption.id_marca,
-              nuevoNombre: editedValue,
-            });
+            if (isMarca(selectedOption)) {
+              editarMarca({
+                id_marca: Number(selectedOption.id_marca),
+                nuevoNombre: editedValue,
+              });
+            }
             break;
           case "Modelo":
-            editarModelo({
-              id_modelo: selectedOption.id_modelo,
-              nuevoNombre: editedValue,
-            });
+            if (isModelo(selectedOption)) {
+              editarModelo({
+                id_modelo: Number(selectedOption.id_modelo),
+                nuevoNombre: editedValue,
+              });
+            }
             break;
           case "Serie":
-            editarSerie({
-              id_serie: selectedOption.id_serie,
-              nuevoNombre: editedValue,
-            });
+            if (isSerie(selectedOption)) {
+              editarSerie({
+                id_serie: Number(selectedOption.id_serie),
+                nuevoNombre: editedValue,
+              });
+            }
             break;
           case "Lampara":
-            editarLampara({
-              id_lampara: selectedOption.id_lampara,
-              nuevoNombre: editedValue,
-            });
+            if (isLampara(selectedOption)) {
+              editarLampara({
+                id_lampara: Number(selectedOption.id_lampara),
+                nuevoNombre: editedValue,
+              });
+            }
             break;
           case "Sistema Operativo":
-            editarSistemaOperativo({
-              id_sistemaoperativo: selectedOption.id_sistemaoperativo,
-              nuevoNombre: editedValue,
-            });
+            if (isSistemaOperativo(selectedOption)) {
+              editarSistemaOperativo({
+                id_sistemaoperativo: Number(selectedOption.id_sistemaoperativo),
+                nuevoNombre: editedValue,
+              });
+            }
             break;
           case "Edificio":
-            editarEdificio({
-              id_edificio: selectedOption.id_edificio,
-              nuevoNombre: editedValue,
-            });
+            if (isEdificio(selectedOption)) {
+              editarEdificio({
+                id_edificio: Number(selectedOption.id_edificio),
+                nuevoNombre: editedValue,
+              });
+            }
             break;
           case "Ubicación":
-            editarUbicacion({
-              id_ubicacion: selectedOption.id_ubicacion,
-              nuevoNombre: editedValue,
-            });
+            if (isUbicacion(selectedOption)) {
+              editarUbicacion({
+                id_ubicacion: Number(selectedOption.id_ubicacion),
+                nuevoNombre: editedValue,
+              });
+            }
             break;
           case "Versión SO":
-            editarVersionSO({
-              id_versionso: selectedOption.id_versionso,
-              nuevoNombre: editedValue,
-            });
-            break;
-          case "RAM":
-            editarSerie({
-              id_serie: selectedOption.id_serie,
-              nuevoNombre: editedValue,
-            });
+            if (isVersionSO(selectedOption)) {
+              editarVersionSO({
+                id_versionso: Number(selectedOption.id_versionso),
+                nuevoNombre: editedValue,
+              });
+            }
             break;
           case "Procesador":
-            editarProcesador({
-              id_procesador: selectedOption.id_procesador,
-              nuevoNombre: editedValue,
-            });
+            if (isProcesador(selectedOption)) {
+              editarProcesador({
+                id_procesador: Number(selectedOption.id_procesador),
+                nuevoNombre: editedValue,
+              });
+            }
             break;
           case "Versión Office":
-            editarVersionOffice({
-              id_versionoffice: selectedOption.id_versionoffice,
-              nuevoNombre: editedValue,
-            });
+            if (isVersionOffice(selectedOption)) {
+              editarVersionOffice({
+                id_versionoffice: Number(selectedOption.id_versionoffice),
+                nuevoNombre: editedValue,
+              });
+            }
             break;
           default:
             console.log(
@@ -329,49 +370,79 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
       try {
         switch (selectedCategoria) {
           case "Dominio":
-            await eliminarDominio(elemento.id_dominio);
+            if (isDominio(elemento)) {
+              await eliminarDominio(Number(elemento.id_dominio));
+            }
             break;
           case "Periférico":
-            await eliminarPeriferico(elemento.id_periferico);
+            if (isPeriferico(elemento)) {
+              await eliminarPeriferico(Number(elemento.id_periferico));
+            }
             break;
           case "Uso":
-            await eliminarUso(elemento.id_uso);
+            if (isUso(elemento)) {
+              await eliminarUso(Number(elemento.id_uso));
+            }
             break;
           case "Disco":
-            await eliminarDisco(elemento.id_disco);
+            if (isDisco(elemento)) {
+              await eliminarDisco(Number(elemento.id_disco));
+            }
             break;
           case "Marca":
-            await eliminarMarca(elemento.id_marca);
+            if (isMarca(elemento)) {
+              await eliminarMarca(Number(elemento.id_marca));
+            }
             break;
           case "Modelo":
-            await eliminarModelo(elemento.id_modelo);
+            if (isModelo(elemento)) {
+              await eliminarModelo(Number(elemento.id_modelo));
+            }
             break;
           case "Serie":
-            await eliminarSerie(elemento.id_serie);
+            if (isSerie(elemento)) {
+              await eliminarSerie(Number(elemento.id_serie));
+            }
             break;
           case "Sistema Operativo":
-            await eliminarSistemaOperativo(elemento.id_sistemaoperativo);
+            if (isSistemaOperativo(elemento)) {
+              await eliminarSistemaOperativo(Number(elemento.id_sistemaoperativo));
+            }
             break;
           case "Edificio":
-            await eliminarEdificio(elemento.id_edificio);
+            if (isEdificio(elemento)) {
+              await eliminarEdificio(Number(elemento.id_edificio));
+            }
             break;
           case "Ubicación":
-            await eliminarUbicacion(elemento.id_ubicacion);
+            if (isUbicacion(elemento)) {
+              await eliminarUbicacion(Number(elemento.id_ubicacion));
+            }
             break;
           case "Versión SO":
-            await eliminarVersionSO(elemento.id_versionso);
+            if (isVersionSO(elemento)) {
+              await eliminarVersionSO(Number(elemento.id_versionso));
+            }
             break;
           case "RAM":
-            await eliminarRAM(elemento.id_ram);
+            if (isRAM(elemento)) {
+              await eliminarRAM(Number(elemento.id_ram));
+            }
             break;
           case "Procesador":
-            await eliminarProcesador(elemento.id_procesador);
+            if (isProcesador(elemento)) {
+              await eliminarProcesador(Number(elemento.id_procesador));
+            }
             break;
           case "Versión Office":
-            await eliminarVersionOffice(elemento.id_versionoffice);
+            if (isVersionOffice(elemento)) {
+              await eliminarVersionOffice(Number(elemento.id_versionoffice));
+            }
             break;
           case "Lampara":
-            await eliminarLampara(elemento.id_lampara);
+            if (isLampara(elemento)) {
+              await eliminarLampara(Number(elemento.id_lampara));
+            }
             break;
           default:
             console.log(
@@ -439,13 +510,18 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
                   elementos.map((elemento, index) => (
                     <tr key={index}>
                       <td className="py-2 px-4 border">
-                        {selectedCategoria === "RAM" ||
-                        selectedCategoria === "Disco"
-                          ? elemento?.capacidad
-                          : elemento?.nombre}
+                        {elemento && selectedCategoria === "RAM" && isRAM(elemento)
+                          ? elemento.capacidad
+                          : elemento && selectedCategoria === "Disco" && isDisco(elemento)
+                          ? elemento.capacidad
+                          : elemento && 'nombre' in elemento
+                          ? elemento.nombre
+                          : ''}
                       </td>
                       {selectedCategoria === "RAM" ? (
-                        <td className="py-2 px-4 border">{elemento?.tipo}</td>
+                        <td className="py-2 px-4 border">
+                          {elemento && isRAM(elemento) ? elemento.tipo : ''}
+                        </td>
                       ) : (
                         <></>
                       )}
