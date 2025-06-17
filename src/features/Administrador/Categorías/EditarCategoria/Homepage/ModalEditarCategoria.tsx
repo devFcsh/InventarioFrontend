@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { Alert, Dialog, Snackbar, TextField, Tooltip } from "@mui/material";
+import { Dialog, TextField, Tooltip } from "@mui/material";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import useUsos from "@hooks/useUsos";
 import useDiscos from "@hooks/useDiscos";
@@ -63,6 +63,7 @@ import { useEditarLampara } from "../../AgregarCategoria/hooks/useEditarLampara"
 import { useEliminarLampara } from "../../AgregarCategoria/hooks/useEliminarLampara";
 import { useEditarRAM } from "../../AgregarCategoria/hooks/useEditarRAM";
 import { useEliminarRAM } from "../../AgregarCategoria/hooks/useEliminarRAM";
+import { useSnackbar } from "@context/SnackbarContext";
 
 type Opcion =
   | Uso
@@ -126,12 +127,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   onClose,
   selectedCategoria,
 }) => {
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-    "success"
-  );
-
+  const { showMessage } = useSnackbar();
   const { usos } = useUsos();
   const { discos } = useDiscos();
   const { marcas } = useMarcas();
@@ -364,17 +360,13 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             break;
         }
 
-        setSnackbarMessage("Opción editada correctamente");
-        setSnackbarSeverity("success");
-        setOpenSnackbar(true);
+        showMessage("Subcategoría editada correctamente", "success");
         onClose();
         setTimeout(() => {
           window.location.reload();
         }, 1000);
       } catch (error) {
-        setSnackbarMessage("Error al editar la opción");
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
+        showMessage("Error al editar la subcategoría", "error");
       }
     }
     setOpenEditModal(false);
@@ -467,37 +459,19 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             );
             break;
         }
-        setSnackbarMessage("Opción eliminada correctamente");
-        setSnackbarSeverity("success");
-        setOpenSnackbar(true);
+        showMessage("Subcategoría eliminada correctamente", "success");
         onClose();
         setTimeout(() => {
           window.location.reload();
         }, 1000);
       } catch (error) {
-        setSnackbarMessage("Desligue la opción antes de eliminarla");
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
+        showMessage("Desligue la subcategoría antes de eliminarla", "error");
       }
     }
   };
 
   return (
     <>
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={() => setOpenSnackbar(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={() => setOpenSnackbar(false)}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
       <Dialog open={open} onClose={onClose}>
         <div className="py-5 px-10">
           <h2 className="text-xl font-semibold mb-4">
@@ -507,9 +481,9 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             <table className="min-w-full table-auto border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-100 border-b">
-                  <th className="py-2 px-4 border">Opción</th>
+                  <th className="py-2 px-4 border">Subcategoría</th>
                   {selectedCategoria === "RAM" ? (
-                    <th className="py-2 px-4 border">Opción Tipo</th>
+                    <th className="py-2 px-4 border">Subcategoría Tipo</th>
                   ) : (
                     <></>
                   )}
@@ -580,7 +554,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
 
         <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
           <div className="p-5">
-            <h3 className="text-xl font-semibold mb-4">Editar Opción</h3>
+            <h3 className="text-xl font-semibold mb-4">Editar Subcategoría</h3>
             {selectedCategoria === "RAM" ? (
               <>
                 <TextField

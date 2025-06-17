@@ -16,6 +16,7 @@ import { useInventoryErrors, useCargarImagenErrors } from "./hooks/index";
 import { useAgregarSimpleBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarSimpleBodega";
 import { useAgregarSimpleBaja } from "../../features/Equipos/Baja/AgregarEquipoBaja/hooks/useAgregarSimpleBaja";
 import { ModalObservation } from "./components/ModalObservation.tsx";
+import { useSnackbar } from "@context/SnackbarContext.tsx";
 
 let steps = ["Datos de inventario", "Cargar imagen"];
 
@@ -23,7 +24,6 @@ export const FormPMTM = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeStep, setActiveStep] = useState(0);
-  const [_, setShowSuccessMessage] = useState(false);
   const tipoInventario = location.state?.tipoInventario;
   if (tipoInventario === "baja" || tipoInventario === "bodega") {
     steps = ["Datos de inventario"];
@@ -85,6 +85,8 @@ export const FormPMTM = () => {
       }
     }
   };
+  
+  const { showMessage } = useSnackbar();
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -212,11 +214,11 @@ export const FormPMTM = () => {
         completeDatosCargarImagen(imageData)
       ) {
         await agregarSimpleActivo(equipoSimpleData);
-        setShowSuccessMessage(true);
-        navigate("/activos", { state: { equipoAgregado: true } });
+        showMessage("Equipo agregado exitosamente", "success");
+        navigate("/activos");
       }
     } catch (error) {
-      alert("Error al agregar el componente");
+      showMessage("Error al agregar el equipo", "error");
     }
   };
 
@@ -235,11 +237,11 @@ export const FormPMTM = () => {
         completeDatosInventario(inventoryDataForm)
       ) {
         await agregarSimpleBodega(bodegaSimpleData);
-        setShowSuccessMessage(true);
-        navigate("/bodega", { state: { equipoAgregado: true } });
+        showMessage("Equipo agregado exitosamente", "success");
+        navigate("/bodega");
       }
     } catch (error) {
-      alert("Error al agregar el componente");
+      showMessage("Error al agregar el equipo", "error");
     }
   };
   const handleAgregarEquipoBaja = async (observationValue: string) => {
@@ -257,11 +259,11 @@ export const FormPMTM = () => {
         completeDatosInventario(inventoryDataForm)
       ) {
         await agregarSimpleBaja(bajaSimpleData);
-        setShowSuccessMessage(true);
-        navigate("/bajas", { state: { equipoAgregado: true } });
+        showMessage("Equipo agregado exitosamente", "success");
+        navigate("/bajas");
       }
     } catch (error) {
-      alert("Error al agregar el componente");
+      showMessage("Error al agregar el equipo", "error");
     }
   };
 

@@ -111,16 +111,6 @@ const Bodega = () => {
     setOpenModal(false);
   };
 
-  useEffect(() => {
-    if (location.state && location.state.equipoAgregado) {
-      showMessage("¡Equipo agregado con éxito!", "success");
-      navigate(location.pathname, { replace: true, state: {} });
-    } else if (location.state && location.state.equipoEditado) {
-      showMessage("¡Equipo editado con éxito!", "success");
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, [location.pathname, location.state, navigate]);
-
   const handleConfirm = async () => {
     try {
       await confirmAction();

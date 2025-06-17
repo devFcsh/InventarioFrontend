@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Autocomplete, TextField, Button, Snackbar, Alert, Box } from "@mui/material";
+import { Autocomplete, TextField, Button, Box } from "@mui/material";
 import {
   Marca,
   Modelo,
@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario";
 import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
 import useLamparas from "@hooks/useLamparas";
+import { useSnackbar } from "@context/SnackbarContext";
 
 interface EditarBodegaSimpleProps {
     equipoSimpleBodega: BodegaSimpleEdit;
@@ -44,8 +45,7 @@ const EditarBodegaSimple = ({
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(null);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  
+  const { showMessage } = useSnackbar();  
   const navigate = useNavigate();
   const { marcas } = useMarcasPorPeriferico(equipoSimpleBodega?.id_periferico ?? "");
   const { modelos } = useModelosPorMarcaPeriferico(
@@ -120,11 +120,11 @@ const EditarBodegaSimple = ({
     };
     try {
       await editarBodegaSimple(equipoSimpleBodega.id_equipo, payload);
-        setShowSuccessMessage(true);
-        navigate("/bodega", { state: { equipoEditado: true } });
+        showMessage("Equipo editado exitosamente", "success");
+        navigate("/bodega");
       
     } catch (error) {
-      console.error("Error al actualizar equipo:", error);
+      showMessage("Error al editar el equipo", "error");
     }
   };
 
@@ -214,13 +214,6 @@ const EditarBodegaSimple = ({
         title="Confirmar Cancelar"
         message="¿Está seguro de que desea cancelar? Todos los cambios no guardados se perderán."
       />
-      <Snackbar
-        open={showSuccessMessage}
-        autoHideDuration={3000}
-        onClose={() => setShowSuccessMessage(false)}
-      >
-        <Alert severity="success">Equipo agregado exitosamente</Alert>
-      </Snackbar>
       <h2 className="text-xl font-semibold mb-5">Información de Inventario</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <Autocomplete
@@ -310,7 +303,7 @@ const EditarBodegaSimple = ({
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
             onChange={(e) => {
-              let value = e.target.value;
+              const value = e.target.value;
               if (empresa==="Espol" && value !== null && value.length > 6) {
                 return
               }else if(empresa==="EspolTech" && value !== null && value.length > 10){

@@ -1,25 +1,21 @@
 import {
-  Alert,
   Autocomplete,
-  Snackbar,
   TextField,
   Tooltip,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
-import * as XLSX from "xlsx";
-import { useLocation } from "react-router-dom";
-import ModalConfirmation from "../../../../components/ModalConfirmation";
+import * as XLSX from "xlsx";import ModalConfirmation from "../../../../components/ModalConfirmation";
 import usePerifericos from "../../../../hooks/usePerifericos";
 import { filas } from "../../../../data";
 import { useEquiposBajaFiltrados } from "../hooks/useEquiposBajaFiltrados";
 import { ModalAgregarBaja } from "../../Baja/Pages/ModalAgregarBaja";
 import { useEliminarComputadora } from "@hooks/useEliminarComputadora.ts";
-import { useNavigate } from "react-router-dom";
 import useMarcas from "@hooks/useMarcas";
 import useModelos from "@hooks/useModelos";
 import useSeries from "@hooks/useSeries";
 import { useInventario } from "@hooks/useInventario";
+import { useSnackbar } from "@context/SnackbarContext";
 
 const Bajas = () => {
   const [inputPeriferico, setInputPeriferico] = useState("");
@@ -35,9 +31,6 @@ const Bajas = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
-  const [snackbarSeverity, setSnackbarSeverity] = useState<
-    "success" | "error" | "warning"
-  >("success");
   const [totalPages, setTotalPages] = useState<number>(1);
   const [modalContent, setModalContent] = useState<{
     title: string;
@@ -57,17 +50,13 @@ const Bajas = () => {
   const handleOpenBajas = () => setOpenModalBajas(true);
   const handleCloseBajas = () => setOpenModalBajas(false);
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
 
+  const { showMessage } = useSnackbar();
   const { perifericos } = usePerifericos();
   const { marcas } = useMarcas();
   const { modelos } = useModelos();
   const { series } = useSeries();
   const { inventarios } = useInventario();
-
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const filtros = {
     perifericoId: inputPeriferico || "",
@@ -101,25 +90,12 @@ const Bajas = () => {
     setOpenModal(false);
   };
 
-  useEffect(() => {
-    if (location.state && location.state.equipoAgregado) {
-      setSnackbarMessage("¡Equipo agregado con éxito!");
-      setOpenSnackbar(true);
-      navigate(location.pathname, { replace: true, state: {} });
-    } else if (location.state && location.state.equipoEditado) {
-      setSnackbarMessage("¡Equipo editado con éxito!");
-      setOpenSnackbar(true);
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, [location.pathname, location.state, navigate]);
-
   const handleConfirm = async () => {
     try {
       await confirmAction();
-      setSnackbarMessage("Operación completada con éxito.");
-      setOpenSnackbar(true);
+      showMessage("Operación completada con éxito.", "success");
     } catch (error) {
-      console.error("Error en la acción", error);
+      showMessage("Error al realizar la operación.", "error");
     }
     handleCloseModal();
   };
@@ -133,21 +109,14 @@ const Bajas = () => {
         const result = await eliminarEquipo(equipoId);
         if (result) {
           setShouldFetch(true);
-          setSnackbarMessage(`Equipo con inventario ${inventario} eliminado.`);
-          setSnackbarSeverity("success");
+          showMessage(`Equipo con inventario ${inventario} eliminado.`, "success");
         } else {
-          setSnackbarMessage(
-            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`
-          );
-          setSnackbarSeverity("error");
+          showMessage(
+            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`, "error");
         }
-        setOpenSnackbar(true);
       } catch (error) {
-        setSnackbarMessage(
-          `Error al eliminar el equipo con inventario ${inventario}.`
-        );
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
+        showMessage(
+          `Error al eliminar el equipo con inventario ${inventario}.`, "error");
       }
     }
   };
@@ -163,24 +132,18 @@ const Bajas = () => {
       }
 
       if (errors.length === 0) {
-        setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success");
+        showMessage("Operación completada con éxito", "success");
       } else {
-        setSnackbarMessage(
+        showMessage(
           `No se pudieron eliminar los equipos: ${errors.join(
             ", "
-          )} ya que están relacionados a una computadora`
-        );
-        setSnackbarSeverity("error");
+          )} ya que están relacionados a una computadora`, "error");
       }
 
       setShouldFetch(true);
       setSelectedItems([]);
-      setOpenSnackbar(true);
     } catch (error) {
-      setSnackbarMessage("Error al eliminar el equipo.");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
+      showMessage("Error al eliminar el equipo.", "error");
     }
   };
 
@@ -274,41 +237,9 @@ const Bajas = () => {
     XLSX.writeFile(wb, "datos_equipos.xlsx");
   };
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-  };
 
   return (
     <div className="flex flex-col p-4">
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-          iconMapping={{
-            success: (
-              <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />
-            ),
-            error: (
-              <Icon
-                icon="fluent:error-circle-24-regular"
-                width={20}
-                height={20}
-              />
-            ),
-            warning: (
-              <Icon icon="fluent:warning-24-regular" width={20} height={20} />
-            ),
-          }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Bajas</h1>

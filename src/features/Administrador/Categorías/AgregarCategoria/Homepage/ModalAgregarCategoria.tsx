@@ -127,43 +127,43 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
 
     if (
       !capacidad && !ramTipo && selectedCategoria === "RAM") {
-      setError("Por favor, ingrese una opción válida.");
+      setError("Por favor, ingrese una subcategoría válida.");
       return;
     }
 
     if (
       !capacidad && selectedCategoria === "Disco" ) {
-      setError("Por favor, ingrese una opción válida.");
+      setError("Por favor, ingrese una subcategoría válida.");
       return;
     }
 
     if (
       !newOption && selectedCategoria !== "Disco" && selectedCategoria !== "RAM") {
-      setError("Por favor, ingrese una opción válida.");
+      setError("Por favor, ingrese una subcategoría válida.");
       return;
     }
 
     if (
       !selectedSO?.id_sistemaoperativo && selectedCategoria === "Versión SO" ) {
-      setError("Por favor, ingrese una opción válida.");
+      setError("Por favor, ingrese una subcategoría válida.");
       return;
     }
 
     if (
       !selectedEdificio?.id_edificio && selectedCategoria === "Ubicación" ) {
-      setError("Por favor, ingrese una opción válida.");
+      setError("Por favor, ingrese una subcategoría válida.");
       return;
     }
 
     if (
       !selectedMarca?.id_marca && selectedCategoria === "Modelo" ) {
-      setError("Por favor, ingrese una opción válida.");
+      setError("Por favor, ingrese una subcategoría válida.");
       return;
     }
 
     if (
       !selectedModelo?.id_modelo && (selectedCategoria === "Serie" || selectedCategoria === "Lampara") ) {
-      setError("Por favor, ingrese una opción válida.");
+      setError("Por favor, ingrese una subcategoría válida.");
       return;
     }
 
@@ -264,7 +264,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
       }
       onClose();
     } catch (err) {
-      setError("Error al agregar la opción.");
+      setError("Error al agregar la subcategoría.");
     }
   };
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Autocomplete, TextField, Button, Snackbar, Alert, Box } from "@mui/material";
+import { Autocomplete, TextField, Button, Box } from "@mui/material";
 import {
   Marca,
   Modelo,
@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario";
 import useEditarBodegaRed from "../hooks/useEditarBodegaRed";
 import { validateMAC } from "@pages/Forms/StepsSAP/helpers/validateMAC";
+import { useSnackbar } from "@context/SnackbarContext";
 
 interface EditarBodegaRedProps {
     equipoRedBodega: BodegaRedEdit;
@@ -51,8 +52,7 @@ const EditarBodegaRed = ({
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(null);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  
+  const { showMessage } = useSnackbar();  
 
   const navigate = useNavigate();
 
@@ -119,11 +119,11 @@ const EditarBodegaRed = ({
     };
     try {
       await editarBodegaRed(equipoRedBodega.id_equipo, payload);
-        setShowSuccessMessage(true);
-        navigate("/bodega", { state: { equipoEditado: true } });
+        showMessage("Equipo editado exitosamente", "success");
+        navigate("/bodega");
       
     } catch (error) {
-      console.error("Error al actualizar equipo:", error);
+      showMessage("Error al editar el equipo", "error");
     }
   };
 
@@ -214,13 +214,6 @@ const EditarBodegaRed = ({
         title="Confirmar Cancelar"
         message="¿Está seguro de que desea cancelar? Todos los cambios no guardados se perderán."
       />
-      <Snackbar
-        open={showSuccessMessage}
-        autoHideDuration={3000}
-        onClose={() => setShowSuccessMessage(false)}
-      >
-        <Alert severity="success">Equipo agregado exitosamente</Alert>
-      </Snackbar>
       <h2 className="text-xl font-semibold mb-5">Información de Inventario</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <Autocomplete

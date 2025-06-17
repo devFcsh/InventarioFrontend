@@ -3,8 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   TextField,
   Button,
-  Snackbar,
-  Alert,
   Autocomplete,
   Tooltip,
 } from "@mui/material";
@@ -14,6 +12,7 @@ import useCambiarUsuarioEquipo from "../hooks/useCambiarUsuarioEquipo";
 import useEditarUsuario from "../hooks/useEditarUsuario";
 import ModalCambiarUsuario from "../components/ModalCambiarUsuario";
 import useUsos from "@hooks/useUsos";
+import { useSnackbar } from "@context/SnackbarContext";
 
 const EditarUsuario = () => {
   const location = useLocation();
@@ -25,10 +24,9 @@ const EditarUsuario = () => {
   const [selectedUsoId, setSelectedUsoId] = useState<string | null>(
     usuario?.id_uso || null
   );
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [equipoId, setEquipoId] = useState<string | null>(null);
 
+  const { showMessage } = useSnackbar();
   const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
   const {
     equipos,
@@ -62,28 +60,19 @@ const EditarUsuario = () => {
     try {
       if (nombre && selectedUsoId) {
         await editarUsuario(usuario.id_usuario, nombre, selectedUsoId);
-        setSnackbarMessage("Usuario actualizado correctamente");
-        setOpenSnackbar(true);
-
+        showMessage("Usuario actualizado correctamente", "success");
         setTimeout(() => {
           navigate("/usuarios");
         }, 1000);
       } else {
-        setSnackbarMessage("Por favor, complete todos los campos.");
-        setOpenSnackbar(true);
+        showMessage("Por favor, complete todos los campos.", "error");
       }
     } catch (error) {
-      setSnackbarMessage("Error al actualizar el usuario");
-      setOpenSnackbar(true);
-
+      showMessage("Error al actualizar el usuario", "error");
       setTimeout(() => {
         navigate("/usuarios");
       }, 1000);
     }
-  };
-
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
   };
 
   const handleCambiarUsuario = (equipoId: string) => {
@@ -93,17 +82,14 @@ const EditarUsuario = () => {
 
   useEffect(() => {
     if (success) {
-      setSnackbarMessage("Usuario cambiado correctamente al equipo");
+      showMessage("Usuario cambiado correctamente al equipo"), "success";
       refetchEquipos();
       setOpenModal(false);
     }
     if (error) {
-      setSnackbarMessage("No se puede cambiar de usuario a un componente");
+      showMessage("No se puede cambiar de usuario a un componente", "error");
     }
-    if (success || error) {
-      setOpenSnackbar(true);
-    }
-  }, [success, error]);
+  }, [success, error, showMessage, refetchEquipos]);
 
   const handleConfirmarCambio = async (usuarioId: string) => {
     if (equipoId) {
@@ -205,21 +191,6 @@ const EditarUsuario = () => {
           </table>
         </div>
       </div>
-
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={success ? "success" : "error"}
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
 
       <div className="flex gap-4 mt-10">
         <Button

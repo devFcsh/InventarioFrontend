@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import {
   Autocomplete,
   TextField,
-  Snackbar,
-  Alert,
   Tooltip,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
@@ -13,6 +11,7 @@ import { filas } from "../../../../data";
 
 import ModalAgregarCategoria from "../AgregarCategoria/Homepage/ModalAgregarCategoria";
 import ModalEditarCategoria from "../EditarCategoria/Homepage/ModalEditarCategoria";
+import { useSnackbar } from "@context/SnackbarContext";
 const categorias = [
   "Uso",
   "Periférico",
@@ -68,11 +67,7 @@ const Categorias = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [filteredItems, setFilteredItems] = useState<FilteredItem[]>([]);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
-  const [snackbarMessage, setSnackbarMessage] = useState<string>("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<
-    "success" | "error" | "warning"
-  >("success");
+  const { showMessage } = useSnackbar();
 
   const location = useLocation();
 
@@ -115,11 +110,9 @@ const Categorias = () => {
 
   useEffect(() => {
     if (location.state && location.state.snackbarMessage) {
-      setSnackbarMessage(location.state.snackbarMessage);
-      setSnackbarSeverity(location.state.snackbarSeverity || "success");
-      setOpenSnackbar(true);
+      showMessage(location.state.snackbarMessage, location.state.snackbarMessage.severity);
     }
-  }, [location]);
+  }, [location, showMessage]);
 
   const handleOpenModalAgregar = () => {
     setOpenModalAgregar(true);
@@ -128,9 +121,7 @@ const Categorias = () => {
   const handleCloseModalAgregar = () => {
     setOpenModalAgregar(false);
     setError(null);
-    setSnackbarMessage("Categoría agregada exitosamente");
-    setSnackbarSeverity("success");
-    setOpenSnackbar(true);
+    showMessage("Subcategoría agregada exitosamente", "success");
     setTimeout(() => {
       window.location.reload();
     }, 1000);
@@ -150,41 +141,8 @@ const Categorias = () => {
     setError(null);
   };
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-  };
-
   return (
     <div className="flex flex-col p-4">
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-          iconMapping={{
-            success: (
-              <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />
-            ),
-            error: (
-              <Icon
-                icon="fluent:error-circle-24-regular"
-                width={20}
-                height={20}
-              />
-            ),
-            warning: (
-              <Icon icon="fluent:warning-24-regular" width={20} height={20} />
-            ),
-          }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
 
       <div className="mb-4">
         <h1 className="text-2xl font-bold my-5">Consulta de Categorías</h1>

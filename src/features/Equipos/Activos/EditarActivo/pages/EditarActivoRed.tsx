@@ -3,8 +3,6 @@ import {
   Autocomplete,
   TextField,
   Button,
-  Snackbar,
-  Alert,
   Box,
 } from "@mui/material";
 import {
@@ -26,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario";
 import useEditarActivoRed from "../hooks/useEditarActivoRed";
 import { validateMAC } from "@pages/Forms/StepsSAP/helpers/validateMAC";
+import { useSnackbar } from "@context/SnackbarContext";
 
 interface EditarActivoRedProps {
   equipoRedActivo: ActivoRedEdit;
@@ -72,8 +71,8 @@ const EditarActivoRed = ({
   );
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
+  const { showMessage } = useSnackbar();
   const navigate = useNavigate();
   const [image, setImage] = useState<File | null>(null);
   const [currentImagePath, setCurrentImagePath] = useState<string | null>(null);
@@ -202,10 +201,10 @@ const EditarActivoRed = ({
     };
     try {
       await editarActivoRed(equipoRedActivo.id_equipo, payload);
-      setShowSuccessMessage(true);
-      navigate("/activos", { state: { equipoEditado: true } });
+      showMessage("Equipo editado correctamente", "success");
+      navigate("/activos");
     } catch (error) {
-      console.error("Error al actualizar equipo:", error);
+      showMessage("Error al editar el equipo", "error");
     }
   };
 
@@ -325,13 +324,6 @@ const EditarActivoRed = ({
         title="Confirmar Cancelar"
         message="¿Está seguro de que desea cancelar? Todos los cambios no guardados se perderán."
       />
-      <Snackbar
-        open={showSuccessMessage}
-        autoHideDuration={3000}
-        onClose={() => setShowSuccessMessage(false)}
-      >
-        <Alert severity="success">Equipo agregado exitosamente</Alert>
-      </Snackbar>
       <h2 className="text-xl font-semibold mb-5">Información de Inventario</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <Autocomplete
@@ -486,7 +478,7 @@ const EditarActivoRed = ({
           error={!!errorMAC}
           helperText={errorMAC ? "Por favor escribir un inventario válido" : ""}
           onChange={(e) => {
-            let value = e.target.value.toUpperCase();
+            const value = e.target.value.toUpperCase();
 
             if (value !== null && value.length > 17) {
               return;

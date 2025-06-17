@@ -10,6 +10,7 @@ import {useFormDatosInventarioSAP,useFormDataInformacionGeneralSAP,useInventoryE
 import { ModalObservation } from "./components/ModalObservation.tsx";
 import {useCargarImagenErrors,useFormDataCargarImagen} from "./hooks/index.ts"
 import {StepCargarImagen} from "./Steps/StepCargarImagen.tsx"
+import { useSnackbar } from "@context/SnackbarContext.tsx";
 export const FormSAP = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
@@ -34,6 +35,7 @@ export const FormSAP = () => {
   const { informacionGeneralSAPErrors, handleInformacionGeneralSAPErrors, handleUniqueInformacionGeneralError, completeDatosInformacionGeneral } = useInformacionGeneralErrorSAP(selectedPeriferico?.nombre);
   const { cargarImagenErrors, handleCargarImagenErrors, handleUniqueCargarImagenError, completeDatosCargarImagen } = useCargarImagenErrors();
 
+  const { showMessage } = useSnackbar();
   const handleNext = () => {
     if (activeStep === 0) {
       handleInventorySAPErrors(inventoryDataSAPForm);
@@ -192,9 +194,10 @@ export const FormSAP = () => {
       await agregarRedActivo(equipoData);
 
       setShowSuccessMessage(true);
-      navigate("/activos", { state: { equipoAgregado: true } });
+      showMessage("Equipo agregado correctamente", "success");
+      navigate("/activos");
     } catch (error) {
-      alert("Error al agregar el equipo y componentes.");
+      showMessage("Error al agregar el equipo", "error");
     }
   };
 
@@ -213,9 +216,10 @@ export const FormSAP = () => {
       await agregarRedBodega(bodegaComputadoraData);
 
       setShowSuccessMessage(true);
-      navigate("/bodega", { state: { equipoAgregado: true } });
+      showMessage("Equipo agregado correctamente", "success");
+      navigate("/bodega");
     } catch (error) {
-      alert("Error al agregar el equipo y componentes.");
+      showMessage("Error al agregar el equipo", "error");
     }
   }
   const handleAgregarEquipoBaja = async (observationValue: string) => {
@@ -233,9 +237,10 @@ export const FormSAP = () => {
       await agregarRedBaja(bodegaComputadoraData);
 
       setShowSuccessMessage(true);
-      navigate("/bajas", { state: { equipoAgregado: true } });
+      showMessage("Equipo agregado correctamente", "success");
+      navigate("/bajas");
     } catch (error) {
-      alert("Error al agregar el equipo y componentes.");
+      showMessage("Error al agregar el equipo", "error");
     }
   }
   
