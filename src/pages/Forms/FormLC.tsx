@@ -69,8 +69,6 @@ export const FormLC = () => {
     handleUniqueCargarImagenError,
     completeDatosCargarImagen,
   } = useCargarImagenErrors();
-  console.log(activeStep)
-  console.log(steps)
 
   const { showMessage } = useSnackbar(); 
   

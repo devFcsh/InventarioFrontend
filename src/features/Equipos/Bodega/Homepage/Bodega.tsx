@@ -228,7 +228,7 @@ const Bodega = () => {
 
   const handleDelete = () => {
     if (selectedItems.length === 0) {
-      console.log("Debe seleccionar al menos un elemento");
+      showMessage("Debe seleccionar al menos un elemento", "warning");
       return;
     }
 
@@ -265,7 +265,7 @@ const Bodega = () => {
     });
     setConfirmAction(() => async () => {
       if (selectedItems.length === 0) {
-        console.log("Debe seleccionar al menos un elemento");
+        showMessage("Debe seleccionar al menos un elemento", "warning");
         return;
       }
       await bajaEquipos(selectedItems);

@@ -149,7 +149,7 @@ const Bajas = () => {
 
   const handleDelete = () => {
     if (selectedItems.length === 0) {
-      console.log("Debe seleccionar al menos un elemento");
+      showMessage("Debe seleccionar al menos un elemento", "warning");
       return;
     }
 

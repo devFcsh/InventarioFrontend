@@ -13,7 +13,6 @@ export const useObtenerRedActivo = (id: string) => {
     const obtenerEquipoRedActivo = async () => {
       try {
         const response = await clienteAxios.get(`/equipos/equipoRedActivo/${id}`);
-        console.log(response)
         setEquipoRedActivo(response.data.equipo);
       } catch (err) {
         setError("Error al obtener equipo" + err);

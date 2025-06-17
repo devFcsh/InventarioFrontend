@@ -17,7 +17,6 @@ export const useModelosPorMarcaPeriferico = (marcaId: string, perifericoId: stri
                             perifericoId
                         }
                     });
-                    console.log(response.data)
                     setModelos(response.data);
                 } catch (err) {
                     setError("Error al obtener modelos por marca periferico" + err);

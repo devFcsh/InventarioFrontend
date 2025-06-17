@@ -258,7 +258,6 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             break;
           case "Uso":
             if (isUso(selectedOption)) {
-              console.log(selectedOption.id_uso + " " + editedValue);
               editarUso({
                 id_uso: Number(selectedOption.id_uso),
                 nuevoNombre: editedValue,
@@ -354,9 +353,8 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             }
             break;
           default:
-            console.log(
-              `No hay función para editar la categoría ${selectedCategoria}`
-            );
+            showMessage(
+              `No se puede editar la categoría ${selectedCategoria}`, "error")
             break;
         }
 
@@ -454,9 +452,8 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             }
             break;
           default:
-            console.log(
-              `No hay función para eliminar la categoría ${selectedCategoria}`
-            );
+            showMessage(
+              `No se puede eliminar la categoría ${selectedCategoria}`, "error")
             break;
         }
         showMessage("Subcategoría eliminada correctamente", "success");

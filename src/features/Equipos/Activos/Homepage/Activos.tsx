@@ -276,7 +276,7 @@ const Activos = () => {
 
   const handlePasarABodega = () => {
     if (selectedItems.length === 0) {
-      console.log("Debe seleccionar al menos un elemento");
+      showMessage("Debe seleccionar al menos un elemento", "warning");
       return;
     }
 
@@ -286,7 +286,12 @@ const Activos = () => {
     });
 
     setConfirmAction(() => async () => {
+      try {
       await pasarABodegaEquipos(selectedItems);
+        showMessage("Equipo pasado a bodega con éxito", "success");
+      } catch (error) {
+        showMessage("Error al pasar equipo a bodega", "error");
+      }
       setOpenModal(false);
     });
 
@@ -295,7 +300,7 @@ const Activos = () => {
 
   const handleDelete = () => {
     if (selectedItems.length === 0) {
-      console.log("Debe seleccionar al menos un elemento");
+      showMessage("Debe seleccionar al menos un elemento", "warning");
       return;
     }
 
@@ -334,7 +339,7 @@ const Activos = () => {
     });
     setConfirmAction(() => async () => {
       if (selectedItems.length === 0) {
-        console.log("Debe seleccionar al menos un elemento");
+        showMessage("Debe seleccionar al menos un elemento", "warning");
         return;
       }
       await bajaEquipos(selectedItems);
