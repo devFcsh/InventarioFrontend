@@ -191,13 +191,13 @@ const AgregarComputadoraActivo = ({
       try {
         imagePath = await uploadImage(image);
       } catch (error) {
-        alert("Error al cargar la imagen.");
+        showMessage("Error al subir la imagen", "error");
         return;
       }
     }
 
     if (!selectedInventarioInv) {
-      alert("El campo de inventario no puede estar vacío.");
+      showMessage("El campo de inventario no puede estar vacío.", "error")
       return;
     }
 

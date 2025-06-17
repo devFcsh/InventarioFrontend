@@ -6,7 +6,7 @@ import {
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
 import usePerifericos from "../../../../hooks/usePerifericos";
 import useMarcas from "@hooks/useMarcas.ts";
@@ -17,7 +17,6 @@ import { filas } from "../../../../data";
 import { useEquiposBodegaFiltrados } from "../hooks/useEquiposBodegaFiltrados";
 import { ModalAgregarBodega } from "../../../../features/Equipos/Bodega/Pages/ModalAgregarBodega";
 import ModalPasarAActivo from "../Pages/ModalPasarAActivo";
-import { useNavigate } from "react-router-dom";
 import { useEliminarComputadora } from "@hooks/useEliminarComputadora.ts";
 import { useDarDeBajaEquipo } from "../../Activos/hooks/useDarDeBajaEquipo";
 import { useExportarEquiposBodega } from "../hooks/useExportarEquiposBodega";
@@ -79,8 +78,6 @@ const Bodega = () => {
   const { darDeBajaEquipo } = useDarDeBajaEquipo();
   const { fetchTodosEquipos } = useExportarEquiposBodega();
 
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const filtros = {
     perifericoId: inputPeriferico || "",

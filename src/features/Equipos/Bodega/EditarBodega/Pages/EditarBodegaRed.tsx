@@ -302,7 +302,7 @@ const EditarBodegaRed = ({
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
             onChange={(e) => {
-              let value = e.target.value;
+              const value = e.target.value;
               if (empresa==="Espol" && value !== null && value.length > 6) {
                 return
               }else if(empresa==="EspolTech" && value !== null && value.length > 10){

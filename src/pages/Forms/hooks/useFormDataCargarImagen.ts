@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useSubirImagen from "@hooks/useSubirImagen";
+import { useSnackbar } from "@context/SnackbarContext";
 
 interface imagenDataForm {
   image: File | null;
@@ -14,6 +15,7 @@ export const useFormDataCargarImagen = () => {
 
   const { uploadImage, error } = useSubirImagen();
 
+  const { showMessage } = useSnackbar();
   const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -30,7 +32,7 @@ export const useFormDataCargarImagen = () => {
         imagePath = await uploadImage(file);
         handleImagenDataForm("imagePath", imagePath);
       } catch (error) {
-        alert("Error al cargar la imagen.");
+        showMessage("Error al subir la imagen. Por favor, inténtelo de nuevo.", "error")
         return;
       }
     }

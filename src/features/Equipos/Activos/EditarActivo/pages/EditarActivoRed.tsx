@@ -181,7 +181,7 @@ const EditarActivoRed = ({
       try {
         nuevaImagen = await uploadImage(image);
       } catch (error) {
-        alert("Error al cargar la imagen.");
+        showMessage("Error al cargar la imagen", "error");
         return;
       }
     }
@@ -412,7 +412,7 @@ const EditarActivoRed = ({
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
             onChange={(e) => {
-              let value = e.target.value;
+              const value = e.target.value;
               if (empresa === "Espol" && value !== null && value.length > 6) {
                 return;
               } else if (
@@ -514,7 +514,7 @@ const EditarActivoRed = ({
             size="small"
             value={selectedPuertos}
             onChange={(e) => {
-              let value = e.target.value;
+              const value = e.target.value;
 
               if (value !== null && value.length > 10) {
                 return;
@@ -544,7 +544,7 @@ const EditarActivoRed = ({
               errorPuertoFTP ? "Por favor escribir un puerto FTP válido" : ""
             }
             onChange={(e) => {
-              let value = e.target.value;
+              const value = e.target.value;
 
               if (value !== null && value.length > 10) {
                 return;
@@ -600,7 +600,7 @@ const EditarActivoRed = ({
           minRows={2}
           value={newObservation}
           onChange={(e) => {
-            let value = e.target.value;
+            const value = e.target.value;
 
             if (value !== null && value.length > 200) {
               return;

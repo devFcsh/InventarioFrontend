@@ -6,7 +6,7 @@ import {
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
 import { ModalAgregarActivo } from "../../../../features/Equipos/Activos/AgregarActivo/pages/ModalAgregarActivo.tsx";
 import usePerifericos from "../../../../hooks/usePerifericos";
@@ -29,7 +29,6 @@ import {
   ExportarSimples,
   ExportarSwitch,
 } from "../../../../types/Equipo/index.ts";
-import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "@context/SnackbarContext.tsx";
 
 const Activos = () => {
@@ -41,7 +40,6 @@ const Activos = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
-  const navigate = useNavigate();
   const [totalPages, setTotalPages] = useState<number>(1);
   const [modalContent, setModalContent] = useState<{
     title: string;
@@ -78,7 +76,6 @@ const Activos = () => {
   const { pasarActivoABodega } = usePasarActivoABodega();
   const { fetchTodosEquipos } = useExportarEquiposActivos();
 
-  const location = useLocation();
   const filtros = {
     perifericoId: inputPeriferico || "",
     marcaId: inputMarca || "",
@@ -118,7 +115,7 @@ const Activos = () => {
     try {
       await confirmAction();
     } catch (error) {
-      alert("Error en la acción");
+      showMessage("Error al realizar la acción", "error");
     }
     handleCloseModal();
   };

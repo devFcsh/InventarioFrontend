@@ -258,7 +258,7 @@ const EditarComputadoraBodega = ({
         ) || null
       );
     }
-  }, [equipo, antivirus]);
+  }, [equipo]);
 
   useEffect(() => {
     if (equipo && versionesOffice.length > 0) {
@@ -294,13 +294,12 @@ const EditarComputadoraBodega = ({
       (nombre === "mouse" && cantidad >= 1) ||
       (nombre === "monitor" && cantidad >= 2)
     ) {
-      alert(
-        nombre === "monitor"
+      showMessage(nombre === "monitor"
           ? "Solo puedes agregar hasta 2 Monitores."
           : `Solo puedes agregar un ${
               nombre.charAt(0).toUpperCase() + nombre.slice(1)
             }.`
-      );
+      , "error");
       return;
     }
 
@@ -322,9 +321,7 @@ const EditarComputadoraBodega = ({
         inventario: "",
       });
     } else {
-      alert(
-        "Por favor, complete todos los campos antes de agregar el componente."
-      );
+      showMessage("Por favor, complete todos los campos antes de agregar el componente.", "error");
     }
   };
 
@@ -608,7 +605,7 @@ const EditarComputadoraBodega = ({
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
             onChange={(e) => {
-              let value = e.target.value;
+              const value = e.target.value;
               if (empresa === "Espol" && value !== null && value.length > 6) {
                 return;
               } else if (
@@ -966,7 +963,7 @@ const EditarComputadoraBodega = ({
                     : ""
                 }
                 onChange={(e) => {
-                  let value = e.target.value;
+                  const value = e.target.value;
                   if (
                     empresaNuevoComponente === "Espol" &&
                     value !== null &&

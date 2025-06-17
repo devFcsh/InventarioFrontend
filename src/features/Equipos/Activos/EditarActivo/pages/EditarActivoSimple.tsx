@@ -186,7 +186,7 @@ const EditarActivoSimple = ({
       try {
         nuevaImagen = await uploadImage(image);
       } catch (error) {
-        alert("Error al cargar la imagen.");
+        showMessage("Error al subir la imagen", "error");
         return;
       }
     }
@@ -394,7 +394,7 @@ const EditarActivoSimple = ({
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
             onChange={(e) => {
-              let value = e.target.value;
+              const value = e.target.value;
               if (empresa === "Espol" && value !== null && value.length > 6) {
                 return;
               } else if (
@@ -521,7 +521,7 @@ const EditarActivoSimple = ({
           minRows={2}
           value={newObservation}
           onChange={(e) => {
-            let value = e.target.value;
+            const value = e.target.value;
             if (value !== null && value.length > 200) {
               return;
             }

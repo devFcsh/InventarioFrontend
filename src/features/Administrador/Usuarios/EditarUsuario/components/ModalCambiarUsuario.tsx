@@ -3,6 +3,7 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Autocomplete
 import useUsos from "@hooks/useUsos";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import { Uso, Usuario } from "../../../../../types"; 
+import { useSnackbar } from "@context/SnackbarContext";
 
 interface ModalCambiarUsuarioProps {
   open: boolean;
@@ -20,6 +21,7 @@ const ModalCambiarUsuario: React.FC<ModalCambiarUsuarioProps> = ({
 
   const { usos } = useUsos(); 
   const { usuarios } = useUsuariosPorUso(selectedUso || ""); 
+  const { showMessage } = useSnackbar();
 
   useEffect(() => {
     if (!open) {
@@ -41,7 +43,7 @@ const ModalCambiarUsuario: React.FC<ModalCambiarUsuarioProps> = ({
     if (selectedUso && selectedUsuario) {
       onConfirm(selectedUsuario); 
     } else {
-      alert("Por favor, selecciona un Uso y un Usuario.");
+      showMessage("Por favor, selecciona un Uso y un Usuario.", "error");
     }
   };
 

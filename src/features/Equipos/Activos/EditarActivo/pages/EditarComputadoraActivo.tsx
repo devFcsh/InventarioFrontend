@@ -334,13 +334,11 @@ const EditarComputadoraActivo = ({
       (nombre === "mouse" && cantidad >= 1) ||
       (nombre === "monitor" && cantidad >= 2)
     ) {
-      alert(
-        nombre === "monitor"
+      showMessage(nombre === "monitor"
           ? "Solo puedes agregar hasta 2 Monitores."
           : `Solo puedes agregar un ${
               nombre.charAt(0).toUpperCase() + nombre.slice(1)
-            }.`
-      );
+            }.`, "error")
       return;
     }
 
@@ -362,9 +360,7 @@ const EditarComputadoraActivo = ({
         inventario: "",
       });
     } else {
-      alert(
-        "Por favor, complete todos los campos antes de agregar el componente."
-      );
+      showMessage("Por favor, complete todos los campos antes de agregar el componente.", "error");
     }
   };
 
@@ -393,7 +389,7 @@ const EditarComputadoraActivo = ({
       try {
         nuevaImagen = await uploadImage(image);
       } catch (error) {
-        alert("Error al cargar la imagen.");
+        showMessage("Error al subir la imagen", "error");
         return;
       }
     }
@@ -689,7 +685,7 @@ const EditarComputadoraActivo = ({
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
             onChange={(e) => {
-              let value = e.target.value;
+              const value = e.target.value;
               if (empresa === "Espol" && value !== null && value.length > 6) {
                 return;
               } else if (
@@ -848,7 +844,7 @@ const EditarComputadoraActivo = ({
             value={direccionIP}
             error={!!errorDireccionIP}
             onChange={(e) => {
-              let value = e.target.value;
+              const value = e.target.value;
               if (value !== null && value.length > 15) {
                 return;
               }
@@ -874,7 +870,7 @@ const EditarComputadoraActivo = ({
               : ""
           }
           onChange={(e) => {
-            let value = e.target.value;
+            const value = e.target.value;
             if (value !== null && value.length > 10) {
               return;
             }
@@ -1134,7 +1130,7 @@ const EditarComputadoraActivo = ({
                     : ""
                 }
                 onChange={(e) => {
-                  let value = e.target.value;
+                  const value = e.target.value;
                   if (
                     empresaNuevoComponente === "Espol" &&
                     value !== null &&
@@ -1174,7 +1170,7 @@ const EditarComputadoraActivo = ({
           minRows={2}
           value={newObservation}
           onChange={(e) => {
-            let value = e.target.value;
+            const value = e.target.value;
             if (value !== null && value.length > 200) {
               return;
             }

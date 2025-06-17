@@ -48,7 +48,7 @@ const AgregarUsuario = () => {
 
   const validarCampos = () => {
     if (!nombre || !selectedUsoId) {
-      alert("Por favor, complete todos los campos.");
+      showMessage("Por favor, complete todos los campos.", "error");
       return false;
     }
     return true;
