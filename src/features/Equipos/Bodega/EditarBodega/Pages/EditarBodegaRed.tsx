@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
 import { Autocomplete, TextField, Button, Box } from "@mui/material";
-import {
-  Marca,
-  Modelo,
-  Serie
-} from "../../../../../types";
+import { Marca, Modelo, Serie } from "../../../../../types";
 import { BodegaRedEdit } from "../../../../../types/Bodega";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
@@ -17,8 +13,8 @@ import { validateMAC } from "@pages/Forms/StepsSAP/helpers/validateMAC";
 import { useSnackbar } from "@context/SnackbarContext";
 
 interface EditarBodegaRedProps {
-    equipoRedBodega: BodegaRedEdit;
-    perifericoName: string;
+  equipoRedBodega: BodegaRedEdit;
+  perifericoName: string;
 }
 
 const EditarBodegaRed = ({
@@ -32,31 +28,34 @@ const EditarBodegaRed = ({
 
   const [selectedInventarioSerie, setSelectedInventarioSerie] =
     useState<Serie | null>(null);
-    
+
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
 
-  const [selectedMAC, setSelectedMAC] =
-    useState<string>("");
-  const [selectedPuertos, setSelectedPuertos] =
-    useState<string>("");
-  const [selectedPuertoFTP, setSelectedPuertoFTP] =
-    useState<string>("");
+  const [selectedMAC, setSelectedMAC] = useState<string>("");
+  const [selectedPuertos, setSelectedPuertos] = useState<string>("");
+  const [selectedPuertoFTP, setSelectedPuertoFTP] = useState<string>("");
   const [empresa, setEmpresa] = useState<string | null>("");
 
   const [newObservation, setNewObservation] = useState<string>("");
-  const [errorMensajeComponente, setErrorMensajeComponente] = useState<string | null>(null);
+  const [errorMensajeComponente, setErrorMensajeComponente] = useState<
+    string | null
+  >(null);
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
   const [errorMAC, setErrorMAC] = useState<boolean>(false);
-  const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(null);
+  const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(
+    null
+  );
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
-  const { showMessage } = useSnackbar();  
+  const { showMessage } = useSnackbar();
 
   const navigate = useNavigate();
 
-  const { marcas } = useMarcasPorPeriferico(equipoRedBodega?.id_periferico ?? "");
+  const { marcas } = useMarcasPorPeriferico(
+    equipoRedBodega?.id_periferico ?? ""
+  );
   const { modelos } = useModelosPorMarcaPeriferico(
     equipoRedBodega?.id_marca ?? "",
     equipoRedBodega?.id_periferico ?? ""
@@ -78,14 +77,17 @@ const EditarBodegaRed = ({
       setSelectedMAC(equipoRedBodega.mac);
       setSelectedPuertos(equipoRedBodega.puertos);
       setSelectedPuertoFTP(equipoRedBodega.puerto_ftp);
-      equipoRedBodega.inventario.length===10?setEmpresa("EspolTech"):setEmpresa("Espol")
+      equipoRedBodega.inventario.length === 10
+        ? setEmpresa("EspolTech")
+        : setEmpresa("Espol");
     }
   }, [equipoRedBodega]);
 
   useEffect(() => {
     if (equipoRedBodega && marcas.length > 0) {
       setSelectedInventarioMarca(
-        marcas.find((marca) => marca?.id_marca === equipoRedBodega.id_marca) || null
+        marcas.find((marca) => marca?.id_marca === equipoRedBodega.id_marca) ||
+          null
       );
     }
   }, [equipoRedBodega, marcas]);
@@ -93,7 +95,9 @@ const EditarBodegaRed = ({
   useEffect(() => {
     if (equipoRedBodega && modelos.length > 0) {
       setSelectedInventarioModelo(
-        modelos.find((modelo) => modelo?.id_modelo === equipoRedBodega.id_modelo) || null
+        modelos.find(
+          (modelo) => modelo?.id_modelo === equipoRedBodega.id_modelo
+        ) || null
       );
     }
   }, [equipoRedBodega, modelos]);
@@ -101,27 +105,26 @@ const EditarBodegaRed = ({
   useEffect(() => {
     if (equipoRedBodega && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipoRedBodega.id_serie) || null
+        series.find((serie) => serie?.id_serie === equipoRedBodega.id_serie) ||
+          null
       );
     }
-  }, [equipoRedBodega, series]);  
+  }, [equipoRedBodega, series]);
 
-  const handleEditEquipo = async (observationValue : string) => {
-
+  const handleEditEquipo = async (observationValue: string) => {
     const payload = {
       tipo: "bodega",
       inventario: selectedInventarioInv,
       id_serie: selectedInventarioSerie?.id_serie ?? "",
-      observacion: observationValue?? "",
-      mac: selectedMAC?? "",
-      puertos: selectedPuertos?? "",
-      puerto_ftp: selectedPuertoFTP?? "",
+      observacion: observationValue ?? "",
+      mac: selectedMAC ?? "",
+      puertos: selectedPuertos ?? "",
+      puerto_ftp: selectedPuertoFTP ?? "",
     };
     try {
       await editarBodegaRed(equipoRedBodega.id_equipo, payload);
-        showMessage("Equipo editado exitosamente", "success");
-        navigate("/bodega");
-      
+      showMessage("Equipo editado exitosamente", "success");
+      navigate("/bodega");
     } catch (error) {
       showMessage("Error al editar el equipo", "error");
     }
@@ -137,43 +140,51 @@ const EditarBodegaRed = ({
     setOpenModalEditar(false);
     await handleEditEquipo(newObservation);
   };
-  const handleObservation = (newObservation :string)=>{
-    if(newObservation.length <= 200){
+  const handleObservation = (newObservation: string) => {
+    if (newObservation.length <= 200) {
       setNewObservation(newObservation);
       setErrorMensajeComponente("");
-    }else{
-      setErrorMensajeComponente("La observación no puede tener más de 200 caracteres.");
+    } else {
+      setErrorMensajeComponente(
+        "La observación no puede tener más de 200 caracteres."
+      );
     }
-  }
+  };
 
-  const handleChangeEmpresa = (newEmpresa :string | null)=>{
-      setEmpresa(newEmpresa);
-      if(newEmpresa===null){
-        setErrorEmpresa(true);
-        setSelectedInventarioInv("")
-        setErrorInventario(true)
-      }else{
-        setErrorEmpresa(false);
-        !validateInventario(selectedInventarioInv,newEmpresa)?setErrorInventario(true):setErrorInventario(false)
-      }
+  const handleChangeEmpresa = (newEmpresa: string | null) => {
+    setEmpresa(newEmpresa);
+    if (newEmpresa === null) {
+      setErrorEmpresa(true);
+      setSelectedInventarioInv("");
+      setErrorInventario(true);
+    } else {
+      setErrorEmpresa(false);
+      !validateInventario(selectedInventarioInv, newEmpresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
     }
+  };
 
-    const handleChangeInventario = (inventario :string)=>{
-      setSelectedInventarioInv(inventario)
-      if(empresa==="Espol"){
-        !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
-      }else if(empresa==="EspolTech"){
-        !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
-      }
+  const handleChangeInventario = (inventario: string) => {
+    setSelectedInventarioInv(inventario);
+    if (empresa === "Espol") {
+      !validateInventario(inventario ? inventario : "", empresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
+    } else if (empresa === "EspolTech") {
+      !validateInventario(inventario ? inventario : "", empresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
     }
-    const handleMACChange = (MAC :string)=>{
-      setSelectedMAC(MAC)
-      if(MAC===null){
-        setErrorMAC(true);
-      }else{
-        !validateMAC(MAC)?setErrorMAC(true):setErrorMAC(false)
+  };
+  const handleMACChange = (MAC: string) => {
+    setSelectedMAC(MAC);
+    if (MAC === null) {
+      setErrorMAC(true);
+    } else {
+      !validateMAC(MAC) ? setErrorMAC(true) : setErrorMAC(false);
     }
-    }
+  };
 
   const handleCancelar = () => {
     setOpenModalCancelar(false);
@@ -187,9 +198,9 @@ const EditarBodegaRed = ({
     if (
       !selectedInventarioInv ||
       !selectedInventarioSerie ||
-      !selectedMAC || 
-      (perifericoName==="AP"?false:!selectedPuertos) || 
-      (perifericoName==="AP"?false:!selectedPuertoFTP)
+      !selectedMAC ||
+      (perifericoName === "AP" ? false : !selectedPuertos) ||
+      (perifericoName === "AP" ? false : !selectedPuertoFTP)
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -207,7 +218,7 @@ const EditarBodegaRed = ({
         title="Confirmar Editar Equipo"
         message="¿Está seguro de que desea editar este equipo?"
       />
-       <ModalConfirmation
+      <ModalConfirmation
         open={openModalCancelar}
         onClose={() => setOpenModalCancelar(false)}
         onConfirm={handleCancelar}
@@ -303,12 +314,16 @@ const EditarBodegaRed = ({
             }
             onChange={(e) => {
               const value = e.target.value;
-              if (empresa==="Espol" && value !== null && value.length > 6) {
-                return
-              }else if(empresa==="EspolTech" && value !== null && value.length > 10){
-                return
+              if (empresa === "Espol" && value !== null && value.length > 6) {
+                return;
+              } else if (
+                empresa === "EspolTech" &&
+                value !== null &&
+                value.length > 10
+              ) {
+                return;
               }
-              handleChangeInventario(value)
+              handleChangeInventario(value);
             }}
             disabled={empresa === ""}
           />
@@ -317,69 +332,91 @@ const EditarBodegaRed = ({
 
       <h2 className="text-xl font-semibold mb-5">Información General</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
-
         <TextField
-            label="MAC"
-            placeholder="MAC"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={selectedMAC}
-            error={!!errorMAC}
-            helperText={
-              errorMAC ? "Por favor escribir un inventario válido" : ""
+          label="MAC"
+          placeholder="MAC"
+          variant="outlined"
+          fullWidth
+          size="small"
+          value={selectedMAC}
+          error={!!errorMAC}
+          helperText={errorMAC ? "Por favor escribir un inventario válido" : ""}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value !== null && value.length > 1) {
+              return;
             }
-            onChange={(e) => handleMACChange(e.target.value)}
+            handleMACChange(e.target.value);
+          }}
         />
         {perifericoName === "Switch" ? (
-        <TextField
-            label="puertos"
+          <TextField
+            label="Puertos 10-100-1000"
             placeholder="Puertos"
             variant="outlined"
             fullWidth
             size="small"
             value={selectedPuertos}
-            onChange={(e) => setSelectedPuertos(e.target.value)}
-        />):""}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 10) {
+                return;
+              }
+              setSelectedPuertos(e.target.value);
+            }}
+          />
+        ) : (
+          ""
+        )}
         {perifericoName === "Switch" ? (
-        <TextField
+          <TextField
             label="puertoFTP"
             placeholder="Puerto FTP"
             variant="outlined"
             fullWidth
             size="small"
             value={selectedPuertoFTP}
-            onChange={(e) => setSelectedPuertoFTP(e.target.value)}
-        />):""}
-
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 10) {
+                return;
+              }
+              setSelectedPuertoFTP(e.target.value);
+            }}
+          />
+        ) : (
+          ""
+        )}
       </div>
 
       <div>
         <h2 className="text-xl font-semibold mb-10">Observación</h2>
         <TextField
-                label="Observación"
-                variant="outlined"
-                fullWidth
-                multiline
-                minRows={2}
-                value={newObservation}
-                onChange={(e) => {
-                  handleObservation(e.target.value)
-                }}
-                error={!!errorMensajeComponente}
-                helperText={errorMensajeComponente}
-          />
+          label="Observación"
+          variant="outlined"
+          fullWidth
+          multiline
+          minRows={2}
+          value={newObservation}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value !== null && value.length > 200) {
+              return;
+            }
+            handleObservation(e.target.value);
+          }}
+          error={!!errorMensajeComponente}
+          helperText={errorMensajeComponente}
+        />
       </div>
 
       <div className="flex gap-4 mt-10">
         <Button
           variant="contained"
           sx={{
-            backgroundColor:
-              "#4CAF50",
+            backgroundColor: "#4CAF50",
             "&:hover": {
-              backgroundColor:
-                "#45a049"
+              backgroundColor: "#45a049",
             },
           }}
           onClick={handleConfirmEditarEquipo}
@@ -388,13 +425,13 @@ const EditarBodegaRed = ({
           Editar Bodega
         </Button>
         <Button
-                onClick={handleConfirmCancelar}
-                color="error"
-                variant="contained"
-                fullWidth
-              >
-                Cancelar
-              </Button>
+          onClick={handleConfirmCancelar}
+          color="error"
+          variant="contained"
+          fullWidth
+        >
+          Cancelar
+        </Button>
       </div>
       {errorMensajeEquipo && (
         <div className="text-red-500 mt-2">{errorMensajeEquipo}</div>

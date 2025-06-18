@@ -295,7 +295,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
       <DialogTitle>Agregar {selectedCategoria || "Elemento"}</DialogTitle>
       <DialogContent className="h-auto">
         {selectedCategoria === "RAM" ? (
-          <Box className="flex flex-col mt-2 gap-3">
+            <Box className="flex flex-col mt-2 gap-3">
             <TextField
               label="Tipo de RAM"
               variant="outlined"
@@ -303,7 +303,13 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               helperText={error && "Por favor ingrese un tipo de ram"}
               fullWidth
               value={ramTipo}
-              onChange={(e) => setRamTipo(e.target.value)}
+              onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 6) {
+                return;
+              }
+              setRamTipo(value);
+              }}
             />
             <TextField
               label="Capacidad"
@@ -312,21 +318,33 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               helperText={error && "Por favor ingrese una capacidad"}
               fullWidth
               value={capacidad}
-              onChange={(e) => setCapacidad(e.target.value)}
+              onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 6) {
+                return;
+              }
+              setCapacidad(value);
+              }}
             />
-          </Box>
+            </Box>
         ) : selectedCategoria === "Disco" ? (
-          <Box className="flex flex-col mt-2 gap-3">
-          <TextField
-            label="Capacidad"
-            variant="outlined"
-            error={!!error}
-            helperText={error && "Por favor ingrese una capacidad"}
-            fullWidth
-            value={capacidad}
-            onChange={(e) => setCapacidad(e.target.value)}
-          />
-          </Box>
+            <Box className="flex flex-col mt-2 gap-3">
+            <TextField
+              label="Capacidad"
+              variant="outlined"
+              error={!!error}
+              helperText={error && "Por favor ingrese una capacidad"}
+              fullWidth
+              value={capacidad}
+              onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 10) {
+                return;
+              }
+              setCapacidad(value);
+              }}
+            />
+            </Box>
         ) : selectedCategoria === "Ubicación" ? (
           <Box className="flex flex-col mt-2 gap-3">
             <Autocomplete
@@ -355,7 +373,13 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               fullWidth
               disabled={!selectedEdificio}
               value={newOption}
-              onChange={(e) => setNewOption(e.target.value)}
+              onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 20) {
+                return;
+              }
+              setNewOption(e.target.value);
+              }}
               error={!!error}
               helperText={error && "Por favor seleccionar una ubicación"}
             />
@@ -390,7 +414,13 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               fullWidth
               disabled={!selectedSO}
               value={newOption}
-              onChange={(e) => setNewOption(e.target.value)}
+              onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 20) {
+                return;
+              }
+              setNewOption(e.target.value);
+              }}
               error={!!error}
               helperText={error && "Por favor seleccionar una versión"}
             />
@@ -425,7 +455,13 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               fullWidth
               disabled={!selectedPeriferico}
               value={newOption}
-              onChange={(e) => setNewOption(e.target.value)}
+              onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 20) {
+                return;
+              }
+              setNewOption(e.target.value);
+              }}
             />
           </Box>
         ) : selectedCategoria === "Modelo" ? (
@@ -465,7 +501,13 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
                   helperText={error && "Por favor ingrese un modelo"}
               fullWidth
               value={newOption}
-              onChange={(e) => setNewOption(e.target.value)}
+              onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 20) {
+                return;
+              }
+              setNewOption(e.target.value);
+              }}
             />
           </Box>
         ) : selectedCategoria === "Serie" || selectedCategoria === "Lampara" ? (
@@ -518,7 +560,13 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
                   helperText={error && "Por favor ingrese un nombre válido"}
               fullWidth
               value={newOption}
-              onChange={(e) => setNewOption(e.target.value)}
+              onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 20) {
+                return;
+              }
+              setNewOption(e.target.value);
+              }}
             />
           </Box>
         ) : (
@@ -528,7 +576,13 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
             variant="outlined"
             fullWidth
             value={newOption}
-            onChange={(e) => setNewOption(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 20) {
+                return;
+              }
+              setNewOption(e.target.value);
+              }}
             error={Boolean(error)}
             helperText={error}
           />

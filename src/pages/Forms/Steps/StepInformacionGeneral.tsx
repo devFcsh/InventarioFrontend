@@ -133,7 +133,7 @@ export const StepInformacionGeneral = ({
                 : ""
             }
             onChange={(e) => {
-              let value = e.target.value;
+              const value = e.target.value;
               if (value !== null && value.length > 10) {
                 return
               }
@@ -217,7 +217,7 @@ export const StepInformacionGeneral = ({
               value={informacionGeneralDataForm.direccionIP}
               error={!!informacionGeneralErrors.direccionIP}
               onChange={(e) => {
-                let value = e.target.value;
+                const value = e.target.value;
                 if (value !== null && value.length > 15) {
                   return
                 }

@@ -559,7 +559,13 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
                   variant="outlined"
                   fullWidth
                   value={editedTipo}
-                  onChange={(e) => setEditedTipo(e.target.value)}
+                  onChange={(e) => {
+                  const value = e.target.value;
+                  if (value !== null && value.length > 6) {
+                    return;
+                  }
+                  setEditedTipo(e.target.value);
+                  }}
                 />
                 <div style={{ marginBottom: "1rem" }}></div>
                 <TextField
@@ -567,7 +573,13 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
                   variant="outlined"
                   fullWidth
                   value={editedValue}
-                  onChange={(e) => setEditedValue(e.target.value)}
+                  onChange={(e) => {
+                  const value = e.target.value;
+                  if (value !== null && value.length > 6) {
+                    return;
+                  }
+                  setEditedValue(e.target.value);
+                  }}
                   className="mt-3"
                 />
               </>
@@ -577,7 +589,13 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
                 variant="outlined"
                 fullWidth
                 value={editedValue}
-                onChange={(e) => setEditedValue(e.target.value)}
+                onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 10) {
+                return;
+              }
+              setEditedValue(e.target.value);
+              }}
               />
             )}
             <div className="mt-4 flex justify-end gap-2">

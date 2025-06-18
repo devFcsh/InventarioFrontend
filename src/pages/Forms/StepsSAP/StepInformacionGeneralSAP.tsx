@@ -33,7 +33,7 @@ export const StepInformacionGeneralSAP = ({
                 : ""
             }
             onChange={(e) => {
-              let value = e.target.value.toUpperCase();
+              const value = e.target.value.toUpperCase();
 
               if (value !== null && value.length > 17) {
                 return;
@@ -81,7 +81,7 @@ export const StepInformacionGeneralSAP = ({
                     : ""
                 }
                 onChange={(e) => {
-                  let value = e.target.value;
+                  const value = e.target.value;
 
                   if (value !== null && value.length > 10) {
                     return;
@@ -105,7 +105,7 @@ export const StepInformacionGeneralSAP = ({
                     : ""
                 }
                 onChange={(e) => {
-                  let value = e.target.value;
+                  const value = e.target.value;
 
                   if (value !== null && value.length > 10) {
                     return;

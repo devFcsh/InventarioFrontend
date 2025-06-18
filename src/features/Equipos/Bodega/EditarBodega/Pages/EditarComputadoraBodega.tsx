@@ -294,12 +294,14 @@ const EditarComputadoraBodega = ({
       (nombre === "mouse" && cantidad >= 1) ||
       (nombre === "monitor" && cantidad >= 2)
     ) {
-      showMessage(nombre === "monitor"
+      showMessage(
+        nombre === "monitor"
           ? "Solo puedes agregar hasta 2 Monitores."
           : `Solo puedes agregar un ${
               nombre.charAt(0).toUpperCase() + nombre.slice(1)
-            }.`
-      , "error");
+            }.`,
+        "error"
+      );
       return;
     }
 
@@ -321,7 +323,10 @@ const EditarComputadoraBodega = ({
         inventario: "",
       });
     } else {
-      showMessage("Por favor, complete todos los campos antes de agregar el componente.", "error");
+      showMessage(
+        "Por favor, complete todos los campos antes de agregar el componente.",
+        "error"
+      );
     }
   };
 
@@ -362,9 +367,8 @@ const EditarComputadoraBodega = ({
       }
       showMessage("Equipo editado exitosamente", "success");
       navigate("/bodega");
-      
     } catch (error) {
-        showMessage("Error al editar el equipo", "error");
+      showMessage("Error al editar el equipo", "error");
     }
   };
 
@@ -1003,6 +1007,10 @@ const EditarComputadoraBodega = ({
           minRows={2}
           value={newObservation}
           onChange={(e) => {
+            const value = e.target.value;
+            if (value !== null && value.length > 200) {
+              return;
+            }
             handleObservation(e.target.value);
           }}
           error={!!errorMensajeComponente}

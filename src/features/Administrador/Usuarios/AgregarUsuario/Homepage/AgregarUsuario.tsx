@@ -84,7 +84,13 @@ const AgregarUsuario = () => {
             fullWidth
             size="small"
             value={nombre || ""}
-            onChange={(e) => setNombre(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 30) {
+                return;
+              }
+              setNombre(e.target.value);
+              }}
           />
           <Autocomplete
             size="small"
