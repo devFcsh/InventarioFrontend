@@ -16,6 +16,8 @@ const AdminSections = [
   { name: 'Admin', icon: <AdminPanelSettingsIcon />, subtypes: [
     { name: 'Usuarios Responsables', route: 'usuarios' },
     { name: 'Categorías', route: 'categorias' },
+    { name: 'Usuarios Sistema', route: 'usuariosSistema' },
+    
   ]},
 ];
 

@@ -19,6 +19,7 @@ import EditarActivo from "@pages/EditarActivo";
 import { EditarBodega } from "@pages/EditarBodega";
 import AgregarUsuario from "../features/Administrador/Usuarios/AgregarUsuario/Homepage/AgregarUsuario";
 import EditarUsuario from "../features/Administrador/Usuarios/EditarUsuario/Homepage/EditarUsuario";
+import UsuariosSistema from "../features/Administrador/Usuarios Sistema/Homepage/UsuariosSistema";
 
 export const routesConfig: RouteConfig[] = [
   {
@@ -85,6 +86,16 @@ export const routesConfig: RouteConfig[] = [
     path: "/editarUsuario",
     element: <EditarUsuario />,
     allowedRoles: ["administrador", "editor"],
+  },
+  {
+    path: "/usuariosSistema",
+    element: <UsuariosSistema />,
+    allowedRoles: ["administrador"],
+  },
+  {
+    path: "/editarUsuarioSistema",
+    element: <EditarUsuario />,
+    allowedRoles: ["administrador"],
   },
   
 ];
