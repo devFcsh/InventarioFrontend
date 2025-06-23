@@ -20,6 +20,8 @@ import { EditarBodega } from "@pages/EditarBodega";
 import AgregarUsuario from "../features/Administrador/Usuarios/AgregarUsuario/Homepage/AgregarUsuario";
 import EditarUsuario from "../features/Administrador/Usuarios/EditarUsuario/Homepage/EditarUsuario";
 import UsuariosSistema from "../features/Administrador/Usuarios Sistema/Homepage/UsuariosSistema";
+import EditarUsuarioSistema from "../features/Administrador/Usuarios Sistema/EditarUsuario/Homepage/EditarUsuario";
+import AgregarUsuarioSistema from "../features/Administrador/Usuarios Sistema/AgregarUsuario/Homepage/AgregarUsuarioSistema";
 
 export const routesConfig: RouteConfig[] = [
   {
@@ -94,7 +96,12 @@ export const routesConfig: RouteConfig[] = [
   },
   {
     path: "/editarUsuarioSistema",
-    element: <EditarUsuario />,
+    element: <EditarUsuarioSistema />,
+    allowedRoles: ["administrador"],
+  },
+   {
+    path: "/agregarUsuarioSistema",
+    element: <AgregarUsuarioSistema />,
     allowedRoles: ["administrador"],
   },
   

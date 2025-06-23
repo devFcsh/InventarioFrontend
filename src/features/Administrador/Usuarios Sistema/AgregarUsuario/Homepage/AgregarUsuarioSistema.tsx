@@ -1,45 +1,41 @@
 import { Autocomplete, TextField, Button } from "@mui/material";
 import { useState } from "react";
-import { Uso } from "../../../../../types";
-import useUsos from "@hooks/useUsos";
 import { useNavigate } from "react-router-dom";
-import { useAgregarUsuario } from "../hooks/useAgregarUsuario";
+import { useAgregarUsuarioSistema } from "../hooks/useAgregarUsuarioSistema";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useSnackbar } from "@context/SnackbarContext";
+import useRoles from "@hooks/useRoles";
 
-const AgregarUsuario = () => {
-  const [selectedUsoId, setSelectedUsoId] = useState<string | null>(null);
-  const [nombre, setNombre] = useState<string | null>(null);
+const AgregarUsuarioSistema = () => {
+  const [correo, setCorreo] = useState<string>("");
+  const [selectedRolId, setSelectedRolId] = useState<number | null>(null);
 
   const [openModalAgregar, setOpenModalAgregar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
 
-  const { agregarUsuario, loading, error, message } = useAgregarUsuario();
-
-  const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
+  const { agregarUsuarioSistema, loading, error, message } = useAgregarUsuarioSistema();
+  const { roles, loading: loadingRoles, error: errorRoles } = useRoles();
 
   const navigate = useNavigate();
-
   const { showMessage } = useSnackbar();
 
-  const handleUsoChange = (_: any, newValue: Uso | null) => {
-    if (newValue) {
-      setSelectedUsoId(newValue.id_uso);
-    } else {
-      setSelectedUsoId(null);
-    }
+  const handleRolChange = (
+    event: React.SyntheticEvent<Element, Event>,
+    value: { id_rol: number; nombre: string } | null
+  ) => {
+    setSelectedRolId(value ? value.id_rol : null);
   };
 
   const handleAgregarUsuario = async () => {
     if (validarCampos()) {
       try {
-        await agregarUsuario({ nombre: nombre!, usoId: Number(selectedUsoId!) });
+        await agregarUsuarioSistema({ correo, rolId: selectedRolId! });
         setOpenModalAgregar(false);
-        setNombre(""); 
-        setSelectedUsoId(null);
-  
+        setCorreo("");
+        setSelectedRolId(null);
+
         showMessage("Usuario agregado exitosamente", "success");
-        navigate("/usuarios");
+        navigate("/usuariosSistema");
       } catch (err) {
         showMessage("Error al agregar el usuario", "error");
       }
@@ -47,7 +43,7 @@ const AgregarUsuario = () => {
   };
 
   const validarCampos = () => {
-    if (!nombre || !selectedUsoId) {
+    if (!correo || !selectedRolId) {
       showMessage("Por favor, complete todos los campos.", "error");
       return false;
     }
@@ -56,61 +52,61 @@ const AgregarUsuario = () => {
 
   const handleConfirmAgregarUsuario = () => {
     if (validarCampos()) {
-      setOpenModalAgregar(true); 
+      setOpenModalAgregar(true);
     }
   };
 
   const handleConfirmCancelar = () => {
-    setOpenModalCancelar(true); 
+    setOpenModalCancelar(true);
   };
 
   const handleCancelar = () => {
     setOpenModalCancelar(false);
-    setNombre(""); 
-    setSelectedUsoId(null);
-    navigate("/usuarios"); 
+    setCorreo("");
+    setSelectedRolId(null);
+    navigate("/usuariosSistema");
   };
 
   return (
     <div className="w-full max-w-7xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-10">Registro de Usuario</h1>
+      <h1 className="text-2xl font-bold mb-10">Registro de Usuario Sistema</h1>
 
       <div className="flex flex-col gap-4 mb-14">
         <div className="grid grid-cols-2 gap-4 mb-4">
           <TextField
-            label="Nombre del Usuario"
-            placeholder="Nombre del Usuario"
+            label="Correo"
+            placeholder="Correo"
             variant="outlined"
             fullWidth
             size="small"
-            value={nombre || ""}
+            value={correo}
             onChange={(e) => {
               const value = e.target.value;
-              if (value !== null && value.length > 30) {
+              if (value !== null && value.length > 50) {
                 return;
               }
-              setNombre(e.target.value);
-              }}
+              setCorreo(value);
+            }}
           />
           <Autocomplete
             size="small"
             disablePortal
-            options={usos}
-            loading={loadingUsos}
+            options={roles}
+            loading={loadingRoles}
             value={
-              selectedUsoId
-                ? usos.find((u) => u?.id_uso === selectedUsoId) ?? null
+              selectedRolId
+                ? roles.find((r) => r.id_rol === selectedRolId) ?? null
                 : null
             }
-            onChange={handleUsoChange}
+            onChange={handleRolChange}
             getOptionLabel={(option) => option?.nombre || ""}
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Uso"
+                label="Rol"
                 variant="outlined"
-                error={!!errorUsos}
-                helperText={errorUsos ? "Error al cargar los usos" : ""}
+                error={!!errorRoles}
+                helperText={errorRoles ? "Error al cargar los roles" : ""}
                 fullWidth
               />
             )}
@@ -127,7 +123,7 @@ const AgregarUsuario = () => {
           color="primary"
           onClick={handleConfirmAgregarUsuario}
           fullWidth
-          disabled={loading} 
+          disabled={loading}
         >
           {loading ? "Agregando..." : "Agregar Usuario"}
         </Button>
@@ -156,9 +152,8 @@ const AgregarUsuario = () => {
         title="Confirmar Cancelar"
         message="¿Está seguro de que desea cancelar? Todos los cambios no guardados se perderán."
       />
-
     </div>
   );
 };
 
-export default AgregarUsuario;
+export default AgregarUsuarioSistema;

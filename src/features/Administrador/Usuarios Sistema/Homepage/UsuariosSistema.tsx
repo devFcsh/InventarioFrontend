@@ -1,47 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { Autocomplete, IconButton, Tooltip } from "@mui/material";
 import { TextField } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
-import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
-import useUsos from "@hooks/useUsos";
-import { useUsuariosFiltrados } from "../hooks/useUsuariosFiltrados";
-import { FiltrosUsuario, Uso, Usuario } from "../../../../types/index";
+import { useUsuariosSistemaFiltrados } from "../hooks/useUsuariosSistemaFiltrados";
 import { filas } from "../../../../data";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
-import useEliminarUsuario from "../hooks/useEliminarUsuario";
+import useEliminarUsuarioSistema from "../hooks/useEliminarUsuarioSistema";
 import { useSnackbar } from "@context/SnackbarContext";
+import { UsuarioSistema } from "../../../../types/UsuarioSistema";
+import useRoles from "@hooks/useRoles";
+
 
 const UsuariosSistema = () => {
-  const [selectedUso, setSelectedUso] = useState<string | null>(null);
-  const [selectedUsuario, setSelectedUsuario] = useState<string | null>(null);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
   const [totalPages, setTotalPages] = useState<number>(1);
 
+  const [selectedRol, setSelectedRol] = useState<number | null>(null);
+
   const [openModal, setOpenModal] = useState(false);
-  const [usuarioToDelete, setUsuarioToDelete] = useState<Usuario | null>(null);
+  const [usuarioToDelete, setUsuarioToDelete] = useState<UsuarioSistema | null>(
+    null
+  );
 
+  const { roles } = useRoles();
   const { showMessage } = useSnackbar();
-  const { eliminarUsuario } = useEliminarUsuario();
-  const { usos } = useUsos();
-  const { usuarios } = useUsuariosPorUso(selectedUso || "");
+  const { eliminarUsuarioSistema } = useEliminarUsuarioSistema();
 
-  const filtros: FiltrosUsuario = {
-    usoId: selectedUso,
-    usuarioId: selectedUsuario,
+  const filtros = {
+    rolId: selectedRol || undefined,
   };
 
   const { usuariosFiltrados, totalCount, loading, error } =
-    useUsuariosFiltrados(filtros, currentPage, rowsPerPage, shouldFetch);
-
-  const location = useLocation();
-  useEffect(() => {
-    if (location.state && location.state.snackbarMessage) {
-      showMessage(location.state.snackbarMessage, location.state.snackbarSeverity || "success");
-    }
-  }, [location, showMessage]);
+    useUsuariosSistemaFiltrados(filtros, currentPage, rowsPerPage, shouldFetch);
 
   useEffect(() => {
     if (totalCount > 0 && rowsPerPage > 0) {
@@ -57,33 +50,6 @@ const UsuariosSistema = () => {
     }
   }, [shouldFetch]);
 
-  const handleUsoChange = (
-    _: React.SyntheticEvent<Element, Event>,
-    newValue: Uso | null
-  ) => {
-    setSelectedUso(newValue ? newValue.id_uso : null);
-    setSelectedUsuario(null);
-  };
-
-  const handleUsuarioChange = (
-    _: React.SyntheticEvent<Element, Event>,
-    newValue: Usuario | null
-  ) => {
-    setSelectedUsuario(newValue ? newValue.id_usuario : null);
-  };
-
-  const handleBuscar = () => {
-    setCurrentPage(1);
-    setShouldFetch(true);
-  };
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
-      setShouldFetch(true);
-    }
-  };
-
   const handleRowsPerPageChange = (
     _event: React.SyntheticEvent<Element, Event>,
     newValue: { id: number; name: string } | null
@@ -93,7 +59,14 @@ const UsuariosSistema = () => {
     setCurrentPage(1);
   };
 
-  const handleDeleteClick = (usuario: Usuario) => {
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      setShouldFetch(true);
+    }
+  };
+
+  const handleDeleteClick = (usuario: UsuarioSistema) => {
     setUsuarioToDelete(usuario);
     setOpenModal(true);
   };
@@ -101,17 +74,17 @@ const UsuariosSistema = () => {
   const handleConfirmDelete = async () => {
     if (usuarioToDelete) {
       try {
-        const result = await eliminarUsuario(usuarioToDelete.id_usuario);
+        const result = await eliminarUsuarioSistema(
+          usuarioToDelete.id_usuario_sistema.toString()
+        );
 
         if (result.success) {
           setOpenModal(false);
           showMessage("Usuario eliminado con éxito.", "success");
           setShouldFetch(true);
         } else {
-          showMessage(
-            "No se puede eliminar el usuario porque tiene equipos asociados.", "error");
+          showMessage("No se pudo eliminar el usuario.", "error");
         }
-
       } catch (error) {
         showMessage("Error al eliminar el usuario.", "error");
       }
@@ -122,13 +95,25 @@ const UsuariosSistema = () => {
     setOpenModal(false);
   };
 
+  const handleRolChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    value: (typeof roles)[number] | null
+  ) => {
+    setSelectedRol(value ? value.id_rol : null);
+  };
+
+  const handleBuscar = () => {
+    setCurrentPage(1);
+    setShouldFetch(true);
+  };
+
   return (
     <div className="flex flex-col p-4">
       <div className="mb-4">
         <div className="flex gap-2 items-center">
-          <h1 className="text-2xl font-bold my-5">Consulta de Usuarios Responsables</h1>
-          <Link to={{ pathname: "/agregarUsuario" }}>
-            <Tooltip title="Agregar Usuario">
+          <h1 className="text-2xl font-bold my-5">Usuarios del Sistema</h1>
+          <Link to={{ pathname: "/agregarUsuarioSistema" }}>
+            <Tooltip title="Agregar Usuario Sistema">
               <span>
                 <Icon
                   icon="gridicons:add"
@@ -140,63 +125,44 @@ const UsuariosSistema = () => {
             </Tooltip>
           </Link>
         </div>
-        <div className="flex flex-wrap gap-4 my-10">
+        <div className="flex flex-col w-full md:flex-row gap-4 md:gap-2 my-10">
           <Autocomplete
             size="small"
-            options={usos}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handleUsoChange}
-            value={usos.find((uso) => uso?.id_uso === selectedUso) || null}
+            disablePortal
+            options={roles}
+            getOptionLabel={(option) => option.nombre}
+            onChange={handleRolChange}
+            value={roles.find((rol) => rol.id_rol === selectedRol) || null}
             renderInput={(params) => (
-              <TextField {...params} label="Uso" variant="outlined" />
+              <TextField {...params} label="Rol" variant="outlined" />
             )}
-            className="w-full md:w-cmbox"
+            className="w-full md:w-1/3"
           />
-
           <Autocomplete
             size="small"
-            options={usuarios}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handleUsuarioChange}
-            value={
-              usuarios.find(
-                (usuario) => usuario?.id_usuario === selectedUsuario
-              ) || null
-            }
+            disablePortal
+            options={filas}
+            onChange={handleRowsPerPageChange}
+            getOptionLabel={(option) => option.name}
             renderInput={(params) => (
-              <TextField {...params} label="Usuario" variant="outlined" />
+              <TextField {...params} label="Filas" variant="outlined" />
             )}
-            className="w-full md:w-cmbox"
-            disabled={!selectedUso}
+            value={filas.find((option) => option.id === rowsPerPage)}
+            className="w-full md:w-1/2"
           />
-
-          <div className="flex flex-col w-full md:w-1/5 md:flex-row gap-4 md:gap-2 lg:ml-2">
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={filas}
-              onChange={handleRowsPerPageChange}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
-                <TextField {...params} label="Filas" variant="outlined" />
-              )}
-              value={filas.find((option) => option.id === rowsPerPage)}
-              className="w-full md:w-1/2"
-            />
-            <button
-              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/2"
-              onClick={handleBuscar}
-            >
-              Buscar
-            </button>
-          </div>
+          <button
+            className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/3"
+            onClick={handleBuscar}
+          >
+            Buscar
+          </button>
         </div>
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {loading ? (
-          <p>Cargando usuarios responsables...</p>
+          <p>Cargando usuarios del sistema...</p>
         ) : error ? (
-          <p>Error al cargar los usuarios responsables</p>
+          <p>Error al cargar los usuarios</p>
         ) : (
           <table className="w-full text-left text-sm text-gray-500">
             <thead className="text-xs uppercase bg-gray-50 text-gray-700">
@@ -215,11 +181,11 @@ const UsuariosSistema = () => {
             <tbody>
               {usuariosFiltrados.map((usuario) => (
                 <tr
-                  key={usuario.id_usuario}
+                  key={usuario.id_usuario_sistema}
                   className="bg-white border-b hover:bg-gray-50"
                 >
-                  <td className="px-4 py-2">{usuario.uso}</td>
-                  <td className="px-4 py-2">{usuario.nombre}</td>
+                  <td className="px-4 py-2">{usuario.correo}</td>
+                  <td className="px-4 py-2">{String(usuario.rol)}</td>
                   <td className="px-4 py-3 flex items-center gap-2">
                     <IconButton onClick={() => handleDeleteClick(usuario)}>
                       <Tooltip title="Eliminar Usuario">
@@ -233,23 +199,21 @@ const UsuariosSistema = () => {
                         </span>
                       </Tooltip>
                     </IconButton>
-                    <td className="px-4 py-3 flex items-center gap-2">
-                      <Link
-                        to={{ pathname: "/editarUsuario" }}
-                        state={{ usuario }}
-                      >
-                        <Tooltip title="Editar Usuario">
-                          <span>
-                            <Icon
-                              icon="mage:edit"
-                              width="25"
-                              height="25"
-                              className="cursor-pointer"
-                            />
-                          </span>
-                        </Tooltip>
-                      </Link>
-                    </td>
+                    <Link
+                      to={{ pathname: "/editarUsuarioSistema" }}
+                      state={{ usuario }}
+                    >
+                      <Tooltip title="Editar Usuario">
+                        <span>
+                          <Icon
+                            icon="mage:edit"
+                            width="25"
+                            height="25"
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
+                    </Link>
                   </td>
                 </tr>
               ))}

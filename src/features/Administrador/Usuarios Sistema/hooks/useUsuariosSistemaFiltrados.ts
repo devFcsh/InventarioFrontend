@@ -1,27 +1,26 @@
 import { useState, useEffect } from "react";
-import { FiltrosUsuario } from "../../../../types";
-import { Usuario } from "../../../../types/Usuario";
 import clienteAxios from "@hooks/index";
+import { UsuarioSistema } from "../../../../types/UsuarioSistema";
 
-export const useUsuariosFiltrados = (
-  filtros: FiltrosUsuario,
+export const useUsuariosSistemaFiltrados = (
+  filtros: { rolId?: number; usuarioId?: number },
   currentPage: number,
   rowsPerPage: number,
   shouldFetch: boolean
 ) => {
-  const [usuariosFiltrados, setUsuarios] = useState<Usuario[]>([]);
+  const [usuariosFiltrados, setUsuarios] = useState<UsuarioSistema[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchUsuarios = async () => {
-      if (!shouldFetch) return; 
+      if (!shouldFetch) return;
       setLoading(true);
       setError(null);
 
       try {
-        const { data } = await clienteAxios.get('/usuarios/', {
+        const { data } = await clienteAxios.get("/usuariosSistema/", {
           params: {
             ...filtros,
             limit: rowsPerPage,
@@ -29,9 +28,9 @@ export const useUsuariosFiltrados = (
           },
         });
         setUsuarios(data.usuarios);
-        setTotalCount(data.total); 
+        setTotalCount(data.total);
       } catch (err) {
-        setError("Error al cargar los usuarios responsables: " + err);
+        setError("Error al cargar los usuarios de sistema: " + err);
       } finally {
         setLoading(false);
       }
