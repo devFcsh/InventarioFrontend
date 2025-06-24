@@ -20,7 +20,7 @@ const AgregarUsuarioSistema = () => {
   const { showMessage } = useSnackbar();
 
   const handleRolChange = (
-    event: React.SyntheticEvent<Element, Event>,
+    _: React.SyntheticEvent<Element, Event>,
     value: { id_rol: number; nombre: string } | null
   ) => {
     setSelectedRolId(value ? value.id_rol : null);

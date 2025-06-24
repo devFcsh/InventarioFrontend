@@ -598,10 +598,6 @@ const Activos = () => {
               ubicacion,
               uso,
               usuario,
-              marca,
-              modelo,
-              serie,
-              inventario,
               fecha_ultimo_cambio,
               observacion,
             }) => ({

@@ -36,6 +36,7 @@ const EditarBodegaRed = ({
   const [selectedPuertos, setSelectedPuertos] = useState<string>("");
   const [selectedPuertoFTP, setSelectedPuertoFTP] = useState<string>("");
   const [empresa, setEmpresa] = useState<string | null>("");
+  const [nombreEquipo, setNombreEquipo] = useState<string>("");
 
   const [newObservation, setNewObservation] = useState<string>("");
   const [errorMensajeComponente, setErrorMensajeComponente] = useState<
@@ -43,7 +44,7 @@ const EditarBodegaRed = ({
   >(null);
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
-  const [errorNombreEquipo, setErrorNombreEquipo] = useState<boolean>(false);
+  //const [errorNombreEquipo, setErrorNombreEquipo] = useState<boolean>(false);
   const [errorMAC, setErrorMAC] = useState<boolean>(false);
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(
     null
@@ -76,10 +77,10 @@ const EditarBodegaRed = ({
       setSelectedMAC(equipoRedBodega.mac);
       setSelectedPuertos(equipoRedBodega.puertos);
       setSelectedPuertoFTP(equipoRedBodega.puerto_ftp);
+      setNombreEquipo(equipoRedBodega.nombre_equipo ?? "");
       equipoRedBodega.inventario.length === 10
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
-
     }
   }, [equipoRedBodega]);
 
@@ -120,7 +121,7 @@ const EditarBodegaRed = ({
       mac: selectedMAC ?? "",
       puertos: selectedPuertos ?? "",
       puerto_ftp: selectedPuertoFTP ?? "",
-
+      nombre_equipo: nombreEquipo,
     };
     try {
       await editarBodegaRed(equipoRedBodega.id_equipo, payload);
@@ -348,6 +349,21 @@ const EditarBodegaRed = ({
               return;
             }
             handleMACChange(e.target.value);
+          }}
+        />
+        <TextField
+          label="Nombre Equipo"
+          placeholder="Nombre Equipo"
+          variant="outlined"
+          fullWidth
+          size="small"
+          value={nombreEquipo}
+          onChange={(e) => {
+            let value = e.target.value;
+            if (value !== null && value.length > 10) {
+              value = value.slice(0, 10);
+            }
+            setNombreEquipo(value);
           }}
         />
         {perifericoName === "Switch" ? (
