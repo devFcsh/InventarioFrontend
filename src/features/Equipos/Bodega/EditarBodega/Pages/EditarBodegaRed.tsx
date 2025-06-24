@@ -43,6 +43,7 @@ const EditarBodegaRed = ({
   >(null);
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
+  const [errorNombreEquipo, setErrorNombreEquipo] = useState<boolean>(false);
   const [errorMAC, setErrorMAC] = useState<boolean>(false);
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(
     null
@@ -68,8 +69,6 @@ const EditarBodegaRed = ({
 
   const { editarBodegaRed } = useEditarBodegaRed();
 
-  //const fileInputRef = useRef<HTMLInputElement | null>(null);
-
   useEffect(() => {
     if (equipoRedBodega) {
       setSelectedInventarioInv(equipoRedBodega.inventario);
@@ -80,6 +79,7 @@ const EditarBodegaRed = ({
       equipoRedBodega.inventario.length === 10
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
+
     }
   }, [equipoRedBodega]);
 
@@ -120,6 +120,7 @@ const EditarBodegaRed = ({
       mac: selectedMAC ?? "",
       puertos: selectedPuertos ?? "",
       puerto_ftp: selectedPuertoFTP ?? "",
+
     };
     try {
       await editarBodegaRed(equipoRedBodega.id_equipo, payload);
@@ -422,7 +423,7 @@ const EditarBodegaRed = ({
           onClick={handleConfirmEditarEquipo}
           fullWidth
         >
-          Editar Bodega
+          Guardar Cambios
         </Button>
         <Button
           onClick={handleConfirmCancelar}

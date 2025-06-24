@@ -17,7 +17,7 @@ export const useInformacionGeneralErrorSAP = (periferico:string | undefined) => 
   });
 
   const completeDatosInformacionGeneral = (dataForm: InformacionGeneralDataForm)=>{
-    if(dataForm.mac !=="" && (periferico==="AP"?true:dataForm.puertos !=="")
+    if(dataForm.nombreEquipo!== "" && dataForm.mac !=="" && (periferico==="AP"?true:dataForm.puertos !=="")
       && (periferico==="AP"?true:(dataForm.puertoFTP!=="" && validateMAC(dataForm.mac)))
     ) return true
     return false;
@@ -55,7 +55,7 @@ export const useInformacionGeneralErrorSAP = (periferico:string | undefined) => 
       [tipo]: value === null || value === "" ? true : false,
     }));
     if (tipo === "mac") {
-      if (!validateMAC(value)) {
+      if (!validateMAC(value ||"")) {
         setInformacionGeneralErrors((prevErrors) => ({
           ...prevErrors,
           ["mac"]: true
@@ -79,6 +79,17 @@ export const useInformacionGeneralErrorSAP = (periferico:string | undefined) => 
           [tipo]: true
         }));
       }
+    }
+    if(value!==null && tipo==="nombreEquipo" && (value.length>10 || value.length<10)){
+      setInformacionGeneralErrors((prevErrors) => ({
+        ...prevErrors,
+        [tipo]: true
+      }));
+    }else if(value!==null && tipo==="nombreEquipo" && value.length===10){
+      setInformacionGeneralErrors((prevErrors) => ({
+        ...prevErrors,
+        [tipo]: false
+      }));
     }
   };
 

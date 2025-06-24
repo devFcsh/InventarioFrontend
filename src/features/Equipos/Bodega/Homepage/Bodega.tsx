@@ -134,6 +134,7 @@ const Bodega = () => {
         (equipo) => equipoId === equipo.id_equipo
       )[0].inventario;
       try {
+
         const result = await eliminarEquipo(equipoId);
         if (result) {
           setShouldFetch(true);
@@ -157,6 +158,7 @@ const Bodega = () => {
         const inventario = equiposBodega.filter(
           (equipo) => id === equipo.id_equipo
         )[0].inventario;
+
         if (!result) {
           errorsInventarios.push(inventario);
         }
@@ -207,6 +209,7 @@ const Bodega = () => {
         const inventario = equiposBodega.filter(
           (equipo) => id === equipo.id_equipo
         )[0].inventario;
+
         if (!result) {
           errorsInventarios.push(inventario);
         }
@@ -562,6 +565,7 @@ const Bodega = () => {
               />
             </span>
           </Tooltip>
+
           <ModalAgregarBodega
             open={openModalBodega}
             onClose={handleCloseBodega}
@@ -671,6 +675,7 @@ const Bodega = () => {
             inputValue={inputInventario}
             onInputChange={(_, newInputValue) =>
               setInputInventario(newInputValue)
+
             }
             onChange={(_, newValue) => {
               if (typeof newValue === "string") {

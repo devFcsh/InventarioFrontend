@@ -19,6 +19,28 @@ export const StepInformacionGeneralSAP = ({
     <Box>
       <div className="mt-8">
         <div className="grid grid-cols-2 gap-4">
+        <TextField
+            label="Nombre Equipo"
+            placeholder="Nombre Equipo"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={informacionGeneralDataSAPForm.nombreEquipo}
+            error={!!informacionGeneralSAPErrors.nombreEquipo}
+            helperText={
+              informacionGeneralSAPErrors.nombreEquipo
+                ? "Por favor escribir un nombre del equipo"
+                : ""
+            }
+            onChange={(e) => {
+              let value = e.target.value.toUpperCase();
+              if (value !== null && value.length > 10) {
+                return
+              }
+              handleInformacionGeneralSAPChange("nombreEquipo",value);
+              handleUniqueInformacionGeneralError("nombreEquipo",value);
+            }}
+          />
           <TextField
             label="MAC"
             placeholder="MAC"

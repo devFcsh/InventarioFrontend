@@ -31,6 +31,7 @@ import {
 } from "../../../../types/Equipo/index.ts";
 import { useSnackbar } from "@context/SnackbarContext.tsx";
 
+
 const Activos = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
@@ -135,6 +136,7 @@ const Activos = () => {
         }
       } catch (error) {
         showMessage(`Error al eliminar el equipo con inventario ${inventario}.`, "error");
+
       }
     }
   };
@@ -165,6 +167,7 @@ const Activos = () => {
       setSelectedItems([]);
     } catch (error) {
       showMessage("Error al eliminar los equipos", "error");
+
     }
   };
 
@@ -607,10 +610,6 @@ const Activos = () => {
               ubicacion,
               uso,
               usuario,
-              marca,
-              modelo,
-              serie,
-              inventario,
               fecha_ultimo_cambio: new Date(
                 fecha_ultimo_cambio
               ).toLocaleString(),
@@ -774,6 +773,7 @@ const Activos = () => {
             inputValue={inputInventario}
             onInputChange={(_, newInputValue) =>
               setInputInventario(newInputValue)
+
             }
             onChange={(_, newValue) => {
               if (typeof newValue === "string") {
@@ -807,6 +807,17 @@ const Activos = () => {
             >
               Buscar
             </button>
+            <div className="relative group">
+              <button
+                onClick={exportToExcel}
+                className="flex items-center justify-center h-full py-1.5 px-2 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+              >
+                <Icon icon="ph:export" width="20" height="20" />
+              </button>
+              <span className="absolute left-1/2 transform -translate-x-1/3 top-full mt-1 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                Exportar a Excel
+              </span>
+            </div>
           </div>
         </div>
       </div>

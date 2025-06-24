@@ -50,4 +50,5 @@ export type BajaSimpleData = {
     puertos: string;
     puerto_ftp: string;
     idLampara: number;
+    nombre_equipo:string;
   };

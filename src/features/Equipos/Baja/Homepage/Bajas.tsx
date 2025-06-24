@@ -5,7 +5,8 @@ import {
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
-import * as XLSX from "xlsx";import ModalConfirmation from "../../../../components/ModalConfirmation";
+import * as XLSX from "xlsx";
+import ModalConfirmation from "../../../../components/ModalConfirmation";
 import usePerifericos from "../../../../hooks/usePerifericos";
 import { filas } from "../../../../data";
 import { useEquiposBajaFiltrados } from "../hooks/useEquiposBajaFiltrados";
@@ -117,6 +118,7 @@ const Bajas = () => {
       } catch (error) {
         showMessage(
           `Error al eliminar el equipo con inventario ${inventario}.`, "error");
+
       }
     }
   };
@@ -236,7 +238,6 @@ const Bajas = () => {
 
     XLSX.writeFile(wb, "datos_equipos.xlsx");
   };
-
 
   return (
     <div className="flex flex-col p-4">

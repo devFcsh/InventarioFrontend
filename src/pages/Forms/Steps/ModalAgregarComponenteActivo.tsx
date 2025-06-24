@@ -87,6 +87,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
     }
     return true;
   });
+
   const { marcas: marcasComponente } = useMarcasPorPeriferico(
     nuevoComponente.periferico?.id_periferico ?? ""
   );
@@ -322,6 +323,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 onChange={(_, newValue: any) => {
                   handleEmpresaChange(newValue);
                   handleUniqueComponentsError("empresa", newValue, {
+
                     ...nuevoComponente,
                     empresa,
                   });

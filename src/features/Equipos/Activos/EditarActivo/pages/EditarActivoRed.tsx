@@ -54,6 +54,7 @@ const EditarActivoRed = ({
   const [selectedMAC, setSelectedMAC] = useState<string>("");
   const [selectedPuertos, setSelectedPuertos] = useState<string>("");
   const [selectedPuertoFTP, setSelectedPuertoFTP] = useState<string>("");
+
   const [empresa, setEmpresa] = useState<string | null>("");
   const [nombreEquipo, setNombreEquipo] = useState<string>("");
 
@@ -64,6 +65,7 @@ const EditarActivoRed = ({
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
   const [errorMAC, setErrorMAC] = useState<boolean>(false);
+  const [errorNombreEquipo, setErrorNombreEquipo] = useState<boolean>(false);
   const [errorPuertos, setErrorPuertos] = useState<boolean>(false);
   const [errorPuertoFTP, setErrorPuertoFTP] = useState<boolean>(false);
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(
@@ -109,6 +111,7 @@ const EditarActivoRed = ({
       equipoRedActivo.inventario.length === 10
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
+
     }
   }, [equipoRedActivo]);
 
@@ -295,13 +298,14 @@ const EditarActivoRed = ({
   const validarCamposEquipo = () => {
     if (
       !selectedInventarioInv ||
+      errorInventario ||
       !selectedInventarioSerie ||
       !selectedUbicacion ||
       !selectedMAC ||
       (perifericoName === "AP" ? false : !selectedPuertos) ||
       (perifericoName === "AP" ? false : !selectedPuertoFTP)
     ) {
-      setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
+      setErrorMensajeEquipo("Por favor verificar todos los campos del equipo.");
       return false;
     }
     setErrorMensajeEquipo(null);
@@ -624,7 +628,7 @@ const EditarActivoRed = ({
           onClick={handleConfirmEditarEquipo}
           fullWidth
         >
-          Editar Activo
+          Guardar Cambios
         </Button>
         <Button
           onClick={handleConfirmCancelar}

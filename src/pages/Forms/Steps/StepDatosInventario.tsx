@@ -17,7 +17,7 @@ import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
 import { useNavigate } from "react-router-dom";
 
 interface StepDatosInventarioProps {
-  periferico: Periferico;
+  periferico?: Periferico;
   uso: string;
   edificio: string;
   inventoryDataForm: any;

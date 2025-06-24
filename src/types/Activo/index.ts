@@ -74,7 +74,7 @@ export type ActivoRedEdit = {
   mac: string;
   puertos: string;
   puerto_ftp: string;
-  nombre_equipo: string;
+  nombre_equipo: string
 };
 
   export type ActivoSimpleEditSend = {
@@ -143,5 +143,6 @@ export type ActivoComputadoraData = {
     mac: string;
     puertos: string;
     puerto_ftp: string;
+    nombre_equipo: string;
   };
   

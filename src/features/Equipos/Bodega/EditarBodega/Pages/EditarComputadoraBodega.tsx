@@ -169,8 +169,6 @@ const EditarComputadoraBodega = ({
     nuevoComponente.modelo?.id_modelo ?? ""
   );
 
-  //const fileInputRef = useRef<HTMLInputElement | null>(null);
-
   useEffect(() => {
     if (equipo && marcas.length > 0) {
       setSelectedInventarioMarca(
@@ -1029,7 +1027,7 @@ const EditarComputadoraBodega = ({
           onClick={handleConfirmEditarEquipo}
           fullWidth
         >
-          Editar Bodega
+        Guardar Cambios
         </Button>
         <Button
           onClick={handleConfirmCancelar}

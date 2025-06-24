@@ -193,6 +193,7 @@ export const FormSAP = () => {
     try {
       await agregarRedActivo(equipoData);
 
+
       setShowSuccessMessage(true);
       showMessage("Equipo agregado correctamente", "success");
       navigate("/activos");
@@ -211,6 +212,7 @@ export const FormSAP = () => {
       puertos: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertos,
       puerto_ftp: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertoFTP,
       idLampara:0,
+      nombre_equipo:informacionGeneralDataSAPForm.nombreEquipo || "",
     };
     try {
       await agregarRedBodega(bodegaComputadoraData);
@@ -232,6 +234,7 @@ export const FormSAP = () => {
       puertos: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertos,
       puerto_ftp: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertoFTP,
       idLampara:0,
+      nombre_equipo:informacionGeneralDataSAPForm.nombreEquipo || "",
     };
     try {
       await agregarRedBaja(bodegaComputadoraData);

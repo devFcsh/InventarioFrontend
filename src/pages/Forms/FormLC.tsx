@@ -32,7 +32,7 @@ export const FormLC = () => {
   const selectedUso = location.state?.uso as Uso | undefined;
   const selectedEdificio = location.state?.edificio as Edificio | undefined;
   const [openModalObservation, setOpenModalObservation] = useState(false);
-  //const [observation, setObservation] = useState("");
+
   const perifericos = location.state?.perifericos as Periferico[];
   const tipoInventario = location.state?.tipoInventario;
   const steps = location.state?.steps;
