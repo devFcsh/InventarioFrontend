@@ -3,10 +3,9 @@ import {
   Autocomplete,
   TextField,
   Button,
-  Snackbar,
-  Alert,
   Box,
   FormHelperText,
+  Tooltip,
 } from "@mui/material";
 import {
   Marca,
@@ -35,15 +34,14 @@ import { Icon } from "@iconify/react";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
 import usePerifericos from "../../../../../hooks/usePerifericos";
-import {useEditarBodega} from "../hooks/useEditarBodega.ts";
+import { useEditarBodega } from "../hooks/useEditarBodega.ts";
 import { useGestionarComponentesBodega } from "../hooks/useGestionarComponentesBodega.ts";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 import useProcesadores from "@hooks/useProcesadores";
 import { validateIP } from "../../../../../pages/Forms/helpers/validateIP.ts";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario.ts";
-
-
+import { useSnackbar } from "@context/SnackbarContext.tsx";
 
 interface EditarComputadoraBodegaProps {
   equipo: BodegaComputadoraEdit;
@@ -74,7 +72,7 @@ const EditarComputadoraBodega = ({
   );
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const { showMessage } = useSnackbar();
 
   const navigate = useNavigate();
   const [selectedRAM, setSelectedRAM] = useState<RAM | null>(null);
@@ -135,11 +133,29 @@ const EditarComputadoraBodega = ({
   const { gestionarComponentesBodega } = useGestionarComponentesBodega();
   const { perifericos } = usePerifericos();
 
-  const filteredPerifericos = perifericos.filter(
-    (p) =>
-      p?.nombre.toLowerCase() !== "computadora" &&
-      p?.nombre.toLowerCase() !== "laptop"
-  );
+  const filteredPerifericos = perifericos.filter((p) => {
+    const nombre = p?.nombre?.toLowerCase();
+    if (nombre !== "mouse" && nombre !== "teclado" && nombre !== "monitor") {
+      return false;
+    }
+    if (
+      (nombre === "mouse" || nombre === "teclado") &&
+      componentesState.some(
+        (comp) => comp.periferico?.nombre?.toLowerCase() === nombre
+      )
+    ) {
+      return false;
+    }
+    if (
+      nombre === "monitor" &&
+      componentesState.filter(
+        (comp) => comp.periferico?.nombre?.toLowerCase() === "monitor"
+      ).length >= 2
+    ) {
+      return false;
+    }
+    return true;
+  });
   const { marcas: marcasComponente } = useMarcasPorPeriferico(
     nuevoComponente.periferico?.id_periferico ?? ""
   );
@@ -152,7 +168,6 @@ const EditarComputadoraBodega = ({
     nuevoComponente.marca?.id_marca ?? "",
     nuevoComponente.modelo?.id_modelo ?? ""
   );
-
 
   useEffect(() => {
     if (equipo && marcas.length > 0) {
@@ -241,7 +256,7 @@ const EditarComputadoraBodega = ({
         ) || null
       );
     }
-  }, [equipo, antivirus]);
+  }, [equipo]);
 
   useEffect(() => {
     if (equipo && versionesOffice.length > 0) {
@@ -267,6 +282,27 @@ const EditarComputadoraBodega = ({
   }, [equipo]);
 
   const handleAddComponente = () => {
+    const nombre = nuevoComponente.periferico?.nombre?.toLowerCase();
+    const cantidad = componentesState.filter(
+      (comp) => comp.periferico?.nombre?.toLowerCase() === nombre
+    ).length;
+
+    if (
+      (nombre === "teclado" && cantidad >= 1) ||
+      (nombre === "mouse" && cantidad >= 1) ||
+      (nombre === "monitor" && cantidad >= 2)
+    ) {
+      showMessage(
+        nombre === "monitor"
+          ? "Solo puedes agregar hasta 2 Monitores."
+          : `Solo puedes agregar un ${
+              nombre.charAt(0).toUpperCase() + nombre.slice(1)
+            }.`,
+        "error"
+      );
+      return;
+    }
+
     if (
       nuevoComponente.periferico &&
       nuevoComponente.marca &&
@@ -285,8 +321,9 @@ const EditarComputadoraBodega = ({
         inventario: "",
       });
     } else {
-      alert(
-        "Por favor, complete todos los campos antes de agregar el componente."
+      showMessage(
+        "Por favor, complete todos los campos antes de agregar el componente.",
+        "error"
       );
     }
   };
@@ -297,7 +334,6 @@ const EditarComputadoraBodega = ({
   };
 
   const handleEditEquipo = async (observationValue: string) => {
-
     const payload = {
       tipo: "bodega",
       id_ram: selectedRAM?.id_ram ?? "",
@@ -324,16 +360,13 @@ const EditarComputadoraBodega = ({
             id_componente: comp.id_componente,
             inventario: comp.inventario,
             serieId: Number(comp.serie?.id_serie) ?? 0,
-          }))
+          })),
         });
-        setShowSuccessMessage(true);
-        navigate("/bodega", { state: { equipoEditado: true } });
-      } else {
-        setShowSuccessMessage(true);
-        navigate("/bodega", { state: { equipoEditado: true } });
       }
+      showMessage("Equipo editado exitosamente", "success");
+      navigate("/bodega");
     } catch (error) {
-      console.error("Error al actualizar equipo:", error);
+      showMessage("Error al editar el equipo", "error");
     }
   };
 
@@ -486,13 +519,6 @@ const EditarComputadoraBodega = ({
         title="Confirmar Cancelar"
         message="¿Está seguro de que desea cancelar? Todos los cambios no guardados se perderán."
       />
-      <Snackbar
-        open={showSuccessMessage}
-        autoHideDuration={3000}
-        onClose={() => setShowSuccessMessage(false)}
-      >
-        <Alert severity="success">Equipo agregado exitosamente</Alert>
-      </Snackbar>
       <h2 className="text-xl font-semibold mb-5">Información de Inventario</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <Autocomplete
@@ -581,13 +607,17 @@ const EditarComputadoraBodega = ({
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
             onChange={(e) => {
-              let value = e.target.value;
-              if (empresa==="Espol" && value !== null && value.length > 6) {
-                return
-              }else if(empresa==="EspolTech" && value !== null && value.length > 10){
-                return
+              const value = e.target.value;
+              if (empresa === "Espol" && value !== null && value.length > 6) {
+                return;
+              } else if (
+                empresa === "EspolTech" &&
+                value !== null &&
+                value.length > 10
+              ) {
+                return;
               }
-              handleChangeInventario(value)
+              handleChangeInventario(value);
             }}
             disabled={empresa === ""}
           />
@@ -770,7 +800,6 @@ const EditarComputadoraBodega = ({
             />
           )}
         />
-
       </div>
 
       <div className="mb-4">
@@ -799,13 +828,17 @@ const EditarComputadoraBodega = ({
                     <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
                     <td className="py-2 px-4 border">{comp.inventario}</td>
                     <td className="py-2 px-1 border">
-                      <Icon
-                        icon="fluent-mdl2:disconnect-virtual-machine"
-                        width="25"
-                        height="25"
-                        onClick={() => eliminarComponente(index)}
-                        className="cursor-pointer mx-auto"
-                      />
+                      <Tooltip title="Eliminar Componente">
+                        <span>
+                          <Icon
+                            icon="fluent-mdl2:disconnect-virtual-machine"
+                            width="25"
+                            height="25"
+                            onClick={() => eliminarComponente(index)}
+                            className="cursor-pointer mx-auto"
+                          />
+                        </span>
+                      </Tooltip>
                     </td>
                   </tr>
                 ))}
@@ -932,13 +965,21 @@ const EditarComputadoraBodega = ({
                     : ""
                 }
                 onChange={(e) => {
-                  let value = e.target.value;
-                  if (empresaNuevoComponente==="Espol" && value !== null && value.length > 6) {
-                    return
-                  }else if(empresaNuevoComponente==="EspolTech" && value !== null && value.length > 10){
-                    return
+                  const value = e.target.value;
+                  if (
+                    empresaNuevoComponente === "Espol" &&
+                    value !== null &&
+                    value.length > 6
+                  ) {
+                    return;
+                  } else if (
+                    empresaNuevoComponente === "EspolTech" &&
+                    value !== null &&
+                    value.length > 10
+                  ) {
+                    return;
                   }
-                  handleChangeNuevoComponenteInventario(value)
+                  handleChangeNuevoComponenteInventario(value);
                 }}
                 disabled={empresa === ""}
               />
@@ -964,6 +1005,10 @@ const EditarComputadoraBodega = ({
           minRows={2}
           value={newObservation}
           onChange={(e) => {
+            const value = e.target.value;
+            if (value !== null && value.length > 200) {
+              return;
+            }
             handleObservation(e.target.value);
           }}
           error={!!errorMensajeComponente}

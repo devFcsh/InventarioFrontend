@@ -14,6 +14,7 @@ import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import useUbicaciones from "@hooks/useUbicaciones";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
+import { useNavigate } from "react-router-dom";
 
 interface StepDatosInventarioProps {
   periferico?: Periferico;
@@ -58,10 +59,29 @@ export const StepDatosInventario = ({
     inventoryDataForm.modelo?.id_modelo ?? ""
   );
   const { ubicaciones } = useUbicaciones(edificio);
+  const navigate = useNavigate();
 
   return (
     <Box>
       <div className="mt-8">
+        <div className="flex items-center mt-8 mb-4">
+          <span>¿No encuentras tu usuario? </span>
+          <a
+            href="#"
+            style={{
+              color: "#1976d2",
+              marginLeft: 4,
+              textDecoration: "underline",
+              cursor: "pointer",
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/agregarUsuario");
+            }}
+          >
+            Agrégalo
+          </a>
+        </div>
         <div className="grid grid-cols-2 gap-4">
           {tipoInventario === "activo" && periferico?.nombre !== "Proyector" ? (
             <Autocomplete
@@ -265,10 +285,18 @@ export const StepDatosInventario = ({
               }
               onChange={(e) => {
                 let value = e.target.value;
-                if (inventoryDataForm.empresa==="Espol" && value !== null && value.length > 6) {
-                  return
-                }else if(inventoryDataForm.empresa==="EspolTech" && value !== null && value.length > 10){
-                  return
+                if (
+                  inventoryDataForm.empresa === "Espol" &&
+                  value !== null &&
+                  value.length > 6
+                ) {
+                  return;
+                } else if (
+                  inventoryDataForm.empresa === "EspolTech" &&
+                  value !== null &&
+                  value.length > 10
+                ) {
+                  return;
                 }
                 handleInventoryChange("inventario", value);
                 handleUniqueInventarioError(

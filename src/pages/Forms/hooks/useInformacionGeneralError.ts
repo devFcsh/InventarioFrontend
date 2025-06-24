@@ -25,7 +25,8 @@ interface InformacionGeneralDataForm{
   procesador: Procesador
 }
 
-export const useInformacionGeneralError = (_: InformacionGeneralDataForm) => {
+export const useInformacionGeneralError = (dataForm: InformacionGeneralDataForm) => {
+
   const [informacionGeneralErrors, setInformacionGeneralErrors] = useState<Record<string, boolean>>({
     "sistemaOperativo":false,
     "versionSO":false,
@@ -40,7 +41,7 @@ export const useInformacionGeneralError = (_: InformacionGeneralDataForm) => {
     "procesador": false
   });
 
-  const completeDatosInformacionGeneral = (dataForm: InformacionGeneralDataForm)=>{
+  const completeDatosInformacionGeneral = ()=>{
     if(dataForm.sistemaOperativo !==null && dataForm.versionSO!==null
       &&dataForm.dominio !==null && dataForm.nombreEquipo !=="" &&
       dataForm.versionOffice !==null && dataForm.protocolo !=="" && dataForm.antivirus !==null && dataForm.ram!==null &&dataForm.disco!==null
@@ -85,7 +86,7 @@ export const useInformacionGeneralError = (_: InformacionGeneralDataForm) => {
     });
   };
 
-  const handleUniqueInformacionGeneralError = (tipo: keyof InformacionGeneralDataForm, value: SistemaOperativo | VersionSO | Dominio | VersionOffice | Antivirus | string | RAM | Disco |Procesador| null) => {
+  const handleUniqueInformacionGeneralError = (tipo: keyof InformacionGeneralDataForm, value: any) => {
   
     setInformacionGeneralErrors((prevErrors) => ({
       ...prevErrors,

@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { Alert, Dialog, Snackbar, TextField } from "@mui/material";
+import { Dialog, TextField, Tooltip } from "@mui/material";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import useUsos from "@hooks/useUsos";
 import useDiscos from "@hooks/useDiscos";
@@ -63,6 +63,7 @@ import { useEditarLampara } from "../../AgregarCategoria/hooks/useEditarLampara"
 import { useEliminarLampara } from "../../AgregarCategoria/hooks/useEliminarLampara";
 import { useEditarRAM } from "../../AgregarCategoria/hooks/useEditarRAM";
 import { useEliminarRAM } from "../../AgregarCategoria/hooks/useEliminarRAM";
+import { useSnackbar } from "@context/SnackbarContext";
 
 type Opcion =
   | Uso
@@ -90,33 +91,43 @@ interface ModalEditarCategoriaProps {
 }
 
 // Type guards corregidos con null checks
-const isRAM = (obj: Opcion | null): obj is RAM => obj !== null && 'id_ram' in obj;
-const isDisco = (obj: Opcion | null): obj is Disco => obj !== null && 'id_disco' in obj;
-const isDominio = (obj: Opcion | null): obj is Dominio => obj !== null && 'id_dominio' in obj;
-const isPeriferico = (obj: Opcion | null): obj is Periferico => obj !== null && 'id_periferico' in obj;
-const isUso = (obj: Opcion | null): obj is Uso => obj !== null && 'id_uso' in obj;
-const isMarca = (obj: Opcion | null): obj is Marca => obj !== null && 'id_marca' in obj;
-const isModelo = (obj: Opcion | null): obj is Modelo => obj !== null && 'id_modelo' in obj;
-const isSerie = (obj: Opcion | null): obj is Serie => obj !== null && 'id_serie' in obj;
-const isLampara = (obj: Opcion | null): obj is Lampara => obj !== null && 'id_lampara' in obj;
-const isSistemaOperativo = (obj: Opcion | null): obj is SistemaOperativo => obj !== null && 'id_sistemaoperativo' in obj;
-const isEdificio = (obj: Opcion | null): obj is Edificio => obj !== null && 'id_edificio' in obj;
-const isUbicacion = (obj: Opcion | null): obj is Ubicacion => obj !== null && 'id_ubicacion' in obj;
-const isVersionSO = (obj: Opcion | null): obj is VersionSO => obj !== null && 'id_versionso' in obj;
-const isProcesador = (obj: Opcion | null): obj is Procesador => obj !== null && 'id_procesador' in obj;
-const isVersionOffice = (obj: Opcion | null): obj is VersionOffice => obj !== null && 'id_versionoffice' in obj;
+const isRAM = (obj: Opcion | null): obj is RAM =>
+  obj !== null && "id_ram" in obj;
+const isDisco = (obj: Opcion | null): obj is Disco =>
+  obj !== null && "id_disco" in obj;
+const isDominio = (obj: Opcion | null): obj is Dominio =>
+  obj !== null && "id_dominio" in obj;
+const isPeriferico = (obj: Opcion | null): obj is Periferico =>
+  obj !== null && "id_periferico" in obj;
+const isUso = (obj: Opcion | null): obj is Uso =>
+  obj !== null && "id_uso" in obj;
+const isMarca = (obj: Opcion | null): obj is Marca =>
+  obj !== null && "id_marca" in obj;
+const isModelo = (obj: Opcion | null): obj is Modelo =>
+  obj !== null && "id_modelo" in obj;
+const isSerie = (obj: Opcion | null): obj is Serie =>
+  obj !== null && "id_serie" in obj;
+const isLampara = (obj: Opcion | null): obj is Lampara =>
+  obj !== null && "id_lampara" in obj;
+const isSistemaOperativo = (obj: Opcion | null): obj is SistemaOperativo =>
+  obj !== null && "id_sistemaoperativo" in obj;
+const isEdificio = (obj: Opcion | null): obj is Edificio =>
+  obj !== null && "id_edificio" in obj;
+const isUbicacion = (obj: Opcion | null): obj is Ubicacion =>
+  obj !== null && "id_ubicacion" in obj;
+const isVersionSO = (obj: Opcion | null): obj is VersionSO =>
+  obj !== null && "id_versionso" in obj;
+const isProcesador = (obj: Opcion | null): obj is Procesador =>
+  obj !== null && "id_procesador" in obj;
+const isVersionOffice = (obj: Opcion | null): obj is VersionOffice =>
+  obj !== null && "id_versionoffice" in obj;
 
 const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   open,
   onClose,
   selectedCategoria,
 }) => {
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-    "success"
-  );
-
+  const { showMessage } = useSnackbar();
   const { usos } = useUsos();
   const { discos } = useDiscos();
   const { marcas } = useMarcas();
@@ -201,7 +212,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
       ? procesadores
       : selectedCategoria === "Versión Office"
       ? versionesOffice
-      : []
+      : [];
 
   const handleEditarCategoria = (elemento: Opcion) => {
     setSelectedOption(elemento);
@@ -210,7 +221,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
       setEditedTipo(elemento?.tipo || "");
     } else if (selectedCategoria === "Disco" && isDisco(elemento)) {
       setEditedValue(elemento?.capacidad || "");
-    } else if (elemento && 'nombre' in elemento) {
+    } else if (elemento && "nombre" in elemento) {
       setEditedValue(elemento.nombre || "");
     }
     setOpenEditModal(true);
@@ -247,7 +258,6 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             break;
           case "Uso":
             if (isUso(selectedOption)) {
-              console.log(selectedOption.id_uso + " " + editedValue)
               editarUso({
                 id_uso: Number(selectedOption.id_uso),
                 nuevoNombre: editedValue,
@@ -343,23 +353,18 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             }
             break;
           default:
-            console.log(
-              `No hay función para editar la categoría ${selectedCategoria}`
-            );
+            showMessage(
+              `No se puede editar la categoría ${selectedCategoria}`, "error")
             break;
         }
 
-        setSnackbarMessage("Opción editada correctamente");
-        setSnackbarSeverity("success");
-        setOpenSnackbar(true);
+        showMessage("Subcategoría editada correctamente", "success");
         onClose();
         setTimeout(() => {
           window.location.reload();
         }, 1000);
       } catch (error) {
-        setSnackbarMessage("Error al editar la opción");
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
+        showMessage("Error al editar la subcategoría", "error");
       }
     }
     setOpenEditModal(false);
@@ -406,7 +411,9 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             break;
           case "Sistema Operativo":
             if (isSistemaOperativo(elemento)) {
-              await eliminarSistemaOperativo(Number(elemento.id_sistemaoperativo));
+              await eliminarSistemaOperativo(
+                Number(elemento.id_sistemaoperativo)
+              );
             }
             break;
           case "Edificio":
@@ -445,42 +452,23 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             }
             break;
           default:
-            console.log(
-              `No hay función para eliminar la categoría ${selectedCategoria}`
-            );
+            showMessage(
+              `No se puede eliminar la categoría ${selectedCategoria}`, "error")
             break;
         }
-        setSnackbarMessage("Opción eliminada correctamente");
-        setSnackbarSeverity("success");
-        setOpenSnackbar(true);
+        showMessage("Subcategoría eliminada correctamente", "success");
         onClose();
         setTimeout(() => {
           window.location.reload();
         }, 1000);
       } catch (error) {
-        setSnackbarMessage("Desligue la opción antes de eliminarla");
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
+        showMessage("Desligue la subcategoría antes de eliminarla", "error");
       }
     }
   };
 
   return (
     <>
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={() => setOpenSnackbar(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={() => setOpenSnackbar(false)}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
       <Dialog open={open} onClose={onClose}>
         <div className="py-5 px-10">
           <h2 className="text-xl font-semibold mb-4">
@@ -490,9 +478,9 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             <table className="min-w-full table-auto border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-100 border-b">
-                  <th className="py-2 px-4 border">Opción</th>
+                  <th className="py-2 px-4 border">Subcategoría</th>
                   {selectedCategoria === "RAM" ? (
-                    <th className="py-2 px-4 border">Opción Tipo</th>
+                    <th className="py-2 px-4 border">Subcategoría Tipo</th>
                   ) : (
                     <></>
                   )}
@@ -510,36 +498,48 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
                   elementos.map((elemento, index) => (
                     <tr key={index}>
                       <td className="py-2 px-4 border">
-                        {elemento && selectedCategoria === "RAM" && isRAM(elemento)
+                        {elemento &&
+                        selectedCategoria === "RAM" &&
+                        isRAM(elemento)
                           ? elemento.capacidad
-                          : elemento && selectedCategoria === "Disco" && isDisco(elemento)
+                          : elemento &&
+                            selectedCategoria === "Disco" &&
+                            isDisco(elemento)
                           ? elemento.capacidad
-                          : elemento && 'nombre' in elemento
+                          : elemento && "nombre" in elemento
                           ? elemento.nombre
-                          : ''}
+                          : ""}
                       </td>
                       {selectedCategoria === "RAM" ? (
                         <td className="py-2 px-4 border">
-                          {elemento && isRAM(elemento) ? elemento.tipo : ''}
+                          {elemento && isRAM(elemento) ? elemento.tipo : ""}
                         </td>
                       ) : (
                         <></>
                       )}
                       <td className="py-2 px-3 border flex gap-2 items-center">
-                        <Icon
-                          icon="mage:edit"
-                          width="25"
-                          height="25"
-                          className="cursor-pointer"
-                          onClick={() => handleEditarCategoria(elemento)}
-                        />
-                        <Icon
-                          icon="weui:delete-outlined"
-                          width="25"
-                          height="25"
-                          className="cursor-pointer"
-                          onClick={() => handleEliminarCategoria(elemento)}
-                        />
+                        <Tooltip title="Editar Subcategoría">
+                          <span>
+                            <Icon
+                              icon="mage:edit"
+                              width="25"
+                              height="25"
+                              className="cursor-pointer"
+                              onClick={() => handleEditarCategoria(elemento)}
+                            />
+                          </span>
+                        </Tooltip>
+                        <Tooltip title="Eliminar Subcategoría">
+                          <span>
+                            <Icon
+                              icon="weui:delete-outlined"
+                              width="25"
+                              height="25"
+                              className="cursor-pointer"
+                              onClick={() => handleEliminarCategoria(elemento)}
+                            />
+                          </span>
+                        </Tooltip>
                       </td>
                     </tr>
                   ))
@@ -551,7 +551,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
 
         <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
           <div className="p-5">
-            <h3 className="text-xl font-semibold mb-4">Editar Opción</h3>
+            <h3 className="text-xl font-semibold mb-4">Editar Subcategoría</h3>
             {selectedCategoria === "RAM" ? (
               <>
                 <TextField
@@ -559,7 +559,13 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
                   variant="outlined"
                   fullWidth
                   value={editedTipo}
-                  onChange={(e) => setEditedTipo(e.target.value)}
+                  onChange={(e) => {
+                  const value = e.target.value;
+                  if (value !== null && value.length > 6) {
+                    return;
+                  }
+                  setEditedTipo(e.target.value);
+                  }}
                 />
                 <div style={{ marginBottom: "1rem" }}></div>
                 <TextField
@@ -567,7 +573,13 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
                   variant="outlined"
                   fullWidth
                   value={editedValue}
-                  onChange={(e) => setEditedValue(e.target.value)}
+                  onChange={(e) => {
+                  const value = e.target.value;
+                  if (value !== null && value.length > 6) {
+                    return;
+                  }
+                  setEditedValue(e.target.value);
+                  }}
                   className="mt-3"
                 />
               </>
@@ -577,7 +589,13 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
                 variant="outlined"
                 fullWidth
                 value={editedValue}
-                onChange={(e) => setEditedValue(e.target.value)}
+                onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 10) {
+                return;
+              }
+              setEditedValue(e.target.value);
+              }}
               />
             )}
             <div className="mt-4 flex justify-end gap-2">

@@ -43,11 +43,12 @@ export const useInformacionGeneralErrorSAP = (periferico:string | undefined) => 
         ...prevErrors,
         ["puertos"]: false,
         ["puertoFTP"]: false,
+        ["nombreEquipo"]: false
       }));
     }
   };
 
-  const handleUniqueInformacionGeneralError = (tipo: keyof InformacionGeneralDataForm, value: string | null) => {
+  const handleUniqueInformacionGeneralError = (tipo: keyof InformacionGeneralDataForm, value: any) => {
   
     setInformacionGeneralErrors((prevErrors) => ({
       ...prevErrors,

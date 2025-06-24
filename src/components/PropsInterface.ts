@@ -16,4 +16,5 @@ export interface NavBarItemsProps {
   currentSection: string;
   setCurrentSection: (section: string) => void;
   setIsDrawerOpen: (isOpen: boolean) => void;
+  rol: string;
 }

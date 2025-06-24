@@ -1,17 +1,14 @@
-import { Alert, Autocomplete, Snackbar, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
 import { ModalAgregarActivo } from "../../../../features/Equipos/Activos/AgregarActivo/pages/ModalAgregarActivo.tsx";
-import {
-  Periferico,
-  Marca,
-  Modelo,
-  Serie,
-  Inventario,
-} from "../../../../types";
 import usePerifericos from "../../../../hooks/usePerifericos";
 import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../../../../data";
@@ -32,16 +29,10 @@ import {
   ExportarSimples,
   ExportarSwitch,
 } from "../../../../types/Equipo/index.ts";
-import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "@context/SnackbarContext.tsx";
+
 
 const Activos = () => {
-  const [selectedPeriferico, setSelectedPeriferico] =
-    useState<Periferico | null>(null);
-  const [selectedMarca, setSelectedMarca] = useState<Marca | null>(null);
-  const [selectedModelo, setSelectedModelo] = useState<Modelo | null>(null);
-  const [selectedSerie, setSelectedSerie] = useState<Serie | null>(null);
-  const [selectedInventario, setSelectedInventario] =
-    useState<Inventario | null>(null);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -50,10 +41,6 @@ const Activos = () => {
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
-  const [snackbarSeverity, setSnackbarSeverity] = useState<
-    "success" | "error" | "warning"
-  >("success");
-  const navigate = useNavigate();
   const [totalPages, setTotalPages] = useState<number>(1);
   const [modalContent, setModalContent] = useState<{
     title: string;
@@ -71,10 +58,15 @@ const Activos = () => {
     message: "Seleccione el periférico a registrar",
   });
 
-  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [inputPeriferico, setInputPeriferico] = useState("");
+  const [inputMarca, setInputMarca] = useState("");
+  const [inputModelo, setInputModelo] = useState("");
+  const [inputSerie, setInputSerie] = useState("");
+  const [inputInventario, setInputInventario] = useState("");
 
+  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+
+  const { showMessage } = useSnackbar();
   const { perifericos } = usePerifericos();
   const { edificios } = useEdificios();
   const { usos } = useUsos();
@@ -85,13 +77,12 @@ const Activos = () => {
   const { pasarActivoABodega } = usePasarActivoABodega();
   const { fetchTodosEquipos } = useExportarEquiposActivos();
 
-  const location = useLocation();
   const filtros = {
-    perifericoId: selectedPeriferico?.id_periferico,
-    marcaId: selectedMarca?.id_marca,
-    modeloId: selectedModelo?.id_modelo,
-    serieId: selectedSerie?.id_serie,
-    inventario: selectedInventario?.inventario,
+    perifericoId: inputPeriferico || "",
+    marcaId: inputMarca || "",
+    modeloId: inputModelo || "",
+    serieId: inputSerie || "",
+    inventario: inputInventario || "",
   };
 
   const { eliminarEquipo } = useEliminarComputadora();
@@ -121,23 +112,11 @@ const Activos = () => {
     setOpenModal(false);
   };
 
-  useEffect(() => {
-    if (location.state && location.state.equipoAgregado) {
-      setSnackbarMessage("¡Equipo agregado con éxito!");
-      setOpenSnackbar(true);
-      navigate(location.pathname, { replace: true, state: {} });
-    } else if (location.state && location.state.equipoEditado) {
-      setSnackbarMessage("¡Equipo editado con éxito!");
-      setOpenSnackbar(true);
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-  }, [location.pathname, location.state, navigate]);
-
   const handleConfirm = async () => {
     try {
       await confirmAction();
     } catch (error) {
-      alert("Error en la acción");
+      showMessage("Error al realizar la acción", "error");
     }
     handleCloseModal();
   };
@@ -151,21 +130,13 @@ const Activos = () => {
         const result = await eliminarEquipo(equipoId);
         if (result) {
           setShouldFetch(true);
-          setSnackbarMessage(`Equipo con inventario ${inventario} eliminado.`);
-          setSnackbarSeverity("success");
+          showMessage(`Equipo con inventario ${inventario} eliminado.`, "success");
         } else {
-          setSnackbarMessage(
-            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`
-          );
-          setSnackbarSeverity("error");
+          showMessage(`No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`, "error");
         }
-        setOpenSnackbar(true);
       } catch (error) {
-        setSnackbarMessage(
-          `Error al eliminar el equipo con inventario ${inventario}.`
-        );
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
+        showMessage(`Error al eliminar el equipo con inventario ${inventario}.`, "error");
+
       }
     }
   };
@@ -184,24 +155,19 @@ const Activos = () => {
       }
 
       if (errorsInventarios.length === 0) {
-        setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success");
+        showMessage("Operación completada con éxito", "success");
       } else {
-        setSnackbarMessage(
+        showMessage(
           `No se pudieron eliminar los equipos: ${errorsInventarios.join(
             ", "
-          )} ya que están relacionados a una computadora`
-        );
-        setSnackbarSeverity("error");
+          )} ya que están relacionados a una computadora`, "error");
       }
 
       setShouldFetch(true);
       setSelectedItems([]);
-      setOpenSnackbar(true);
     } catch (error) {
-      setSnackbarMessage("Error al eliminar los equipos");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
+      showMessage("Error al eliminar los equipos", "error");
+
     }
   };
 
@@ -214,23 +180,18 @@ const Activos = () => {
         const result = await pasarActivoABodega(equipoId);
         if (result) {
           setShouldFetch(true);
-          setSnackbarMessage(
+          showMessage(
             `Equipo con inventario ${inventario} pasado a bodega`
-          );
-          setSnackbarSeverity("success");
+          , "success");
         } else {
-          setSnackbarMessage(
+          showMessage(
             `No se puede pasar a bodega el equipo con inventario ${inventario}porque el equipo está asociado a una computadora`
-          );
-          setSnackbarSeverity("error");
+          , "error");
         }
-        setOpenSnackbar(true);
       } catch (error) {
-        setSnackbarMessage(
+        showMessage(
           `Error al pasar a bodega el equipo con inventario ${inventario}`
-        );
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
+        , "error");
       }
     }
   };
@@ -249,24 +210,19 @@ const Activos = () => {
       }
 
       if (errorsInventarios.length === 0) {
-        setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success");
+        showMessage("Operación completada con éxito", "success");
       } else {
-        setSnackbarMessage(
+        showMessage(
           `No se pudieron pasar los equipos con inventarios: ${errorsInventarios.join(
             ", "
           )} a bodega ya que están relacionados a una computadora`
-        );
-        setSnackbarSeverity("error");
+        , "error");
       }
 
       setShouldFetch(true);
       setSelectedItems([]);
-      setOpenSnackbar(true);
     } catch (error) {
-      setSnackbarMessage("Error al pasar a bodega los equipos");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
+      showMessage("Error al pasar a bodega los equipos", "error");
     }
   };
 
@@ -279,23 +235,16 @@ const Activos = () => {
         const result = await darDeBajaEquipo(equipoId, "activo");
         if (result) {
           setShouldFetch(true);
-          setSnackbarMessage(
+          showMessage(
             `Equipo con inventario ${inventario} dado de baja`
-          );
-          setSnackbarSeverity("success");
+          , "success");
         } else {
-          setSnackbarMessage(
-            `No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora`
-          );
-          setSnackbarSeverity("error");
+          showMessage(
+            `No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora`, "error");
         }
-        setOpenSnackbar(true);
       } catch (error) {
-        setSnackbarMessage(
-          `Error al dar de baja al equipo con inventario ${inventario}`
-        );
-        setSnackbarSeverity("error");
-        setOpenSnackbar(true);
+        showMessage(
+          `Error al dar de baja al equipo con inventario ${inventario}`, "error");
       }
     }
   };
@@ -314,28 +263,23 @@ const Activos = () => {
       }
       if (errorsInventarios.length === 0) {
         setShouldFetch(true);
-        setSnackbarMessage("Operación completada con éxito");
-        setSnackbarSeverity("success");
+        showMessage("Operación completada con éxito", "success");
       } else {
-        setSnackbarMessage(
+        showMessage(
           `Error al dar de baja los equipos con inventario ${errorsInventarios.join(
             ", "
           )} ya que están relacionados a una computadora`
-        );
-        setSnackbarSeverity("error");
+        , "error");
       }
       setSelectedItems([]);
-      setOpenSnackbar(true);
     } catch (error) {
-      setSnackbarMessage("Error al dar de baja los equipos");
-      setSnackbarSeverity("error");
-      setOpenSnackbar(true);
+      showMessage("Error al dar de baja los equipos", "error");
     }
   };
 
   const handlePasarABodega = () => {
     if (selectedItems.length === 0) {
-      console.log("Debe seleccionar al menos un elemento");
+      showMessage("Debe seleccionar al menos un elemento", "warning");
       return;
     }
 
@@ -345,7 +289,12 @@ const Activos = () => {
     });
 
     setConfirmAction(() => async () => {
+      try {
       await pasarABodegaEquipos(selectedItems);
+        showMessage("Equipo pasado a bodega con éxito", "success");
+      } catch (error) {
+        showMessage("Error al pasar equipo a bodega", "error");
+      }
       setOpenModal(false);
     });
 
@@ -354,7 +303,7 @@ const Activos = () => {
 
   const handleDelete = () => {
     if (selectedItems.length === 0) {
-      console.log("Debe seleccionar al menos un elemento");
+      showMessage("Debe seleccionar al menos un elemento", "warning");
       return;
     }
 
@@ -393,41 +342,13 @@ const Activos = () => {
     });
     setConfirmAction(() => async () => {
       if (selectedItems.length === 0) {
-        console.log("Debe seleccionar al menos un elemento");
+        showMessage("Debe seleccionar al menos un elemento", "warning");
         return;
       }
       await bajaEquipos(selectedItems);
       setOpenModal(false);
     });
     setOpenModal(true);
-  };
-
-  const handlePerifericoChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Periferico | null
-  ) => {
-    setSelectedPeriferico(newValue);
-  };
-
-  const handleMarcaChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Marca | null
-  ) => {
-    setSelectedMarca(newValue);
-  };
-
-  const handleModeloChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Modelo | null
-  ) => {
-    setSelectedModelo(newValue);
-  };
-
-  const handleSerieChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Serie | null
-  ) => {
-    setSelectedSerie(newValue);
   };
 
   const handleBuscar = () => {
@@ -492,7 +413,6 @@ const Activos = () => {
         return addIDColumn(
           equipos.map(
             ({
-              empresa,
               edificio,
               ubicacion,
               uso,
@@ -501,7 +421,6 @@ const Activos = () => {
               nombre_equipo,
               dominio,
               sistema_operativo,
-              version_sistema_operativo,
               procesador,
               tipo_ram,
               capacidad_ram,
@@ -526,11 +445,6 @@ const Activos = () => {
               monitor_inventario,
             }) => ({
               tipo: "Computadora",
-              empresa,
-              inventario,
-              marca,
-              modelo,
-              serie,
               edificio,
               ubicacion,
               uso,
@@ -539,11 +453,14 @@ const Activos = () => {
               nombre_equipo,
               dominio,
               sistema_operativo,
-              version_sistema_operativo,
               procesador,
               tipo_ram,
               capacidad_ram,
               capacidad_disco,
+              marca,
+              modelo,
+              serie,
+              inventario,
               fecha_ultimo_cambio: new Date(
                 fecha_ultimo_cambio
               ).toLocaleString(),
@@ -586,13 +503,13 @@ const Activos = () => {
               tipo: "Switch",
               empresa,
               inventario,
+              edificio,
+              ubicacion,
               marca,
               modelo,
               serie,
               mac,
-              edificio,
-              ubicacion,
-              "puertos-10-100-1000": puertos,
+              puertos,
               puerto_ftp,
               nombre_equipo,
               fecha_ultimo_cambio: new Date(
@@ -623,12 +540,12 @@ const Activos = () => {
               tipo: "AP",
               empresa,
               inventario,
+              edificio,
+              ubicacion,
               marca,
               modelo,
               serie,
               mac,
-              edificio,
-              ubicacion,
               nombre_equipo,
               fecha_ultimo_cambio: new Date(
                 fecha_ultimo_cambio
@@ -657,12 +574,12 @@ const Activos = () => {
               tipo: "Proyector",
               empresa,
               inventario,
+              edificio,
+              ubicacion,
               marca,
               modelo,
               serie,
               lampara,
-              edificio,
-              ubicacion,
               fecha_ultimo_cambio: new Date(
                 fecha_ultimo_cambio
               ).toLocaleString(),
@@ -677,7 +594,6 @@ const Activos = () => {
           equipos.map(
             ({
               periferico,
-              empresa,
               edificio,
               ubicacion,
               uso,
@@ -690,11 +606,6 @@ const Activos = () => {
               observacion,
             }) => ({
               tipo: periferico,
-              empresa,
-              inventario,
-              marca,
-              modelo,
-              serie,
               edificio,
               ubicacion,
               uso,
@@ -729,63 +640,28 @@ const Activos = () => {
       XLSX.utils.book_append_sheet(wb, wsProyector, "Proyector");
       XLSX.utils.book_append_sheet(wb, wsEquiposSimples, "Equipos Simples");
 
-      XLSX.writeFile(wb, "datos_equipos_activos.xlsx");
+      XLSX.writeFile(wb, "datos_equipos.xlsx");
     } catch (error) {
       console.error("Error al exportar a Excel:", error);
     }
   };
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-  };
-
   return (
     <div className="flex flex-col p-4">
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-          iconMapping={{
-            success: (
-              <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />
-            ),
-            error: (
-              <Icon
-                icon="fluent:error-circle-24-regular"
-                width={20}
-                height={20}
-              />
-            ),
-            warning: (
-              <Icon icon="fluent:warning-24-regular" width={20} height={20} />
-            ),
-          }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
       <div className="mb-4">
         <div className="flex gap-2 items-center">
           <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>
-
-          <div className="relative group">
-            <Icon
-              icon="gridicons:add"
-              width="30"
-              height="30"
-              className="text-green-900 hover:text-green-950"
-              onClick={handleOpenActivos}
-            />
-            <span className="absolute left-1/2 transform -translate-x-1/3 top-full mt-1 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
-              Agregar activo
+          <Tooltip title="Agregar activo">
+            <span>
+              <Icon
+                icon="gridicons:add"
+                width="30"
+                height="30"
+                className="text-green-900 hover:text-green-950"
+                onClick={handleOpenActivos}
+              />
             </span>
-          </div>
+          </Tooltip>
           <ModalAgregarActivo
             open={openModalActivos}
             onClose={handleCloseActivos}
@@ -799,14 +675,22 @@ const Activos = () => {
         <div className="flex flex-wrap gap-4 my-10">
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={perifericos}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handlePerifericoChange}
-            value={selectedPeriferico}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_periferico === value?.id_periferico
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputPeriferico}
+            onInputChange={(_, newInputValue) => {
+              setInputPeriferico(newInputValue);
+            }}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputPeriferico(newValue);
+              } else {
+                setInputPeriferico(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Periférico" variant="outlined" />
             )}
@@ -815,29 +699,42 @@ const Activos = () => {
 
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={marcas}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handleMarcaChange}
-            value={selectedMarca}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_marca === value?.id_marca
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputMarca}
+            onInputChange={(_, newInputValue) => setInputMarca(newInputValue)}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputMarca(newValue);
+              } else {
+                setInputMarca(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Marca" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
           />
+
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={modelos}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handleModeloChange}
-            value={selectedModelo}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_modelo === value?.id_modelo
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputModelo}
+            onInputChange={(_, newInputValue) => setInputModelo(newInputValue)}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputModelo(newValue);
+              } else {
+                setInputModelo(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Modelo" variant="outlined" />
             )}
@@ -846,29 +743,45 @@ const Activos = () => {
 
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={series}
-            getOptionLabel={(option) => option?.nombre || ""}
-            onChange={handleSerieChange}
-            value={selectedSerie}
-            isOptionEqualToValue={(option, value) =>
-              option?.id_serie === value?.id_serie
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option?.nombre || ""
             }
+            inputValue={inputSerie}
+            onInputChange={(_, newInputValue) => setInputSerie(newInputValue)}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputSerie(newValue);
+              } else {
+                setInputSerie(newValue?.nombre || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Serie" variant="outlined" />
             )}
             className="w-full md:w-cmbox"
           />
+
           <Autocomplete
             size="small"
-            disablePortal
+            freeSolo
             options={inventarios}
-            getOptionLabel={(option) => option.inventario || ""}
-            onChange={(_, newValue) => setSelectedInventario(newValue)}
-            value={selectedInventario}
-            isOptionEqualToValue={(option, value) =>
-              option.inventario === value?.inventario
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option.inventario || ""
             }
+            inputValue={inputInventario}
+            onInputChange={(_, newInputValue) =>
+              setInputInventario(newInputValue)
+
+            }
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") {
+                setInputInventario(newValue);
+              } else {
+                setInputInventario(newValue?.inventario || "");
+              }
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Inventario" variant="outlined" />
             )}
@@ -918,35 +831,49 @@ const Activos = () => {
             <thead className="text-xs uppercase bg-gray-50 text-gray-700">
               <tr>
                 <th scope="col" className="flex items-center gap-2 px-4 py-3">
-                  <input
-                    type="checkbox"
-                    onChange={handleSelectAllChange}
-                    checked={selectedItems.length === equipos.length}
-                    className="mr-2"
-                  />
+                  <Tooltip title="Seleccionar todos">
+                    <input
+                      type="checkbox"
+                      onChange={handleSelectAllChange}
+                      checked={selectedItems.length === equipos.length}
+                      className="mr-2"
+                    />
+                  </Tooltip>
                   {selectedItems.length > 0 && (
                     <>
-                      <Icon
-                        icon="weui:delete-outlined"
-                        width="20"
-                        height="20"
-                        onClick={handleDelete}
-                        className="cursor-pointer"
-                      />
-                      <Icon
-                        icon="ph:arrow-fat-down-light"
-                        width="20"
-                        height="20"
-                        onClick={handleBaja}
-                        className="cursor-pointer"
-                      />
-                      <Icon
-                        icon="lucide:warehouse"
-                        width="20"
-                        height="20"
-                        onClick={handlePasarABodega}
-                        className="cursor-pointer"
-                      />
+                      <Tooltip title="Eliminar activos">
+                        <span>
+                          <Icon
+                            icon="weui:delete-outlined"
+                            width="20"
+                            height="20"
+                            onClick={handleDelete}
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="Dar de baja activos">
+                        <span>
+                          <Icon
+                            icon="ph:arrow-fat-down-light"
+                            width="20"
+                            height="20"
+                            onClick={handleBaja}
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="Pasar activos a bodega">
+                        <span>
+                          <Icon
+                            icon="lucide:warehouse"
+                            width="20"
+                            height="20"
+                            onClick={handlePasarABodega}
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
                     </>
                   )}
                 </th>
@@ -1000,84 +927,80 @@ const Activos = () => {
                   <td className="px-4 py-2">{equipo.usuario}</td>
                   <td className="px-4 py-2">{equipo.uso}</td>
                   <td className="px-4 py-2">{equipo.edificio}</td>
-                  <td className="px-4 py-5 flex items-center gap-2 max-w-[15rem] truncate text-black">
-                    <div className="relative group">
-                      <Icon
-                        icon="ph:arrow-fat-down-light"
-                        width="25"
-                        height="25"
-                        onClick={() =>
-                          handleOpenModal(
-                            equipo.id_equipo,
-                            "Dar de baja equipo",
-                            `¿Estás seguro de que deseas dar de baja el equipo ${equipo.inventario}?`,
-                            bajaEquipo
-                          )
-                        }
-                        className="cursor-pointer"
-                      />
-                      <span className="absolute left-1/2 transform -translate-x-1/3 top-full mt-1 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                        Dar de baja
-                      </span>
-                    </div>
-                    <div className="relative group">
-                      <Icon
-                        icon="weui:delete-outlined"
-                        width="25"
-                        height="25"
-                        onClick={() =>
-                          handleOpenModal(
-                            equipo.id_equipo,
-                            "Eliminar equipo",
-                            `¿Estás seguro de que deseas eliminar el equipo con inventario ${equipo.inventario}?`,
-                            deleteEquipo
-                          )
-                        }
-                        className="cursor-pointer"
-                      />
-                      <span className="absolute left-1/2 transform -translate-x-1/2 top-full mt-1 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                        Eliminar
-                      </span>
-                    </div>
-                    <div className="relative group">
-                      <Link
-                        to="/editarActivo"
-                        state={{
-                          equipoId: equipo.id_equipo,
-                          perifericos,
-                          equipoName: equipo.periferico,
-                        }}
-                      >
+                  <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
+                    <Tooltip title="Dar de baja activo">
+                      <span>
                         <Icon
-                          icon="mage:edit"
+                          icon="ph:arrow-fat-down-light"
+                          width="25"
+                          height="25"
+                          onClick={() =>
+                            handleOpenModal(
+                              equipo.id_equipo,
+                              "Dar de baja equipo",
+                              `¿Estás seguro de que deseas dar de baja el equipo ${equipo.inventario}?`,
+                              bajaEquipo
+                            )
+                          }
+                          className="cursor-pointer"
+                        />
+                      </span>
+                    </Tooltip>
+                    <Tooltip title="Eliminar activo">
+                      <span>
+                        <Icon
+                          icon="weui:delete-outlined"
+                          width="25"
+                          height="25"
+                          onClick={() =>
+                            handleOpenModal(
+                              equipo.id_equipo,
+                              "Eliminar equipo",
+                              `¿Estás seguro de que deseas eliminar el equipo con inventario ${equipo.inventario}?`,
+                              deleteEquipo
+                            )
+                          }
+                          className="cursor-pointer"
+                        />
+                      </span>
+                    </Tooltip>
+                    <Link
+                      to="/editarActivo"
+                      state={{
+                        equipoId: equipo.id_equipo,
+                        perifericos,
+                        equipoName: equipo.periferico,
+                      }}
+                    >
+                      <Tooltip title="Editar activo">
+                        <span>
+                          <Icon
+                            icon="mage:edit"
+                            width="25"
+                            height="25"
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
+                    </Link>
+                    <Tooltip title="Pasar a bodega">
+                      <span>
+                        <Icon
+                          icon="lucide:warehouse"
                           width="25"
                           height="25"
                           className="cursor-pointer"
+                          onClick={() =>
+                            handleOpenModal(
+                              equipo.id_equipo,
+                              "Pasar equipo a bodega",
+                              `¿Estás seguro de que deseas pasar el equipo a bodega ${equipo.inventario}?`,
+                              pasarABodegaEquipo
+                            )
+                          }
                         />
-                      </Link>
-                      <span className="absolute left-1/2 transform -translate-x-1/2 top-full mt-1 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                        Editar
                       </span>
-                    </div>
-                    <div className="relative group">
-                      <Icon
-                        icon="lucide:warehouse"
-                        width="25"
-                        height="25"
-                        className="cursor-pointer"
-                        onClick={() =>
-                          handleOpenModal(
-                            equipo.id_equipo,
-                            "Pasar equipo a bodega",
-                            `¿Estás seguro de que deseas pasar el equipo a bodega ${equipo.inventario}?`,
-                            pasarABodegaEquipo
-                          )
-                        }
-                      />
-                      <span className="absolute left-1/2 transform -translate-x-1/2 top-full mt-1 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                        Pasar a bodega
-                      </span>
-                    </div>
+                    </Tooltip>
                   </td>
                 </tr>
               ))}
@@ -1098,7 +1021,15 @@ const Activos = () => {
                 disabled={currentPage === 1}
                 className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
               >
-                <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
+                <Tooltip title="Página Anterior">
+                  <span>
+                    <Icon
+                      icon="iconamoon:arrow-left-2"
+                      width="20"
+                      height="20"
+                    />
+                  </span>
+                </Tooltip>
               </button>
             </li>
             <li>
@@ -1112,10 +1043,26 @@ const Activos = () => {
                 disabled={currentPage === totalPages}
                 className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
               >
-                <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
+                <Tooltip title="Siguiente Página">
+                  <span>
+                    <Icon
+                      icon="iconamoon:arrow-right-2"
+                      width="20"
+                      height="20"
+                    />
+                  </span>
+                </Tooltip>
               </button>
             </li>
           </ul>
+          <Tooltip title="Exportar a Excel">
+            <button
+              onClick={exportToExcel}
+              className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+            >
+              <Icon icon="ph:export" width="20" height="20" />
+            </button>
+          </Tooltip>
         </div>
       </nav>
       <ModalConfirmation

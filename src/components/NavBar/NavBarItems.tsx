@@ -7,19 +7,28 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { NavBarItemsProps } from "../PropsInterface";
 
-const sections = [
+const AdminSections = [
   { name: 'Equipos', icon: <ComputerIcon />, subtypes: [
     { name: 'Activos', route: 'activos' },
     { name: 'Bodega', route: 'bodega' },
     { name: 'Bajas', route: 'bajas' },
   ]},
   { name: 'Admin', icon: <AdminPanelSettingsIcon />, subtypes: [
-    { name: 'Usuarios', route: 'usuarios' },
+    { name: 'Usuarios Responsables', route: 'usuarios' },
     { name: 'Categorías', route: 'categorias' },
+    { name: 'Usuarios Sistema', route: 'usuariosSistema' },
+    
   ]},
 ];
 
-export const NavBarItems: React.FC<NavBarItemsProps> = ({ currentSection, setCurrentSection, setIsDrawerOpen }) => {
+const ConsultantSections = [
+  { name: 'Equipos', icon: <ComputerIcon />, subtypes: [
+    { name: 'Activos', route: 'activos' },
+    { name: 'Bodega', route: 'bodega' },
+  ]},
+];
+
+export const NavBarItems: React.FC<NavBarItemsProps> = ({ currentSection, setCurrentSection, setIsDrawerOpen, rol }) => {
   const [openSections, setOpenSections] = useState<{ [key: string]: boolean }>({
     Equipos: false,
     Admin: false,
@@ -39,6 +48,11 @@ export const NavBarItems: React.FC<NavBarItemsProps> = ({ currentSection, setCur
       [section]: !prevState[section],
     }));
   };
+
+  const sections =
+    rol === "administrador" || rol === "editor"
+      ? AdminSections
+      : ConsultantSections;
 
   return (
     <>

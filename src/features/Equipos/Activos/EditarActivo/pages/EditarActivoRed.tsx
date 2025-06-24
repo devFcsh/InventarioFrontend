@@ -1,5 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Autocomplete, TextField, Button, Snackbar, Alert, Box } from "@mui/material";
+import {
+  Autocomplete,
+  TextField,
+  Button,
+  Box,
+} from "@mui/material";
 import {
   Marca,
   Modelo,
@@ -19,10 +24,11 @@ import { useNavigate } from "react-router-dom";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario";
 import useEditarActivoRed from "../hooks/useEditarActivoRed";
 import { validateMAC } from "@pages/Forms/StepsSAP/helpers/validateMAC";
+import { useSnackbar } from "@context/SnackbarContext";
 
 interface EditarActivoRedProps {
-    equipoRedActivo: ActivoRedEdit;
-    perifericoName: string;
+  equipoRedActivo: ActivoRedEdit;
+  perifericoName: string;
 }
 
 const EditarActivoRed = ({
@@ -36,43 +42,47 @@ const EditarActivoRed = ({
 
   const [selectedInventarioSerie, setSelectedInventarioSerie] =
     useState<Serie | null>(null);
-    
+
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
-    const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
-      null
-    );
-    const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(null);
-  const [selectedMAC, setSelectedMAC] =
-    useState<string>("");
-  const [selectedNombreEquipo, setSelectedNombreEquipo] =
-    useState<string>("");
-  const [selectedPuertos, setSelectedPuertos] =
-    useState<string>("");
-  const [selectedPuertoFTP, setSelectedPuertoFTP] =
-    useState<string>("");
+  const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
+    null
+  );
+  const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(
+    null
+  );
+  const [selectedMAC, setSelectedMAC] = useState<string>("");
+  const [selectedPuertos, setSelectedPuertos] = useState<string>("");
+  const [selectedPuertoFTP, setSelectedPuertoFTP] = useState<string>("");
+
   const [empresa, setEmpresa] = useState<string | null>("");
+  const [nombreEquipo, setNombreEquipo] = useState<string>("");
 
   const [newObservation, setNewObservation] = useState<string>("");
-  const [errorMensajeComponente, setErrorMensajeComponente] = useState<string | null>(null);
+  const [errorMensajeComponente, setErrorMensajeComponente] = useState<
+    string | null
+  >(null);
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
   const [errorMAC, setErrorMAC] = useState<boolean>(false);
   const [errorNombreEquipo, setErrorNombreEquipo] = useState<boolean>(false);
   const [errorPuertos, setErrorPuertos] = useState<boolean>(false);
   const [errorPuertoFTP, setErrorPuertoFTP] = useState<boolean>(false);
-  const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(null);
+  const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(
+    null
+  );
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  
 
+  const { showMessage } = useSnackbar();
   const navigate = useNavigate();
   const [image, setImage] = useState<File | null>(null);
   const [currentImagePath, setCurrentImagePath] = useState<string | null>(null);
 
   const { uploadImage } = useSubirImagen();
-  const { marcas } = useMarcasPorPeriferico(equipoRedActivo?.id_periferico ?? "");
+  const { marcas } = useMarcasPorPeriferico(
+    equipoRedActivo?.id_periferico ?? ""
+  );
   const { modelos } = useModelosPorMarcaPeriferico(
     equipoRedActivo?.id_marca ?? "",
     equipoRedActivo?.id_periferico ?? ""
@@ -82,7 +92,7 @@ const EditarActivoRed = ({
     selectedInventarioMarca?.id_marca ?? "",
     selectedInventarioModelo?.id_modelo ?? ""
   );
-  
+
   const { edificios } = useEdificios();
   const { ubicaciones } = useUbicaciones(selectedEdificio?.id_edificio ?? "");
   const { editarActivoRed } = useEditarActivoRed();
@@ -97,15 +107,19 @@ const EditarActivoRed = ({
       setSelectedMAC(equipoRedActivo.mac);
       setSelectedPuertos(equipoRedActivo.puertos);
       setSelectedPuertoFTP(equipoRedActivo.puerto_ftp);
-      equipoRedActivo.inventario.length===10?setEmpresa("EspolTech"):setEmpresa("Espol");
-      setSelectedNombreEquipo(equipoRedActivo.nombre_equipo)
+      setNombreEquipo(equipoRedActivo.nombre_equipo ?? "");
+      equipoRedActivo.inventario.length === 10
+        ? setEmpresa("EspolTech")
+        : setEmpresa("Espol");
+
     }
   }, [equipoRedActivo]);
 
   useEffect(() => {
     if (equipoRedActivo && marcas.length > 0) {
       setSelectedInventarioMarca(
-        marcas.find((marca) => marca?.id_marca === equipoRedActivo.id_marca) || null
+        marcas.find((marca) => marca?.id_marca === equipoRedActivo.id_marca) ||
+          null
       );
     }
   }, [equipoRedActivo, marcas]);
@@ -113,7 +127,9 @@ const EditarActivoRed = ({
   useEffect(() => {
     if (equipoRedActivo && modelos.length > 0) {
       setSelectedInventarioModelo(
-        modelos.find((modelo) => modelo?.id_modelo === equipoRedActivo.id_modelo) || null
+        modelos.find(
+          (modelo) => modelo?.id_modelo === equipoRedActivo.id_modelo
+        ) || null
       );
     }
   }, [equipoRedActivo, modelos]);
@@ -121,7 +137,8 @@ const EditarActivoRed = ({
   useEffect(() => {
     if (equipoRedActivo && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipoRedActivo.id_serie) || null
+        series.find((serie) => serie?.id_serie === equipoRedActivo.id_serie) ||
+          null
       );
     }
   }, [equipoRedActivo, series]);
@@ -129,7 +146,9 @@ const EditarActivoRed = ({
   useEffect(() => {
     if (equipoRedActivo && edificios.length > 0) {
       setSelectedEdificio(
-        edificios.find((edificio) => edificio?.id_edificio === equipoRedActivo.id_edificio) || null
+        edificios.find(
+          (edificio) => edificio?.id_edificio === equipoRedActivo.id_edificio
+        ) || null
       );
     }
   }, [equipoRedActivo, edificios]);
@@ -137,11 +156,13 @@ const EditarActivoRed = ({
   useEffect(() => {
     if (equipoRedActivo && ubicaciones.length > 0) {
       setSelectedUbicacion(
-        ubicaciones.find((ubicacion) => ubicacion?.id_ubicacion === equipoRedActivo.id_ubicacion) || null
+        ubicaciones.find(
+          (ubicacion) =>
+            ubicacion?.id_ubicacion === equipoRedActivo.id_ubicacion
+        ) || null
       );
     }
   }, [equipoRedActivo, ubicaciones]);
-  
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -156,14 +177,14 @@ const EditarActivoRed = ({
     }
   };
 
-  const handleEditEquipo = async (observationValue : string) => {
+  const handleEditEquipo = async (observationValue: string) => {
     let nuevaImagen = currentImagePath;
-    
+
     if (image) {
       try {
         nuevaImagen = await uploadImage(image);
       } catch (error) {
-        alert('Error al cargar la imagen.');
+        showMessage("Error al cargar la imagen", "error");
         return;
       }
     }
@@ -175,19 +196,18 @@ const EditarActivoRed = ({
       imagenRuta: image ? nuevaImagen : "",
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
       id_serie: selectedInventarioSerie?.id_serie ?? "",
-      observacion: observationValue?? "",
-      mac: selectedMAC?? "",
-      puertos: selectedPuertos?? "",
-      puerto_ftp: selectedPuertoFTP?? "",
-      nombre_equipo:selectedNombreEquipo??""
+      observacion: observationValue ?? "",
+      mac: selectedMAC ?? "",
+      puertos: selectedPuertos ?? "",
+      puerto_ftp: selectedPuertoFTP ?? "",
+      nombre_equipo: nombreEquipo,
     };
     try {
       await editarActivoRed(equipoRedActivo.id_equipo, payload);
-        setShowSuccessMessage(true);
-        navigate("/activos", { state: { equipoEditado: true } });
-      
+      showMessage("Equipo editado correctamente", "success");
+      navigate("/activos");
     } catch (error) {
-      console.error("Error al actualizar equipo:", error);
+      showMessage("Error al editar el equipo", "error");
     }
   };
 
@@ -201,73 +221,71 @@ const EditarActivoRed = ({
     setOpenModalEditar(false);
     await handleEditEquipo(newObservation);
   };
-  const handleObservation = (newObservation :string)=>{
-    if(newObservation.length <= 200){
+  const handleObservation = (newObservation: string) => {
+    if (newObservation.length <= 200) {
       setNewObservation(newObservation);
       setErrorMensajeComponente("");
-    }else{
-      setErrorMensajeComponente("La observación no puede tener más de 200 caracteres.");
+    } else {
+      setErrorMensajeComponente(
+        "La observación no puede tener más de 200 caracteres."
+      );
     }
-  }
+  };
 
-  const handleChangeEmpresa = (newEmpresa :string | null)=>{
-      setEmpresa(newEmpresa);
-      if(newEmpresa===null){
-        setErrorEmpresa(true);
-        setSelectedInventarioInv("")
-        setErrorInventario(true)
-      }else{
-        setErrorEmpresa(false);
-        !validateInventario(selectedInventarioInv,newEmpresa)?setErrorInventario(true):setErrorInventario(false)
-      }
+  const handleChangeEmpresa = (newEmpresa: string | null) => {
+    setEmpresa(newEmpresa);
+    if (newEmpresa === null) {
+      setErrorEmpresa(true);
+      setSelectedInventarioInv("");
+      setErrorInventario(true);
+    } else {
+      setErrorEmpresa(false);
+      !validateInventario(selectedInventarioInv, newEmpresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
     }
+  };
 
-    const handleChangeInventario = (inventario :string)=>{
-      setSelectedInventarioInv(inventario)
-      if(empresa==="Espol"){
-        !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
-      }else if(empresa==="EspolTech"){
-        !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
-      }
+  const handleChangeInventario = (inventario: string) => {
+    setSelectedInventarioInv(inventario);
+    if (empresa === "Espol") {
+      !validateInventario(inventario ? inventario : "", empresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
+    } else if (empresa === "EspolTech") {
+      !validateInventario(inventario ? inventario : "", empresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
     }
-    const handleMACChange = (MAC :string)=>{
-      setSelectedMAC(MAC)
-      if(MAC===null || MAC===""){
-        setErrorMAC(true);
-      }else{
-        !validateMAC(MAC)?setErrorMAC(true):setErrorMAC(false)
+  };
+  const handleMACChange = (MAC: string) => {
+    setSelectedMAC(MAC);
+    if (MAC === null) {
+      setErrorMAC(true);
+    } else {
+      !validateMAC(MAC) ? setErrorMAC(true) : setErrorMAC(false);
     }
+  };
+  const handlePuertosChange = (puertos: string) => {
+    setSelectedPuertos(puertos);
+    if (puertos === null) {
+      setErrorPuertos(true);
+    } else if (puertos !== null && /^\d+$/.test(puertos)) {
+      setErrorPuertos(false);
+    } else {
+      setErrorPuertos(true);
     }
-    const handleEquipoChange = (nombreEquipo :string)=>{
-      setSelectedNombreEquipo(nombreEquipo)
-      if(nombreEquipo===null || nombreEquipo===""){
-        setErrorNombreEquipo(true);
-      }else if(nombreEquipo!==null && (nombreEquipo.length<10 || nombreEquipo.length>10)){
-        setErrorNombreEquipo(true);
-      }else{
-        setErrorNombreEquipo(false);
-      }
+  };
+  const handlePuertoFTPChange = (puertoFTP: string) => {
+    setSelectedPuertoFTP(puertoFTP);
+    if (puertoFTP === null) {
+      setErrorPuertoFTP(true);
+    } else if (puertoFTP !== null && /^\d+$/.test(puertoFTP)) {
+      setErrorPuertoFTP(false);
+    } else {
+      setErrorPuertoFTP(true);
     }
-    const handlePuertosChange = (puertos :string)=>{
-      setSelectedPuertos(puertos)      
-      if(puertos===null){
-        setErrorPuertos(true);
-      }else if(puertos !== null && /^\d+$/.test(puertos)){
-        setErrorPuertos(false)
-      }else{
-        setErrorPuertos(true)
-      }
-    }
-    const handlePuertoFTPChange = (puertoFTP :string)=>{
-      setSelectedPuertoFTP(puertoFTP)      
-      if(puertoFTP===null){
-        setErrorPuertoFTP(true);
-      }else if(puertoFTP !== null && /^\d+$/.test(puertoFTP)){
-        setErrorPuertoFTP(false)
-      }else{
-        setErrorPuertoFTP(true)
-      }
-    }
+  };
 
   const handleCancelar = () => {
     setOpenModalCancelar(false);
@@ -282,13 +300,10 @@ const EditarActivoRed = ({
       !selectedInventarioInv ||
       errorInventario ||
       !selectedInventarioSerie ||
-      !selectedUbicacion || 
+      !selectedUbicacion ||
       !selectedMAC ||
-      errorMAC ||
-      !selectedNombreEquipo ||
-      errorNombreEquipo ||
-      (perifericoName==="AP"?false:(!selectedPuertos || errorPuertos)) || 
-      (perifericoName==="AP"?false:(!selectedPuertoFTP || errorPuertoFTP))
+      (perifericoName === "AP" ? false : !selectedPuertos) ||
+      (perifericoName === "AP" ? false : !selectedPuertoFTP)
     ) {
       setErrorMensajeEquipo("Por favor verificar todos los campos del equipo.");
       return false;
@@ -306,20 +321,13 @@ const EditarActivoRed = ({
         title="Confirmar Editar Equipo"
         message="¿Está seguro de que desea editar este equipo?"
       />
-       <ModalConfirmation
+      <ModalConfirmation
         open={openModalCancelar}
         onClose={() => setOpenModalCancelar(false)}
         onConfirm={handleCancelar}
         title="Confirmar Cancelar"
         message="¿Está seguro de que desea cancelar? Todos los cambios no guardados se perderán."
       />
-      <Snackbar
-        open={showSuccessMessage}
-        autoHideDuration={3000}
-        onClose={() => setShowSuccessMessage(false)}
-      >
-        <Alert severity="success">Equipo agregado exitosamente</Alert>
-      </Snackbar>
       <h2 className="text-xl font-semibold mb-5">Información de Inventario</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <Autocomplete
@@ -408,13 +416,17 @@ const EditarActivoRed = ({
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
             onChange={(e) => {
-              let value = e.target.value;
-              if (empresa==="Espol" && value !== null && value.length > 6) {
-                return
-              }else if(empresa==="EspolTech" && value !== null && value.length > 10){
-                return
+              const value = e.target.value;
+              if (empresa === "Espol" && value !== null && value.length > 6) {
+                return;
+              } else if (
+                empresa === "EspolTech" &&
+                value !== null &&
+                value.length > 10
+              ) {
+                return;
               }
-              handleChangeInventario(value)
+              handleChangeInventario(value);
             }}
             disabled={empresa === ""}
           />
@@ -423,28 +435,6 @@ const EditarActivoRed = ({
 
       <h2 className="text-xl font-semibold mb-5">Información General</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
-      <TextField
-            label="Nombre Equipo"
-            placeholder="Nombre Equipo"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={selectedNombreEquipo}
-            error={!!errorNombreEquipo}
-            helperText={
-              errorNombreEquipo
-                ? "Por favor escribir un nombre del equipo"
-                : ""
-            }
-            onChange={(e) => {
-              let value = e.target.value.toUpperCase();
-              if (value !== null && value.length > 10) {
-                return
-              }
-              handleEquipoChange(value)
-            }}
-          />
-
         <Autocomplete
           size="small"
           disablePortal
@@ -454,7 +444,7 @@ const EditarActivoRed = ({
             setSelectedEdificio(newValue);
             setSelectedUbicacion(null);
           }}
-          getOptionLabel={(option) => option? option.nombre : ""}
+          getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
             <TextField
               {...params}
@@ -471,55 +461,82 @@ const EditarActivoRed = ({
           options={ubicaciones}
           value={selectedUbicacion}
           onChange={(_, newValue) => setSelectedUbicacion(newValue)}
-          getOptionLabel={(option) => option? option.nombre : ""}
+          getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
-            <TextField {...params} label="Ubicacion" variant="outlined" fullWidth />
+            <TextField
+              {...params}
+              label="Ubicacion"
+              variant="outlined"
+              fullWidth
+            />
           )}
           disabled={!selectedEdificio}
         />
         <TextField
-            label="MAC"
-            placeholder="MAC"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={selectedMAC}
-            error={!!errorMAC}
-            helperText={
-              errorMAC ? "Por favor escribir un inventario válido" : ""
+          label="MAC"
+          placeholder="MAC"
+          variant="outlined"
+          fullWidth
+          size="small"
+          value={selectedMAC}
+          error={!!errorMAC}
+          helperText={errorMAC ? "Por favor escribir un inventario válido" : ""}
+          onChange={(e) => {
+            const value = e.target.value.toUpperCase();
+
+            if (value !== null && value.length > 17) {
+              return;
             }
-            onChange={(e) => {
-              let value = e.target.value.toUpperCase();
-              
-              if (value !== null && value.length > 17) {
-                return
-              }
-              handleMACChange(value)
-            }}
+            handleMACChange(value);
+          }}
+        />
+        <TextField
+          label="Nombre Equipo"
+          placeholder="Nombre Equipo"
+          variant="outlined"
+          fullWidth
+          size="small"
+          value={nombreEquipo}
+          error={!!errorMensajeEquipo}
+          helperText={
+            errorMensajeEquipo ? "Por favor escribir un nombre del equipo" : ""
+          }
+          onChange={(e) => {
+            let value = e.target.value;
+            if (value !== null && value.length > 10) {
+              value = value.slice(0, 10);
+            }
+            setNombreEquipo(value);
+          }}
         />
         {perifericoName === "Switch" ? (
-        <TextField
-            label="puertos"
+          <TextField
+            label="Puertos 10-100-1000"
             placeholder="Puertos"
             variant="outlined"
             fullWidth
             size="small"
             value={selectedPuertos}
             onChange={(e) => {
-              let value = e.target.value;
-              
+              const value = e.target.value;
+
               if (value !== null && value.length > 10) {
-                return
+                return;
               }
-              handlePuertosChange(value)
+              handlePuertosChange(value);
             }}
             error={!!errorPuertos}
             helperText={
-              errorPuertos ? "Por favor escribir una cantidad de puertos válidos" : ""
+              errorPuertos
+                ? "Por favor escribir una cantidad de puertos válidos"
+                : ""
             }
-        />):""}
+          />
+        ) : (
+          ""
+        )}
         {perifericoName === "Switch" ? (
-        <TextField
+          <TextField
             label="puertoFTP"
             placeholder="Puerto FTP"
             variant="outlined"
@@ -531,15 +548,17 @@ const EditarActivoRed = ({
               errorPuertoFTP ? "Por favor escribir un puerto FTP válido" : ""
             }
             onChange={(e) => {
-              let value = e.target.value;
-              
-              if (value !== null && value.length > 10) {
-                return
-              }
-              handlePuertoFTPChange(value)
-            }}
-        />):""}
+              const value = e.target.value;
 
+              if (value !== null && value.length > 10) {
+                return;
+              }
+              handlePuertoFTPChange(value);
+            }}
+          />
+        ) : (
+          ""
+        )}
       </div>
 
       <div className="mb-4">
@@ -578,35 +597,32 @@ const EditarActivoRed = ({
       <div>
         <h2 className="text-xl font-semibold mb-10">Observación</h2>
         <TextField
-                label="Observación"
-                variant="outlined"
-                fullWidth
-                multiline
-                minRows={2}
-                value={newObservation}
-                onChange={(e) => {
-                  let value = e.target.value;
-                  
-                  if (value !== null && value.length > 200) {
-                    return
-                  }
-                  handleObservation(value)
-                }}
+          label="Observación"
+          variant="outlined"
+          fullWidth
+          multiline
+          minRows={2}
+          value={newObservation}
+          onChange={(e) => {
+            const value = e.target.value;
 
-                error={!!errorMensajeComponente}
-                helperText={errorMensajeComponente}
-          />
+            if (value !== null && value.length > 200) {
+              return;
+            }
+            handleObservation(value);
+          }}
+          error={!!errorMensajeComponente}
+          helperText={errorMensajeComponente}
+        />
       </div>
 
       <div className="flex gap-4 mt-10">
         <Button
           variant="contained"
           sx={{
-            backgroundColor:
-              "#4CAF50",
+            backgroundColor: "#4CAF50",
             "&:hover": {
-              backgroundColor:
-                "#45a049"
+              backgroundColor: "#45a049",
             },
           }}
           onClick={handleConfirmEditarEquipo}
@@ -615,13 +631,13 @@ const EditarActivoRed = ({
           Guardar Cambios
         </Button>
         <Button
-                onClick={handleConfirmCancelar}
-                color="error"
-                variant="contained"
-                fullWidth
-              >
-                Cancelar
-              </Button>
+          onClick={handleConfirmCancelar}
+          color="error"
+          variant="contained"
+          fullWidth
+        >
+          Cancelar
+        </Button>
       </div>
       {errorMensajeEquipo && (
         <div className="text-red-500 mt-2">{errorMensajeEquipo}</div>

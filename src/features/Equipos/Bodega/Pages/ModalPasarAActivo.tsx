@@ -7,6 +7,7 @@ import useEdificios from "@hooks/useEdificios";
 import useUbicaciones from "@hooks/useUbicaciones";
 import useUsos from "@hooks/useUsos";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
+import { useSnackbar } from "@context/SnackbarContext";
 
 interface ModalPasarAActivoProps {
   equipoId: string | null;
@@ -30,6 +31,7 @@ const ModalPasarAActivo: React.FC<ModalPasarAActivoProps> = ({ equipoId, open, o
   const { usos } = useUsos();
   const { usuarios } = useUsuariosPorUso(selectedUsoId ?? "");
 
+  const { showMessage } = useSnackbar();
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -45,7 +47,7 @@ const ModalPasarAActivo: React.FC<ModalPasarAActivoProps> = ({ equipoId, open, o
 
   const handleCambiarActivo = async () => {
     if (!selectedEdificio || !selectedUbicacion || !selectedUsoId || !selectedUsuarioId) {
-      alert("Por favor, complete todos los campos.");
+      showMessage("Por favor, complete todos los campos.", "error");
       return;
     }
 
@@ -54,17 +56,17 @@ const ModalPasarAActivo: React.FC<ModalPasarAActivoProps> = ({ equipoId, open, o
       try {
         imagePath = await uploadImage(image);
       } catch (error) {
-        alert("Error al cargar la imagen.");
+        showMessage("Error al subir la imagen. Por favor, inténtelo de nuevo.", "error");
         return;
       }
     }
 
     try {
       await pasarBodegaAActivo(equipoId ? equipoId : "", selectedUsuarioId, selectedUbicacion.id_ubicacion, imagePath);
-      alert("El equipo ha sido activado correctamente.");
+      showMessage("Equipo activado exitosamente", "success");
       onClose();
     } catch (error) {
-      alert("Hubo un error al activar el equipo.");
+      showMessage("Error al activar el equipo. Por favor, inténtelo de nuevo.", "error");
     }
   };
 

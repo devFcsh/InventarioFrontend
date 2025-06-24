@@ -4,7 +4,7 @@ interface InformacionGeneralDataForm{
   mac: string;
   puertos: string;
   puertoFTP: string;
-  nombreEquipo:string;
+  nombreEquipo: string;
 }
 
 

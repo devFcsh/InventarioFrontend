@@ -2,8 +2,7 @@ import {
   Autocomplete,
   TextField,
   Button,
-  Snackbar,
-  Alert,
+  Tooltip,
 } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
@@ -41,6 +40,7 @@ import { useNavigate } from "react-router-dom";
 import useSubirImagen from "@hooks/useSubirImagen";
 import { useAgregarComputadoraActivo } from "../hooks/useAgregarComputadoraActivo";
 import { useAgregarComponentes } from "../../../../../hooks/useAgregarComponentes.ts";
+import { useSnackbar } from "@context/SnackbarContext.tsx";
 
 interface AgregarComputadoraActivoProps {
   periferico: string;
@@ -73,7 +73,9 @@ const AgregarComputadoraActivo = ({
   const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
     null
   );
-  const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(null);
+  const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(
+    null
+  );
   const [selectedVersionOffice, setSelectedVersionOffice] =
     useState<VersionOffice | null>(null);
   const [selectedAntivirus, setSelectedAntivirus] = useState<Antivirus | null>(
@@ -99,8 +101,7 @@ const AgregarComputadoraActivo = ({
   );
   const [openModalAgregar, setOpenModalAgregar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-
+  const { showMessage } = useSnackbar();
   const { agregarComputadoraActivo } = useAgregarComputadoraActivo();
   const { agregarComponentes } = useAgregarComponentes();
   const { marcas } = useMarcasPorPeriferico(periferico);
@@ -190,13 +191,13 @@ const AgregarComputadoraActivo = ({
       try {
         imagePath = await uploadImage(image);
       } catch (error) {
-        alert("Error al cargar la imagen.");
+        showMessage("Error al subir la imagen", "error");
         return;
       }
     }
 
     if (!selectedInventarioInv) {
-      alert("El campo de inventario no puede estar vacío.");
+      showMessage("El campo de inventario no puede estar vacío.", "error")
       return;
     }
 
@@ -235,12 +236,11 @@ const AgregarComputadoraActivo = ({
         });
       }
 
-      setShowSuccessMessage(true);
+      showMessage("Equipo agregado exitosamente", "success");
       limpiarCampos();
-      navigate("/activos", { state: { equipoAgregado: true } });
+      navigate("/activos");
     } catch (error) {
-      console.error("Error al agregar el equipo y componentes:", error);
-      alert("Error al agregar el equipo y componentes.");
+      showMessage("Error al agregar el equipo", "error");
     }
   };
 
@@ -422,13 +422,6 @@ const AgregarComputadoraActivo = ({
         message="¿Está seguro de que desea cancelar? Todos los cambios no guardados se perderán."
       />
 
-      <Snackbar
-        open={showSuccessMessage}
-        autoHideDuration={3000}
-        onClose={() => setShowSuccessMessage(false)}
-      >
-        <Alert severity="success">Equipo agregado exitosamente</Alert>
-      </Snackbar>
       <div className="mb-4">
         <h2 className="text-xl font-semibold mb-5">
           Información de Inventario
@@ -738,13 +731,17 @@ const AgregarComputadoraActivo = ({
                     <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
                     <td className="py-2 px-4 border">{comp.inventario}</td>
                     <td className="py-2 px-1 border">
-                      <Icon
-                        icon="weui:delete-outlined"
-                        width="25"
-                        height="25"
-                        onClick={() => eliminarComponente(index)}
-                        className="cursor-pointer mx-auto"
-                      />
+                      <Tooltip title="Eliminar Componente">
+                        <span>
+                          <Icon
+                            icon="weui:delete-outlined"
+                            width="25"
+                            height="25"
+                            onClick={() => eliminarComponente(index)}
+                            className="cursor-pointer mx-auto"
+                          />
+                        </span>
+                      </Tooltip>
                     </td>
                   </tr>
                 ))}

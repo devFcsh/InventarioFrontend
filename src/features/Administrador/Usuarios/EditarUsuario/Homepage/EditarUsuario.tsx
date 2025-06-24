@@ -3,9 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import {
   TextField,
   Button,
-  Snackbar,
-  Alert,
   Autocomplete,
+  Tooltip,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import useEquiposPorUsuario from "../hooks/useEquiposPorUsuario";
@@ -13,6 +12,7 @@ import useCambiarUsuarioEquipo from "../hooks/useCambiarUsuarioEquipo";
 import useEditarUsuario from "../hooks/useEditarUsuario";
 import ModalCambiarUsuario from "../components/ModalCambiarUsuario";
 import useUsos from "@hooks/useUsos";
+import { useSnackbar } from "@context/SnackbarContext";
 
 const EditarUsuario = () => {
   const location = useLocation();
@@ -24,10 +24,9 @@ const EditarUsuario = () => {
   const [selectedUsoId, setSelectedUsoId] = useState<string | null>(
     usuario?.id_uso || null
   );
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [equipoId, setEquipoId] = useState<string | null>(null);
 
+  const { showMessage } = useSnackbar();
   const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
   const {
     equipos,
@@ -36,7 +35,12 @@ const EditarUsuario = () => {
     refetch: refetchEquipos,
   } = useEquiposPorUsuario(usuario?.id_usuario || "");
 
-  const { cambiarUsuario, loading: loadingCambio, error, success } = useCambiarUsuarioEquipo();
+  const {
+    cambiarUsuario,
+    loading: loadingCambio,
+    error,
+    success,
+  } = useCambiarUsuarioEquipo();
 
   const {
     editarUsuario,
@@ -56,29 +60,19 @@ const EditarUsuario = () => {
     try {
       if (nombre && selectedUsoId) {
         await editarUsuario(usuario.id_usuario, nombre, selectedUsoId);
-        setSnackbarMessage("Usuario actualizado correctamente");
-        setOpenSnackbar(true);
-  
+        showMessage("Usuario actualizado correctamente", "success");
         setTimeout(() => {
           navigate("/usuarios");
         }, 1000);
       } else {
-        setSnackbarMessage("Por favor, complete todos los campos.");
-        setOpenSnackbar(true);
+        showMessage("Por favor, complete todos los campos.", "error");
       }
     } catch (error) {
-      setSnackbarMessage("Error al actualizar el usuario");
-      setOpenSnackbar(true);
-  
+      showMessage("Error al actualizar el usuario", "error");
       setTimeout(() => {
         navigate("/usuarios");
       }, 1000);
     }
-  };
-  
-
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
   };
 
   const handleCambiarUsuario = (equipoId: string) => {
@@ -88,23 +82,20 @@ const EditarUsuario = () => {
 
   useEffect(() => {
     if (success) {
-        setSnackbarMessage("Usuario cambiado correctamente al equipo");
-        refetchEquipos();
-        setOpenModal(false);
+      showMessage("Usuario cambiado correctamente al equipo"), "success";
+      refetchEquipos();
+      setOpenModal(false);
     }
     if (error) {
-        setSnackbarMessage("No se puede cambiar de usuario a un componente");
+      showMessage("No se puede cambiar de usuario a un componente", "error");
     }
-    if (success || error) {
-        setOpenSnackbar(true);
-    }
-}, [success, error]);
+  }, [success, error, showMessage, refetchEquipos]);
 
-const handleConfirmarCambio = async (usuarioId: string) => {
+  const handleConfirmarCambio = async (usuarioId: string) => {
     if (equipoId) {
-        await cambiarUsuario(equipoId, usuarioId);
+      await cambiarUsuario(equipoId, usuarioId);
     }
-};
+  };
 
   if (loadingEquipos || loadingEdicion || loadingUsos) {
     return <div>Cargando...</div>;
@@ -126,7 +117,13 @@ const handleConfirmarCambio = async (usuarioId: string) => {
             fullWidth
             size="small"
             value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 30) {
+                return;
+              }
+              setNombre(e.target.value);
+              }}
           />
 
           <Autocomplete
@@ -179,13 +176,19 @@ const handleConfirmarCambio = async (usuarioId: string) => {
                     <td className="py-2 px-4 border">{equipo.serie}</td>
                     <td className="py-2 px-4 border">{equipo.inventario}</td>
                     <td className="py-2 px-4 border">
-                      <Icon
-                        icon="material-symbols:compare-arrows-rounded"
-                        width="25"
-                        height="25"
-                        className="cursor-pointer"
-                        onClick={() => handleCambiarUsuario(equipo.id_equipo)}
-                      />
+                      <Tooltip title="Asignar a otro usuario">
+                        <span>
+                          <Icon
+                            icon="material-symbols:compare-arrows-rounded"
+                            width="25"
+                            height="25"
+                            className="cursor-pointer"
+                            onClick={() =>
+                              handleCambiarUsuario(equipo.id_equipo)
+                            }
+                          />
+                        </span>
+                      </Tooltip>
                     </td>
                   </tr>
                 ))
@@ -194,21 +197,6 @@ const handleConfirmarCambio = async (usuarioId: string) => {
           </table>
         </div>
       </div>
-
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={success ? "success" : "error"}
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
 
       <div className="flex gap-4 mt-10">
         <Button

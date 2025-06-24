@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import {
   Autocomplete,
   TextField,
-  Snackbar,
-  Alert,
+  Tooltip,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
@@ -12,6 +11,7 @@ import { filas } from "../../../../data";
 
 import ModalAgregarCategoria from "../AgregarCategoria/Homepage/ModalAgregarCategoria";
 import ModalEditarCategoria from "../EditarCategoria/Homepage/ModalEditarCategoria";
+import { useSnackbar } from "@context/SnackbarContext";
 const categorias = [
   "Uso",
   "Periférico",
@@ -27,7 +27,7 @@ const categorias = [
   "Versión Office",
   "RAM",
   "Disco",
-  "Procesador"
+  "Procesador",
 ];
 
 const itemsData = [
@@ -46,7 +46,6 @@ const itemsData = [
   { id: 14, categoria: "Procesador" },
   { id: 15, categoria: "Versión Office" },
   { id: 16, categoria: "Lampara" },
-
 ];
 
 type FilteredItem = {
@@ -55,7 +54,6 @@ type FilteredItem = {
 };
 
 const Categorias = () => {
-  
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(
     null
   );
@@ -69,11 +67,7 @@ const Categorias = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [filteredItems, setFilteredItems] = useState<FilteredItem[]>([]);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
-  const [snackbarMessage, setSnackbarMessage] = useState<string>("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<
-    "success" | "error" | "warning"
-  >("success");
+  const { showMessage } = useSnackbar();
 
   const location = useLocation();
 
@@ -116,11 +110,9 @@ const Categorias = () => {
 
   useEffect(() => {
     if (location.state && location.state.snackbarMessage) {
-      setSnackbarMessage(location.state.snackbarMessage);
-      setSnackbarSeverity(location.state.snackbarSeverity || "success");
-      setOpenSnackbar(true);
+      showMessage(location.state.snackbarMessage, location.state.snackbarMessage.severity);
     }
-  }, [location]);
+  }, [location, showMessage]);
 
   const handleOpenModalAgregar = () => {
     setOpenModalAgregar(true);
@@ -129,9 +121,7 @@ const Categorias = () => {
   const handleCloseModalAgregar = () => {
     setOpenModalAgregar(false);
     setError(null);
-    setSnackbarMessage("Categoría agregada exitosamente");
-    setSnackbarSeverity("success");
-    setOpenSnackbar(true);
+    showMessage("Subcategoría agregada exitosamente", "success");
     setTimeout(() => {
       window.location.reload();
     }, 1000);
@@ -141,7 +131,6 @@ const Categorias = () => {
     setOpenModalAgregar(false);
     setError(null);
   };
-  
 
   const handleOpenModalEditar = () => {
     setOpenModalEditar(true);
@@ -152,41 +141,8 @@ const Categorias = () => {
     setError(null);
   };
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-  };
-
   return (
     <div className="flex flex-col p-4">
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-          iconMapping={{
-            success: (
-              <Icon icon="fluent:checkmark-24-regular" width={20} height={20} />
-            ),
-            error: (
-              <Icon
-                icon="fluent:error-circle-24-regular"
-                width={20}
-                height={20}
-              />
-            ),
-            warning: (
-              <Icon icon="fluent:warning-24-regular" width={20} height={20} />
-            ),
-          }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
 
       <div className="mb-4">
         <h1 className="text-2xl font-bold my-5">Consulta de Categorías</h1>
@@ -229,7 +185,9 @@ const Categorias = () => {
 
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {filteredItems.length === 0 ? (
-          <p className="text-center text-gray-500 my-5">No hay datos disponibles. Presiona "Buscar" para cargar resultados.</p>
+          <p className="text-center text-gray-500 my-5">
+            No hay datos disponibles. Presiona "Buscar" para cargar resultados.
+          </p>
         ) : (
           <table className="w-full text-left text-sm text-gray-500">
             <thead className="text-xs uppercase bg-gray-50 text-gray-700">
@@ -255,26 +213,34 @@ const Categorias = () => {
                   >
                     <td className="px-4 py-2">{item.categoria}</td>
                     <td className="px-4 py-3 flex items-center gap-2">
-                        <Icon
-                          icon="mage:edit"
-                          width="30"
-                          height="30"
-                          className="cursor-pointer"
-                          onClick={() => {
-                            setSelectedItemCategoria(item.categoria);
-                            handleOpenModalEditar();
-                          }}
-                        />
-                      <Icon
-                        icon="gridicons:add"
-                        width="30"
-                        height="30"
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setSelectedItemCategoria(item.categoria);
-                          handleOpenModalAgregar();
-                        }}
-                      />
+                      <Tooltip title="Editar Subcategorías">
+                        <span>
+                          <Icon
+                            icon="mage:edit"
+                            width="30"
+                            height="30"
+                            className="cursor-pointer"
+                            onClick={() => {
+                              setSelectedItemCategoria(item.categoria);
+                              handleOpenModalEditar();
+                            }}
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="Agregar Subcategoría">
+                        <span>
+                          <Icon
+                            icon="gridicons:add"
+                            width="30"
+                            height="30"
+                            className="cursor-pointer"
+                            onClick={() => {
+                              setSelectedItemCategoria(item.categoria);
+                              handleOpenModalAgregar();
+                            }}
+                          />
+                        </span>
+                      </Tooltip>
                     </td>
                   </tr>
                 ))}
@@ -299,13 +265,21 @@ const Categorias = () => {
         <div className="flex flex-col md:flex-row items-center gap-2">
           <ul className="inline-flex items-center -space-x-px">
             <li>
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-              >
-                <Icon icon="iconamoon:arrow-left-2" width="20" height="20" />
-              </button>
+              <Tooltip title="Página Anterior">
+                <span>
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                  >
+                    <Icon
+                      icon="iconamoon:arrow-left-2"
+                      width="20"
+                      height="20"
+                    />
+                  </button>
+                </span>
+              </Tooltip>
             </li>
             <li>
               <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
@@ -313,13 +287,21 @@ const Categorias = () => {
               </div>
             </li>
             <li>
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-              >
-                <Icon icon="iconamoon:arrow-right-2" width="20" height="20" />
-              </button>
+              <Tooltip title="Siguiente Página">
+                <span>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                  >
+                    <Icon
+                      icon="iconamoon:arrow-right-2"
+                      width="20"
+                      height="20"
+                    />
+                  </button>
+                </span>
+              </Tooltip>
             </li>
           </ul>
         </div>

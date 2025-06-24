@@ -107,7 +107,7 @@ const AgregarActivo = () => {
                 label="Usuario"
                 variant="outlined"
                 error={!!errorUsuarios}
-                helperText={errorUsuarios ? "Error al cargar los usuarios" : ""}
+                helperText={errorUsuarios ? "Error al cargar los usuarios responsables" : ""}
                 fullWidth
               />
             )}

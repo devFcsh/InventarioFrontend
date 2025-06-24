@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import clienteAxios from '.';
+import { Inventario } from '../types';
 
 export const useInventario = () => {
-  const [inventarios, setInventarios] = useState([]);
+  const [inventarios, setInventarios] = useState<Inventario[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null); 
 

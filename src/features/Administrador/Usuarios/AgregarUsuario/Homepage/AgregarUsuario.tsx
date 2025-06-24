@@ -3,9 +3,9 @@ import { useState } from "react";
 import { Uso } from "../../../../../types";
 import useUsos from "@hooks/useUsos";
 import { useNavigate } from "react-router-dom";
-import { Snackbar, Alert } from "@mui/material";
 import { useAgregarUsuario } from "../hooks/useAgregarUsuario";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
+import { useSnackbar } from "@context/SnackbarContext";
 
 const AgregarUsuario = () => {
   const [selectedUsoId, setSelectedUsoId] = useState<string | null>(null);
@@ -18,9 +18,9 @@ const AgregarUsuario = () => {
 
   const { usos, loading: loadingUsos, error: errorUsos } = useUsos();
 
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-
   const navigate = useNavigate();
+
+  const { showMessage } = useSnackbar();
 
   const handleUsoChange = (_: any, newValue: Uso | null) => {
     if (newValue) {
@@ -34,23 +34,21 @@ const AgregarUsuario = () => {
     if (validarCampos()) {
       try {
         await agregarUsuario({ nombre: nombre!, usoId: Number(selectedUsoId!) });
-        setShowSuccessMessage(true); 
         setOpenModalAgregar(false);
         setNombre(""); 
         setSelectedUsoId(null);
   
-        navigate("/usuarios", {
-          state: { snackbarMessage: "Usuario agregado exitosamente" },
-        });
+        showMessage("Usuario agregado exitosamente", "success");
+        navigate("/usuarios");
       } catch (err) {
-        console.error("Error al agregar el usuario:", err);
+        showMessage("Error al agregar el usuario", "error");
       }
     }
   };
 
   const validarCampos = () => {
     if (!nombre || !selectedUsoId) {
-      alert("Por favor, complete todos los campos.");
+      showMessage("Por favor, complete todos los campos.", "error");
       return false;
     }
     return true;
@@ -86,7 +84,13 @@ const AgregarUsuario = () => {
             fullWidth
             size="small"
             value={nombre || ""}
-            onChange={(e) => setNombre(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 30) {
+                return;
+              }
+              setNombre(e.target.value);
+              }}
           />
           <Autocomplete
             size="small"
@@ -153,13 +157,6 @@ const AgregarUsuario = () => {
         message="¿Está seguro de que desea cancelar? Todos los cambios no guardados se perderán."
       />
 
-      <Snackbar
-        open={showSuccessMessage}
-        autoHideDuration={3000}
-        onClose={() => setShowSuccessMessage(false)}
-      >
-        <Alert severity="success">Usuario agregado exitosamente</Alert>
-      </Snackbar>
     </div>
   );
 };

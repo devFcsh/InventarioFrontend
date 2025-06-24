@@ -93,10 +93,9 @@ export const useInventoryErrors = (tipoInventario: string,periferico:string | un
         ["lampara"]: false
       }));
     }
-    console.log(inventoryErrors)
   };
 
-  const handleUniqueInventarioError = (tipo: keyof InventoryDataForm, value: Usuario | Marca | Modelo | Serie | string  | Ubicacion | Lampara | null,formData:InventoryDataForm) => {
+  const handleUniqueInventarioError = (tipo: keyof InventoryDataForm, value: any,formData:InventoryDataForm) => {
     setInventoryErrors((prevErrors) => ({
       ...prevErrors,
       [tipo]: value === null || value === ""? true : false,

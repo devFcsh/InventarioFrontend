@@ -13,8 +13,8 @@ import { useState } from "react";
 import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import { Componente } from "../../../types/Activo/Componente/index.ts";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
-import { Marca, Modelo, Serie, Periferico} from "../../../types/index.ts";
-import { useErrorsComponents } from '../hooks/useErrorsComponents.ts';
+import { Marca, Modelo, Serie, Periferico } from "../../../types/index.ts";
+import { useErrorsComponents } from "../hooks/useErrorsComponents.ts";
 
 interface ModalProps {
   open: boolean;
@@ -43,17 +43,51 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
   const [errorMensajeComponente, setErrorMensajeComponente] = useState<
     string | null
   >(null);
-  const { componentsErrors, completeDatosComponents, handleComponentsErrors, handleUniqueComponentsError } = useErrorsComponents();
+  const {
+    componentsErrors,
+    completeDatosComponents,
+    handleComponentsErrors,
+    handleUniqueComponentsError,
+  } = useErrorsComponents();
   const [empresa, setEmpresa] = useState("");
-  const filteredPerifericos = perifericos.filter(
-    (p) =>
-      p?.nombre.toLowerCase() !== "computadora" &&
-      p?.nombre.toLowerCase() !== "laptop" &&
-      p?.nombre.toLowerCase() !== "proyector" &&
-      p?.nombre.toLowerCase() !== "ap" &&
-      p?.nombre.toLowerCase() !== "switch" &&
-      !addedPerifericos.some((added: { periferico: { id_periferico: string | undefined; }; })=> added?.periferico?.id_periferico === p?.id_periferico)
-  );
+  const filteredPerifericos = perifericos.filter((p) => {
+    const nombre = p?.nombre?.toLowerCase();
+    if (
+      nombre === "computadora" ||
+      nombre === "laptop" ||
+      nombre === "proyector" ||
+      nombre === "ap" ||
+      nombre === "switch"
+    ) {
+      return false;
+    }
+    if (
+      (nombre === "mouse" || nombre === "teclado") &&
+      addedPerifericos.some(
+        (added: any) => added?.periferico?.id_periferico === p?.id_periferico
+      )
+    ) {
+      return false;
+    }
+    if (
+      nombre === "monitor" &&
+      addedPerifericos.filter(
+        (added: any) => added?.periferico?.nombre?.toLowerCase() === "monitor"
+      ).length >= 2
+    ) {
+      return false;
+    }
+    if (
+      nombre !== "monitor" &&
+      addedPerifericos.some(
+        (added: any) => added?.periferico?.id_periferico === p?.id_periferico
+      )
+    ) {
+      return false;
+    }
+    return true;
+  });
+
   const { marcas: marcasComponente } = useMarcasPorPeriferico(
     nuevoComponente.periferico?.id_periferico ?? ""
   );
@@ -102,29 +136,36 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
     setNuevoComponente({ ...nuevoComponente, serie: newValue });
   };
   const agregarComponente = () => {
-    handleComponentsErrors({
+    const errores = handleComponentsErrors({
       ...nuevoComponente,
-      empresa
+      empresa,
     });
-    if (
-      !Object.values(componentsErrors).includes(true) && completeDatosComponents({
-        ...nuevoComponente,
-        empresa
-      })
-    ) {
-      onAddComponent(nuevoComponente);
-      setNuevoComponente({
-        periferico: {} as Periferico,
-        marca: {} as Marca,
-        modelo: {} as Modelo,
-        serie: {} as Serie,
-        inventario: "",
-      });
-      limpiarCamposDependientesComponente();
-      setErrorMensajeComponente(null);
 
-      onClose();
+    if (Object.values(errores).includes(true)) {
+      setErrorMensajeComponente(
+        "Por favor completa todos los campos obligatorios."
+      );
+      return;
     }
+
+    if (!completeDatosComponents({ ...nuevoComponente, empresa })) {
+      setErrorMensajeComponente(
+        "Por favor completa todos los campos obligatorios."
+      );
+      return;
+    }
+
+    onAddComponent(nuevoComponente);
+    setNuevoComponente({
+      periferico: {} as Periferico,
+      marca: {} as Marca,
+      modelo: {} as Modelo,
+      serie: {} as Serie,
+      inventario: "",
+    });
+    limpiarCamposDependientesComponente();
+    setErrorMensajeComponente(null);
+    onClose();
   };
 
   const limpiarCamposDependientesComponente = () => {
@@ -164,10 +205,10 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 options={filteredPerifericos}
                 getOptionLabel={(option: Periferico) => option?.nombre || ""}
                 onChange={(_, newValue: Periferico | null) => {
-                  handlePerifericoComponenteChange(_,newValue)
-                  handleUniqueComponentsError("periferico", newValue,{
+                  handlePerifericoComponenteChange(_, newValue);
+                  handleUniqueComponentsError("periferico", newValue, {
                     ...nuevoComponente,
-                    empresa
+                    empresa,
                   });
                 }}
                 value={nuevoComponente.periferico}
@@ -192,10 +233,10 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 options={marcasComponente}
                 getOptionLabel={(option: Marca) => option?.nombre || ""}
                 onChange={(_, newValue: Marca | null) => {
-                  handleMarcaComponenteChange(_,newValue)
-                  handleUniqueComponentsError("marca", newValue,{
+                  handleMarcaComponenteChange(_, newValue);
+                  handleUniqueComponentsError("marca", newValue, {
                     ...nuevoComponente,
-                    empresa
+                    empresa,
                   });
                 }}
                 value={nuevoComponente.marca}
@@ -221,10 +262,10 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 options={modelosComponente}
                 getOptionLabel={(option: Modelo) => option?.nombre || ""}
                 onChange={(_, newValue: Modelo | null) => {
-                  handleModeloComponenteChange(_,newValue)
-                  handleUniqueComponentsError("modelo", newValue,{
+                  handleModeloComponenteChange(_, newValue);
+                  handleUniqueComponentsError("modelo", newValue, {
                     ...nuevoComponente,
-                    empresa
+                    empresa,
                   });
                 }}
                 value={nuevoComponente.modelo}
@@ -250,10 +291,10 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 options={seriesComponente}
                 getOptionLabel={(option: Serie) => option?.nombre || ""}
                 onChange={(_, newValue: Serie | null) => {
-                  handleSerieComponenteChange(_,newValue)
-                  handleUniqueComponentsError("serie", newValue,{
+                  handleSerieComponenteChange(_, newValue);
+                  handleUniqueComponentsError("serie", newValue, {
                     ...nuevoComponente,
-                    empresa
+                    empresa,
                   });
                 }}
                 value={nuevoComponente.serie}
@@ -279,11 +320,12 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 options={["Espol", "EspolTech"]}
                 getOptionLabel={(option) => (option ? option : "")}
                 value={empresa}
-                onChange={(_, newValue: string | null) => {
-                  handleEmpresaChange(newValue|| "" )
-                  handleUniqueComponentsError("empresa", newValue,{
+                onChange={(_, newValue: any) => {
+                  handleEmpresaChange(newValue);
+                  handleUniqueComponentsError("empresa", newValue, {
+
                     ...nuevoComponente,
-                    empresa
+                    empresa,
                   });
                 }}
                 renderInput={(params) => (
@@ -310,19 +352,33 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 size="small"
                 value={nuevoComponente.inventario}
                 error={!!componentsErrors.inventario}
-                helperText={componentsErrors.inventario? "Por favor escribir un inventario válido" :""}
+                helperText={
+                  componentsErrors.inventario
+                    ? "Por favor escribir un inventario válido"
+                    : ""
+                }
                 onChange={(e) => {
                   let value = e.target.value;
-                  if (value !== null && value.length > 10) {
-                    return
+                  if (
+                    empresa === "Espol" &&
+                    value !== null &&
+                    value.length > 6
+                  ) {
+                    value = value.slice(0, 6);
+                  } else if (
+                    empresa === "EspolTech" &&
+                    value !== null &&
+                    value.length > 10
+                  ) {
+                    value = value.slice(0, 10);
                   }
                   setNuevoComponente({
                     ...nuevoComponente,
                     inventario: value,
-                  })
-                  handleUniqueComponentsError("inventario",value,{
+                  });
+                  handleUniqueComponentsError("inventario", value, {
                     ...nuevoComponente,
-                    empresa
+                    empresa,
                   });
                 }}
                 disabled={empresa === ""}

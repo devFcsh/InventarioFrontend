@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
-import { Autocomplete, TextField, Button, Snackbar, Alert, Box } from "@mui/material";
-import {
-  Marca,
-  Modelo,
-  Serie,
-  Lampara,
-} from "../../../../../types";
+import { Autocomplete, TextField, Button, Box } from "@mui/material";
+import { Marca, Modelo, Serie, Lampara } from "../../../../../types";
 import { BodegaSimpleEdit } from "../../../../../types/Bodega/index";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
@@ -16,38 +11,43 @@ import { useNavigate } from "react-router-dom";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario";
 import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
 import useLamparas from "@hooks/useLamparas";
+import { useSnackbar } from "@context/SnackbarContext";
 
 interface EditarBodegaSimpleProps {
-    equipoSimpleBodega: BodegaSimpleEdit;
-    perifericoName: string;
+  equipoSimpleBodega: BodegaSimpleEdit;
+  perifericoName: string;
 }
 
 const EditarBodegaSimple = ({
   perifericoName,
-  equipoSimpleBodega
+  equipoSimpleBodega,
 }: EditarBodegaSimpleProps) => {
   const [selectedInventarioMarca, setSelectedInventarioMarca] =
     useState<Marca | null>(null);
   const [selectedInventarioModelo, setSelectedInventarioModelo] =
     useState<Modelo | null>(null);
-  const [selectedLampara, setSelectedLampara] =
-    useState<Lampara | null>(null);
+  const [selectedLampara, setSelectedLampara] = useState<Lampara | null>(null);
   const [selectedInventarioSerie, setSelectedInventarioSerie] =
     useState<Serie | null>(null);
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
   const [newObservation, setNewObservation] = useState<string>("");
-  const [errorMensajeComponente, setErrorMensajeComponente] = useState<string | null>(null);
+  const [errorMensajeComponente, setErrorMensajeComponente] = useState<
+    string | null
+  >(null);
   const [empresa, setEmpresa] = useState<string | null>("");
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
-  const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(null);
+  const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(
+    null
+  );
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  
+  const { showMessage } = useSnackbar();
   const navigate = useNavigate();
-  const { marcas } = useMarcasPorPeriferico(equipoSimpleBodega?.id_periferico ?? "");
+  const { marcas } = useMarcasPorPeriferico(
+    equipoSimpleBodega?.id_periferico ?? ""
+  );
   const { modelos } = useModelosPorMarcaPeriferico(
     selectedInventarioMarca?.id_marca ?? "",
     equipoSimpleBodega?.id_periferico ?? ""
@@ -63,7 +63,7 @@ const EditarBodegaSimple = ({
     selectedInventarioModelo?.id_modelo ?? ""
   );
   const [errorLampara, setErrorLampara] = useState(false);
-  
+
   const { lamparasTotales } = useLamparas();
   const { editarBodegaSimple } = useEditarBodegaSimple();
 
@@ -71,14 +71,18 @@ const EditarBodegaSimple = ({
     if (equipoSimpleBodega) {
       setSelectedInventarioInv(equipoSimpleBodega.inventario);
       setNewObservation(equipoSimpleBodega.observacion);
-      equipoSimpleBodega.inventario.length===10?setEmpresa("EspolTech"):setEmpresa("Espol")
+      equipoSimpleBodega.inventario.length === 10
+        ? setEmpresa("EspolTech")
+        : setEmpresa("Espol");
     }
   }, [equipoSimpleBodega]);
 
   useEffect(() => {
     if (equipoSimpleBodega && marcas.length > 0) {
       setSelectedInventarioMarca(
-        marcas.find((marca) => marca?.id_marca === equipoSimpleBodega.id_marca) || null
+        marcas.find(
+          (marca) => marca?.id_marca === equipoSimpleBodega.id_marca
+        ) || null
       );
     }
   }, [equipoSimpleBodega, marcas]);
@@ -86,7 +90,9 @@ const EditarBodegaSimple = ({
   useEffect(() => {
     if (equipoSimpleBodega && modelos.length > 0) {
       setSelectedInventarioModelo(
-        modelos.find((modelo) => modelo?.id_modelo === equipoSimpleBodega.id_modelo) || null
+        modelos.find(
+          (modelo) => modelo?.id_modelo === equipoSimpleBodega.id_modelo
+        ) || null
       );
     }
   }, [equipoSimpleBodega, modelos]);
@@ -94,23 +100,24 @@ const EditarBodegaSimple = ({
   useEffect(() => {
     if (equipoSimpleBodega && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipoSimpleBodega.id_serie) || null
+        series.find(
+          (serie) => serie?.id_serie === equipoSimpleBodega.id_serie
+        ) || null
       );
     }
   }, [equipoSimpleBodega, series]);
 
-
   useEffect(() => {
     if (equipoSimpleBodega && lamparasTotales.length > 0) {
       setSelectedLampara(
-        lamparasTotales.find((lampara) => lampara?.id_lampara === equipoSimpleBodega.id_lampara) || null
+        lamparasTotales.find(
+          (lampara) => lampara?.id_lampara === equipoSimpleBodega.id_lampara
+        ) || null
       );
     }
   }, [equipoSimpleBodega, lamparasTotales]);
 
-
-  const handleEditEquipo = async (observationValue : string) => {
-
+  const handleEditEquipo = async (observationValue: string) => {
     const payload = {
       tipo: "bodega",
       inventario: selectedInventarioInv,
@@ -120,11 +127,10 @@ const EditarBodegaSimple = ({
     };
     try {
       await editarBodegaSimple(equipoSimpleBodega.id_equipo, payload);
-        setShowSuccessMessage(true);
-        navigate("/bodega", { state: { equipoEditado: true } });
-      
+      showMessage("Equipo editado exitosamente", "success");
+      navigate("/bodega");
     } catch (error) {
-      console.error("Error al actualizar equipo:", error);
+      showMessage("Error al editar el equipo", "error");
     }
   };
 
@@ -138,43 +144,51 @@ const EditarBodegaSimple = ({
     setOpenModalEditar(false);
     await handleEditEquipo(newObservation);
   };
-  const handleObservation = (newObservation :string)=>{
-    if(newObservation.length <= 200){
+  const handleObservation = (newObservation: string) => {
+    if (newObservation.length <= 200) {
       setNewObservation(newObservation);
       setErrorMensajeComponente("");
-    }else{
-      setErrorMensajeComponente("La observación no puede tener más de 200 caracteres.");
+    } else {
+      setErrorMensajeComponente(
+        "La observación no puede tener más de 200 caracteres."
+      );
     }
-  }
+  };
 
-  const handleChangeEmpresa = (newEmpresa :string | null)=>{
-      setEmpresa(newEmpresa);
-      if(newEmpresa===null){
-        setErrorEmpresa(true);
-        setSelectedInventarioInv("")
-        setErrorInventario(true)
-      }else{
-        setErrorEmpresa(false);
-        !validateInventario(selectedInventarioInv,newEmpresa)?setErrorInventario(true):setErrorInventario(false)
-      }
+  const handleChangeEmpresa = (newEmpresa: string | null) => {
+    setEmpresa(newEmpresa);
+    if (newEmpresa === null) {
+      setErrorEmpresa(true);
+      setSelectedInventarioInv("");
+      setErrorInventario(true);
+    } else {
+      setErrorEmpresa(false);
+      !validateInventario(selectedInventarioInv, newEmpresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
     }
+  };
 
-    const handleChangeInventario = (inventario :string)=>{
-      setSelectedInventarioInv(inventario)
-      if(empresa==="Espol"){
-        !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
-      }else if(empresa==="EspolTech"){
-        !validateInventario(inventario?inventario:"",empresa)?setErrorInventario(true):setErrorInventario(false)
-      }
+  const handleChangeInventario = (inventario: string) => {
+    setSelectedInventarioInv(inventario);
+    if (empresa === "Espol") {
+      !validateInventario(inventario ? inventario : "", empresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
+    } else if (empresa === "EspolTech") {
+      !validateInventario(inventario ? inventario : "", empresa)
+        ? setErrorInventario(true)
+        : setErrorInventario(false);
     }
-    const handleLamparaChange = (lampara :Lampara)=>{
-      setSelectedLampara(lampara)
-      if(lampara===null){
-        setErrorLampara(true)
-      }else{
-        setErrorLampara(false)
-      }
+  };
+  const handleLamparaChange = (lampara: Lampara) => {
+    setSelectedLampara(lampara);
+    if (lampara === null) {
+      setErrorLampara(true);
+    } else {
+      setErrorLampara(false);
     }
+  };
 
   const handleCancelar = () => {
     setOpenModalCancelar(false);
@@ -189,7 +203,7 @@ const EditarBodegaSimple = ({
       !selectedInventarioInv ||
       errorInventario ||
       !selectedInventarioSerie ||
-      (perifericoName!=="Proyector"?false:!selectedLampara)
+      (perifericoName !== "Proyector" ? false : !selectedLampara)
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;
@@ -207,20 +221,13 @@ const EditarBodegaSimple = ({
         title="Confirmar Editar Equipo"
         message="¿Está seguro de que desea editar este equipo?"
       />
-       <ModalConfirmation
+      <ModalConfirmation
         open={openModalCancelar}
         onClose={() => setOpenModalCancelar(false)}
         onConfirm={handleCancelar}
         title="Confirmar Cancelar"
         message="¿Está seguro de que desea cancelar? Todos los cambios no guardados se perderán."
       />
-      <Snackbar
-        open={showSuccessMessage}
-        autoHideDuration={3000}
-        onClose={() => setShowSuccessMessage(false)}
-      >
-        <Alert severity="success">Equipo agregado exitosamente</Alert>
-      </Snackbar>
       <h2 className="text-xl font-semibold mb-5">Información de Inventario</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <Autocomplete
@@ -310,74 +317,78 @@ const EditarBodegaSimple = ({
               errorInventario ? "Por favor escribir un inventario válido" : ""
             }
             onChange={(e) => {
-              let value = e.target.value;
-              if (empresa==="Espol" && value !== null && value.length > 6) {
-                return
-              }else if(empresa==="EspolTech" && value !== null && value.length > 10){
-                return
+              const value = e.target.value;
+              if (empresa === "Espol" && value !== null && value.length > 6) {
+                return;
+              } else if (
+                empresa === "EspolTech" &&
+                value !== null &&
+                value.length > 10
+              ) {
+                return;
               }
-              handleChangeInventario(value)
+              handleChangeInventario(value);
             }}
             disabled={empresa === ""}
           />
         </Box>
         {perifericoName === "Proyector" ? (
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={lamparas}
-              value={selectedLampara}
-              onChange={(_, newValue: Lampara | null) => {
-                handleLamparaChange(newValue)
-              }}
-              getOptionLabel={(option) => (option ? option.nombre : "")}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Lámpara"
-                  variant="outlined"
-                  error={!!errorLampara}
-                  helperText={
-                    errorLampara
-                      ? "Por favor seleccionar una lámpara"
-                      : ""
-                  }
-                  fullWidth
-                />
-              )}
-              disabled={!selectedInventarioModelo}
-            />
-          ) : (
-            ""
-          )}
+          <Autocomplete
+            size="small"
+            disablePortal
+            options={lamparas}
+            value={selectedLampara}
+            onChange={(_, newValue: Lampara | null) => {
+              handleLamparaChange(newValue);
+            }}
+            getOptionLabel={(option) => (option ? option.nombre : "")}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Lámpara"
+                variant="outlined"
+                error={!!errorLampara}
+                helperText={
+                  errorLampara ? "Por favor seleccionar una lámpara" : ""
+                }
+                fullWidth
+              />
+            )}
+            disabled={!selectedInventarioModelo}
+          />
+        ) : (
+          ""
+        )}
       </div>
 
       <div>
         <h2 className="text-xl font-semibold mb-10">Observación</h2>
         <TextField
-                label="Observación"
-                variant="outlined"
-                fullWidth
-                multiline
-                minRows={2}
-                value={newObservation}
-                onChange={(e) => {
-                  handleObservation(e.target.value)
-                }}
-                error={!!errorMensajeComponente}
-                helperText={errorMensajeComponente}
-          />
+          label="Observación"
+          variant="outlined"
+          fullWidth
+          multiline
+          minRows={2}
+          value={newObservation}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value !== null && value.length > 200) {
+              return;
+            }
+            handleObservation(e.target.value);
+          }}
+          error={!!errorMensajeComponente}
+          helperText={errorMensajeComponente}
+        />
       </div>
 
       <div className="flex gap-4 mt-10">
         <Button
           variant="contained"
           sx={{
-            backgroundColor:
-              "#4CAF50",
+            backgroundColor: "#4CAF50",
             "&:hover": {
-              backgroundColor:
-                "#45a049"
+              backgroundColor: "#45a049",
             },
           }}
           onClick={handleConfirmEditarEquipo}
@@ -386,13 +397,13 @@ const EditarBodegaSimple = ({
           Guardar Cambios
         </Button>
         <Button
-                onClick={handleConfirmCancelar}
-                color="error"
-                variant="contained"
-                fullWidth
-              >
-                Cancelar
-              </Button>
+          onClick={handleConfirmCancelar}
+          color="error"
+          variant="contained"
+          fullWidth
+        >
+          Cancelar
+        </Button>
       </div>
       {errorMensajeEquipo && (
         <div className="text-red-500 mt-2">{errorMensajeEquipo}</div>

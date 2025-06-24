@@ -31,7 +31,7 @@ export const useUsuariosFiltrados = (
         setUsuarios(data.usuarios);
         setTotalCount(data.total); 
       } catch (err) {
-        setError("Error al cargar los usuarios: " + err);
+        setError("Error al cargar los usuarios responsables: " + err);
       } finally {
         setLoading(false);
       }

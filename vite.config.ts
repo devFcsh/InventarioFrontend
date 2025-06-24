@@ -13,6 +13,7 @@ export default defineConfig({
       "@pages": fileURLToPath(new URL("./src/pages", import.meta.url)),
       "@types": fileURLToPath(new URL("./src/types", import.meta.url)),
       "@data": fileURLToPath(new URL("./src/data", import.meta.url)),
+      "@context": fileURLToPath(new URL("./src/context", import.meta.url)),
     },
   },
   server: {

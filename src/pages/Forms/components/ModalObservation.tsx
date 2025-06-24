@@ -1,12 +1,22 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Radio, RadioGroup, FormControlLabel } from '@mui/material';
-import { useState } from 'react';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+} from "@mui/material";
+import { useState } from "react";
 
 interface ModalProps {
   open: boolean;
   onClose: () => void;
   onConfirm: (observation: string) => void;
   title?: string;
-  message?: string;
 }
 
 export const ModalObservation: React.FC<ModalProps> = ({
@@ -18,9 +28,13 @@ export const ModalObservation: React.FC<ModalProps> = ({
 }) => {
   const [newObservation, setNewObservation] = useState<string>("");
   const [addObservation, setAddObservation] = useState<boolean>(false);
-  const [errorMensajeComponente, setErrorMensajeComponente] = useState<string | null>(null);
+  const [errorMensajeComponente, setErrorMensajeComponente] = useState<
+    string | null
+  >(null);
 
-  const handleAddObservationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAddObservationChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = event.target.value === "yes";
     setAddObservation(value);
     if (!value) {
@@ -36,14 +50,16 @@ export const ModalObservation: React.FC<ModalProps> = ({
     }
   };
 
-  const handleChangeNewObservation = (value : string)=>{
-    if(value.length <= 200){
-      setNewObservation(value)
+  const handleChangeNewObservation = (value: string) => {
+    if (value.length <= 200) {
+      setNewObservation(value);
       setErrorMensajeComponente("");
-    }else{
-      setErrorMensajeComponente("La observación no puede tener más de 200 caracteres.");
+    } else {
+      setErrorMensajeComponente(
+        "La observación no puede tener más de 200 caracteres."
+      );
     }
-  }
+  };
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -51,7 +67,11 @@ export const ModalObservation: React.FC<ModalProps> = ({
       <DialogContent>
         <Box sx={{ width: "100%" }}>
           <div className="flex-1 space-y-4 m-4">
-            <RadioGroup row value={addObservation ? "yes" : "no"} onChange={handleAddObservationChange}>
+            <RadioGroup
+              row
+              value={addObservation ? "yes" : "no"}
+              onChange={handleAddObservationChange}
+            >
               <FormControlLabel value="yes" control={<Radio />} label="Sí" />
               <FormControlLabel value="no" control={<Radio />} label="No" />
             </RadioGroup>
@@ -65,7 +85,11 @@ export const ModalObservation: React.FC<ModalProps> = ({
                 minRows={4}
                 value={newObservation}
                 onChange={(e) => {
-                  handleChangeNewObservation(e.target.value)
+                  const value = e.target.value;
+                  if (value !== null && value.length > 200) {
+                    return;
+                  }
+                  handleChangeNewObservation(e.target.value);
                 }}
                 error={!!errorMensajeComponente}
                 helperText={errorMensajeComponente}
@@ -75,10 +99,33 @@ export const ModalObservation: React.FC<ModalProps> = ({
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ mt: '-10px' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%', gap: 2, pb: 2 }}>
-          <Button onClick={onClose} color="error" variant="contained" size="large">Cancelar</Button>
-          <Button onClick={handleConfirm} fullWidth variant="contained" sx={{ backgroundColor: "#4CAF50", "&:hover": { backgroundColor: "#45a049" } }}>
+      <DialogActions sx={{ mt: "-10px" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            width: "100%",
+            gap: 2,
+            pb: 2,
+          }}
+        >
+          <Button
+            onClick={onClose}
+            color="error"
+            variant="contained"
+            size="large"
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleConfirm}
+            fullWidth
+            variant="contained"
+            sx={{
+              backgroundColor: "#4CAF50",
+              "&:hover": { backgroundColor: "#45a049" },
+            }}
+          >
             Finalizar
           </Button>
         </Box>
