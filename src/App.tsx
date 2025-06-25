@@ -9,6 +9,9 @@ import { ProtectedRoute } from "./router/ProtectedRoute";
 const App: React.FC = () => {
   const [currentSection, setCurrentSection] = useState<string>("");
 
+  const allRoles = Array.from(
+    new Set(routesConfig.flatMap((route) => route.allowedRoles))
+  );
   return (
     <Router>
       <Routes>
@@ -34,7 +37,12 @@ const App: React.FC = () => {
           />
         ))}
         <Route path="/notFound" element={<NotFound />} />
-        <Route path="*" element={<NotFound />} />
+        <Route
+          path="*"
+          element={
+            <ProtectedRoute element={<NotFound />} allowedRoles={allRoles} />
+          }
+        />
       </Routes>
     </Router>
   );

@@ -2,47 +2,51 @@ import { useEffect, useState } from "react";
 
 const Login = () => {
   const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
-  const [status, setStatus] = useState<'loading'|'redirecting'|'error'>('loading');
+  const [status, setStatus] = useState<"loading" | "redirecting" | "error">(
+    "loading"
+  );
   const [error, setError] = useState<string | null>(null);
-  
+
   useEffect(() => {
     checkAuth();
   }, []);
 
   const checkAuth = async () => {
     try {
-      console.log('🔍 Verificando estado de autenticación...');
+      console.log("🔍 Verificando estado de autenticación...");
       const response = await fetch(`${API_BASE_URL}/auth/status`, {
-        method: 'GET',
-        credentials: 'include', // <— crucial para que viaje la cookie
+        method: "GET",
+        credentials: "include", // <— crucial para que viaje la cookie
         headers: {
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       });
 
       const data = await response.json();
-      console.log('📊 Estado de auth:', data);
+      console.log("📊 Estado de auth:", data);
 
       if (data.isAuthenticated) {
-        console.log('✅ Usuario ya autenticado, redirigiendo a activos...');
-        localStorage.setItem("rol", "administrador");
-        window.location.href = '/activos';
+        console.log("✅ Usuario ya autenticado, redirigiendo a activos...");
+        if (data.rol) {
+          localStorage.setItem("rol", data.rol);
+        }
+        window.location.href = "/activos";
       } else {
-        console.log('❌ Usuario no autenticado, iniciando login...');
-          localStorage.removeItem("rol"); 
-        setStatus('redirecting');
+        console.log("❌ Usuario no autenticado, iniciando login...");
+        localStorage.removeItem("rol");
+        setStatus("redirecting");
         setTimeout(() => {
           window.location.href = `${API_BASE_URL}/auth/cas/login`;
         }, 1500);
       }
     } catch (error) {
-      console.error('❌ Error verificando auth:', error);
-      setError('Error de conexión con el servidor');
-      setStatus('error');
+      console.error("❌ Error verificando auth:", error);
+      setError("Error de conexión con el servidor");
+      setStatus("error");
     }
   };
 
-  if (status === 'error') {
+  if (status === "error") {
     return (
       <div className="min-h-screen bg-red-50 flex items-center justify-center">
         <div className="max-w-md w-full text-center">
@@ -75,7 +79,7 @@ const Login = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
       <div className="max-w-md w-full text-center">
@@ -108,17 +112,19 @@ const Login = () => {
             </div>
 
             <p className="text-gray-600">
-              {status === 'loading'
-                ? 'Verificando autenticación...'
-                : 'Redirigiendo al sistema de autenticación de ESPOL...'}
+              {status === "loading"
+                ? "Verificando autenticación..."
+                : "Redirigiendo al sistema de autenticación de ESPOL..."}
             </p>
 
-            {status === 'redirecting' && (
+            {status === "redirecting" && (
               <div className="text-sm text-gray-500 mt-4">
                 <p>
                   Si no eres redirigido automáticamente,&nbsp;
                   <button
-                    onClick={() => (window.location.href = `${API_BASE_URL}/auth/cas/login`)}
+                    onClick={() =>
+                      (window.location.href = `${API_BASE_URL}/auth/cas/login`)
+                    }
                     className="text-blue-600 hover:text-blue-800 underline ml-1"
                   >
                     haz clic aquí
