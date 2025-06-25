@@ -4,10 +4,6 @@ const Login = () => {
   const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
   const [status, setStatus] = useState<'loading'|'redirecting'|'error'>('loading');
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-      localStorage.setItem("rol", "administrador");
-  }, []);
   
   useEffect(() => {
     checkAuth();
@@ -29,6 +25,7 @@ const Login = () => {
 
       if (data.authenticated) {
         console.log('✅ Usuario ya autenticado, redirigiendo a activos...');
+        localStorage.setItem("rol", "administrador");
         window.location.href = '/activos';
       } else {
         console.log('❌ Usuario no autenticado, iniciando login...');
