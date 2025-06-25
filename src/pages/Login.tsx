@@ -23,12 +23,13 @@ const Login = () => {
       const data = await response.json();
       console.log('📊 Estado de auth:', data);
 
-      if (data.authenticated) {
+      if (data.isAuthenticated) {
         console.log('✅ Usuario ya autenticado, redirigiendo a activos...');
         localStorage.setItem("rol", "administrador");
         window.location.href = '/activos';
       } else {
         console.log('❌ Usuario no autenticado, iniciando login...');
+          localStorage.removeItem("rol"); 
         setStatus('redirecting');
         setTimeout(() => {
           window.location.href = `${API_BASE_URL}/auth/cas/login`;
