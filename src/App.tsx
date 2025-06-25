@@ -19,12 +19,17 @@ const App: React.FC = () => {
             key={path}
             path={path}
             element={
-              <Layout
-                currentSection={currentSection}
-                setCurrentSection={setCurrentSection}
-              >
-                <ProtectedRoute element={element} allowedRoles={allowedRoles} />
-              </Layout>
+              <ProtectedRoute
+                element={
+                  <Layout
+                    currentSection={currentSection}
+                    setCurrentSection={setCurrentSection}
+                  >
+                    {element}
+                  </Layout>
+                }
+                allowedRoles={allowedRoles}
+              />
             }
           />
         ))}
