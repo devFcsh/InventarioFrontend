@@ -25,7 +25,7 @@ const Login = () => {
       const data = await response.json();
       console.log("📊 Estado de auth:", data);
 
-      if (data.isAuthenticated) {
+      if (data.authenticated) {
         console.log("✅ Usuario ya autenticado, redirigiendo a activos...");
         if (data.rol) {
           localStorage.setItem("rol", data.rol);
