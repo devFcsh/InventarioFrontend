@@ -16,6 +16,7 @@ export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSectio
 
    useEffect(() => {
       const rol = localStorage.getItem("rol");
+      console.log(rol)
       if (rol) {
         setRol(rol);
       } else {
