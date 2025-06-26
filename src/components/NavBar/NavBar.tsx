@@ -13,16 +13,79 @@ import { Link } from "react-router-dom";
 export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSection }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [rol, setRol] = useState<string>("");
+  const [usuario, setUsuario] = useState<string>("Usuario");
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
-   useEffect(() => {
-      const rol = localStorage.getItem("rol");
-      console.log(rol)
-      if (rol) {
-        setRol(rol);
-      } else {
-        setRol("consultor");
+  useEffect(() => {
+    const storedRol = localStorage.getItem("rol");
+    if (storedRol) {
+      setRol(storedRol);
+    } else {
+      setRol("consultor");
+    }
+    fetchUserInfo();
+  }, []);
+
+  const fetchUserInfo = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/status`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.authenticated && data.user) {
+          const displayName = data.user.displayName || data.user.username || "Usuario";
+          setUsuario(displayName);
+        }
       }
-    }, []);
+    } catch (error) {
+      console.error("Error obteniendo información del usuario:", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    
+    setIsLoggingOut(true);
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        localStorage.removeItem("rol");
+        localStorage.clear();
+        if (data.casLogoutUrl) {
+          window.location.href = data.casLogoutUrl;
+        } else {
+          window.location.href = "/";
+        }
+      } else {
+        console.error("❌ Error en logout:", data);
+        localStorage.clear();
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("❌ Error durante logout:", error);
+      localStorage.clear();
+      window.location.href = "/";
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <div>
@@ -33,20 +96,21 @@ export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSectio
           </IconButton>
           <div className="w-60 h-auto overflow-hidden">
             <Link to={"/activos"}>
-            < img className="w-full h-full object-cover" src={logoFCSH} alt="LogoFCSH" />
+              <img className="w-full h-full object-cover" src={logoFCSH} alt="LogoFCSH" />
             </Link>
           </div>
         </div>
         <div className="flex items-center gap-8 text-sm font-medium text-black">
           <div className="flex items-center gap-1">
             <PersonIcon />
-            <p>Jorge Navarrete</p>
+            <p>{usuario}</p>
           </div>
-          <div className="flex items-center gap-1 cursor-pointer">
-            <Link to={"/"}>
-              <LogoutIcon />
-            </Link>
-            <p>Salir</p>
+          <div 
+            className={`flex items-center gap-1 cursor-pointer ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : 'hover:text-gray-700'}`}
+            onClick={handleLogout}
+          >
+            <LogoutIcon />
+            <p>{isLoggingOut ? "Cerrando..." : "Salir"}</p>
           </div>
         </div>
       </nav>
