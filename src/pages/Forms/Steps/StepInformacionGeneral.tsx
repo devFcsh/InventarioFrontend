@@ -134,7 +134,7 @@ export const StepInformacionGeneral = ({
             }
             onChange={(e) => {
               const value = e.target.value;
-              if (value !== null && value.length > 10) {
+              if (value !== null && value.length > 15) {
                 return
               }
               handleInformacionGeneralChange("nombreEquipo",value);
