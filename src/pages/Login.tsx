@@ -27,9 +27,6 @@ const Login = () => {
 
       if (data.authenticated) {
         console.log("✅ Usuario ya autenticado, redirigiendo a activos...");
-        if (data.rol) {
-          localStorage.setItem("rol", data.rol);
-        }
         window.location.href = "/activos";
       } else {
         console.log("❌ Usuario no autenticado, iniciando login...");

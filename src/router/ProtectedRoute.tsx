@@ -1,3 +1,4 @@
+import { useUser } from '@context/userContext';
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
@@ -9,12 +10,25 @@ interface Props {
 export const ProtectedRoute: React.FC<Props> = ({ element, allowedRoles }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [userRole, setUserRole] = useState<string | null>(null);
   const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     checkAuthStatus();
   }, []);
+
+  const { rol, loading } = useUser();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div>Verificando autenticación...</div>
+      </div>
+    );
+  }
+
+  if (!rol) {
+    return <Navigate to="/" replace />;
+  }
 
   const checkAuthStatus = async () => {
     try {
@@ -24,10 +38,8 @@ export const ProtectedRoute: React.FC<Props> = ({ element, allowedRoles }) => {
         headers: { 'Content-Type': 'application/json' }
       });
       const data = await response.json();
-      // Ajusta según la respuesta real de tu backend
       const authenticated = data.authenticated || data.isAuth || data.isAuthenticated;
       setIsAuthenticated(authenticated);
-      setUserRole(data.rol || localStorage.getItem("rol") || null);
       setIsLoading(false);
     } catch (error) {
       setIsAuthenticated(false);
@@ -47,7 +59,7 @@ export const ProtectedRoute: React.FC<Props> = ({ element, allowedRoles }) => {
     return <Navigate to="/" replace />;
   }
 
-  if (!userRole || !allowedRoles.includes(userRole)) {
+  if (!rol || !allowedRoles.includes(rol)) {
     return <Navigate to="/notFound" replace />;
   }
 

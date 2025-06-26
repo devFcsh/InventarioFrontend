@@ -2,52 +2,23 @@ import "./NavBar.css";
 import logoFCSH from "../../assets/logoFCSH.png";
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { NavBarItems } from "./NavBarItems";
 import { Drawer as MuiDrawer } from '@mui/material';
 import { NavBarProps } from "../PropsInterface";
 import { Link } from "react-router-dom";
+import { useUser } from "@context/userContext";
 
 export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSection }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [rol, setRol] = useState<string>("");
-  const [usuario, setUsuario] = useState<string>("Usuario");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
+  const { user, rol, loading } = useUser();
 
-  useEffect(() => {
-    const storedRol = localStorage.getItem("rol");
-    if (storedRol) {
-      setRol(storedRol);
-    } else {
-      setRol("consultor");
-    }
-    fetchUserInfo();
-  }, []);
+  if(loading) return null;
 
-  const fetchUserInfo = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/status`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.authenticated && data.user) {
-          const displayName = data.user.displayName || data.user.username || "Usuario";
-          setUsuario(displayName);
-        }
-      }
-    } catch (error) {
-      console.error("Error obteniendo información del usuario:", error);
-    }
-  };
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
@@ -103,7 +74,7 @@ export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSectio
         <div className="flex items-center gap-8 text-sm font-medium text-black">
           <div className="flex items-center gap-1">
             <PersonIcon />
-            <p>{usuario}</p>
+            <p>{user ? user.email : ""}</p>
           </div>
           <div 
             className={`flex items-center gap-1 cursor-pointer ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : 'hover:text-gray-700'}`}
@@ -130,7 +101,7 @@ export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSectio
           currentSection={currentSection} 
           setCurrentSection={setCurrentSection} 
           setIsDrawerOpen={setIsDrawerOpen}
-          rol={rol} 
+          rol={rol ?? ""} 
         />
       </MuiDrawer>
     </div>
