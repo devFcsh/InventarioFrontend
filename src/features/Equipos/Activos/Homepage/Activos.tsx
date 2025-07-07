@@ -803,17 +803,6 @@ const Activos = () => {
             >
               Buscar
             </button>
-            <div className="relative group">
-              <button
-                onClick={exportToExcel}
-                className="flex items-center justify-center h-full py-1.5 px-2 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-              >
-                <Icon icon="ph:export" width="20" height="20" />
-              </button>
-              <span className="absolute left-1/2 transform -translate-x-1/3 top-full mt-1 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                Exportar a Excel
-              </span>
-            </div>
           </div>
         </div>
       </div>
