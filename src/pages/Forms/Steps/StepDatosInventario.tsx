@@ -91,7 +91,7 @@ export const StepDatosInventario = ({
               loading={loadingUsuarios}
               value={
                 usuarios.find(
-                  (u) => u?.id_usuario === inventoryDataForm.usuarioId
+                  (ul) => ul?.id_usuario === inventoryDataForm.usuarioId
                 ) ?? null
               }
               onChange={(_, newValue: Usuario | null) => {

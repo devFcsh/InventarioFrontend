@@ -99,7 +99,7 @@ const AgregarUsuario = () => {
             loading={loadingUsos}
             value={
               selectedUsoId
-                ? usos.find((u) => u?.id_uso === selectedUsoId) ?? null
+                ? usos.find((ul) => ul?.id_uso === selectedUsoId) ?? null
                 : null
             }
             onChange={handleUsoChange}

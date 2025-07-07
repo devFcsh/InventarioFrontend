@@ -72,7 +72,7 @@ const AgregarActivo = () => {
             loading={loadingUsos}
             value={
               selectedUsoId
-                ? usos.find((u) => u?.id_uso === selectedUsoId) ?? null
+                ? usos.find((ul) => ul?.id_uso === selectedUsoId) ?? null
                 : null
             }
             onChange={handleUsoChange}
@@ -95,7 +95,7 @@ const AgregarActivo = () => {
             options={usuarios}
             loading={loadingUsuarios}
             value={
-              usuarios.find((u) => u?.id_usuario === selectedUsuarioId) ?? null
+              usuarios.find((ul) => ul?.id_usuario === selectedUsuarioId) ?? null
             }
             onChange={(_, newValue: Usuario | null) =>
               setSelectedUsuarioId(newValue ? newValue.id_usuario : null)

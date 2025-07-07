@@ -114,7 +114,7 @@ const ModalPasarAActivo: React.FC<ModalPasarAActivoProps> = ({ equipoId, open, o
           size="small"
           options={usos}
           getOptionLabel={(option) => option?.nombre || ""}
-          value={selectedUsoId ? usos.find((u) => u?.id_uso === selectedUsoId) : null}
+          value={selectedUsoId ? usos.find((ul) => ul?.id_uso === selectedUsoId) : null}
           onChange={(_, newValue) => setSelectedUsoId(newValue ? newValue.id_uso : null)}
           renderInput={(params) => <TextField {...params} label="Uso" variant="outlined" />}
           sx={{ marginBottom: 2 }}
@@ -124,7 +124,7 @@ const ModalPasarAActivo: React.FC<ModalPasarAActivoProps> = ({ equipoId, open, o
           size="small"
           options={usuarios}
           getOptionLabel={(option) => option?.nombre || ""}
-          value={selectedUsuarioId ? usuarios.find((u) => u?.id_usuario === selectedUsuarioId) : null}
+          value={selectedUsuarioId ? usuarios.find((ul) => ul?.id_usuario === selectedUsuarioId) : null}
           onChange={(_, newValue) => setSelectedUsuarioId(newValue ? newValue.id_usuario : null)}
           renderInput={(params) => <TextField {...params} label="Usuario" variant="outlined" />}
           sx={{ marginBottom: 2 }}
