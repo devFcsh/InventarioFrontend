@@ -37,8 +37,6 @@ export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSectio
       const data = await response.json();
       
       if (data.success) {
-        localStorage.removeItem("rol");
-        localStorage.clear();
         if (data.casLogoutUrl) {
           window.location.href = data.casLogoutUrl;
         } else {
@@ -46,12 +44,10 @@ export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSectio
         }
       } else {
         console.error("❌ Error en logout:", data);
-        localStorage.clear();
         window.location.href = "/";
       }
     } catch (error) {
       console.error("❌ Error durante logout:", error);
-      localStorage.clear();
       window.location.href = "/";
     } finally {
       setIsLoggingOut(false);

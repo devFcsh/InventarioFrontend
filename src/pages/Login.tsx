@@ -30,7 +30,7 @@ const Login = () => {
         window.location.href = "/activos";
       } else {
         console.log("❌ Usuario no autenticado, iniciando login...");
-        localStorage.removeItem("rol");
+        age.removeItem("rol");
         setStatus("redirecting");
         setTimeout(() => {
           window.location.href = `${API_BASE_URL}/auth/cas/login`;
