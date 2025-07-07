@@ -1,8 +1,4 @@
-import {
-  Autocomplete,
-  TextField,
-  Tooltip,
-} from "@mui/material";
+import { Autocomplete, TextField, Tooltip } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
@@ -30,7 +26,7 @@ import {
   ExportarSwitch,
 } from "../../../../types/Equipo/index.ts";
 import { useSnackbar } from "@context/SnackbarContext.tsx";
-
+import { useUser } from "@context/userContext.tsx";
 
 const Activos = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -65,6 +61,8 @@ const Activos = () => {
   const [inputInventario, setInputInventario] = useState("");
 
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+  const { rol } = useUser();
+  const unableAction = rol !== "administrador" && rol !== "editor";
 
   const { showMessage } = useSnackbar();
   const { perifericos } = usePerifericos();
@@ -130,13 +128,21 @@ const Activos = () => {
         const result = await eliminarEquipo(equipoId);
         if (result) {
           setShouldFetch(true);
-          showMessage(`Equipo con inventario ${inventario} eliminado.`, "success");
+          showMessage(
+            `Equipo con inventario ${inventario} eliminado.`,
+            "success"
+          );
         } else {
-          showMessage(`No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`, "error");
+          showMessage(
+            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`,
+            "error"
+          );
         }
       } catch (error) {
-        showMessage(`Error al eliminar el equipo con inventario ${inventario}.`, "error");
-
+        showMessage(
+          `Error al eliminar el equipo con inventario ${inventario}.`,
+          "error"
+        );
       }
     }
   };
@@ -160,14 +166,15 @@ const Activos = () => {
         showMessage(
           `No se pudieron eliminar los equipos: ${errorsInventarios.join(
             ", "
-          )} ya que están relacionados a una computadora`, "error");
+          )} ya que están relacionados a una computadora`,
+          "error"
+        );
       }
 
       setShouldFetch(true);
       setSelectedItems([]);
     } catch (error) {
       showMessage("Error al eliminar los equipos", "error");
-
     }
   };
 
@@ -181,17 +188,20 @@ const Activos = () => {
         if (result) {
           setShouldFetch(true);
           showMessage(
-            `Equipo con inventario ${inventario} pasado a bodega`
-          , "success");
+            `Equipo con inventario ${inventario} pasado a bodega`,
+            "success"
+          );
         } else {
           showMessage(
-            `No se puede pasar a bodega el equipo con inventario ${inventario}porque el equipo está asociado a una computadora`
-          , "error");
+            `No se puede pasar a bodega el equipo con inventario ${inventario}porque el equipo está asociado a una computadora`,
+            "error"
+          );
         }
       } catch (error) {
         showMessage(
-          `Error al pasar a bodega el equipo con inventario ${inventario}`
-        , "error");
+          `Error al pasar a bodega el equipo con inventario ${inventario}`,
+          "error"
+        );
       }
     }
   };
@@ -215,8 +225,9 @@ const Activos = () => {
         showMessage(
           `No se pudieron pasar los equipos con inventarios: ${errorsInventarios.join(
             ", "
-          )} a bodega ya que están relacionados a una computadora`
-        , "error");
+          )} a bodega ya que están relacionados a una computadora`,
+          "error"
+        );
       }
 
       setShouldFetch(true);
@@ -236,15 +247,20 @@ const Activos = () => {
         if (result) {
           setShouldFetch(true);
           showMessage(
-            `Equipo con inventario ${inventario} dado de baja`
-          , "success");
+            `Equipo con inventario ${inventario} dado de baja`,
+            "success"
+          );
         } else {
           showMessage(
-            `No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora`, "error");
+            `No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora`,
+            "error"
+          );
         }
       } catch (error) {
         showMessage(
-          `Error al dar de baja al equipo con inventario ${inventario}`, "error");
+          `Error al dar de baja al equipo con inventario ${inventario}`,
+          "error"
+        );
       }
     }
   };
@@ -268,8 +284,9 @@ const Activos = () => {
         showMessage(
           `Error al dar de baja los equipos con inventario ${errorsInventarios.join(
             ", "
-          )} ya que están relacionados a una computadora`
-        , "error");
+          )} ya que están relacionados a una computadora`,
+          "error"
+        );
       }
       setSelectedItems([]);
     } catch (error) {
@@ -290,7 +307,7 @@ const Activos = () => {
 
     setConfirmAction(() => async () => {
       try {
-      await pasarABodegaEquipos(selectedItems);
+        await pasarABodegaEquipos(selectedItems);
         showMessage("Equipo pasado a bodega con éxito", "success");
       } catch (error) {
         showMessage("Error al pasar equipo a bodega", "error");
@@ -653,8 +670,10 @@ const Activos = () => {
                 icon="gridicons:add"
                 width="30"
                 height="30"
-                className="text-green-900 hover:text-green-950"
-                onClick={handleOpenActivos}
+                className={`text-green-900 hover:text-green-950 ${
+                  unableAction ? "opacity-50 pointer-events-none" : ""
+                }`}
+                onClick={!unableAction ? handleOpenActivos : undefined}
               />
             </span>
           </Tooltip>
@@ -769,7 +788,6 @@ const Activos = () => {
             inputValue={inputInventario}
             onInputChange={(_, newInputValue) =>
               setInputInventario(newInputValue)
-
             }
             onChange={(_, newValue) => {
               if (typeof newValue === "string") {
@@ -822,6 +840,7 @@ const Activos = () => {
                       onChange={handleSelectAllChange}
                       checked={selectedItems.length === equipos.length}
                       className="mr-2"
+                      disabled={unableAction}
                     />
                   </Tooltip>
                   {selectedItems.length > 0 && (
@@ -832,8 +851,12 @@ const Activos = () => {
                             icon="weui:delete-outlined"
                             width="20"
                             height="20"
-                            onClick={handleDelete}
-                            className="cursor-pointer"
+                            onClick={!unableAction ? handleDelete : undefined}
+                            className={`cursor-pointer ${
+                              unableAction
+                                ? "opacity-50 pointer-events-none"
+                                : ""
+                            }`}
                           />
                         </span>
                       </Tooltip>
@@ -843,8 +866,12 @@ const Activos = () => {
                             icon="ph:arrow-fat-down-light"
                             width="20"
                             height="20"
-                            onClick={handleBaja}
-                            className="cursor-pointer"
+                            onClick={!unableAction ? handleBaja : undefined}
+                            className={`cursor-pointer ${
+                              unableAction
+                                ? "opacity-50 pointer-events-none"
+                                : ""
+                            }`}
                           />
                         </span>
                       </Tooltip>
@@ -854,8 +881,14 @@ const Activos = () => {
                             icon="lucide:warehouse"
                             width="20"
                             height="20"
-                            onClick={handlePasarABodega}
-                            className="cursor-pointer"
+                            onClick={
+                              !unableAction ? handlePasarABodega : undefined
+                            }
+                            className={`cursor-pointer ${
+                              unableAction
+                                ? "opacity-50 pointer-events-none"
+                                : ""
+                            }`}
                           />
                         </span>
                       </Tooltip>
@@ -919,15 +952,20 @@ const Activos = () => {
                           icon="ph:arrow-fat-down-light"
                           width="25"
                           height="25"
-                          onClick={() =>
-                            handleOpenModal(
-                              equipo.id_equipo,
-                              "Dar de baja equipo",
-                              `¿Estás seguro de que deseas dar de baja el equipo ${equipo.inventario}?`,
-                              bajaEquipo
-                            )
+                          onClick={
+                            !unableAction
+                              ? () =>
+                                  handleOpenModal(
+                                    equipo.id_equipo,
+                                    "Dar de baja equipo",
+                                    `¿Estás seguro de que deseas dar de baja el equipo ${equipo.inventario}?`,
+                                    bajaEquipo
+                                  )
+                              : undefined
                           }
-                          className="cursor-pointer"
+                          className={`cursor-pointer ${
+                            unableAction ? "opacity-50 pointer-events-none" : ""
+                          }`}
                         />
                       </span>
                     </Tooltip>
@@ -937,15 +975,20 @@ const Activos = () => {
                           icon="weui:delete-outlined"
                           width="25"
                           height="25"
-                          onClick={() =>
-                            handleOpenModal(
-                              equipo.id_equipo,
-                              "Eliminar equipo",
-                              `¿Estás seguro de que deseas eliminar el equipo con inventario ${equipo.inventario}?`,
-                              deleteEquipo
-                            )
+                          onClick={
+                            !unableAction
+                              ? () =>
+                                  handleOpenModal(
+                                    equipo.id_equipo,
+                                    "Eliminar equipo",
+                                    `¿Estás seguro de que deseas eliminar el equipo con inventario ${equipo.inventario}?`,
+                                    deleteEquipo
+                                  )
+                              : undefined
                           }
-                          className="cursor-pointer"
+                          className={`cursor-pointer ${
+                            unableAction ? "opacity-50 pointer-events-none" : ""
+                          }`}
                         />
                       </span>
                     </Tooltip>
@@ -956,6 +999,13 @@ const Activos = () => {
                         perifericos,
                         equipoName: equipo.periferico,
                       }}
+                      tabIndex={unableAction ? -1 : 0}
+                      aria-disabled={unableAction}
+                      style={
+                        unableAction
+                          ? { pointerEvents: "none", opacity: 0.5 }
+                          : {}
+                      }
                     >
                       <Tooltip title="Editar activo">
                         <span>
@@ -963,7 +1013,9 @@ const Activos = () => {
                             icon="mage:edit"
                             width="25"
                             height="25"
-                            className="cursor-pointer"
+                            className={`cursor-pointer ${
+                              unableAction ? "opacity-50" : ""
+                            }`}
                           />
                         </span>
                       </Tooltip>
@@ -974,15 +1026,20 @@ const Activos = () => {
                           icon="lucide:warehouse"
                           width="25"
                           height="25"
-                          className="cursor-pointer"
-                          onClick={() =>
-                            handleOpenModal(
-                              equipo.id_equipo,
-                              "Pasar equipo a bodega",
-                              `¿Estás seguro de que deseas pasar el equipo a bodega ${equipo.inventario}?`,
-                              pasarABodegaEquipo
-                            )
+                          onClick={
+                            !unableAction
+                              ? () =>
+                                  handleOpenModal(
+                                    equipo.id_equipo,
+                                    "Pasar equipo a bodega",
+                                    `¿Estás seguro de que deseas pasar el equipo a bodega ${equipo.inventario}?`,
+                                    pasarABodegaEquipo
+                                  )
+                              : undefined
                           }
+                          className={`cursor-pointer ${
+                            unableAction ? "opacity-50 pointer-events-none" : ""
+                          }`}
                         />
                       </span>
                     </Tooltip>
