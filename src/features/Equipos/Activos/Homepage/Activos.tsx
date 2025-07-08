@@ -956,7 +956,11 @@ const Activos = () => {
                   <td className="px-4 py-2">{equipo.uso}</td>
                   <td className="px-4 py-2">{equipo.edificio}</td>
                   <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
-                    <span>
+                    <span
+                      className={
+                        unableAction ? "opacity-50 pointer-events-none" : ""
+                      }
+                    >
                       <Icon
                         icon="ph:arrow-fat-down-light"
                         width="25"
@@ -972,12 +976,14 @@ const Activos = () => {
                                 )
                             : undefined
                         }
-                        className={`cursor-pointer ${
-                          unableAction ? "opacity-50 pointer-events-none" : ""
-                        }`}
+                        className="cursor-pointer"
                       />
                     </span>
-                    <span>
+                    <span
+                      className={
+                        unableAction ? "opacity-50 pointer-events-none" : ""
+                      }
+                    >
                       <Icon
                         icon="weui:delete-outlined"
                         width="25"
@@ -993,9 +999,7 @@ const Activos = () => {
                                 )
                             : undefined
                         }
-                        className={`cursor-pointer ${
-                          unableAction ? "opacity-50 pointer-events-none" : ""
-                        }`}
+                        className="cursor-pointer"
                       />
                     </span>
                     <Link
@@ -1018,13 +1022,15 @@ const Activos = () => {
                           icon="mage:edit"
                           width="25"
                           height="25"
-                          className={`cursor-pointer ${
-                            unableAction ? "opacity-50 pointer-events-none" : ""
-                          }`}
+                          className="cursor-pointer"
                         />
                       </span>
                     </Link>
-                    <span>
+                    <span
+                      className={
+                        unableAction ? "opacity-50 pointer-events-none" : ""
+                      }
+                    >
                       <Icon
                         icon="lucide:warehouse"
                         width="25"
@@ -1040,9 +1046,7 @@ const Activos = () => {
                                 )
                             : undefined
                         }
-                        className={`cursor-pointer ${
-                          unableAction ? "opacity-50 pointer-events-none" : ""
-                        }`}
+                        className="cursor-pointer"
                       />
                     </span>
                   </td>
