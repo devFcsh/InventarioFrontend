@@ -111,17 +111,6 @@ export const useInformacionGeneralError = (dataForm: InformacionGeneralDataForm)
         ["direccionIP"]: false
       }));
     }
-    if(tipo==="nombreEquipo" && value?.toString().length===14){
-      setInformacionGeneralErrors((prevErrors) => ({
-        ...prevErrors,
-        ["nombreEquipo"]: false
-      }));
-    }else{
-      setInformacionGeneralErrors((prevErrors) => ({
-        ...prevErrors,
-        ["nombreEquipo"]: true
-      }));
-    }
     
   };
 
