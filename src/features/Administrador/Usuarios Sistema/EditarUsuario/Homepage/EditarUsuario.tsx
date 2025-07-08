@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  TextField,
-  Button,
-  Autocomplete,
-} from "@mui/material";
+import { TextField, Button, Autocomplete } from "@mui/material";
 import useEditarUsuarioSistema from "../hooks/useEditarUsuarioSistema";
 import { useSnackbar } from "@context/SnackbarContext";
 import useRoles from "@hooks/useRoles";
@@ -16,24 +12,32 @@ const EditarUsuarioSistema = () => {
   const { usuario } = location.state || {};
 
   const [correo, setCorreo] = useState(usuario?.correo || "");
-  const [selectedRolId, setSelectedRolId] = useState<number | null>(
-  usuario?.id_rol ?? null
-);
 
   const { showMessage } = useSnackbar();
   const { roles, loading: loadingRoles, error: errorRoles } = useRoles();
 
-  const {
-    editarUsuarioSistema,
-    loading,
-    error,
-  } = useEditarUsuarioSistema();
+  const [selectedRolId, setSelectedRolId] = useState<number | null>(() => {
+    if (!usuario?.rol || !roles?.length) return null;
+    const rolObj = roles.find((r) => r.nombre === usuario.rol);
+    return rolObj ? rolObj.id_rol : null;
+  });
+  const { editarUsuarioSistema, loading, error } = useEditarUsuarioSistema();
 
   useEffect(() => {
     if (!usuario) {
       navigate("/usuariosSistema");
     }
   }, [usuario, navigate]);
+
+  useEffect(() => {
+    if (usuario?.rol && roles.length) {
+      const rolObj = roles.find((r) => r.nombre === usuario.rol);
+      if (rolObj && rolObj.id_rol !== selectedRolId) {
+        setSelectedRolId(rolObj.id_rol);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roles, usuario]);
 
   const handleSave = async () => {
     try {
@@ -88,22 +92,22 @@ const EditarUsuarioSistema = () => {
           />
 
           <Autocomplete
-  value={roles.find((rol) => rol.id_rol === selectedRolId) || null}
-  options={roles}
-  getOptionLabel={(option) => option?.nombre || ""}
-  onChange={(_, newValue) => {
-    setSelectedRolId(newValue ? newValue.id_rol : null);
-  }}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label="Rol"
-      variant="outlined"
-      size="small"
-      fullWidth
-    />
-  )}
-/>
+            value={roles.find((rol) => rol.id_rol === selectedRolId) || null}
+            options={roles}
+            getOptionLabel={(option) => option?.nombre || ""}
+            onChange={(_, newValue) => {
+              setSelectedRolId(newValue ? newValue.id_rol : null);
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Rol"
+                variant="outlined"
+                size="small"
+                fullWidth
+              />
+            )}
+          />
         </div>
       </div>
 
