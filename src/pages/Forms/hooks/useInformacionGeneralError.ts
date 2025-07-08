@@ -26,7 +26,6 @@ interface InformacionGeneralDataForm{
 }
 
 export const useInformacionGeneralError = (dataForm: InformacionGeneralDataForm) => {
-
   const [informacionGeneralErrors, setInformacionGeneralErrors] = useState<Record<string, boolean>>({
     "sistemaOperativo":false,
     "versionSO":false,
@@ -46,11 +45,15 @@ export const useInformacionGeneralError = (dataForm: InformacionGeneralDataForm)
       &&dataForm.dominio !==null && dataForm.nombreEquipo !=="" &&
       dataForm.versionOffice !==null && dataForm.protocolo !=="" && dataForm.antivirus !==null && dataForm.ram!==null &&dataForm.disco!==null
       && (dataForm.protocolo==="0"?validateIP(dataForm.direccionIP):true)
+      && dataForm.nombreEquipo.length === 14
+      && dataForm.procesador !== null
     ) return true
     return false;
   }
 
   const handleInformacionGeneralErrors = (formData: InformacionGeneralDataForm) => {
+    const newErrors: Record<string, boolean> = {};
+    
     const fieldsToCheck: (keyof InformacionGeneralDataForm)[] = [
         "sistemaOperativo",
         "versionSO",
@@ -58,56 +61,68 @@ export const useInformacionGeneralError = (dataForm: InformacionGeneralDataForm)
         "nombreEquipo",
         "versionOffice",
         "protocolo",
-        "direccionIP",
         "antivirus",
         "ram",
         "disco",
         "procesador"
     ];
+    
     fieldsToCheck.forEach((field) => {
-      if (formData[field] === null || formData[field] === "") {
-        setInformacionGeneralErrors((prevErrors) => ({
-          ...prevErrors,
-          [field]: true,
-        }));
-      }
-      if(field==="direccionIP" && formData["protocolo"]==="1"){
-        setInformacionGeneralErrors((prevErrors) => ({
-          ...prevErrors,
-          ["direccionIP"]: false,
-        }));
-      }
-      if(field==="nombreEquipo" && formData["nombreEquipo"].length!==14){
-        setInformacionGeneralErrors((prevErrors) => ({
-          ...prevErrors,
-          ["nombreEquipo"]: true
-        }));
-      }
+      newErrors[field] = formData[field] === null || formData[field] === "";
     });
+
+    if (formData.nombreEquipo && formData.nombreEquipo.length !== 14) {
+      newErrors["nombreEquipo"] = true;
+    }
+
+    if (formData.protocolo === "0") {
+      newErrors["direccionIP"] = !formData.direccionIP || !validateIP(formData.direccionIP);
+    } else {
+      newErrors["direccionIP"] = false;
+    }
+
+    setInformacionGeneralErrors(newErrors);
   };
 
   const handleUniqueInformacionGeneralError = (tipo: keyof InformacionGeneralDataForm, value: any) => {
-    if (tipo === "direccionIP") {
-      if (!validateIP(value)) {
-        setInformacionGeneralErrors((prevErrors) => ({
-          ...prevErrors,
-          ["direccionIP"]: true
-        }));
-      } else {
-        setInformacionGeneralErrors((prevErrors) => ({
-          ...prevErrors,
-          ["direccionIP"]: false
-        }));
+    setInformacionGeneralErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      
+      switch (tipo) {
+        case "direccionIP":
+          if (dataForm.protocolo === "0") {
+            newErrors["direccionIP"] = !value || !validateIP(value);
+          } else {
+            newErrors["direccionIP"] = false;
+          }
+          break;
+          
+        case "protocolo":
+          if (value === "1") {
+            newErrors["direccionIP"] = false;
+          } else if (value === "0") {
+            newErrors["direccionIP"] = !dataForm.direccionIP || !validateIP(dataForm.direccionIP);
+          }
+          newErrors["protocolo"] = !value;
+          break;
+          
+        case "nombreEquipo":
+          newErrors["nombreEquipo"] = !value || value.length !== 14;
+          break;
+          
+        default:
+          newErrors[tipo] = value === null || value === "";
+          break;
       }
-    }  
-    if(tipo==="protocolo" && value==="1"){
-      setInformacionGeneralErrors((prevErrors) => ({
-        ...prevErrors,
-        ["direccionIP"]: false
-      }));
-    }
-    
+      
+      return newErrors;
+    });
   };
 
-  return { informacionGeneralErrors,handleInformacionGeneralErrors, handleUniqueInformacionGeneralError,completeDatosInformacionGeneral};
+  return { 
+    informacionGeneralErrors,
+    handleInformacionGeneralErrors, 
+    handleUniqueInformacionGeneralError,
+    completeDatosInformacionGeneral
+  };
 };
