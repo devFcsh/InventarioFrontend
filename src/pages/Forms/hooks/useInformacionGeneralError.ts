@@ -87,11 +87,6 @@ export const useInformacionGeneralError = (dataForm: InformacionGeneralDataForm)
   };
 
   const handleUniqueInformacionGeneralError = (tipo: keyof InformacionGeneralDataForm, value: any) => {
-  
-    setInformacionGeneralErrors((prevErrors) => ({
-      ...prevErrors,
-      [tipo]: value === null || value === "" ? true : false,
-    }));
     if (tipo === "direccionIP") {
       if (!validateIP(value)) {
         setInformacionGeneralErrors((prevErrors) => ({
