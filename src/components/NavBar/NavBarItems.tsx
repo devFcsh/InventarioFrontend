@@ -17,7 +17,18 @@ const AdminSections = [
     { name: 'Usuarios Responsables', route: 'usuarios' },
     { name: 'Categorías', route: 'categorias' },
     { name: 'Usuarios Sistema', route: 'usuariosSistema' },
-    
+  ]},
+];
+
+const EditorSections = [
+  { name: 'Equipos', icon: <ComputerIcon />, subtypes: [
+    { name: 'Activos', route: 'activos' },
+    { name: 'Bodega', route: 'bodega' },
+    { name: 'Bajas', route: 'bajas' },
+  ]},
+  { name: 'Editor', icon: <AdminPanelSettingsIcon />, subtypes: [
+    { name: 'Usuarios Responsables', route: 'usuarios' },
+    { name: 'Categorías', route: 'categorias' },    
   ]},
 ];
 
@@ -32,6 +43,7 @@ export const NavBarItems: React.FC<NavBarItemsProps> = ({ currentSection, setCur
   const [openSections, setOpenSections] = useState<{ [key: string]: boolean }>({
     Equipos: false,
     Admin: false,
+    Editor: false,
   });
 
   const navigate = useNavigate();
@@ -49,10 +61,14 @@ export const NavBarItems: React.FC<NavBarItemsProps> = ({ currentSection, setCur
     }));
   };
 
-  const sections =
-    rol === "administrador" || rol === "editor"
-      ? AdminSections
-      : ConsultantSections;
+  let sections;
+  if (rol === "administrador") {
+    sections = AdminSections;
+  } else if (rol === "editor") {
+    sections = EditorSections;
+  } else {
+    sections = ConsultantSections;
+  }
 
   return (
     <>

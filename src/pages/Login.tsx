@@ -25,9 +25,14 @@ const Login = () => {
       const data = await response.json();
       console.log("📊 Estado de auth:", data);
 
-      if (data.authenticated) {
+      if (data.authenticated && data.rol) {
         console.log("✅ Usuario ya autenticado, redirigiendo a activos...");
         window.location.href = "/activos";
+      } else if (data.authenticated && !data.rol) {
+        console.log(
+          "⚠️ Usuario autenticado pero no registrado, redirigiendo a /no-registrado"
+        );
+        window.location.href = "/no-registrado";
       } else {
         console.log("❌ Usuario no autenticado, iniciando login...");
         setStatus("redirecting");

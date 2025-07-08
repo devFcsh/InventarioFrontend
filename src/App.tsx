@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { routesConfig } from "./router/routesConfig";
 import { ProtectedRoute } from "./router/ProtectedRoute";
+import NotRegistered from "@pages/NotRegistered";
 
 const App: React.FC = () => {
   const [currentSection, setCurrentSection] = useState<string>("");
@@ -16,6 +17,7 @@ const App: React.FC = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/no-registrado" element={<NotRegistered />} />
 
         {routesConfig.map(({ path, element, allowedRoles }) => (
           <Route
