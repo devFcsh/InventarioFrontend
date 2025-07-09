@@ -9,7 +9,7 @@ import { useObtenerComputadora } from "../features/Equipos/Activos/EditarActivo/
 import { useObtenerComputadoraActivo } from "../features/Equipos/Activos/EditarActivo/hooks/useObtenerEquipoSimpleActivo";
 import { useObtenerRedActivo } from "../features/Equipos/Activos/EditarActivo/hooks/useObtenerEquipoRedActivo";
 import { Periferico, Uso, Usuario } from "../types";
-import VisualizarComputadoraActivo from "features/Equipos/Activos/EditarActivo/pages/VisualizarComputadoraActivo";
+import VisualizarComputadoraActivo from "../features/Equipos/Activos/EditarActivo/pages/VisualizarComputadoraActivo";
 
 const computadores: string[] = ["Laptop", "Computadora"];
 
