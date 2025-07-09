@@ -22,6 +22,7 @@ import EditarUsuario from "../features/Administrador/Usuarios/EditarUsuario/Home
 import UsuariosSistema from "../features/Administrador/Usuarios Sistema/Homepage/UsuariosSistema";
 import EditarUsuarioSistema from "../features/Administrador/Usuarios Sistema/EditarUsuario/Homepage/EditarUsuario";
 import AgregarUsuarioSistema from "../features/Administrador/Usuarios Sistema/AgregarUsuario/Homepage/AgregarUsuarioSistema";
+import VisualizarActivo from "@pages/VisualizarActivo";
 
 export const routesConfig: RouteConfig[] = [
   {
@@ -67,6 +68,11 @@ export const routesConfig: RouteConfig[] = [
   {
     path: "/FormPMTM",
     element: <FormPMTM />,
+    allowedRoles: ["administrador", "editor"],
+  },
+  {
+    path: "/visualizarActivo",
+    element: <VisualizarActivo />,
     allowedRoles: ["administrador", "editor"],
   },
   {

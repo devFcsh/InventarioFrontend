@@ -956,6 +956,30 @@ const Activos = () => {
                   <td className="px-4 py-2">{equipo.uso}</td>
                   <td className="px-4 py-2">{equipo.edificio}</td>
                   <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
+                     <Link
+                      to="/visualizarActivo"
+                      state={{
+                        equipoId: equipo.id_equipo,
+                        perifericos,
+                        equipoName: equipo.periferico,
+                      }}
+                      tabIndex={unableAction ? -1 : 0}
+                      aria-disabled={unableAction}
+                      style={
+                        unableAction
+                          ? { pointerEvents: "none", opacity: 0.5 }
+                          : {}
+                      }
+                    >
+                      <span>
+                        <Icon
+                          icon="mage:edit"
+                          width="25"
+                          height="25"
+                          className="cursor-pointer"
+                        />
+                      </span>
+                    </Link>
                     <span
                       className={
                         unableAction ? "opacity-50 pointer-events-none" : ""
