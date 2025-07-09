@@ -1,6 +1,6 @@
-import { CircularProgress, Button } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import EditarActivoSimple from "../features/Equipos/Activos/EditarActivo/pages/EditarActivoSimple";
 import EditarActivoRed from "../features/Equipos/Activos/EditarActivo/pages/EditarActivoRed";
 import useUsos from "../hooks/useUsos";
@@ -18,7 +18,6 @@ const VisualizarActivo = () => {
   const [selectedUso, setSelectedUso] = useState<Uso | null>(null);
   const [selectedUsuario, setSelectedUsuario] = useState<Usuario | null>(null);
   const location = useLocation();
-  const navigate = useNavigate();
   const {
     equipoId,
     perifericos,
@@ -91,16 +90,6 @@ const VisualizarActivo = () => {
             )
           )}
         </div>
-        <div className="flex gap-4 mt-10">
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => navigate(-1)}
-            fullWidth
-          >
-            Salir
-          </Button>
-        </div>
       </div>
     );
   }
@@ -134,16 +123,6 @@ const VisualizarActivo = () => {
               equipoRedActivo={equipoRedActivo}
             />
           )}
-        </div>
-        <div className="flex gap-4 mt-10">
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => navigate(-1)}
-            fullWidth
-          >
-            Salir
-          </Button>
         </div>
       </div>
     );
@@ -203,16 +182,6 @@ const VisualizarActivo = () => {
               idUsuario={selectedUsuario?.id_usuario || null}
             />
           )}
-        </div>
-        <div className="flex gap-4 mt-10">
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => navigate(-1)}
-            fullWidth
-          >
-            Salir
-          </Button>
         </div>
       </div>
     );

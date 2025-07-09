@@ -555,7 +555,7 @@ const navigate = useNavigate();
       </div>
     </div>
 
-    <div className="mb-4 flex flex-col items-center">
+    <div className="mb-4 flex flex-col">
       <h2 className="text-xl font-semibold mb-10">Componentes</h2>
       <div className="flex-1 overflow-x-auto w-full flex justify-center">
         <table className="min-w-[600px] border-collapse border border-gray-300">
