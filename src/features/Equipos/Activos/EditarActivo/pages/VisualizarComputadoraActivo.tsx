@@ -522,67 +522,68 @@ const navigate = useNavigate();
       />
     </div>
 
-    <div className="mb-4">
-      <h2 className="text-xl font-semibold mb-5">Cargar Imagen</h2>
-      <div className="flex flex-col items-center gap-4">
-        <input
-        type="file"
-        accept="image/*"
-        onChange={handleImageChange}
-        ref={fileInputRef}
-        style={{ display: "none" }}
-        disabled
-        />
-        <div
-        className="w-full max-w-sm h-48 border border-dashed border-gray-300 flex items-center justify-center"
-        >
-        {image ? (
-          <img
-            src={URL.createObjectURL(image)}
-            alt="Vista previa"
-            className="w-full h-full object-cover"
+    <div className="mb-4 flex gap-8 items-start">
+      <div className="flex-1">
+        <h2 className="text-xl font-semibold mb-5">Cargar Imagen</h2>
+        <div className="flex flex-col items-center gap-4">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            disabled
           />
-        ) : equipo.imagenRuta ? (
-          <img
-            src={`http://localhost:5000${equipo.imagenRuta}`}
-            alt="Imagen del equipo"
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <p className="text-gray-500">Sin imagen</p>
-        )}
+          <div
+            className="w-full max-w-sm h-48 border border-dashed border-gray-300 flex items-center justify-center"
+          >
+            {image ? (
+              <img
+                src={URL.createObjectURL(image)}
+                alt="Vista previa"
+                className="w-full h-full object-cover"
+              />
+            ) : equipo.imagenRuta ? (
+              <img
+                src={`http://localhost:5000${equipo.imagenRuta}`}
+                alt="Imagen del equipo"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <p className="text-gray-500">Sin imagen</p>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-
-    <div className="mb-4 flex flex-col">
-      <h2 className="text-xl font-semibold mb-10">Componentes</h2>
-      <div className="flex-1 overflow-x-auto w-full flex justify-center">
-        <table className="min-w-[600px] border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-100 border-b">
-            <th className="py-2 px-4 border">Periférico</th>
-            <th className="py-2 px-4 border">Marca</th>
-            <th className="py-2 px-4 border">Modelo</th>
-            <th className="py-2 px-4 border">Serie</th>
-            <th className="py-2 px-4 border">Inventario</th>
-            <th className="py-2 px-1 border">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {componentes.map((comp, index) => (
-            <tr key={index}>
-            <td className="py-2 px-4 border">
-              {comp.periferico?.nombre}
-            </td>
-            <td className="py-2 px-4 border">{comp.marca?.nombre}</td>
-            <td className="py-2 px-4 border">{comp.modelo?.nombre}</td>
-            <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
-            <td className="py-2 px-4 border">{comp.inventario}</td>
-            </tr>
-          ))}
-        </tbody>
-        </table>
+      <div className="flex-1 flex flex-col">
+        <h2 className="text-xl font-semibold mb-5">Componentes</h2>
+        <div className="flex-1 overflow-x-auto w-full flex justify-center">
+          <table className="min-w-[600px] border-collapse border border-gray-300">
+            <thead>
+              <tr className="bg-gray-100 border-b">
+                <th className="py-2 px-4 border">Periférico</th>
+                <th className="py-2 px-4 border">Marca</th>
+                <th className="py-2 px-4 border">Modelo</th>
+                <th className="py-2 px-4 border">Serie</th>
+                <th className="py-2 px-4 border">Inventario</th>
+                <th className="py-2 px-1 border">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {componentes.map((comp, index) => (
+                <tr key={index}>
+                  <td className="py-2 px-4 border">
+                    {comp.periferico?.nombre}
+                  </td>
+                  <td className="py-2 px-4 border">{comp.marca?.nombre}</td>
+                  <td className="py-2 px-4 border">{comp.modelo?.nombre}</td>
+                  <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
+                  <td className="py-2 px-4 border">{comp.inventario}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
     <div>
