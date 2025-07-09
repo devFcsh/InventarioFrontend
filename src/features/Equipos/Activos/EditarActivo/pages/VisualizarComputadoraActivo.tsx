@@ -524,7 +524,7 @@ const navigate = useNavigate();
 
     <div className="mb-4 flex gap-8 items-start">
       <div className="flex-1">
-        <h2 className="text-xl font-semibold mb-5">Cargar Imagen</h2>
+        <h2 className="text-xl font-semibold mb-5">Imagen</h2>
         <div className="flex flex-col items-center gap-4">
           <input
             type="file"
@@ -566,7 +566,6 @@ const navigate = useNavigate();
                 <th className="py-2 px-4 border">Modelo</th>
                 <th className="py-2 px-4 border">Serie</th>
                 <th className="py-2 px-4 border">Inventario</th>
-                <th className="py-2 px-1 border">Acciones</th>
               </tr>
             </thead>
             <tbody>
