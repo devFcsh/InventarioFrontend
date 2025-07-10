@@ -73,7 +73,7 @@ export const routesConfig: RouteConfig[] = [
   {
     path: "/visualizarActivo",
     element: <VisualizarActivo />,
-    allowedRoles: ["administrador", "editor"],
+    allowedRoles: ["administrador", "editor", "consultor"],
   },
   {
     path: "/editarActivo",
