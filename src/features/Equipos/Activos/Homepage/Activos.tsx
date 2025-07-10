@@ -965,13 +965,6 @@ const Activos = () => {
                         perifericos,
                         equipoName: equipo.periferico,
                         }}
-                        tabIndex={unableAction ? -1 : 0}
-                        aria-disabled={unableAction}
-                        style={
-                        unableAction
-                          ? { pointerEvents: "none", opacity: 0.5 }
-                          : {}
-                        }
                       >
                         <Icon
                         icon="basil:info-rect-outline"
