@@ -23,6 +23,7 @@ import UsuariosSistema from "../features/Administrador/Usuarios Sistema/Homepage
 import EditarUsuarioSistema from "../features/Administrador/Usuarios Sistema/EditarUsuario/Homepage/EditarUsuario";
 import AgregarUsuarioSistema from "../features/Administrador/Usuarios Sistema/AgregarUsuario/Homepage/AgregarUsuarioSistema";
 import VisualizarActivo from "@pages/VisualizarActivo";
+import VisualizarBodega from "@pages/VisualizarBodega";
 
 export const routesConfig: RouteConfig[] = [
   {
@@ -73,6 +74,11 @@ export const routesConfig: RouteConfig[] = [
   {
     path: "/visualizarActivo",
     element: <VisualizarActivo />,
+    allowedRoles: ["administrador", "editor", "consultor"],
+  },
+  {
+    path: "/visualizarBodega",
+    element: <VisualizarBodega />,
     allowedRoles: ["administrador", "editor", "consultor"],
   },
   {
