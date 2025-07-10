@@ -65,28 +65,6 @@ export const StepInformacionGeneralSAP = ({
               handleUniqueInformacionGeneralError("mac", value);
             }}
           />
-          <TextField
-            label="Nombre Equipo"
-            placeholder="Nombre Equipo"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={informacionGeneralDataSAPForm.nombreEquipo}
-            error={!!informacionGeneralSAPErrors.nombreEquipo}
-            helperText={
-              informacionGeneralSAPErrors.nombreEquipo
-                ? "Por favor escribir un nombre de equipo válido"
-                : ""
-            }
-            onChange={(e) => {
-              let value = e.target.value;
-              if (value !== null && value.length > 10) {
-                value = value.slice(0, 10);
-              }
-              handleInformacionGeneralSAPChange("nombreEquipo", value);
-              handleUniqueInformacionGeneralError("nombreEquipo", value);
-            }}
-          />
           {periferico !== "AP" ? (
             <>
               <TextField
