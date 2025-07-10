@@ -1,8 +1,6 @@
 import { CircularProgress } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import EditarActivoSimple from "../features/Equipos/Activos/EditarActivo/pages/EditarActivoSimple";
-import EditarActivoRed from "../features/Equipos/Activos/EditarActivo/pages/EditarActivoRed";
 import useUsos from "../hooks/useUsos";
 import useUsuariosPorUso from "../hooks/useUsuariosPorUso";
 import { useObtenerComputadora } from "../features/Equipos/Activos/EditarActivo/hooks/useComputadora";
@@ -10,6 +8,8 @@ import { useObtenerComputadoraActivo } from "../features/Equipos/Activos/EditarA
 import { useObtenerRedActivo } from "../features/Equipos/Activos/EditarActivo/hooks/useObtenerEquipoRedActivo";
 import { Periferico, Uso, Usuario } from "../types";
 import VisualizarComputadoraActivo from "../features/Equipos/Activos/EditarActivo/pages/VisualizarComputadoraActivo";
+import VisualizarActivoRed from "features/Equipos/Activos/EditarActivo/pages/VisualizarActivoRed";
+import VisualizarActivoSimple from "features/Equipos/Activos/EditarActivo/pages/VisualizarActivoSimple";
 
 const computadores: string[] = ["Laptop", "Computadora"];
 
@@ -118,7 +118,7 @@ const VisualizarActivo = () => {
             </div>
           </div>
           {perifericoId && equipoRedActivo && (
-            <EditarActivoRed
+            <VisualizarActivoRed
               perifericoName={equipoName}
               equipoRedActivo={equipoRedActivo}
             />
@@ -176,10 +176,9 @@ const VisualizarActivo = () => {
             </div>
           </div>
           {perifericoId && equipoSimpleActivo && (
-            <EditarActivoSimple
+            <VisualizarActivoSimple
               perifericoName={equipoName}
               equipoSimpleActivo={equipoSimpleActivo}
-              idUsuario={selectedUsuario?.id_usuario || null}
             />
           )}
         </div>
