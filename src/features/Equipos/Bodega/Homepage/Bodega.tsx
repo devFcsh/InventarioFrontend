@@ -77,6 +77,7 @@ const Bodega = () => {
 
   const { rol } = useUser();
   const unableAction = rol !== "administrador" && rol !== "editor";
+  const unableActionEditor = rol !== "administrador";
 
   const filtros = {
     perifericoId: inputPeriferico || "",
@@ -761,14 +762,14 @@ const Bodega = () => {
                       <Tooltip title="Eliminar Equipos">
                         <span
                           className={
-                            unableAction ? "opacity-50 pointer-events-none" : ""
+                            unableActionEditor ? "opacity-50 pointer-events-none" : ""
                           }
                         >
                           <Icon
                             icon="weui:delete-outlined"
                             width="20"
                             height="20"
-                            onClick={!unableAction ? handleDelete : undefined}
+                            onClick={!unableActionEditor ? handleDelete : undefined}
                             className="cursor-pointer"
                           />
                         </span>
@@ -878,7 +879,7 @@ const Bodega = () => {
                     <Tooltip title="Eliminar equipo">
                       <span
                         className={
-                          unableAction ? "opacity-50 pointer-events-none" : ""
+                          unableActionEditor ? "opacity-50 pointer-events-none" : ""
                         }
                       >
                         <Icon
@@ -886,7 +887,7 @@ const Bodega = () => {
                           width="25"
                           height="25"
                           onClick={
-                            !unableAction
+                            !unableActionEditor
                               ? () =>
                                   handleOpenModal(
                                     equipo.id_equipo,

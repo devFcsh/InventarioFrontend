@@ -1,8 +1,4 @@
-import {
-  Autocomplete,
-  TextField,
-  Tooltip,
-} from "@mui/material";
+import { Autocomplete, TextField, Tooltip } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
@@ -17,6 +13,8 @@ import useModelos from "@hooks/useModelos";
 import useSeries from "@hooks/useSeries";
 import { useInventario } from "@hooks/useInventario";
 import { useSnackbar } from "@context/SnackbarContext";
+import { useSacarEquipoDeBaja } from "../hooks/useSacarEquipoDeBaja";
+import { useUser } from "@context/userContext";
 
 const Bajas = () => {
   const [inputPeriferico, setInputPeriferico] = useState("");
@@ -58,6 +56,9 @@ const Bajas = () => {
   const { modelos } = useModelos();
   const { series } = useSeries();
   const { inventarios } = useInventario();
+  const { useSacarEquipoDeBaja: sacarEquipoDeBaja } = useSacarEquipoDeBaja();
+  const { rol } = useUser();
+  const unableActionEditor = rol !== "administrador";
 
   const filtros = {
     perifericoId: inputPeriferico || "",
@@ -101,6 +102,34 @@ const Bajas = () => {
     handleCloseModal();
   };
 
+  const handleSacarDeBaja = async (equipoId: string) => {
+    if (equipoId) {
+      const inventario = equiposBaja.find(
+        (equipo) => equipoId === equipo.id_equipo
+      )?.inventario;
+      try {
+        const result = await sacarEquipoDeBaja(equipoId, "baja");
+        if (result) {
+          setShouldFetch(true);
+          showMessage(
+            `Equipo con inventario ${inventario} sacado de baja exitosamente.`,
+            "success"
+          );
+        } else {
+          showMessage(
+            `No se pudo sacar de baja el equipo con inventario ${inventario}.`,
+            "error"
+          );
+        }
+      } catch (error) {
+        showMessage(
+          `Error al sacar de baja el equipo con inventario ${inventario}.`,
+          "error"
+        );
+      }
+    }
+  };
+
   const deleteEquipo = async (equipoId: string) => {
     if (equipoId) {
       const inventario = equiposBaja.filter(
@@ -110,15 +139,21 @@ const Bajas = () => {
         const result = await eliminarEquipo(equipoId);
         if (result) {
           setShouldFetch(true);
-          showMessage(`Equipo con inventario ${inventario} eliminado.`, "success");
+          showMessage(
+            `Equipo con inventario ${inventario} eliminado.`,
+            "success"
+          );
         } else {
           showMessage(
-            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`, "error");
+            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`,
+            "error"
+          );
         }
       } catch (error) {
         showMessage(
-          `Error al eliminar el equipo con inventario ${inventario}.`, "error");
-
+          `Error al eliminar el equipo con inventario ${inventario}.`,
+          "error"
+        );
       }
     }
   };
@@ -139,7 +174,9 @@ const Bajas = () => {
         showMessage(
           `No se pudieron eliminar los equipos: ${errors.join(
             ", "
-          )} ya que están relacionados a una computadora`, "error");
+          )} ya que están relacionados a una computadora`,
+          "error"
+        );
       }
 
       setShouldFetch(true);
@@ -488,22 +525,58 @@ const Bajas = () => {
                         />
                       </span>
                     </Tooltip> */}
-                    <Tooltip title="Eliminar Equipo">
-                      <span>
-                        <Icon
-                          icon="weui:delete-outlined"
-                          width="25"
-                          height="25"
-                          onClick={() =>
+                    <Tooltip title="Sacar de baja">
+                      <span
+                      className={
+                        unableActionEditor
+                        ? "opacity-50 pointer-events-none"
+                        : ""
+                      }
+                      >
+                      <Icon
+                        icon="streamline-sharp:upload-computer"
+                        width="25"
+                        height="25"
+                        onClick={
+                        !unableActionEditor
+                          ? () =>
                             handleOpenModal(
-                              equipo.id_equipo,
-                              "Eliminar equipo",
-                              `¿Estás seguro de que deseas eliminar el equipo ${equipo.inventario}?`,
-                              deleteEquipo
+                            equipo.id_equipo,
+                            "Sacar equipo de baja",
+                            `¿Estás seguro de que deseas sacar de baja el equipo ${equipo.inventario}?`,
+                            handleSacarDeBaja
                             )
-                          }
-                          className="cursor-pointer"
-                        />
+                          : undefined
+                        }
+                        className="cursor-pointer"
+                      />
+                      </span>
+                    </Tooltip>
+                    <Tooltip title="Eliminar Equipo">
+                      <span
+                      className={
+                        unableActionEditor
+                        ? "opacity-50 pointer-events-none"
+                        : ""
+                      }
+                      >
+                      <Icon
+                        icon="weui:delete-outlined"
+                        width="25"
+                        height="25"
+                        onClick={
+                        !unableActionEditor
+                          ? () =>
+                            handleOpenModal(
+                            equipo.id_equipo,
+                            "Eliminar equipo",
+                            `¿Estás seguro de que deseas eliminar el equipo ${equipo.inventario}?`,
+                            deleteEquipo
+                            )
+                          : undefined
+                        }
+                        className="cursor-pointer"
+                      />
                       </span>
                     </Tooltip>
                   </td>

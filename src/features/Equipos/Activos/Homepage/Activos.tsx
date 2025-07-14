@@ -63,6 +63,7 @@ const Activos = () => {
   const [shouldFetch, setShouldFetch] = useState<boolean>(false);
   const { rol } = useUser();
   const unableAction = rol !== "administrador" && rol !== "editor";
+  const unableActionEditor = rol !== "administrador";
 
   const { showMessage } = useSnackbar();
   const { perifericos } = usePerifericos();
@@ -860,9 +861,9 @@ const Activos = () => {
                             icon="weui:delete-outlined"
                             width="20"
                             height="20"
-                            onClick={!unableAction ? handleDelete : undefined}
+                            onClick={!unableActionEditor ? handleDelete : undefined}
                             className={`cursor-pointer ${
-                              unableAction
+                              unableActionEditor
                                 ? "opacity-50 pointer-events-none"
                                 : ""
                             }`}
@@ -884,6 +885,7 @@ const Activos = () => {
                           />
                         </span>
                       </Tooltip>
+                      {/** 
                       <Tooltip title="Pasar activos a bodega">
                         <span>
                           <Icon
@@ -901,6 +903,7 @@ const Activos = () => {
                           />
                         </span>
                       </Tooltip>
+                      */}
                     </>
                   )}
                 </th>
@@ -1003,7 +1006,7 @@ const Activos = () => {
                     <Tooltip title="Eliminar equipo">
                       <span
                         className={
-                          unableAction ? "opacity-50 pointer-events-none" : ""
+                          unableActionEditor ? "opacity-50 pointer-events-none" : ""
                         }
                       >
                         <Icon
@@ -1011,7 +1014,7 @@ const Activos = () => {
                           width="25"
                           height="25"
                           onClick={
-                            !unableAction
+                            !unableActionEditor
                               ? () =>
                                   handleOpenModal(
                                     equipo.id_equipo,
