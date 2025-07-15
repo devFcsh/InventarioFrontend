@@ -885,7 +885,7 @@ const Activos = () => {
                           />
                         </span>
                       </Tooltip>
-                      {/** 
+                      
                       <Tooltip title="Pasar activos a bodega">
                         <span>
                           <Icon
@@ -903,7 +903,7 @@ const Activos = () => {
                           />
                         </span>
                       </Tooltip>
-                      */}
+                      
                     </>
                   )}
                 </th>
