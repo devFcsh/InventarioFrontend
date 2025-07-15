@@ -1,4 +1,5 @@
 import { useUser } from '@context/userContext';
+import Loader from '@pages/Loader';
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
@@ -12,9 +13,7 @@ export const ProtectedRoute: React.FC<Props> = ({ element, allowedRoles }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div>Verificando autenticación...</div>
-      </div>
+      <Loader/>
     );
   }
 
