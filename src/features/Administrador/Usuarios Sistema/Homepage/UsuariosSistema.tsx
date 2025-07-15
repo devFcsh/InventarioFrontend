@@ -11,7 +11,6 @@ import { useSnackbar } from "@context/SnackbarContext";
 import { UsuarioSistema } from "../../../../types/UsuarioSistema";
 import useRoles from "@hooks/useRoles";
 
-
 const UsuariosSistema = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -125,7 +124,7 @@ const UsuariosSistema = () => {
             </Tooltip>
           </Link>
         </div>
-        <div className="flex flex-col w-full md:flex-row gap-4 md:gap-2 my-10">
+        <div className="flex flex-wrap gap-4 my-10">
           <Autocomplete
             size="small"
             disablePortal
@@ -136,7 +135,7 @@ const UsuariosSistema = () => {
             renderInput={(params) => (
               <TextField {...params} label="Rol" variant="outlined" />
             )}
-            className="w-full md:w-1/3"
+            className="w-full md:w-cmbox"
           />
           <Autocomplete
             size="small"
@@ -148,10 +147,10 @@ const UsuariosSistema = () => {
               <TextField {...params} label="Filas" variant="outlined" />
             )}
             value={filas.find((option) => option.id === rowsPerPage)}
-            className="w-full md:w-1/2"
+            className="w-full md:w-cmbox"
           />
           <button
-            className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/3"
+            className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/5"
             onClick={handleBuscar}
           >
             Buscar

@@ -126,7 +126,7 @@ const Usuarios = () => {
     <div className="flex flex-col p-4">
       <div className="mb-4">
         <div className="flex gap-2 items-center">
-          <h1 className="text-2xl font-bold my-5">Consulta de Usuarios Responsables</h1>
+          <h1 className="text-2xl font-bold my-5">Usuarios Responsables</h1>
           <Link to={{ pathname: "/agregarUsuario" }}>
             <Tooltip title="Agregar Usuario">
               <span>
