@@ -1,9 +1,9 @@
 import clienteAxios from '../../../../hooks';
 
 export const useSacarEquipoDeBaja = () => {
-    const useSacarEquipoDeBaja = async (equipoId: string, tipo: string) => {
+    const useSacarEquipoDeBaja = async (equipoId: string) => {
         try {
-            const response = await clienteAxios.put(`/equipos/sacarEquipoBaja/${equipoId}`, {tipo});
+            const response = await clienteAxios.put(`/equipos/sacarEquipoBaja/${equipoId}`);
             if (response.status === 200) {
                 return true;
             } else {

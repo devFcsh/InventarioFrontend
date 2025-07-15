@@ -108,7 +108,7 @@ const Bajas = () => {
         (equipo) => equipoId === equipo.id_equipo
       )?.inventario;
       try {
-        const result = await sacarEquipoDeBaja(equipoId, "baja");
+        const result = await sacarEquipoDeBaja(equipoId);
         if (result) {
           setShouldFetch(true);
           showMessage(
