@@ -13,6 +13,7 @@ import useEditarUsuario from "../hooks/useEditarUsuario";
 import ModalCambiarUsuario from "../components/ModalCambiarUsuario";
 import useUsos from "@hooks/useUsos";
 import { useSnackbar } from "@context/SnackbarContext";
+import Loader from "@pages/Loader";
 
 const EditarUsuario = () => {
   const location = useLocation();
@@ -98,7 +99,7 @@ const EditarUsuario = () => {
   };
 
   if (loadingEquipos || loadingEdicion || loadingUsos) {
-    return <div>Cargando...</div>;
+    return <Loader/>;
   }
 
   if (errorEquipos || errorEdicion || errorUsos) {

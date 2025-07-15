@@ -1,4 +1,4 @@
-import { Autocomplete, TextField, CircularProgress } from "@mui/material";
+import { Autocomplete, TextField } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import EditarComputadoraActivo from "../features/Equipos/Activos/EditarActivo/pages/EditarComputadoraActivo";
@@ -10,6 +10,7 @@ import { useObtenerComputadoraActivo } from "../features/Equipos/Activos/EditarA
 import EditarActivoSimple from "../features/Equipos/Activos/EditarActivo/pages/EditarActivoSimple";
 import { useObtenerRedActivo } from "../features/Equipos/Activos/EditarActivo/hooks/useObtenerEquipoRedActivo";
 import EditarActivoRed from "../features/Equipos/Activos/EditarActivo/pages/EditarActivoRed";
+import Loader from "./Loader";
 
 const computadores: string[] = ["Laptop", "Computadora"];
 
@@ -54,7 +55,7 @@ const EditarActivo = () => {
       }
     }, [equipo, usuarios]);
 
-    if (loading) return <CircularProgress />;
+    if (loading) return <Loader/>;
     if (error) return <div>Error al cargar los datos del equipo</div>;
     return (
       <div className="w-full max-w-7xl mx-auto p-4">
@@ -159,7 +160,7 @@ const EditarActivo = () => {
       }
     }, [equipoRedActivo, perifericos]);
 
-    if (loadingActivoRed) return <CircularProgress />;
+    if (loadingActivoRed) return <Loader/>;
     if (errorActivoRed) return <div>Error al cargar los datos del equipo</div>;
     return (
       <div className="w-full max-w-7xl mx-auto p-4">
@@ -226,7 +227,7 @@ const EditarActivo = () => {
       }
     }, [equipoSimpleActivo, usuarios]);
 
-    if (loadingActivoSimple) return <CircularProgress />;
+    if (loadingActivoSimple) return <Loader/>;
     if (errorActivoSimple) return <div>Error al cargar los datos del equipo</div>;
     return (
       <div className="w-full max-w-7xl mx-auto p-4">

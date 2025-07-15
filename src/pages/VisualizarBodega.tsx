@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Periferico } from "../types";
@@ -8,6 +7,7 @@ import { useObtenerRedBodega } from "../features/Equipos/Bodega/EditarBodega/hoo
 import VisualizarComputadoraBodega from "../features/Equipos/Bodega/EditarBodega/Pages/VisualizarComputadoraBodega";
 import VisualizarBodegaRed from "../features/Equipos/Bodega/EditarBodega/Pages/VisualizarBodegaRed";
 import VisualizarBodegaSimple from "../features/Equipos/Bodega/EditarBodega/Pages/VisualizarBodegaSimple";
+import Loader from "./Loader";
 
 const computadores: string[] = ["Laptop", "Computadora"];
 
@@ -33,7 +33,7 @@ const VisualizarBodega = () => {
       }
     }, [equipoBodega, perifericos]);
 
-    if (loading) return <CircularProgress />;
+    if (loading) return <Loader/>;
     if (error) return <div>Error al cargar los datos del equipo</div>;
 
     return (
@@ -80,7 +80,7 @@ const VisualizarBodega = () => {
       }
     }, [equipoRedBodega, perifericos]);
 
-    if (loading) return <CircularProgress />;
+    if (loading) return <Loader/>;
     if (error) return <div>Error al cargar los datos del equipo</div>;
 
     return (
@@ -118,7 +118,7 @@ const VisualizarBodega = () => {
       }
     }, [equipoSimpleBodega, perifericos]);
 
-    if (loading) return <CircularProgress />;
+    if (loading) return <Loader/>;
     if (error) return <div>Error al cargar los datos del equipo</div>;
 
     return (

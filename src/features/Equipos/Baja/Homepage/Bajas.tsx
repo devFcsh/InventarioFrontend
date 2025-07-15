@@ -15,6 +15,7 @@ import { useInventario } from "@hooks/useInventario";
 import { useSnackbar } from "@context/SnackbarContext";
 import { useSacarEquipoDeBaja } from "../hooks/useSacarEquipoDeBaja";
 import { useUser } from "@context/userContext";
+import Loader from "@pages/Loader";
 
 const Bajas = () => {
   const [inputPeriferico, setInputPeriferico] = useState("");
@@ -439,7 +440,7 @@ const Bajas = () => {
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {loading ? (
-          <p>Cargando equipos...</p>
+          <Loader/>
         ) : error ? (
           <p>Error al cargar los equipos</p>
         ) : (

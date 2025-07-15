@@ -11,6 +11,7 @@ import { filas } from "../../../../data";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
 import useEliminarUsuario from "../hooks/useEliminarUsuario";
 import { useSnackbar } from "@context/SnackbarContext";
+import Loader from "@pages/Loader";
 
 const Usuarios = () => {
   const [selectedUso, setSelectedUso] = useState<string | null>(null);
@@ -194,7 +195,7 @@ const Usuarios = () => {
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {loading ? (
-          <p>Cargando usuarios responsables...</p>
+          <Loader/>
         ) : error ? (
           <p>Error al cargar los usuarios responsables</p>
         ) : (

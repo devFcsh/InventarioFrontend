@@ -1,4 +1,4 @@
-import { Autocomplete, TextField, CircularProgress } from "@mui/material";
+import { Autocomplete, TextField } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import EditarComputadoraBodega from "../features/Equipos/Bodega/EditarBodega/Pages/EditarComputadoraBodega";
@@ -8,6 +8,7 @@ import { useObtenerEquipoSimpleBodega } from '../features/Equipos/Bodega/EditarB
 import EditarBodegaSimple from "../features/Equipos/Bodega/EditarBodega/Pages/EditarBodegaSimple";
 import { useObtenerRedBodega } from "../features/Equipos/Bodega/EditarBodega/hooks/useObtenerEquipoRedBodega";
 import EditarBodegaRed from "../features/Equipos/Bodega/EditarBodega/Pages/EditarBodegaRed";
+import Loader from "./Loader";
 
 const computadores: string[] = ["Laptop", "Computadora"];
 
@@ -32,7 +33,7 @@ export const EditarBodega = () => {
       }
     }, [equipoBodega, perifericos]);
 
-    if (loading) return <CircularProgress />;
+    if (loading) return <Loader/>;
     if (error) return <div>Error al cargar los datos del equipo</div>;
     
     return (
@@ -102,7 +103,7 @@ export const EditarBodega = () => {
       }
     }, [equipoRedBodega, perifericos]);
 
-    if (loading) return <CircularProgress />;
+    if (loading) return <Loader/>;
     if (error) return <div>Error al cargar los datos del equipo</div>;
     
     return (
@@ -166,7 +167,7 @@ export const EditarBodega = () => {
       }
     }, [equipoSimpleBodega, perifericos]);
 
-    if (loading) return <CircularProgress />;
+    if (loading) return <Loader/>;
     if (error) return <div>Error al cargar los datos del equipo</div>;
     
     return (

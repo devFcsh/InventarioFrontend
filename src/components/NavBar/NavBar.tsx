@@ -10,6 +10,7 @@ import { Drawer as MuiDrawer } from '@mui/material';
 import { NavBarProps } from "../PropsInterface";
 import { Link } from "react-router-dom";
 import { useUser } from "@context/userContext";
+import Loader from "@pages/Loader";
 
 export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSection }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -17,8 +18,7 @@ export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSectio
   const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
   const { user, rol, loading } = useUser();
 
-  if(loading) return null;
-
+  if(loading) return <Loader/>;
 
   const handleLogout = async () => {
     if (isLoggingOut) return;

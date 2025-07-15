@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import useUsos from "../hooks/useUsos";
@@ -10,6 +9,7 @@ import { Periferico, Uso, Usuario } from "../types";
 import VisualizarComputadoraActivo from "../features/Equipos/Activos/EditarActivo/pages/VisualizarComputadoraActivo";
 import VisualizarActivoRed from "../features/Equipos/Activos/EditarActivo/pages/VisualizarActivoRed";
 import VisualizarActivoSimple from "../features/Equipos/Activos/EditarActivo/pages/VisualizarActivoSimple";
+import Loader from "./Loader";
 
 const computadores: string[] = ["Laptop", "Computadora"];
 
@@ -54,7 +54,7 @@ const VisualizarActivo = () => {
       }
     }, [equipo, usuarios]);
 
-    if (loading) return <CircularProgress />;
+    if (loading) return <Loader/>;
     if (error) return <div>Error al cargar los datos del equipo</div>;
     return (
       <div className="w-full max-w-7xl mx-auto p-4">
@@ -105,7 +105,7 @@ const VisualizarActivo = () => {
       }
     }, [equipoRedActivo, perifericos]);
 
-    if (loadingActivoRed) return <CircularProgress />;
+    if (loadingActivoRed) return <Loader/>;
     if (errorActivoRed) return <div>Error al cargar los datos del equipo</div>;
     return (
       <div className="w-full max-w-7xl mx-auto p-4">
@@ -155,7 +155,7 @@ const VisualizarActivo = () => {
       }
     }, [equipoSimpleActivo, usuarios]);
 
-    if (loadingActivoSimple) return <CircularProgress />;
+    if (loadingActivoSimple) return <Loader/>;
     if (errorActivoSimple) return <div>Error al cargar los datos del equipo</div>;
     return (
       <div className="w-full max-w-7xl mx-auto p-4">

@@ -27,6 +27,7 @@ import {
 } from "../../../../types/Equipo/index.ts";
 import { useSnackbar } from "@context/SnackbarContext.tsx";
 import { useUser } from "@context/userContext.tsx";
+import Loader from "@pages/Loader.tsx";
 
 const Activos = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -836,7 +837,7 @@ const Activos = () => {
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {loading ? (
-          <p>Cargando equipos...</p>
+          <Loader/>
         ) : error ? (
           <p>Error al cargar los equipos</p>
         ) : (

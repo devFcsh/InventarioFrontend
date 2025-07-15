@@ -25,6 +25,7 @@ import {
 } from "../../../../types/Equipo/index";
 import { useSnackbar } from "@context/SnackbarContext";
 import { useUser } from "@context/userContext";
+import Loader from "@pages/Loader";
 
 const Bodega = () => {
   const [inputPeriferico, setInputPeriferico] = useState("");
@@ -740,7 +741,7 @@ const Bodega = () => {
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {loading ? (
-          <p>Cargando equipos...</p>
+          <Loader/>
         ) : error ? (
           <p>Error al cargar los equipos</p>
         ) : (

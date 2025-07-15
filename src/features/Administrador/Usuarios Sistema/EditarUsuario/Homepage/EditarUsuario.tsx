@@ -4,6 +4,7 @@ import { TextField, Button, Autocomplete } from "@mui/material";
 import useEditarUsuarioSistema from "../hooks/useEditarUsuarioSistema";
 import { useSnackbar } from "@context/SnackbarContext";
 import useRoles from "@hooks/useRoles";
+import Loader from "@pages/Loader";
 
 const EditarUsuarioSistema = () => {
   const location = useLocation();
@@ -63,7 +64,7 @@ const EditarUsuarioSistema = () => {
   };
 
   if (loading || loadingRoles) {
-    return <div>Cargando...</div>;
+    return <Loader/>;
   }
 
   if (error || errorRoles) {

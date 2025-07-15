@@ -10,6 +10,7 @@ import useEliminarUsuarioSistema from "../hooks/useEliminarUsuarioSistema";
 import { useSnackbar } from "@context/SnackbarContext";
 import { UsuarioSistema } from "../../../../types/UsuarioSistema";
 import useRoles from "@hooks/useRoles";
+import Loader from "@pages/Loader";
 
 const UsuariosSistema = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
@@ -159,7 +160,7 @@ const UsuariosSistema = () => {
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {loading ? (
-          <p>Cargando usuarios del sistema...</p>
+          <Loader/>
         ) : error ? (
           <p>Error al cargar los usuarios</p>
         ) : (
