@@ -34,12 +34,12 @@ export const routesConfig: RouteConfig[] = [
   {
     path: "/bajas",
     element: <Bajas />,
-    allowedRoles: ["administrador", "consultor", "editor"],
+    allowedRoles: ["administrador", "editor"],
   },
   {
     path: "/usuarios",
     element: <Usuarios />,
-    allowedRoles: ["administrador", "consultor", "editor"],
+    allowedRoles: ["administrador", "editor"],
   },
   {
     path: "/bodega",
@@ -49,7 +49,7 @@ export const routesConfig: RouteConfig[] = [
   {
     path: "/categorias",
     element: <Categorias />,
-    allowedRoles: ["administrador", "consultor", "editor"],
+    allowedRoles: ["administrador", "editor"],
   },
   {
     path: "/agregarActivo",
