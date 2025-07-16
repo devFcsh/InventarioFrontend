@@ -28,9 +28,13 @@ const Bajas = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const [confirmAction, setConfirmAction] = useState<() => void>(
-    () => () => {}
-  );
+  const [confirmAction, setConfirmAction] = useState<
+    () => Promise<{ success: boolean; message: string }>
+  >(() => async () => ({
+    success: false,
+    message: "",
+  }));
+
   const [totalPages, setTotalPages] = useState<number>(1);
   const [modalContent, setModalContent] = useState<{
     title: string;
@@ -95,15 +99,29 @@ const Bajas = () => {
 
   const handleConfirm = async () => {
     try {
-      await confirmAction();
-      showMessage("Operación completada con éxito.", "success");
+      const result = await confirmAction();
+
+      if (result?.success) {
+        showMessage(
+          result.message || "Operación completada con éxito.",
+          "success"
+        );
+      } else {
+        showMessage(
+          result?.message || "La operación no se pudo completar.",
+          "error"
+        );
+      }
     } catch (error) {
       showMessage("Error al realizar la operación.", "error");
+    } finally {
+      handleCloseModal();
     }
-    handleCloseModal();
   };
 
-  const handleSacarDeBaja = async (equipoId: string) => {
+  const handleSacarDeBaja = async (
+    equipoId: string
+  ): Promise<{ success: boolean; message: string }> => {
     if (equipoId) {
       const inventario = equiposBaja.find(
         (equipo) => equipoId === equipo.id_equipo
@@ -114,51 +132,58 @@ const Bajas = () => {
 
         if (success) {
           setShouldFetch(true);
-          showMessage(
-            `Equipo con inventario ${inventario} sacado de baja exitosamente.`,
-            "success"
-          );
-        } else {
-          showMessage(
-            `No se pudo sacar de baja el equipo con inventario ${inventario}. Detalle: ${message}`,
-            "error"
-          );
         }
+
+        return {
+          success,
+          message: success
+            ? `Equipo con inventario ${inventario} sacado de baja exitosamente.`
+            : `No se pudo sacar de baja el equipo con inventario ${inventario}. Detalle: ${message}`,
+        };
       } catch (error) {
-        showMessage(
-          `Error inesperado al sacar de baja el equipo con inventario ${inventario}.`,
-          "error"
-        );
+        return {
+          success: false,
+          message: `Error inesperado al sacar de baja el equipo con inventario ${inventario}.`,
+        };
       }
     }
+
+    return {
+      success: false,
+      message: "ID de equipo inválido.",
+    };
   };
 
-  const deleteEquipo = async (equipoId: string) => {
+  const deleteEquipo = async (
+    equipoId: string
+  ): Promise<{ success: boolean; message: string }> => {
     if (equipoId) {
-      const inventario = equiposBaja.filter(
-        (equipo) => equipoId === equipo.id_equipo
-      )[0].inventario;
+      const inventario =
+        equiposBaja.find((equipo) => equipoId === equipo.id_equipo)
+          ?.inventario || "N/A";
+
       try {
         const result = await eliminarEquipo(equipoId);
         if (result) {
           setShouldFetch(true);
-          showMessage(
-            `Equipo con inventario ${inventario} eliminado.`,
-            "success"
-          );
+          const message = `Equipo con inventario ${inventario} eliminado.`;
+          showMessage(message, "success");
+          return { success: true, message };
         } else {
-          showMessage(
-            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`,
-            "error"
-          );
+          const message = `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora.`;
+          showMessage(message, "error");
+          return { success: false, message };
         }
       } catch (error) {
-        showMessage(
-          `Error al eliminar el equipo con inventario ${inventario}.`,
-          "error"
-        );
+        const message = `Error al eliminar el equipo con inventario ${inventario}.`;
+        showMessage(message, "error");
+        return { success: false, message };
       }
     }
+
+    const message = "ID de equipo inválido.";
+    showMessage(message, "error");
+    return { success: false, message };
   };
 
   const deleteEquipos = async (equipoIds: string[]) => {
@@ -204,6 +229,7 @@ const Bajas = () => {
     setConfirmAction(() => async () => {
       await deleteEquipos(selectedItems);
       setOpenModal(false);
+      return { success: true, message: "Equipos eliminados" };
     });
 
     setOpenModal(true);
@@ -213,7 +239,7 @@ const Bajas = () => {
     id: string,
     title: string,
     message: string,
-    action: (id: string) => Promise<void>
+    action: (id: string) => Promise<{ success: boolean; message: string }>
   ) => {
     setModalContent({ title, message });
     setConfirmAction(() => () => action(id));

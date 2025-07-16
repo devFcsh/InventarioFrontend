@@ -13,6 +13,7 @@ interface ModalConfirmationProps {
   onConfirm: () => void;
   title?: string;
   message?: string;
+  loading?: boolean;
 }
 
 const ModalConfirmation: React.FC<ModalConfirmationProps> = ({
@@ -21,6 +22,7 @@ const ModalConfirmation: React.FC<ModalConfirmationProps> = ({
   onConfirm,
   title = "Confirmar",
   message = "¿Estás seguro?",
+  loading = false
 }) => {
   return (
     <Dialog open={open} onClose={onClose}>
@@ -29,10 +31,10 @@ const ModalConfirmation: React.FC<ModalConfirmationProps> = ({
         <p>{message}</p>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+        <Button disabled={loading} onClick={onClose} color="primary">
           Cancelar
         </Button>
-        <Button onClick={onConfirm} color="primary">
+        <Button disabled={loading} onClick={onConfirm} color="primary">
           Confirmar
         </Button>
       </DialogActions>
