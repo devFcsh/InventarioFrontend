@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Autocomplete, IconButton, Tooltip } from "@mui/material";
 import { TextField } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import useUsos from "@hooks/useUsos";
@@ -36,13 +36,6 @@ const Usuarios = () => {
 
   const { usuariosFiltrados, totalCount, loading, error } =
     useUsuariosFiltrados(filtros, currentPage, rowsPerPage, shouldFetch);
-
-  const location = useLocation();
-  useEffect(() => {
-    if (location.state && location.state.snackbarMessage) {
-      showMessage(location.state.snackbarMessage, location.state.snackbarSeverity || "success");
-    }
-  }, [location, showMessage]);
 
   useEffect(() => {
     if (totalCount > 0 && rowsPerPage > 0) {

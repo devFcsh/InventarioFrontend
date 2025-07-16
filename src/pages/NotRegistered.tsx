@@ -1,6 +1,6 @@
 const NotRegistered = () => (
-<div className="min-h-screen flex items-center justify-center bg-yellow-100 bg-opacity-70">
-    <div className="bg-white p-8 rounded shadow text-center">
+<div className="min-h-screen flex items-center justify-center bg-yellow-200 bg-opacity-70">
+    <div className="bg-yellow-200 bg-opacity-70 p-8 rounded shadow text-center">
       <h1 className="text-2xl font-bold text-red-600 mb-4">Usuario no registrado</h1>
       <p className="text-gray-700">
         Tu usuario ha sido autenticado por CAS, pero no está registrado en el sistema de inventario.

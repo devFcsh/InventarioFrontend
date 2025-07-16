@@ -4,7 +4,6 @@ import {
   TextField,
   Tooltip,
 } from "@mui/material";
-import { useLocation } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
 import { filas } from "../../../../data";
@@ -69,8 +68,6 @@ const Categorias = () => {
   const [totalPages, setTotalPages] = useState<number>(1);
   const { showMessage } = useSnackbar();
 
-  const location = useLocation();
-
   const handleCategoriaChange = (
     _: React.SyntheticEvent<Element, Event>,
     newValue: string | null
@@ -107,12 +104,6 @@ const Categorias = () => {
       setTotalPages(1);
     }
   }, [filteredItems, rowsPerPage]);
-
-  useEffect(() => {
-    if (location.state && location.state.snackbarMessage) {
-      showMessage(location.state.snackbarMessage, location.state.snackbarMessage.severity);
-    }
-  }, [location, showMessage]);
 
   const handleOpenModalAgregar = () => {
     setOpenModalAgregar(true);
