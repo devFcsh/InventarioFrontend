@@ -1,6 +1,6 @@
 const NotFound = () => (
   <div className="min-h-screen flex items-center justify-center bg-yellow-200 bg-opacity-70">
-    <div className="bg-yellow-200 bg-opacity-70 p-8 rounded shadow text-center">
+    <div className="p-8 rounded shadow text-center">
       <h1 className="text-2xl font-bold text-red-600 mb-4">Página no encontrada</h1>
       <p className="text-gray-700">
         La página que buscas no existe o ha sido movida.

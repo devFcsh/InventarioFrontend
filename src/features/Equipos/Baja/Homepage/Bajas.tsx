@@ -108,9 +108,11 @@ const Bajas = () => {
       const inventario = equiposBaja.find(
         (equipo) => equipoId === equipo.id_equipo
       )?.inventario;
+
       try {
-        const result = await sacarEquipoDeBaja(equipoId);
-        if (result) {
+        const { success, message } = await sacarEquipoDeBaja(equipoId);
+
+        if (success) {
           setShouldFetch(true);
           showMessage(
             `Equipo con inventario ${inventario} sacado de baja exitosamente.`,
@@ -118,13 +120,13 @@ const Bajas = () => {
           );
         } else {
           showMessage(
-            `No se pudo sacar de baja el equipo con inventario ${inventario}.`,
+            `No se pudo sacar de baja el equipo con inventario ${inventario}. Detalle: ${message}`,
             "error"
           );
         }
       } catch (error) {
         showMessage(
-          `Error al sacar de baja el equipo con inventario ${inventario}.`,
+          `Error inesperado al sacar de baja el equipo con inventario ${inventario}.`,
           "error"
         );
       }
@@ -440,7 +442,7 @@ const Bajas = () => {
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {loading ? (
-          <Loader/>
+          <Loader />
         ) : error ? (
           <p>Error al cargar los equipos</p>
         ) : (
@@ -528,56 +530,56 @@ const Bajas = () => {
                     </Tooltip> */}
                     <Tooltip title="Sacar de baja">
                       <span
-                      className={
-                        unableActionEditor
-                        ? "opacity-50 pointer-events-none"
-                        : ""
-                      }
-                      >
-                      <Icon
-                        icon="streamline-sharp:upload-computer"
-                        width="25"
-                        height="25"
-                        onClick={
-                        !unableActionEditor
-                          ? () =>
-                            handleOpenModal(
-                            equipo.id_equipo,
-                            "Sacar equipo de baja",
-                            `¿Estás seguro de que deseas sacar de baja el equipo ${equipo.inventario}?`,
-                            handleSacarDeBaja
-                            )
-                          : undefined
+                        className={
+                          unableActionEditor
+                            ? "opacity-50 pointer-events-none"
+                            : ""
                         }
-                        className="cursor-pointer"
-                      />
+                      >
+                        <Icon
+                          icon="streamline-sharp:upload-computer"
+                          width="25"
+                          height="25"
+                          onClick={
+                            !unableActionEditor
+                              ? () =>
+                                  handleOpenModal(
+                                    equipo.id_equipo,
+                                    "Sacar equipo de baja",
+                                    `¿Estás seguro de que deseas sacar de baja el equipo ${equipo.inventario}?`,
+                                    handleSacarDeBaja
+                                  )
+                              : undefined
+                          }
+                          className="cursor-pointer"
+                        />
                       </span>
                     </Tooltip>
                     <Tooltip title="Eliminar Equipo">
                       <span
-                      className={
-                        unableActionEditor
-                        ? "opacity-50 pointer-events-none"
-                        : ""
-                      }
-                      >
-                      <Icon
-                        icon="weui:delete-outlined"
-                        width="25"
-                        height="25"
-                        onClick={
-                        !unableActionEditor
-                          ? () =>
-                            handleOpenModal(
-                            equipo.id_equipo,
-                            "Eliminar equipo",
-                            `¿Estás seguro de que deseas eliminar el equipo ${equipo.inventario}?`,
-                            deleteEquipo
-                            )
-                          : undefined
+                        className={
+                          unableActionEditor
+                            ? "opacity-50 pointer-events-none"
+                            : ""
                         }
-                        className="cursor-pointer"
-                      />
+                      >
+                        <Icon
+                          icon="weui:delete-outlined"
+                          width="25"
+                          height="25"
+                          onClick={
+                            !unableActionEditor
+                              ? () =>
+                                  handleOpenModal(
+                                    equipo.id_equipo,
+                                    "Eliminar equipo",
+                                    `¿Estás seguro de que deseas eliminar el equipo ${equipo.inventario}?`,
+                                    deleteEquipo
+                                  )
+                              : undefined
+                          }
+                          className="cursor-pointer"
+                        />
                       </span>
                     </Tooltip>
                   </td>

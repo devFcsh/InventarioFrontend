@@ -5,12 +5,13 @@ export const useSacarEquipoDeBaja = () => {
         try {
             const response = await clienteAxios.put(`/equipos/sacarEquipoBaja/${equipoId}`);
             if (response.status === 200) {
-                return true;
+                return { success: true, message: 'Equipo sacado de baja correctamente.' };
             } else {
-                return false;
+                return { success: false, message: 'Error desconocido al sacar de baja.' };
             }
-        } catch (error) {
-            console.error('Error al sacar de baja el equipo', error);
+        } catch (error: any) {
+            const message = error.response?.data?.error || 'Error al sacar de baja el equipo.';
+            return { success: false, message };
         }
     };
 
