@@ -195,7 +195,7 @@ const Activos = () => {
           );
         } else {
           showMessage(
-            `No se puede pasar a bodega el equipo con inventario ${inventario}porque el equipo está asociado a una computadora`,
+            `No se puede pasar a bodega el equipo con inventario ${inventario} porque el equipo está asociado a una computadora`,
             "error"
           );
         }
