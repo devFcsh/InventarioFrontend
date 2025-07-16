@@ -208,6 +208,7 @@ const Activos = () => {
     }
   };
 
+  /** 
   const pasarABodegaEquipos = async (equipoIds: string[]) => {
     const errorsInventarios = [];
     try {
@@ -239,6 +240,7 @@ const Activos = () => {
     }
   };
 
+  */
   const bajaEquipo = async (equipoId: string) => {
     if (equipoId) {
       const inventario = equipos.filter(
@@ -295,7 +297,7 @@ const Activos = () => {
       showMessage("Error al dar de baja los equipos", "error");
     }
   };
-
+  /** 
   const handlePasarABodega = () => {
     if (selectedItems.length === 0) {
       showMessage("Debe seleccionar al menos un elemento", "warning");
@@ -319,7 +321,7 @@ const Activos = () => {
 
     setOpenModal(true);
   };
-
+*/
   const handleDelete = () => {
     if (selectedItems.length === 0) {
       showMessage("Debe seleccionar al menos un elemento", "warning");
@@ -886,7 +888,7 @@ const Activos = () => {
                           />
                         </span>
                       </Tooltip>
-                      
+                      {/*
                       <Tooltip title="Pasar activos a bodega">
                         <span>
                           <Icon
@@ -904,7 +906,7 @@ const Activos = () => {
                           />
                         </span>
                       </Tooltip>
-                      
+                      */}
                     </>
                   )}
                 </th>

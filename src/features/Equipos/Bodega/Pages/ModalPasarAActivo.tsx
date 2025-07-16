@@ -66,7 +66,7 @@ const ModalPasarAActivo: React.FC<ModalPasarAActivoProps> = ({ equipoId, open, o
       showMessage("Equipo activado exitosamente", "success");
       onClose();
     } catch (error) {
-      showMessage("Error al activar el equipo. Por favor, inténtelo de nuevo.", "error");
+      showMessage("Error: No se puede pasar a activo un componente ligado a una computadora", "error");
     }
   };
 
