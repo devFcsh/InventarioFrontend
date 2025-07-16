@@ -38,9 +38,10 @@ const Bodega = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const [confirmAction, setConfirmAction] = useState<() => void>(
-    () => () => {}
-  );
+  const [confirmAction, setConfirmAction] = useState<
+    () => Promise<{ success: boolean; message: string }>
+  >(() => async () => ({ success: false, message: "" }));
+
   const [modalContentBodega, _] = useState<{
     title: string;
     message: string;
@@ -111,12 +112,18 @@ const Bodega = () => {
 
   const handleConfirm = async () => {
     try {
-      await confirmAction();
-      showMessage("Operación completada con éxito.", "success");
-    } catch (error) {
-      showMessage("Error en la acción", "error");
+      const result = await confirmAction();
+
+      if (result.success) {
+        showMessage(result.message, "success");
+      } else {
+        showMessage(result.message, "error");
+      }
+    } catch {
+      showMessage("Error al ejecutar la acción", "error");
+    } finally {
+      handleCloseModal();
     }
-    handleCloseModal();
   };
 
   const handleOpenModalPasarAActivo = (equipoId: string) => {
@@ -129,120 +136,61 @@ const Bodega = () => {
     setSelectedEquipoId(null);
   };
 
-  const deleteEquipo = async (equipoId: string) => {
-    if (equipoId) {
-      const inventario = equiposBodega.filter(
-        (equipo) => equipoId === equipo.id_equipo
-      )[0].inventario;
-      try {
-        const result = await eliminarEquipo(equipoId);
-        if (result) {
-          setShouldFetch(true);
-          showMessage(
-            `Equipo con inventario ${inventario} eliminado.`,
-            "success"
-          );
-        } else {
-          showMessage(
-            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`,
-            "error"
-          );
-        }
-      } catch (error) {
-        showMessage(
-          `Error al eliminar el equipo con inventario ${inventario}.`,
-          "error"
-        );
-      }
-    }
-  };
+  const deleteEquipo = async (
+    equipoId: string
+  ): Promise<{ success: boolean; message: string }> => {
+    const equipo = equiposBodega.find(
+      (equipo) => equipoId === equipo.id_equipo
+    );
+    const inventario = equipo?.inventario ?? "N/A";
 
-  const deleteEquipos = async (equipoIds: string[]) => {
-    const errorsInventarios = [];
     try {
-      for (const id of equipoIds) {
-        const result = await eliminarEquipo(id);
-        const inventario = equiposBodega.filter(
-          (equipo) => id === equipo.id_equipo
-        )[0].inventario;
-
-        if (!result) {
-          errorsInventarios.push(inventario);
-        }
-      }
-
-      if (errorsInventarios.length === 0) {
-        showMessage("Operación completada con éxito", "success");
+      const result = await eliminarEquipo(equipoId);
+      if (result) {
+        return {
+          success: true,
+          message: `Equipo con inventario ${inventario} eliminado.`,
+        };
       } else {
-        showMessage(
-          `No se pudieron eliminar los equipos: ${errorsInventarios.join(
-            ", "
-          )} ya que están relacionados a una computadora`,
-          "error"
-        );
+        return {
+          success: false,
+          message: `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora.`,
+        };
       }
-
-      setSelectedItems([]);
-    } catch (error) {
-      showMessage("Error al eliminar el equipo.", "error");
+    } catch {
+      return {
+        success: false,
+        message: `Error al eliminar el equipo con inventario ${inventario}.`,
+      };
     }
   };
 
-  const bajaEquipo = async (equipoId: string) => {
-    if (equipoId) {
-      const inventario = equiposBodega.filter(
-        (equipo) => equipoId === equipo.id_equipo
-      )[0].inventario;
-      try {
-        const result = await darDeBajaEquipo(equipoId, "bodega");
-        if (result) {
-          setShouldFetch(true);
-          showMessage(
-            `Equipo con inventario ${inventario} dado de baja`,
-            "success"
-          );
-        } else {
-          showMessage(
-            `No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora`,
-            "error"
-          );
-        }
-      } catch (error) {
-        showMessage(
-          `Error al dar de baja al equipo con inventario ${inventario}`,
-          "error"
-        );
-      }
-    }
-  };
+  const bajaEquipo = async (
+    equipoId: string
+  ): Promise<{ success: boolean; message: string }> => {
+    const equipo = equiposBodega.find(
+      (equipo) => equipoId === equipo.id_equipo
+    );
+    const inventario = equipo?.inventario ?? "N/A";
 
-  const bajaEquipos = async (equipoIds: string[]) => {
-    const errorsInventarios = [];
     try {
-      for (const id of equipoIds) {
-        const result = await darDeBajaEquipo(id, "baja");
-        const inventario = equiposBodega.filter(
-          (equipo) => id === equipo.id_equipo
-        )[0].inventario;
-
-        if (!result) {
-          errorsInventarios.push(inventario);
-        }
-      }
-      if (errorsInventarios.length === 0) {
-        setShouldFetch(true);
-        showMessage("Operación completada con éxito", "success");
+      const result = await darDeBajaEquipo(equipoId, "bodega");
+      if (result) {
+        return {
+          success: true,
+          message: `Equipo con inventario ${inventario} dado de baja.`,
+        };
       } else {
-        showMessage(
-          `Error al dar de baja los equipos con inventario ${errorsInventarios.join(
-            ", "
-          )} ya que están relacionados a una computadora`,
-          "error"
-        );
+        return {
+          success: false,
+          message: `No se puede dar de baja al equipo con inventario ${inventario} ya que está asociado a una computadora.`,
+        };
       }
-      setSelectedItems([]);
-    } catch (error) {
-      showMessage("Error al dar de baja a los equipos.", "error");
+    } catch {
+      return {
+        success: false,
+        message: `Error al dar de baja al equipo con inventario ${inventario}.`,
+      };
     }
   };
 
@@ -259,8 +207,34 @@ const Bodega = () => {
     });
 
     setConfirmAction(() => async () => {
-      await deleteEquipos(selectedItems);
-      setOpenModal(false);
+      try {
+        const errores: string[] = [];
+
+        for (const id of selectedItems) {
+          const { success, message } = await deleteEquipo(id);
+          if (!success) {
+            errores.push(message);
+          }
+        }
+
+        if (errores.length === 0) {
+          setShouldFetch(true);
+          setSelectedItems([]);
+          return {
+            success: true,
+            message: "Todos los equipos fueron eliminados correctamente.",
+          };
+        } else {
+          return { success: false, message: `Errores:\n${errores.join("\n")}` };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          message: "Ocurrió un error inesperado al eliminar los equipos.",
+        };
+      } finally {
+        setOpenModal(false);
+      }
     });
 
     setOpenModal(true);
@@ -270,7 +244,7 @@ const Bodega = () => {
     id: string,
     title: string,
     message: string,
-    action: (id: string) => Promise<void>
+    action: (id: string) => Promise<{ success: boolean; message: string }>
   ) => {
     setModalContent({ title, message });
     setConfirmAction(() => () => action(id));
@@ -278,20 +252,48 @@ const Bodega = () => {
   };
 
   const handleBaja = () => {
+    if (selectedItems.length === 0) {
+      showMessage("Debe seleccionar al menos un elemento", "warning");
+      return;
+    }
+
     setModalContent({
       title: "Dar de Baja Equipos",
       message:
         "¿Estás seguro de que deseas dar de baja los equipos seleccionados?",
     });
+
     setConfirmAction(() => async () => {
-      if (selectedItems.length === 0) {
-        showMessage("Debe seleccionar al menos un elemento", "warning");
-        return;
+      try {
+        const errores: string[] = [];
+
+        for (const id of selectedItems) {
+          const { success, message } = await bajaEquipo(id);
+          if (!success) {
+            errores.push(message);
+          }
+        }
+
+        if (errores.length === 0) {
+          setShouldFetch(true);
+          setSelectedItems([]);
+          return {
+            success: true,
+            message: "Todos los equipos fueron dados de baja correctamente.",
+          };
+        } else {
+          return { success: false, message: `Errores:\n${errores.join("\n")}` };
+        }
+      } catch (error) {
+        return {
+          success: false,
+          message: "Ocurrió un error inesperado al dar de baja los equipos.",
+        };
+      } finally {
+        setOpenModal(false);
       }
-      await bajaEquipos(selectedItems);
-      showMessage("¡Equipos dados de baja con éxito!", "success");
-      setOpenModal(false);
     });
+
     setOpenModal(true);
   };
 
@@ -741,7 +743,7 @@ const Bodega = () => {
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {loading ? (
-          <Loader/>
+          <Loader />
         ) : error ? (
           <p>Error al cargar los equipos</p>
         ) : (
@@ -763,14 +765,18 @@ const Bodega = () => {
                       <Tooltip title="Eliminar Equipos">
                         <span
                           className={
-                            unableActionEditor ? "opacity-50 pointer-events-none" : ""
+                            unableActionEditor
+                              ? "opacity-50 pointer-events-none"
+                              : ""
                           }
                         >
                           <Icon
                             icon="weui:delete-outlined"
                             width="20"
                             height="20"
-                            onClick={!unableActionEditor ? handleDelete : undefined}
+                            onClick={
+                              !unableActionEditor ? handleDelete : undefined
+                            }
                             className="cursor-pointer"
                           />
                         </span>
@@ -880,7 +886,9 @@ const Bodega = () => {
                     <Tooltip title="Eliminar equipo">
                       <span
                         className={
-                          unableActionEditor ? "opacity-50 pointer-events-none" : ""
+                          unableActionEditor
+                            ? "opacity-50 pointer-events-none"
+                            : ""
                         }
                       >
                         <Icon
