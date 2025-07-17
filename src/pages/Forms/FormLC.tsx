@@ -20,19 +20,19 @@ import { useCargarImagenErrors } from "./hooks/useCargarImagenErrors.ts";
 import { useAgregarComputadoraBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarComputadoraBodega.ts";
 import { useAgregarComponentesBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarComponentesBodega.ts";
 import { ModalObservation } from "./components/ModalObservation.tsx";
-import { useSnackbar } from "@context/SnackbarContext.tsx";
 
 export const FormLC = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const location = useLocation();
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const selectedPeriferico = location.state?.periferico as
     | Periferico
     | undefined;
   const selectedUso = location.state?.uso as Uso | undefined;
   const selectedEdificio = location.state?.edificio as Edificio | undefined;
   const [openModalObservation, setOpenModalObservation] = useState(false);
-
+  const [observation, setObservation] = useState("");
   const perifericos = location.state?.perifericos as Periferico[];
   const tipoInventario = location.state?.tipoInventario;
   const steps = location.state?.steps;
@@ -56,7 +56,7 @@ export const FormLC = () => {
     completeDatosInventario,
     handleInventoryErrors,
     handleUniqueInventarioError,
-  } = useInventoryErrors(tipoInventario,selectedPeriferico?.nombre);
+  } = useInventoryErrors(tipoInventario, selectedPeriferico?.nombre);
   const {
     informacionGeneralErrors,
     handleInformacionGeneralErrors,
@@ -69,9 +69,9 @@ export const FormLC = () => {
     handleUniqueCargarImagenError,
     completeDatosCargarImagen,
   } = useCargarImagenErrors();
+  console.log(activeStep)
+  console.log(steps)
 
-  const { showMessage } = useSnackbar(); 
-  
   const handleNext = () => {
     if (activeStep === 0) {
       handleInventoryErrors(inventoryDataForm);
@@ -86,7 +86,7 @@ export const FormLC = () => {
       handleInformacionGeneralErrors(informacionGeneralDataForm);
       if (
         !Object.values(informacionGeneralErrors).includes(true) &&
-        completeDatosInformacionGeneral()
+        completeDatosInformacionGeneral(informacionGeneralDataForm)
       ) {
         if (tipoInventario === "activo") {
           setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -122,12 +122,12 @@ export const FormLC = () => {
       navigate("/bajas");
     }
   };
-  const handleAgregarEquipo = (observationValue: string)=>{
-    if(tipoInventario==="activo"){
+  const handleAgregarEquipo = (observationValue: string) => {
+    if (tipoInventario === "activo") {
       handleAgregarEquipoActivo(observationValue);
-    }else if(tipoInventario==="bodega"){
+    } else if (tipoInventario === "bodega") {
       handleAgregarEquipoBodega(observationValue);
-      
+
     }
   }
 
@@ -140,7 +140,7 @@ export const FormLC = () => {
       case 0:
         return (
           <StepDatosInventario
-            periferico={selectedPeriferico ?? null}
+            periferico={selectedPeriferico}
             uso={selectedUso?.id_uso ?? ""}
             edificio={selectedEdificio?.id_edificio ?? ""}
             inventoryDataForm={inventoryDataForm}
@@ -176,24 +176,25 @@ export const FormLC = () => {
         return (
           <>
             <ModalObservation
-                open={openModalObservation}
-                onClose={() => setOpenModalObservation(false)}
-                onConfirm={(observationValue) => {
-                  setOpenModalObservation(false);
-                  handleAgregarEquipo(observationValue)
-                  
-                }}
-                title="Agregar observación"
-              />
+              open={openModalObservation}
+              onClose={() => setOpenModalObservation(false)}
+              onConfirm={(observationValue) => {
+                setOpenModalObservation(false);
+                handleAgregarEquipo(observationValue)
+
+              }}
+              title="Agregar observación"
+              message="¿Desea agregar una observación al equipo?"
+            />
             <StepComponentes
               perifericos={perifericos}
               componentes={componentes}
               handleAddComponents={handleAddComponents}
               eliminarComponente={eliminarComponente}
               showSuccessMessageComponentes={showSuccessMessageComponentes}
-              setShowSuccessMessageComponentes={
-                setShowSuccessMessageComponentes
-              }
+              setShowSuccessMessageComponentes={setShowSuccessMessageComponentes}
+              empresaComputadora={inventoryDataForm.empresa}
+              inventarioComputadora={inventoryDataForm.inventario}
             />
           </>
         );
@@ -241,10 +242,10 @@ export const FormLC = () => {
           imagenRuta: imageData.imagePath,
         });
       }
-      showMessage("Equipo agregado exitosamente", "success");
-      navigate("/activos");
+      setShowSuccessMessage(true);
+      navigate("/activos", { state: { equipoAgregado: true } });
     } catch (error) {
-      showMessage("Error al agregar el equipo.", "error");
+      alert("Error al agregar el equipo y componentes.");
     }
   };
 
@@ -280,10 +281,10 @@ export const FormLC = () => {
           })),
         });
       }
-      showMessage("Equipo agregado exitosamente", "success");
-      navigate("/bodega");
+      setShowSuccessMessage(true);
+      navigate("/bodega", { state: { equipoAgregado: true } });
     } catch (error) {
-      showMessage("Error al agregar el equipo.", "error");
+      alert("Error al agregar el equipo y componentes.");
     }
   };
 
@@ -323,7 +324,7 @@ export const FormLC = () => {
     >
       <Box sx={{ width: "60%" }}>
         <Stepper activeStep={activeStep} alternativeLabel sx={stepStyle}>
-          {steps.map((label:any, _:any) => {
+          {steps.map((label, index) => {
             const stepProps: { completed?: boolean } = {};
             const labelProps: {
               optional?: React.ReactNode;
@@ -358,53 +359,53 @@ export const FormLC = () => {
             </Button>
 
             {steps.length === 1 ? (
-                ""
-              ) : (
-                <Button
-                  variant="contained"
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                >
-                  Atrás
-                </Button>
-              )}
+              ""
+            ) : (
+              <Button
+                variant="contained"
+                disabled={activeStep === 0}
+                onClick={handleBack}
+              >
+                Atrás
+              </Button>
+            )}
 
             <Button
-                onClick={
-                  activeStep === steps.length - 1 && tipoInventario === "activo"
-                    ? handleModalBeforeAdd
-                    : activeStep - 1 === steps.length - 1 &&
-                      tipoInventario === "bodega"
+              onClick={
+                activeStep === steps.length - 1 && tipoInventario === "activo"
+                  ? handleModalBeforeAdd
+                  : activeStep - 1 === steps.length - 1 &&
+                    tipoInventario === "bodega"
                     ? handleModalBeforeAdd
                     : handleNext
-                }
-                variant="contained"
-                sx={{
-                  backgroundColor:
-                    activeStep === steps.length - 1 && tipoInventario === "activo"
-                      ? "#4CAF50"
-                      : activeStep - 1 === steps.length - 1 &&
-                        tipoInventario === "bodega"
+              }
+              variant="contained"
+              sx={{
+                backgroundColor:
+                  activeStep === steps.length - 1 && tipoInventario === "activo"
+                    ? "#4CAF50"
+                    : activeStep - 1 === steps.length - 1 &&
+                      tipoInventario === "bodega"
                       ? "#4CAF50"
                       : "#1976d2",
-                  "&:hover": {
-                    backgroundColor:
-                      activeStep === steps.length - 1 &&
+                "&:hover": {
+                  backgroundColor:
+                    activeStep === steps.length - 1 &&
                       tipoInventario === "activo"
-                        ? "#45a049"
-                        : activeStep - 1 === steps.length - 1 &&
-                          tipoInventario === "bodega"
+                      ? "#45a049"
+                      : activeStep - 1 === steps.length - 1 &&
+                        tipoInventario === "bodega"
                         ? "#45a049"
                         : "#1565c0",
-                  },
-                }}
-              >
+                },
+              }}
+            >
               {activeStep === steps.length - 1 && tipoInventario === "activo"
                 ? "Finalizar"
                 : activeStep - 1 === steps.length - 1 &&
                   tipoInventario === "bodega"
-                ? "Agregar Bodega"
-                : "Siguiente"}
+                  ? "Agregar Bodega"
+                  : "Siguiente"}
             </Button>
           </Box>
         </Fragment>
