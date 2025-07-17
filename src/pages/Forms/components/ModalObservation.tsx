@@ -9,6 +9,7 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
+  Typography,
 } from "@mui/material";
 import { useState } from "react";
 
@@ -17,6 +18,7 @@ interface ModalProps {
   onClose: () => void;
   onConfirm: (observation: string) => void;
   title?: string;
+  message?: string;
 }
 
 export const ModalObservation: React.FC<ModalProps> = ({
@@ -24,7 +26,7 @@ export const ModalObservation: React.FC<ModalProps> = ({
   onClose,
   onConfirm,
   title = "Agregar observación",
-
+  message,
 }) => {
   const [newObservation, setNewObservation] = useState<string>("");
   const [addObservation, setAddObservation] = useState<boolean>(false);
@@ -66,6 +68,11 @@ export const ModalObservation: React.FC<ModalProps> = ({
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <Box sx={{ width: "100%" }}>
+          {message && (
+            <Typography variant="body1" sx={{ mb: 2 }}>
+              {message}
+            </Typography>
+          )}
           <div className="flex-1 space-y-4 m-4">
             <RadioGroup
               row
@@ -75,7 +82,6 @@ export const ModalObservation: React.FC<ModalProps> = ({
               <FormControlLabel value="yes" control={<Radio />} label="Sí" />
               <FormControlLabel value="no" control={<Radio />} label="No" />
             </RadioGroup>
-
             {addObservation && (
               <TextField
                 label="Observación"
@@ -98,7 +104,6 @@ export const ModalObservation: React.FC<ModalProps> = ({
           </div>
         </Box>
       </DialogContent>
-
       <DialogActions sx={{ mt: "-10px" }}>
         <Box
           sx={{
