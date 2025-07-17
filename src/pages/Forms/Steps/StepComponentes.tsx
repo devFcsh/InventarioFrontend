@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Box, Button, Snackbar, Tooltip } from "@mui/material";
+import { Alert, Box, Button, Snackbar } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { ModalAgregarComponenteActivo } from "./ModalAgregarComponenteActivo.tsx";
 import { Periferico } from "../../../types/index.ts";
@@ -11,6 +11,8 @@ interface FormProps {
   eliminarComponente: any;
   showSuccessMessageComponentes: any;
   setShowSuccessMessageComponentes: any;
+  empresaComputadora?: string;
+  inventarioComputadora?: string;
 }
 
 export const StepComponentes: React.FC<FormProps> = ({
@@ -20,17 +22,20 @@ export const StepComponentes: React.FC<FormProps> = ({
   eliminarComponente,
   showSuccessMessageComponentes,
   setShowSuccessMessageComponentes,
+  empresaComputadora = "",
+  inventarioComputadora = ""
 }) => {
   const [openModalComponentes, setOpenModalComponentes] =
     useState<boolean>(false);
 
-  const [modalContentComponentes, _] = useState<{
+  const [modalContentComponentes, setModalContentComponentes] = useState<{
     title: string;
     message: string;
   }>({
     title: "Agregar Componentes",
     message: "Seleccione el componente a registrar",
   });
+  
   const handleOpenModalComponentes = () => setOpenModalComponentes(true);
   const handleCloseModalComponentes = () => setOpenModalComponentes(false);
 
@@ -52,6 +57,8 @@ export const StepComponentes: React.FC<FormProps> = ({
         perifericos={perifericos}
         onAddComponent={handleAddComponents}
         addedPerifericos={componentes}
+        empresaComputadora={empresaComputadora}
+        inventarioComputadora={inventarioComputadora}
       />
       <Snackbar
         open={showSuccessMessageComponentes}
@@ -84,17 +91,13 @@ export const StepComponentes: React.FC<FormProps> = ({
                   <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
                   <td className="py-2 px-4 border">{comp.inventario}</td>
                   <td className="py-2 px-1 border">
-                    <Tooltip title="Eliminar Componente">
-                      <span>
-                        <Icon
-                          icon="weui:delete-outlined"
-                          width="25"
-                          height="25"
-                          onClick={() => eliminarComponente(index)}
-                          className="cursor-pointer mx-auto"
-                        />
-                      </span>
-                    </Tooltip>
+                    <Icon
+                      icon="weui:delete-outlined"
+                      width="25"
+                      height="25"
+                      onClick={() => eliminarComponente(index)}
+                      className="cursor-pointer mx-auto"
+                    />
                   </td>
                 </tr>
               ))}
