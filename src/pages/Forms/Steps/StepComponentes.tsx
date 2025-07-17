@@ -28,7 +28,7 @@ export const StepComponentes: React.FC<FormProps> = ({
   const [openModalComponentes, setOpenModalComponentes] =
     useState<boolean>(false);
 
-  const [modalContentComponentes, setModalContentComponentes] = useState<{
+  const [modalContentComponentes, _] = useState<{
     title: string;
     message: string;
   }>({
