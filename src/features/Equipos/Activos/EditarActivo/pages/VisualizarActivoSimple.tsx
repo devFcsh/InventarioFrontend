@@ -59,7 +59,7 @@ const VisualizarActivoSimple = ({
   useEffect(() => {
     if (equipoSimpleActivo) {
       setSelectedInventarioInv(equipoSimpleActivo.inventario);
-        (equipo.inventario.length === 10 || equipo.inventario.length === 12)
+        (equipoSimpleActivo.inventario.length === 10 || equipoSimpleActivo.inventario.length === 12)
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
