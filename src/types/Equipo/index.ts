@@ -137,4 +137,5 @@ export type EquipoBaja = {
     modelo: string;
     serie: string;
     inventario: string;
+    anio_compra: string;
 };

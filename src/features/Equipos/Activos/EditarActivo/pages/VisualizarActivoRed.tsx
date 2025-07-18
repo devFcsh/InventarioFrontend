@@ -173,8 +173,8 @@ const VisualizarActivoRed = ({
             disabled
           />
           <TextField
-            label="Año Compra"
-            placeholder="Año Compra"
+            label="Año de Compra"
+            placeholder="Año de Compra"
             variant="outlined"
             fullWidth
             size="small"
