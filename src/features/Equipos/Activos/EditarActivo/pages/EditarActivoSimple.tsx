@@ -99,7 +99,7 @@ const EditarActivoSimple = ({
       setSelectedInventarioInv(equipoSimpleActivo.inventario);
       setCurrentImagePath(equipoSimpleActivo.imagenRuta);
       setNewObservation(equipoSimpleActivo.observacion);
-      equipoSimpleActivo.inventario.length === 10
+      (equipo.inventario.length === 10 || equipo.inventario.length === 12)
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
