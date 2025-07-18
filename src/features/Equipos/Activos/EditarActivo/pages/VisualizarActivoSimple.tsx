@@ -27,16 +27,28 @@ const VisualizarActivoSimple = ({
   perifericoName,
   equipoSimpleActivo,
 }: VisualizarActivoSimpleProps) => {
-  const [selectedInventarioMarca, setSelectedInventarioMarca] = useState<Marca | null>(null);
-  const [selectedInventarioModelo, setSelectedInventarioModelo] = useState<Modelo | null>(null);
+  const [selectedInventarioMarca, setSelectedInventarioMarca] =
+    useState<Marca | null>(null);
+  const [selectedInventarioModelo, setSelectedInventarioModelo] =
+    useState<Modelo | null>(null);
   const [selectedLampara, setSelectedLampara] = useState<Lampara | null>(null);
-  const [selectedInventarioSerie, setSelectedInventarioSerie] = useState<Serie | null>(null);
-  const [selectedInventarioInv, setSelectedInventarioInv] = useState<string>("");
+  const [selectedInventarioSerie, setSelectedInventarioSerie] =
+    useState<Serie | null>(null);
+  const [selectedInventarioInv, setSelectedInventarioInv] =
+    useState<string>("");
+  const [selectedInventarioAnio, setSelectedInventarioAnio] =
+    useState<string>("");
   const [empresa, setEmpresa] = useState<string | null>("");
-  const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(null);
-  const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(null);
+  const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
+    null
+  );
+  const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(
+    null
+  );
 
-  const { marcas } = useMarcasPorPeriferico(equipoSimpleActivo?.id_periferico ?? "");
+  const { marcas } = useMarcasPorPeriferico(
+    equipoSimpleActivo?.id_periferico ?? ""
+  );
   const { modelos } = useModelosPorMarcaPeriferico(
     selectedInventarioMarca?.id_marca ?? "",
     equipoSimpleActivo?.id_periferico ?? ""
@@ -59,14 +71,19 @@ const VisualizarActivoSimple = ({
   useEffect(() => {
     if (equipoSimpleActivo) {
       setSelectedInventarioInv(equipoSimpleActivo.inventario);
-      setEmpresa(equipoSimpleActivo.inventario.length === 10 ? "EspolTech" : "Espol");
+      setSelectedInventarioAnio(equipoSimpleActivo.anio_compra);
+      setEmpresa(
+        equipoSimpleActivo.inventario.length === 10 ? "EspolTech" : "Espol"
+      );
     }
   }, [equipoSimpleActivo]);
 
   useEffect(() => {
     if (equipoSimpleActivo && marcas.length > 0) {
       setSelectedInventarioMarca(
-        marcas.find((marca) => marca?.id_marca === equipoSimpleActivo.id_marca) || null
+        marcas.find(
+          (marca) => marca?.id_marca === equipoSimpleActivo.id_marca
+        ) || null
       );
     }
   }, [equipoSimpleActivo, marcas]);
@@ -74,7 +91,9 @@ const VisualizarActivoSimple = ({
   useEffect(() => {
     if (equipoSimpleActivo && modelos.length > 0) {
       setSelectedInventarioModelo(
-        modelos.find((modelo) => modelo?.id_modelo === equipoSimpleActivo.id_modelo) || null
+        modelos.find(
+          (modelo) => modelo?.id_modelo === equipoSimpleActivo.id_modelo
+        ) || null
       );
     }
   }, [equipoSimpleActivo, modelos]);
@@ -82,7 +101,9 @@ const VisualizarActivoSimple = ({
   useEffect(() => {
     if (equipoSimpleActivo && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipoSimpleActivo.id_serie) || null
+        series.find(
+          (serie) => serie?.id_serie === equipoSimpleActivo.id_serie
+        ) || null
       );
     }
   }, [equipoSimpleActivo, series]);
@@ -90,7 +111,9 @@ const VisualizarActivoSimple = ({
   useEffect(() => {
     if (equipoSimpleActivo && edificios.length > 0) {
       setSelectedEdificio(
-        edificios.find((edificio) => edificio?.id_edificio === equipoSimpleActivo.id_edificio) || null
+        edificios.find(
+          (edificio) => edificio?.id_edificio === equipoSimpleActivo.id_edificio
+        ) || null
       );
     }
   }, [equipoSimpleActivo, edificios]);
@@ -98,7 +121,10 @@ const VisualizarActivoSimple = ({
   useEffect(() => {
     if (equipoSimpleActivo && ubicaciones.length > 0) {
       setSelectedUbicacion(
-        ubicaciones.find((ubicacion) => ubicacion?.id_ubicacion === equipoSimpleActivo.id_ubicacion) || null
+        ubicaciones.find(
+          (ubicacion) =>
+            ubicacion?.id_ubicacion === equipoSimpleActivo.id_ubicacion
+        ) || null
       );
     }
   }, [equipoSimpleActivo, ubicaciones]);
@@ -106,7 +132,9 @@ const VisualizarActivoSimple = ({
   useEffect(() => {
     if (equipoSimpleActivo && lamparasTotales.length > 0) {
       setSelectedLampara(
-        lamparasTotales.find((lampara) => lampara?.id_lampara === equipoSimpleActivo.id_lampara) || null
+        lamparasTotales.find(
+          (lampara) => lampara?.id_lampara === equipoSimpleActivo.id_lampara
+        ) || null
       );
     }
   }, [equipoSimpleActivo, lamparasTotales]);
@@ -133,7 +161,12 @@ const VisualizarActivoSimple = ({
           value={selectedInventarioModelo}
           getOptionLabel={(option) => option?.nombre || ""}
           renderInput={(params) => (
-            <TextField {...params} label="Modelo" variant="outlined" fullWidth />
+            <TextField
+              {...params}
+              label="Modelo"
+              variant="outlined"
+              fullWidth
+            />
           )}
           disabled
         />
@@ -176,6 +209,15 @@ const VisualizarActivoSimple = ({
             value={selectedInventarioInv}
             disabled
           />
+          <TextField
+            label="Año Compra"
+            placeholder="Año Compra"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={selectedInventarioAnio}
+            disabled
+          />
         </Box>
         {perifericoName === "Proyector" ? (
           <Autocomplete
@@ -206,7 +248,12 @@ const VisualizarActivoSimple = ({
           value={selectedEdificio}
           getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
-            <TextField {...params} label="Edificio" variant="outlined" fullWidth />
+            <TextField
+              {...params}
+              label="Edificio"
+              variant="outlined"
+              fullWidth
+            />
           )}
           disabled
         />
@@ -217,7 +264,12 @@ const VisualizarActivoSimple = ({
           value={selectedUbicacion}
           getOptionLabel={(option) => (option ? option.nombre : "")}
           renderInput={(params) => (
-            <TextField {...params} label="Ubicación" variant="outlined" fullWidth />
+            <TextField
+              {...params}
+              label="Ubicación"
+              variant="outlined"
+              fullWidth
+            />
           )}
           disabled
         />

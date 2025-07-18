@@ -205,6 +205,7 @@ export const FormLC = () => {
     const equipoData = {
       tipo: "activo",
       inventario: inventoryDataForm.inventario || "",
+      anio_compra: inventoryDataForm.anio_compra,
       serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
       nombreEquipo: informacionGeneralDataForm.nombreEquipo || "",
       direccionIp: informacionGeneralDataForm.direccionIP,
@@ -252,6 +253,7 @@ export const FormLC = () => {
     const bodegaComputadoraData = {
       tipo: "bodega",
       inventario: inventoryDataForm.inventario || "",
+      anio_compra: inventoryDataForm.anio_compra,
       serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
       nombreEquipo: informacionGeneralDataForm.nombreEquipo || "",
       direccionIp: informacionGeneralDataForm.direccionIP,

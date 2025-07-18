@@ -23,6 +23,7 @@ const VisualizarBodegaSimple = ({
   const [selectedLampara, setSelectedLampara] = useState<Lampara | null>(null);
   const [selectedInventarioSerie, setSelectedInventarioSerie] = useState<Serie | null>(null);
   const [selectedInventarioInv, setSelectedInventarioInv] = useState<string>("");
+  const [selectedInventarioAnio, setSelectedInventarioAnio] = useState<string>("");
   const [empresa, setEmpresa] = useState<string | null>("");
   const [observacion, setObservacion] = useState<string>("");
 
@@ -47,6 +48,7 @@ const VisualizarBodegaSimple = ({
   useEffect(() => {
     if (equipoSimpleBodega) {
       setSelectedInventarioInv(equipoSimpleBodega.inventario);
+      setSelectedInventarioAnio(equipoSimpleBodega.anio_compra);
       setObservacion(equipoSimpleBodega.observacion);
       equipoSimpleBodega.inventario.length === 10
         ? setEmpresa("EspolTech")
@@ -149,6 +151,15 @@ const VisualizarBodegaSimple = ({
             fullWidth
             size="small"
             value={selectedInventarioInv}
+            disabled
+          />
+          <TextField
+            label="Año Compra"
+            placeholder="Año Compra"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={selectedInventarioAnio}
             disabled
           />
         </Box>

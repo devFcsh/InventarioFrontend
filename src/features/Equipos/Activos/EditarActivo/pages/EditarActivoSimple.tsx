@@ -43,6 +43,8 @@ const EditarActivoSimple = ({
     useState<Serie | null>(null);
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
+  const [selectedInventarioAnio, setSelectedInventarioAnio] =
+    useState<string>("");
   const [newObservation, setNewObservation] = useState<string>("");
   const [errorMensajeComponente, setErrorMensajeComponente] = useState<
     string | null
@@ -50,6 +52,7 @@ const EditarActivoSimple = ({
   const [empresa, setEmpresa] = useState<string | null>("");
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
+  const [errorAnio, setErrorAnio] = useState<boolean>(false);
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(
     null
   );
@@ -97,6 +100,7 @@ const EditarActivoSimple = ({
   useEffect(() => {
     if (equipoSimpleActivo) {
       setSelectedInventarioInv(equipoSimpleActivo.inventario);
+      setSelectedInventarioAnio(equipoSimpleActivo.anio_compra);
       setCurrentImagePath(equipoSimpleActivo.imagenRuta);
       setNewObservation(equipoSimpleActivo.observacion);
       equipoSimpleActivo.inventario.length === 10
@@ -194,6 +198,7 @@ const EditarActivoSimple = ({
     const payload = {
       tipo: "activo",
       inventario: selectedInventarioInv,
+      anio_compra: selectedInventarioAnio,
       id_usuario: idUsuario ?? "",
       imagenRuta: image ? nuevaImagen : "",
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
@@ -278,6 +283,8 @@ const EditarActivoSimple = ({
     if (
       !selectedInventarioInv ||
       errorInventario ||
+      !selectedInventarioAnio ||
+      errorAnio ||
       !selectedInventarioSerie ||
       !selectedUbicacion ||
       (perifericoName !== "Proyector" ? false : !selectedLampara)
@@ -407,6 +414,24 @@ const EditarActivoSimple = ({
               handleChangeInventario(value);
             }}
             disabled={empresa === ""}
+          />
+          <TextField
+            label="Año de Compra"
+            placeholder="Año de Compra"
+            variant="outlined"
+            fullWidth
+            size="small"
+            error={!!errorAnio}
+            helperText={errorAnio ? "Por favor escribir un año válido" : ""}
+            value={selectedInventarioAnio}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                setSelectedInventarioAnio(value);
+              } else {
+                setErrorAnio(true);
+              }
+            }}
           />
         </Box>
         {perifericoName === "Proyector" ? (

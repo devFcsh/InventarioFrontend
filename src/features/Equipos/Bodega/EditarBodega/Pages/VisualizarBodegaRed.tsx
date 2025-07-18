@@ -20,6 +20,7 @@ const VisualizarBodegaRed = ({
   const [selectedInventarioModelo, setSelectedInventarioModelo] = useState<Modelo | null>(null);
   const [selectedInventarioSerie, setSelectedInventarioSerie] = useState<Serie | null>(null);
   const [selectedInventarioInv, setSelectedInventarioInv] = useState<string>("");
+  const [selectedInventarioAnio, setSelectedInventarioAnio] = useState<string>("");
   const [selectedMAC, setSelectedMAC] = useState<string>("");
   const [selectedPuertos, setSelectedPuertos] = useState<string>("");
   const [selectedPuertoFTP, setSelectedPuertoFTP] = useState<string>("");
@@ -43,6 +44,7 @@ const VisualizarBodegaRed = ({
   useEffect(() => {
     if (equipoRedBodega) {
       setSelectedInventarioInv(equipoRedBodega.inventario);
+      setSelectedInventarioAnio(equipoRedBodega.anio_compra);
       setObservacion(equipoRedBodega.observacion);
       setSelectedMAC(equipoRedBodega.mac);
       setSelectedPuertos(equipoRedBodega.puertos);
@@ -141,6 +143,15 @@ const VisualizarBodegaRed = ({
             fullWidth
             size="small"
             value={selectedInventarioInv}
+            disabled
+          />
+          <TextField
+            label="Año Compra"
+            placeholder="Año Compra"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={selectedInventarioAnio}
             disabled
           />
         </Box>

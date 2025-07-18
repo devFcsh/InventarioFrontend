@@ -28,6 +28,7 @@ const VisualizarActivoRed = ({
   const [selectedInventarioModelo, setSelectedInventarioModelo] = useState<Modelo | null>(null);
   const [selectedInventarioSerie, setSelectedInventarioSerie] = useState<Serie | null>(null);
   const [selectedInventarioInv, setSelectedInventarioInv] = useState<string>("");
+  const [selectedInventarioAnio, setSelectedInventarioAnio] = useState<string>("");
   const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(null);
   const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(null);
   const [selectedMAC, setSelectedMAC] = useState<string>("");
@@ -54,6 +55,7 @@ const VisualizarActivoRed = ({
   useEffect(() => {
     if (equipoRedActivo) {
       setSelectedInventarioInv(equipoRedActivo.inventario);
+      setSelectedInventarioAnio(equipoRedActivo.anio_compra);
       setObservacion(equipoRedActivo.observacion);
       setSelectedMAC(equipoRedActivo.mac);
       setSelectedPuertos(equipoRedActivo.puertos);
@@ -168,6 +170,15 @@ const VisualizarActivoRed = ({
             fullWidth
             size="small"
             value={selectedInventarioInv}
+            disabled
+          />
+          <TextField
+            label="Año Compra"
+            placeholder="Año Compra"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={selectedInventarioAnio}
             disabled
           />
         </Box>

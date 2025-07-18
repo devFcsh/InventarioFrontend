@@ -1,9 +1,4 @@
-import {
-  Autocomplete,
-  TextField,
-  Button,
-  Tooltip,
-} from "@mui/material";
+import { Autocomplete, TextField, Button, Tooltip } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
@@ -63,6 +58,9 @@ const AgregarComputadoraActivo = ({
   const [selectedInventarioInv, setSelectedInventarioInv] = useState<
     string | null
   >("");
+  const [selectedInventarioAnio, setSelectedInventarioAnio] = useState<
+    string | null
+  >(null);
   const [selectedSO, setSelectedSO] = useState<SistemaOperativo | null>(null);
   const [selectedVersionSO, setSelectedVersionSO] = useState<VersionSO | null>(
     null
@@ -197,13 +195,19 @@ const AgregarComputadoraActivo = ({
     }
 
     if (!selectedInventarioInv) {
-      showMessage("El campo de inventario no puede estar vacío.", "error")
+      showMessage("El campo de inventario no puede estar vacío.", "error");
+      return;
+    }
+
+    if (!selectedInventarioAnio) {
+      showMessage("El campo de año no puede estar vacío.", "error");
       return;
     }
 
     const equipoData = {
       tipo: "activo",
       inventario: selectedInventarioInv || "",
+      anio_compra: selectedInventarioAnio,
       serie: Number(selectedInventarioSerie?.id_serie) ?? 0,
       nombreEquipo: nombreEquipo || "",
       direccionIp: direccionIP,
@@ -257,6 +261,7 @@ const AgregarComputadoraActivo = ({
     setSelectedInventarioModelo(null);
     setSelectedInventarioSerie(null);
     setSelectedInventarioInv("");
+    setSelectedInventarioAnio(null);
     setSelectedSO(null);
     setSelectedVersionSO(null);
     setSelectedRAM(null);
@@ -389,6 +394,7 @@ const AgregarComputadoraActivo = ({
     if (
       !selectedInventarioInv ||
       !selectedInventarioSerie ||
+      !selectedInventarioAnio ||
       !nombreEquipo ||
       !selectedVersionSO ||
       !selectedVersionOffice ||
@@ -486,6 +492,19 @@ const AgregarComputadoraActivo = ({
             value={selectedInventarioInv}
             onChange={(e) => setSelectedInventarioInv(e.target.value)}
           />
+          <TextField
+            label="Año de Compra"
+            placeholder="Año de Compra"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={selectedInventarioAnio}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                setSelectedInventarioAnio(value);
+              }
+            }}/>
         </div>
       </div>
 

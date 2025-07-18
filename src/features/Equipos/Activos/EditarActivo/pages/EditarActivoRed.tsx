@@ -1,10 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  Autocomplete,
-  TextField,
-  Button,
-  Box,
-} from "@mui/material";
+import { Autocomplete, TextField, Button, Box } from "@mui/material";
 import {
   Marca,
   Modelo,
@@ -45,6 +40,8 @@ const EditarActivoRed = ({
 
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
+  const [selectedInventarioAnio, setSelectedInventarioAnio] =
+    useState<string>("");
   const [selectedEdificio, setSelectedEdificio] = useState<Edificio | null>(
     null
   );
@@ -64,6 +61,7 @@ const EditarActivoRed = ({
   >(null);
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
+  const [errorAnio, setErrorAnio] = useState<boolean>(false);
   const [errorMAC, setErrorMAC] = useState<boolean>(false);
   //const [errorNombreEquipo, setErrorNombreEquipo] = useState<boolean>(false);
   const [errorPuertos, setErrorPuertos] = useState<boolean>(false);
@@ -102,6 +100,7 @@ const EditarActivoRed = ({
   useEffect(() => {
     if (equipoRedActivo) {
       setSelectedInventarioInv(equipoRedActivo.inventario);
+      setSelectedInventarioAnio(equipoRedActivo.anio_compra);
       setCurrentImagePath(equipoRedActivo.imagenRuta);
       setNewObservation(equipoRedActivo.observacion);
       setSelectedMAC(equipoRedActivo.mac);
@@ -111,7 +110,6 @@ const EditarActivoRed = ({
       equipoRedActivo.inventario.length === 10
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
-
     }
   }, [equipoRedActivo]);
 
@@ -192,6 +190,7 @@ const EditarActivoRed = ({
     const payload = {
       tipo: "activo",
       inventario: selectedInventarioInv,
+      anio_compra: selectedInventarioAnio,
       id_usuario: "1",
       imagenRuta: image ? nuevaImagen : "",
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
@@ -299,6 +298,8 @@ const EditarActivoRed = ({
     if (
       !selectedInventarioInv ||
       errorInventario ||
+      !selectedInventarioAnio ||
+      errorAnio ||
       !selectedInventarioSerie ||
       !selectedUbicacion ||
       !selectedMAC ||
@@ -429,6 +430,24 @@ const EditarActivoRed = ({
               handleChangeInventario(value);
             }}
             disabled={empresa === ""}
+          />
+          <TextField
+            label="Año de Compra"
+            placeholder="Año de Compra"
+            variant="outlined"
+            fullWidth
+            size="small"
+            error={!!errorAnio}
+            helperText={errorAnio ? "Por favor escribir un año válido" : ""}
+            value={selectedInventarioAnio}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                setSelectedInventarioAnio(value);
+              } else {
+                setErrorAnio(true);
+              }
+            }}
           />
         </Box>
       </div>

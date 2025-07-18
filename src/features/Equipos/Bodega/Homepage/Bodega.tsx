@@ -371,6 +371,7 @@ const Bodega = () => {
               modelo,
               serie,
               inventario,
+              anio_compra,
               fecha_ultimo_cambio,
               observacion,
               mouse_marca,
@@ -399,6 +400,7 @@ const Bodega = () => {
               modelo,
               serie,
               inventario,
+              anio_compra,
               fecha_ultimo_cambio: new Date(
                 fecha_ultimo_cambio
               ).toLocaleString(),
@@ -426,6 +428,7 @@ const Bodega = () => {
             ({
               empresa,
               inventario,
+              anio_compra,
               marca,
               modelo,
               serie,
@@ -439,6 +442,7 @@ const Bodega = () => {
               tipo: "Switch",
               empresa,
               inventario,
+              anio_compra,
               marca,
               modelo,
               serie,
@@ -461,6 +465,7 @@ const Bodega = () => {
             ({
               empresa,
               inventario,
+              anio_compra,
               marca,
               modelo,
               serie,
@@ -472,6 +477,7 @@ const Bodega = () => {
               tipo: "AP",
               empresa,
               inventario,
+              anio_compra,
               marca,
               modelo,
               serie,
@@ -492,6 +498,7 @@ const Bodega = () => {
             ({
               empresa,
               inventario,
+              anio_compra,
               marca,
               modelo,
               serie,
@@ -502,6 +509,7 @@ const Bodega = () => {
               tipo: "Proyector",
               empresa,
               inventario,
+              anio_compra,
               marca,
               modelo,
               serie,
@@ -524,6 +532,7 @@ const Bodega = () => {
               modelo,
               serie,
               inventario,
+              anio_compra,
               fecha_ultimo_cambio,
               observacion,
             }) => ({
@@ -532,6 +541,7 @@ const Bodega = () => {
               modelo,
               serie,
               inventario,
+              anio_compra,
               fecha_ultimo_cambio: new Date(
                 fecha_ultimo_cambio
               ).toLocaleString(),

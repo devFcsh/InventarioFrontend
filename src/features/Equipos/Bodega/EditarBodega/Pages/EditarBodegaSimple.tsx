@@ -31,6 +31,8 @@ const EditarBodegaSimple = ({
     useState<Serie | null>(null);
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
+  const [selectedInventarioAnio, setSelectedInventarioAnio] =
+    useState<string>("");
   const [newObservation, setNewObservation] = useState<string>("");
   const [errorMensajeComponente, setErrorMensajeComponente] = useState<
     string | null
@@ -38,6 +40,7 @@ const EditarBodegaSimple = ({
   const [empresa, setEmpresa] = useState<string | null>("");
   const [errorEmpresa, setErrorEmpresa] = useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
+  const [errorAnio, setErrorAnio] = useState<boolean>(false);
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(
     null
   );
@@ -70,6 +73,7 @@ const EditarBodegaSimple = ({
   useEffect(() => {
     if (equipoSimpleBodega) {
       setSelectedInventarioInv(equipoSimpleBodega.inventario);
+      setSelectedInventarioAnio(equipoSimpleBodega.anio_compra);
       setNewObservation(equipoSimpleBodega.observacion);
       equipoSimpleBodega.inventario.length === 10
         ? setEmpresa("EspolTech")
@@ -121,6 +125,7 @@ const EditarBodegaSimple = ({
     const payload = {
       tipo: "bodega",
       inventario: selectedInventarioInv,
+      anio_compra: selectedInventarioAnio,
       id_serie: selectedInventarioSerie?.id_serie ?? "",
       observacion: observationValue,
       id_lampara: selectedLampara?.id_lampara ?? "",
@@ -330,6 +335,24 @@ const EditarBodegaSimple = ({
               handleChangeInventario(value);
             }}
             disabled={empresa === ""}
+          />
+          <TextField
+            label="Año de Compra"
+            placeholder="Año de Compra"
+            variant="outlined"
+            fullWidth
+            size="small"
+            error={!!errorAnio}
+            helperText={errorAnio ? "Por favor escribir un año válido" : ""}
+            value={selectedInventarioAnio}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                setSelectedInventarioAnio(value);
+              } else {
+                setErrorAnio(true);
+              }
+            }}
           />
         </Box>
         {perifericoName === "Proyector" ? (

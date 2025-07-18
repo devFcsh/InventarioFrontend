@@ -2,6 +2,7 @@ export type ActivoComputadoraEdit = {
     id_equipo: string;
     id_periferico: string;
     inventario: string;
+    anio_compra: string;
     id_usuario: string;
     id_uso: string;
     imagenRuta: string;
@@ -26,6 +27,7 @@ export type ActivoComputadoraEdit = {
   export type ActivoComputadoraEditSend = {
     tipo: string;
     inventario: string;
+    anio_compra: string;
     id_usuario: string;
     imagenRuta: string | null;
     id_versionso: string;
@@ -46,6 +48,7 @@ export type ActivoComputadoraEdit = {
     id_equipo: string;
     id_periferico: string;
     inventario: string;
+    anio_compra: string;
     id_usuario: string;
     id_uso: string;
     imagenRuta: string;
@@ -62,6 +65,7 @@ export type ActivoRedEdit = {
   id_equipo: string;
   id_periferico: string;
   inventario: string;
+  anio_compra: string;
   id_usuario: string;
   id_uso: string;
   imagenRuta: string;
@@ -80,6 +84,7 @@ export type ActivoRedEdit = {
   export type ActivoSimpleEditSend = {
     tipo: string;
     inventario: string;
+    anio_compra: string;
     id_usuario: string;
     imagenRuta: string | null;
     id_ubicacion: string;
@@ -91,6 +96,7 @@ export type ActivoRedEdit = {
   export type ActivoRedEditSend = {
     tipo: string;
     inventario: string;
+    anio_compra: string;
     id_usuario: string;
     imagenRuta: string | null;
     id_ubicacion: string;
@@ -105,6 +111,7 @@ export type ActivoRedEdit = {
 export type ActivoComputadoraData = {
     tipo: string;
     inventario: string;
+    anio_compra: string;
     serie: number;
     nombreEquipo?: string; 
     direccionIp?: string; 
@@ -124,6 +131,7 @@ export type ActivoComputadoraData = {
   export type ActivoSimpleData = {
     tipo: string;
     inventario: string;
+    anio_compra: string;
     serie: number;     
     idLampara: number;
     idUbicacion: number;
@@ -135,6 +143,7 @@ export type ActivoComputadoraData = {
   export type ActivoRedData = {
     tipo: string;
     inventario: string;
+    anio_compra: string;
     serie: number;     
     idUbicacion: number;
     idUsuario: number;

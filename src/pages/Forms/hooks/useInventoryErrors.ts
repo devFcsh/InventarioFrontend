@@ -15,6 +15,7 @@ interface InventoryDataForm {
   modelo: Modelo;
   serie: Serie;
   inventario: string;
+  anio_compra: string;
   empresa:string
   ubicacion: Ubicacion;
   usuarioId: string;
@@ -28,6 +29,7 @@ export const useInventoryErrors = (tipoInventario: string,periferico:string | un
     "modelo":false,
     "serie":false,
     "inventario":false,
+    "anio_compra": false,
     "empresa":false,
     "ubicacion":false,
     "lampara":false
@@ -37,13 +39,13 @@ export const useInventoryErrors = (tipoInventario: string,periferico:string | un
     if(tipoInventario==="activo"){
       if((periferico==="Proyector"?true:dataForm.usuario!==null)
         &&dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
-        dataForm.inventario !==""  && dataForm.ubicacion!==null && dataForm.empresa!=""
+        dataForm.inventario !=="" && dataForm.anio_compra !=="" && dataForm.ubicacion!==null && dataForm.empresa!=""
         && (periferico!=="Proyector"?true:dataForm.lampara!==null)
       ) return true
       return false;
     }else{
       if(dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
-        dataForm.inventario !=="" && (periferico!=="Proyector"?true:dataForm.lampara!==null)
+        dataForm.inventario !=="" && dataForm.anio_compra !=="" && (periferico!=="Proyector"?true:dataForm.lampara!==null)
       ) return true
       return false;
     }
@@ -56,6 +58,7 @@ export const useInventoryErrors = (tipoInventario: string,periferico:string | un
       "modelo",
       "serie",
       "inventario",
+      "anio_compra",
       "empresa",
       "ubicacion",
       "lampara"

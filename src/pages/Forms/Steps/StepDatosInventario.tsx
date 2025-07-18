@@ -284,7 +284,7 @@ export const StepDatosInventario = ({
                   : ""
               }
               onChange={(e) => {
-                let value = e.target.value;
+                const value = e.target.value;
                 if (
                   inventoryDataForm.empresa === "Espol" &&
                   value !== null &&
@@ -306,6 +306,32 @@ export const StepDatosInventario = ({
                 );
               }}
               disabled={inventoryDataForm.empresa === ""}
+            />
+             <TextField
+              label="Año Compra"
+              placeholder="Año Compra"
+              variant="outlined"
+              fullWidth
+              size="small"
+              value={inventoryDataForm.anio_compra}
+              error={!!inventoryErrors.anio_compra}
+              helperText={
+                inventoryErrors.anio_compra
+                  ? "Por favor escribir un año válido"
+                  : ""
+              }
+              onChange={(e) => {
+              const value = e.target.value;
+              if (!(/^\d*$/.test(value))) {
+                return;
+              }
+              handleInventoryChange("anio_compra", value);
+                handleUniqueInventarioError(
+                  "anio_compra",
+                  value,
+                  inventoryDataForm
+                );
+            }}
             />
           </Box>
 

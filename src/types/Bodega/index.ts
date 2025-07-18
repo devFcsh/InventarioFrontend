@@ -2,6 +2,7 @@ export type BodegaComputadoraEdit = {
   id_equipo: string;
   id_periferico: string;
   inventario: string;
+  anio_compra: string;
   id_marca: string;
   id_modelo: string;
   id_sistemaoperativo: string;
@@ -21,6 +22,7 @@ export type BodegaComputadoraEdit = {
 export type BodegaComputadoraEditSend = {
   tipo: string;
   inventario: string;
+  anio_compra: string;
   id_versionso: string;
   id_ram: string;
   id_disco: string;
@@ -38,6 +40,7 @@ export type BodegaSimpleEdit = {
   id_equipo: string;
   id_periferico: string;
   inventario: string;
+  anio_compra: string;
   id_marca: string;
   id_modelo: string;
   id_serie: string;
@@ -49,6 +52,7 @@ export type BodegaRedEdit = {
   id_equipo: string;
   id_periferico: string;
   inventario: string;
+  anio_compra: string;
   id_marca: string;
   id_modelo: string;
   id_serie: string;
@@ -62,6 +66,7 @@ export type BodegaRedEdit = {
 export type BodegaSimpleEditSend = {
   tipo: string;
   inventario: string;
+  anio_compra: string;
   id_serie: string;
   id_lampara: string;
   observacion: string;
@@ -70,6 +75,7 @@ export type BodegaSimpleEditSend = {
 export type BodegaRedEditSend = {
   tipo: string;
   inventario: string;
+  anio_compra: string;
   id_serie: string;
   observacion: string;
   mac: string;
@@ -81,6 +87,7 @@ export type BodegaRedEditSend = {
 export type BodegaComputadoraData = {
     tipo: string;
     inventario: string;
+    anio_compra: string;
     serie: number;
     nombreEquipo?: string; 
     direccionIp?: string; 
@@ -97,6 +104,7 @@ export type BodegaComputadoraData = {
   export type BodegaSimpleData = {
     tipo: string;
     inventario: string;
+    anio_compra: string;
     serie: number;
     idLampara: number;
     observacion: string;
@@ -105,6 +113,7 @@ export type BodegaComputadoraData = {
   export type BodegarRedData = {
     tipo: string;
     inventario: string;
+    anio_compra: string;
     serie: number;
     observacion: string;
     mac: string;

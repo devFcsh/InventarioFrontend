@@ -29,7 +29,8 @@ export type ExportarComputadora = {
     marca: string;
     modelo: string;
     serie: string;
-    inventario: string; 
+    inventario: string;
+    anio_compra: string;
     fecha_ultimo_cambio: string;
     observacion: string;
     mouse_marca: string; 
@@ -49,6 +50,7 @@ export type ExportarComputadora = {
 export type ExportarAP = {
     empresa: string;
     inventario: string;
+    anio_compra: string;
     edificio: string;
     ubicacion: string;
     marca: string;
@@ -63,6 +65,7 @@ export type ExportarAP = {
 export type ExportarSwitch = {
     empresa: string;
     inventario: string;
+    anio_compra: string;
     edificio: string;
     ubicacion: string;
     marca: string;
@@ -79,6 +82,7 @@ export type ExportarSwitch = {
 export type ExportarProyector = {
     empresa: string;
     inventario: string;
+    anio_compra: string;
     edificio: string;
     ubicacion: string;
     marca: string;
@@ -100,6 +104,7 @@ export type ExportarSimples = {
     modelo: string;
     serie: string;
     inventario: string;
+    anio_compra: string;
     fecha_ultimo_cambio: string;
     observacion: string;
 }
@@ -111,6 +116,7 @@ export type ExportarEquiposBaja = {
     modelo: string;
     serie: string;
     inventario: string;
+    anio_compra: string;
     fecha_ultimo_cambio: string;
     estado: string;
 }

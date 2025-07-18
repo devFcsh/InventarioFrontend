@@ -31,6 +31,8 @@ const EditarBodegaRed = ({
 
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
+  const [selectedInventarioAnio, setSelectedInventarioAnio] =
+    useState<string>("");
 
   const [selectedMAC, setSelectedMAC] = useState<string>("");
   const [selectedPuertos, setSelectedPuertos] = useState<string>("");
@@ -49,6 +51,7 @@ const EditarBodegaRed = ({
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(
     null
   );
+  const [errorAnio, setErrorAnio] = useState<boolean>(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
   const { showMessage } = useSnackbar();
@@ -73,6 +76,7 @@ const EditarBodegaRed = ({
   useEffect(() => {
     if (equipoRedBodega) {
       setSelectedInventarioInv(equipoRedBodega.inventario);
+      setSelectedInventarioAnio(equipoRedBodega.anio_compra);
       setNewObservation(equipoRedBodega.observacion);
       setSelectedMAC(equipoRedBodega.mac);
       setSelectedPuertos(equipoRedBodega.puertos);
@@ -116,6 +120,7 @@ const EditarBodegaRed = ({
     const payload = {
       tipo: "bodega",
       inventario: selectedInventarioInv,
+      anio_compra: selectedInventarioAnio,
       id_serie: selectedInventarioSerie?.id_serie ?? "",
       observacion: observationValue ?? "",
       mac: selectedMAC ?? "",
@@ -200,6 +205,7 @@ const EditarBodegaRed = ({
     if (
       !selectedInventarioInv ||
       !selectedInventarioSerie ||
+      !selectedInventarioAnio ||
       !selectedMAC ||
       (perifericoName === "AP" ? false : !selectedPuertos) ||
       (perifericoName === "AP" ? false : !selectedPuertoFTP)
@@ -328,6 +334,24 @@ const EditarBodegaRed = ({
               handleChangeInventario(value);
             }}
             disabled={empresa === ""}
+          />
+          <TextField
+            label="Año de Compra"
+            placeholder="Año de Compra"
+            variant="outlined"
+            fullWidth
+            size="small"
+            error={!!errorAnio}
+            helperText={errorAnio ? "Por favor escribir un año válido" : ""}
+            value={selectedInventarioAnio}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                setSelectedInventarioAnio(value);
+              } else {
+                setErrorAnio(true);
+              }
+            }}
           />
         </Box>
       </div>

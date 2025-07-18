@@ -178,6 +178,7 @@ export const FormSAP = () => {
     const equipoData = {
       tipo: "activo",
       inventario: inventoryDataSAPForm.inventario || "",
+      anio_compra: inventoryDataSAPForm.anio_compra,
       serie: Number(inventoryDataSAPForm.serie?.id_serie) ?? 0,
       idUbicacion: Number(inventoryDataSAPForm.ubicacion?.id_ubicacion) ?? 0,
       idUsuario: 1,
@@ -206,6 +207,7 @@ export const FormSAP = () => {
     const bodegaComputadoraData = {
       tipo: "bodega",
       inventario: inventoryDataSAPForm.inventario || "",
+      anio_compra: inventoryDataSAPForm.anio_compra,
       serie: Number(inventoryDataSAPForm.serie?.id_serie) ?? 0,
       observacion: observationValue,
       mac: informacionGeneralDataSAPForm.mac || "",
@@ -228,6 +230,7 @@ export const FormSAP = () => {
     const bodegaComputadoraData = {
       tipo: "baja",
       inventario: inventoryDataSAPForm.inventario || "",
+      anio_compra: inventoryDataSAPForm.anio_compra,
       serie: Number(inventoryDataSAPForm.serie?.id_serie) ?? 0,
       observacion: observationValue,
       mac: informacionGeneralDataSAPForm.mac || "",

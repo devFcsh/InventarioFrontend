@@ -67,6 +67,8 @@ const EditarComputadoraActivo = ({
     useState<Serie | null>(null);
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
+  const [selectedInventarioAnio, setSelectedInventarioAnio] =
+    useState<string>("");
   const [errorDireccionIP, setErrorDireccionIP] = useState(false);
   const [componentesState, setComponentesState] =
     useState<Componente[]>(componentes);
@@ -125,6 +127,7 @@ const EditarComputadoraActivo = ({
   const [errorEmpresaNuevoComponente, setErrorEmpresaNuevoComponente] =
     useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
+  const [errorAnio, setErrorAnio] = useState<boolean>(false);
   const [errorNuevoComponenteInventario, setErrorNuevoComponenteInventario] =
     useState<boolean>(false);
 
@@ -312,6 +315,7 @@ const EditarComputadoraActivo = ({
   useEffect(() => {
     if (equipo) {
       setSelectedInventarioInv(equipo.inventario);
+      setSelectedInventarioAnio(equipo.anio_compra);
       setCurrentImagePath(equipo.imagenRuta);
       setNombreEquipo(equipo.nombre_equipo);
       setDireccionIP(equipo.direccion_ip);
@@ -334,11 +338,14 @@ const EditarComputadoraActivo = ({
       (nombre === "mouse" && cantidad >= 1) ||
       (nombre === "monitor" && cantidad >= 2)
     ) {
-      showMessage(nombre === "monitor"
+      showMessage(
+        nombre === "monitor"
           ? "Solo puedes agregar hasta 2 Monitores."
           : `Solo puedes agregar un ${
               nombre.charAt(0).toUpperCase() + nombre.slice(1)
-            }.`, "error")
+            }.`,
+        "error"
+      );
       return;
     }
 
@@ -360,7 +367,10 @@ const EditarComputadoraActivo = ({
         inventario: "",
       });
     } else {
-      showMessage("Por favor, complete todos los campos antes de agregar el componente.", "error");
+      showMessage(
+        "Por favor, complete todos los campos antes de agregar el componente.",
+        "error"
+      );
     }
   };
 
@@ -405,6 +415,7 @@ const EditarComputadoraActivo = ({
       id_dominio: selectedDominio?.id_dominio ?? "",
       id_serie: selectedInventarioSerie?.id_serie ?? "",
       inventario: selectedInventarioInv,
+      anio_compra: selectedInventarioAnio,
       nombre_equipo: nombreEquipo,
       direccion_ip: protocolo === "0" ? direccionIP : "",
       id_usuario: idUsuario ?? "",
@@ -459,6 +470,8 @@ const EditarComputadoraActivo = ({
     if (
       !selectedInventarioInv ||
       errorInventario ||
+      selectedInventarioAnio ||
+      errorAnio ||
       !selectedInventarioSerie ||
       !nombreEquipo ||
       errorNombreEquipo ||
@@ -573,7 +586,6 @@ const EditarComputadoraActivo = ({
   };
 
   const handleNombreEquipo = (value: string) => {
-
     setNombreEquipo(value);
     if (value.length === 14) {
       setErrorNombreEquipo(false);
@@ -699,6 +711,24 @@ const EditarComputadoraActivo = ({
               handleChangeInventario(value);
             }}
             disabled={empresa === ""}
+          />
+          <TextField
+            label="Año de Compra"
+            placeholder="Año de Compra"
+            variant="outlined"
+            fullWidth
+            size="small"
+            error={!!errorAnio}
+            helperText={errorAnio ? "Por favor escribir un año válido" : ""}
+            value={selectedInventarioAnio}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                setSelectedInventarioAnio(value);
+              } else {
+                setErrorAnio(true);
+              }
+            }}
           />
         </Box>
       </div>

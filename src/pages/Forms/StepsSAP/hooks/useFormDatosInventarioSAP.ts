@@ -11,6 +11,7 @@ interface InventoryDataForm{
   modelo: Modelo;
   serie: Serie;
   inventario: string;
+  anio_compra: string,
   empresa:string;
   ubicacion: Ubicacion;
 }
@@ -22,6 +23,7 @@ export const useFormDatosInventarioSAP = () => {
     modelo:  null,
     serie: null,
     inventario:  "",
+    anio_compra: "",
     empresa:"",
     ubicacion: null,
   });

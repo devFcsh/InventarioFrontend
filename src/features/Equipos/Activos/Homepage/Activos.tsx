@@ -450,6 +450,7 @@ const Activos = () => {
               modelo,
               serie,
               inventario,
+              anio_compra,
               fecha_ultimo_cambio,
               observacion,
               mouse_marca,
@@ -482,6 +483,7 @@ const Activos = () => {
               modelo,
               serie,
               inventario,
+              anio_compra,
               fecha_ultimo_cambio: new Date(
                 fecha_ultimo_cambio
               ).toLocaleString(),
@@ -509,6 +511,7 @@ const Activos = () => {
             ({
               empresa,
               inventario,
+              anio_compra,
               edificio,
               ubicacion,
               marca,
@@ -524,6 +527,7 @@ const Activos = () => {
               tipo: "Switch",
               empresa,
               inventario,
+              anio_compra,
               edificio,
               ubicacion,
               marca,
@@ -548,6 +552,7 @@ const Activos = () => {
             ({
               empresa,
               inventario,
+              anio_compra,
               edificio,
               ubicacion,
               marca,
@@ -561,6 +566,7 @@ const Activos = () => {
               tipo: "AP",
               empresa,
               inventario,
+              anio_compra,
               edificio,
               ubicacion,
               marca,
@@ -583,6 +589,7 @@ const Activos = () => {
             ({
               empresa,
               inventario,
+              anio_compra,
               edificio,
               ubicacion,
               marca,
@@ -595,6 +602,7 @@ const Activos = () => {
               tipo: "Proyector",
               empresa,
               inventario,
+              anio_compra,
               edificio,
               ubicacion,
               marca,
@@ -619,6 +627,7 @@ const Activos = () => {
               ubicacion,
               uso,
               usuario,
+              anio_compra,
               fecha_ultimo_cambio,
               observacion,
             }) => ({
@@ -627,6 +636,7 @@ const Activos = () => {
               ubicacion,
               uso,
               usuario,
+              anio_compra,
               fecha_ultimo_cambio: new Date(
                 fecha_ultimo_cambio
               ).toLocaleString(),

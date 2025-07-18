@@ -54,6 +54,8 @@ const VisualizarComputadoraActivo = ({
     useState<Serie | null>(null);
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
+  const [selectedInventarioAnio, setSelectedInventarioAnio] =
+    useState<string>("");
   const [selectedSO, setSelectedSO] = useState<SistemaOperativo | null>(null);
   const [selectedVersionSO, setSelectedVersionSO] = useState<VersionSO | null>(
     null
@@ -225,6 +227,7 @@ const navigate = useNavigate();
   useEffect(() => {
     if (equipo) {
       setSelectedInventarioInv(equipo.inventario);
+      setSelectedInventarioAnio(equipo.anio_compra);
       setNombreEquipo(equipo.nombre_equipo);
       setDireccionIP(equipo.direccion_ip);
       setProtocolo(equipo.direccion_ip ? "0" : "1");
@@ -318,6 +321,15 @@ const navigate = useNavigate();
         fullWidth
         size="small"
         value={selectedInventarioInv}
+        disabled
+        />
+        <TextField
+        label="Año Compra"
+        placeholder="Año Compra"
+        variant="outlined"
+        fullWidth
+        size="small"
+        value={selectedInventarioAnio}
         disabled
         />
       </Box>

@@ -198,6 +198,7 @@ export const FormPMTM = () => {
     const equipoSimpleData = {
       tipo: "activo",
       inventario: inventoryDataForm.inventario || "",
+      anio_compra: inventoryDataForm.anio_compra,
       serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
       idUbicacion: Number(inventoryDataForm.ubicacion?.id_ubicacion) ?? 0,
       idUsuario:
@@ -227,6 +228,7 @@ export const FormPMTM = () => {
     const bodegaSimpleData = {
       tipo: "bodega",
       inventario: inventoryDataForm.inventario || "",
+      anio_compra: inventoryDataForm.anio_compra,
       serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
       observacion: observationValue,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,
@@ -249,6 +251,7 @@ export const FormPMTM = () => {
     const bajaSimpleData = {
       tipo: "baja",
       inventario: inventoryDataForm.inventario || "",
+      anio_compra: inventoryDataForm.anio_compra,
       serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
       observacion: observationValue,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,

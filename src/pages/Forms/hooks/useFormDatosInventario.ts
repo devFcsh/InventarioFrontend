@@ -14,6 +14,7 @@ interface InventoryDataForm{
   modelo: Modelo;
   serie: Serie;
   inventario: string;
+  anio_compra: string;
   empresa:string;
   lampara: Lampara;
   ubicacion: Ubicacion;
@@ -28,6 +29,7 @@ export const useFormDatosInventario = () => {
     modelo:  null,
     serie: null,
     inventario:  "",
+    anio_compra: "",
     empresa:"",
     ubicacion: null,
     lampara: null,

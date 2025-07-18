@@ -60,6 +60,8 @@ const EditarComputadoraBodega = ({
     useState<Serie | null>(null);
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
+  const [selectedInventarioAnio, setSelectedInventarioAnio] =
+    useState<string>("");
   const [errorDireccionIP, setErrorDireccionIP] = useState(false);
   const [componentesState, setComponentesState] =
     useState<ComponenteBodega[]>(componentesBodega);
@@ -109,6 +111,7 @@ const EditarComputadoraBodega = ({
   const [errorEmpresaNuevoComponente, setErrorEmpresaNuevoComponente] =
     useState<boolean>(false);
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
+  const [errorAnio, setErrorAnio] = useState<boolean>(false);
   const [errorNuevoComponenteInventario, setErrorNuevoComponenteInventario] =
     useState<boolean>(false);
   const { marcas } = useMarcasPorPeriferico(equipo?.id_periferico ?? "");
@@ -271,6 +274,7 @@ const EditarComputadoraBodega = ({
   useEffect(() => {
     if (equipo) {
       setSelectedInventarioInv(equipo.inventario);
+      setSelectedInventarioAnio(equipo.anio_compra);
       setNombreEquipo(equipo.nombre_equipo);
       setDireccionIP(equipo.direccion_ip);
       setProtocolo(equipo.direccion_ip ? "0" : "1");
@@ -345,6 +349,7 @@ const EditarComputadoraBodega = ({
       id_dominio: selectedDominio?.id_dominio ?? "",
       id_serie: selectedInventarioSerie?.id_serie ?? "",
       inventario: selectedInventarioInv,
+      anio_compra: selectedInventarioAnio,
       nombre_equipo: nombreEquipo,
       direccion_ip: protocolo === "0" ? direccionIP : "",
       observacion: observationValue,
@@ -392,6 +397,7 @@ const EditarComputadoraBodega = ({
   const validarCamposEquipo = () => {
     if (
       !selectedInventarioInv ||
+      !selectedInventarioAnio ||
       !selectedInventarioSerie ||
       !nombreEquipo ||
       !selectedVersionSO ||
@@ -620,6 +626,24 @@ const EditarComputadoraBodega = ({
               handleChangeInventario(value);
             }}
             disabled={empresa === ""}
+          />
+          <TextField
+            label="Año de Compra"
+            placeholder="Año de Compra"
+            variant="outlined"
+            fullWidth
+            size="small"
+            error={!!errorAnio}
+            helperText={errorAnio ? "Por favor escribir un año válido" : ""}
+            value={selectedInventarioAnio}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*$/.test(value)) {
+                setSelectedInventarioAnio(value);
+              } else {
+                setErrorAnio(true);
+              }
+            }}
           />
         </Box>
       </div>
@@ -1027,7 +1051,7 @@ const EditarComputadoraBodega = ({
           onClick={handleConfirmEditarEquipo}
           fullWidth
         >
-        Guardar Cambios
+          Guardar Cambios
         </Button>
         <Button
           onClick={handleConfirmCancelar}

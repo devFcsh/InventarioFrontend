@@ -290,12 +290,13 @@ const Bajas = () => {
 
   const exportToExcel = () => {
     const ws = XLSX.utils.json_to_sheet(
-      equiposBaja.map(({ periferico, marca, modelo, serie, inventario }) => ({
+      equiposBaja.map(({ periferico, marca, modelo, serie, inventario, anio_compra }) => ({
         Periférico: periferico,
         Marca: marca,
         Modelo: modelo,
         Serie: serie,
         Inventario: inventario,
+        AnioCompra: anio_compra,
       }))
     );
 
