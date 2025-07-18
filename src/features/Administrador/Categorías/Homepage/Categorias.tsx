@@ -1,9 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Autocomplete,
-  TextField,
-  Tooltip,
-} from "@mui/material";
+import { Autocomplete, TextField, Tooltip } from "@mui/material";
 import { Icon } from "@iconify/react";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
 import { filas } from "../../../../data";
@@ -134,7 +130,6 @@ const Categorias = () => {
 
   return (
     <div className="flex flex-col p-4">
-
       <div className="mb-4">
         <h1 className="text-2xl font-bold my-5">Consulta de Categorías</h1>
 
@@ -180,63 +175,114 @@ const Categorias = () => {
             No hay datos disponibles. Presiona "Buscar" para cargar resultados.
           </p>
         ) : (
-          <table className="w-full text-left text-sm text-gray-500">
-            <thead className="text-xs uppercase bg-gray-50 text-gray-700">
-              <tr>
-                <th scope="col" className="px-4 py-3">
-                  Categoría
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredItems
-                .slice(
-                  (currentPage - 1) * rowsPerPage,
-                  currentPage * rowsPerPage
-                )
-                .map((item) => (
-                  <tr
-                    key={item.id}
-                    className="bg-white border-b hover:bg-gray-50"
-                  >
-                    <td className="px-4 py-2">{item.categoria}</td>
-                    <td className="px-4 py-3 flex items-center gap-2">
-                      <Tooltip title="Editar Subcategorías">
-                        <span>
+          <>
+            <table className="w-full text-left text-sm text-gray-500">
+              <thead className="text-xs uppercase bg-gray-50 text-gray-700">
+                <tr>
+                  <th scope="col" className="px-4 py-3">
+                    Categoría
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredItems
+                  .slice(
+                    (currentPage - 1) * rowsPerPage,
+                    currentPage * rowsPerPage
+                  )
+                  .map((item) => (
+                    <tr
+                      key={item.id}
+                      className="bg-white border-b hover:bg-gray-50"
+                    >
+                      <td className="px-4 py-2">{item.categoria}</td>
+                      <td className="px-4 py-3 flex items-center gap-2">
+                        <Tooltip title="Editar Subcategorías">
+                          <span>
+                            <Icon
+                              icon="mage:edit"
+                              width="30"
+                              height="30"
+                              className="cursor-pointer"
+                              onClick={() => {
+                                setSelectedItemCategoria(item.categoria);
+                                handleOpenModalEditar();
+                              }}
+                            />
+                          </span>
+                        </Tooltip>
+                        <Tooltip title="Agregar Subcategoría">
+                          <span>
+                            <Icon
+                              icon="gridicons:add"
+                              width="30"
+                              height="30"
+                              className="cursor-pointer"
+                              onClick={() => {
+                                setSelectedItemCategoria(item.categoria);
+                                handleOpenModalAgregar();
+                              }}
+                            />
+                          </span>
+                        </Tooltip>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+            <nav
+              className="flex flex-col md:flex-row justify-between items-center p-4"
+              aria-label="Table navigation"
+            >
+              <span className="text-sm font-normal text-gray-500"></span>
+              <div className="flex flex-col md:flex-row items-center gap-2">
+                <ul className="inline-flex items-center -space-x-px">
+                  <li>
+                    <Tooltip title="Página Anterior">
+                      <span>
+                        <button
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={currentPage === 1}
+                          className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                        >
                           <Icon
-                            icon="mage:edit"
-                            width="30"
-                            height="30"
-                            className="cursor-pointer"
-                            onClick={() => {
-                              setSelectedItemCategoria(item.categoria);
-                              handleOpenModalEditar();
-                            }}
+                            icon="iconamoon:arrow-left-2"
+                            width="20"
+                            height="20"
                           />
-                        </span>
-                      </Tooltip>
-                      <Tooltip title="Agregar Subcategoría">
-                        <span>
+                        </button>
+                      </span>
+                    </Tooltip>
+                  </li>
+                  <li>
+                    <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
+                      Página {currentPage} de {totalPages}
+                    </div>
+                  </li>
+                  <li>
+                    <Tooltip title="Siguiente Página">
+                      <span>
+                        <button
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                          className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                        >
                           <Icon
-                            icon="gridicons:add"
-                            width="30"
-                            height="30"
-                            className="cursor-pointer"
-                            onClick={() => {
-                              setSelectedItemCategoria(item.categoria);
-                              handleOpenModalAgregar();
-                            }}
+                            icon="iconamoon:arrow-right-2"
+                            width="20"
+                            height="20"
                           />
-                        </span>
-                      </Tooltip>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
+                        </button>
+                      </span>
+                    </Tooltip>
+                  </li>
+                </ul>
+              </div>
+            </nav>
+          </>
         )}
       </div>
 
@@ -247,56 +293,6 @@ const Categorias = () => {
         title="Confirmar Acción"
         message="¿Estás seguro de que deseas continuar?"
       />
-
-      <nav
-        className="flex flex-col md:flex-row justify-between items-center p-4"
-        aria-label="Table navigation"
-      >
-        <span className="text-sm font-normal text-gray-500"></span>
-        <div className="flex flex-col md:flex-row items-center gap-2">
-          <ul className="inline-flex items-center -space-x-px">
-            <li>
-              <Tooltip title="Página Anterior">
-                <span>
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-                  >
-                    <Icon
-                      icon="iconamoon:arrow-left-2"
-                      width="20"
-                      height="20"
-                    />
-                  </button>
-                </span>
-              </Tooltip>
-            </li>
-            <li>
-              <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
-                Página {currentPage} de {totalPages}
-              </div>
-            </li>
-            <li>
-              <Tooltip title="Siguiente Página">
-                <span>
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-                  >
-                    <Icon
-                      icon="iconamoon:arrow-right-2"
-                      width="20"
-                      height="20"
-                    />
-                  </button>
-                </span>
-              </Tooltip>
-            </li>
-          </ul>
-        </div>
-      </nav>
       <ModalAgregarCategoria
         open={openModalAgregar}
         onClose={handleCloseModalAgregar}
