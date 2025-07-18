@@ -275,7 +275,7 @@ const EditarComputadoraBodega = ({
       setDireccionIP(equipo.direccion_ip);
       setProtocolo(equipo.direccion_ip ? "0" : "1");
       setNewObservation(equipo.observacion);
-      equipo.inventario.length === 10
+      (equipo.inventario.length === 10 || equipo.inventario.length === 12)
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
