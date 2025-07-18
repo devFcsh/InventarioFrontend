@@ -82,7 +82,7 @@ const EditarBodegaRed = ({
       setSelectedPuertos(equipoRedBodega.puertos);
       setSelectedPuertoFTP(equipoRedBodega.puerto_ftp);
       setNombreEquipo(equipoRedBodega.nombre_equipo ?? "");
-      equipoRedBodega.inventario.length === 10
+      (equipoRedBodega.inventario.length === 10 || equipoRedBodega.inventario.length === 12)
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
@@ -322,12 +322,12 @@ const EditarBodegaRed = ({
             }
             onChange={(e) => {
               const value = e.target.value;
-              if (empresa === "Espol" && value !== null && value.length > 6) {
+              if (empresa === "Espol" && value !== null && value.length > 8) {
                 return;
               } else if (
                 empresa === "EspolTech" &&
                 value !== null &&
-                value.length > 10
+                value.length > 12
               ) {
                 return;
               }

@@ -184,13 +184,13 @@ export const StepDatosInventarioSAP = ({
                 if (
                   inventoryDataSAPForm.empresa === "Espol" &&
                   value !== null &&
-                  value.length > 6
+                  value.length > 8
                 ) {
                   return;
                 } else if (
                   inventoryDataSAPForm.empresa === "EspolTech" &&
                   value !== null &&
-                  value.length > 10
+                  value.length > 12
                 ) {
                   return;
                 }

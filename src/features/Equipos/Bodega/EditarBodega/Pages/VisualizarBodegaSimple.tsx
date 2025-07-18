@@ -50,7 +50,7 @@ const VisualizarBodegaSimple = ({
       setSelectedInventarioInv(equipoSimpleBodega.inventario);
       setSelectedInventarioAnio(equipoSimpleBodega.anio_compra);
       setObservacion(equipoSimpleBodega.observacion);
-      equipoSimpleBodega.inventario.length === 10
+      (equipoSimpleBodega.inventario.length === 10 || equipoSimpleBodega.inventario.length === 12)
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }

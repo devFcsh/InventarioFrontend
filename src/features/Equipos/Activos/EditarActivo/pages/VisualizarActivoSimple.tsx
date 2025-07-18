@@ -72,8 +72,10 @@ const VisualizarActivoSimple = ({
     if (equipoSimpleActivo) {
       setSelectedInventarioInv(equipoSimpleActivo.inventario);
       setSelectedInventarioAnio(equipoSimpleActivo.anio_compra);
-      setEmpresa(
-        equipoSimpleActivo.inventario.length === 10 ? "EspolTech" : "Espol"
+        (
+        equipoSimpleActivo.inventario.length === 10 || equipoSimpleActivo.inventario.length === 12)
+        ? setEmpresa("EspolTech")
+        : setEmpresa("Espol"
       );
     }
   }, [equipoSimpleActivo]);

@@ -56,7 +56,7 @@ export const FormLC = () => {
     completeDatosInventario,
     handleInventoryErrors,
     handleUniqueInventarioError,
-  } = useInventoryErrors(tipoInventario,selectedPeriferico?.nombre);
+  } = useInventoryErrors(tipoInventario, selectedPeriferico?.nombre);
   const {
     informacionGeneralErrors,
     handleInformacionGeneralErrors,
@@ -70,8 +70,8 @@ export const FormLC = () => {
     completeDatosCargarImagen,
   } = useCargarImagenErrors();
 
-  const { showMessage } = useSnackbar(); 
-  
+  const { showMessage } = useSnackbar();
+
   const handleNext = () => {
     if (activeStep === 0) {
       handleInventoryErrors(inventoryDataForm);
@@ -122,12 +122,12 @@ export const FormLC = () => {
       navigate("/bajas");
     }
   };
-  const handleAgregarEquipo = (observationValue: string)=>{
-    if(tipoInventario==="activo"){
+  const handleAgregarEquipo = (observationValue: string) => {
+    if (tipoInventario === "activo") {
       handleAgregarEquipoActivo(observationValue);
-    }else if(tipoInventario==="bodega"){
+    } else if (tipoInventario === "bodega") {
       handleAgregarEquipoBodega(observationValue);
-      
+
     }
   }
 
@@ -176,24 +176,25 @@ export const FormLC = () => {
         return (
           <>
             <ModalObservation
-                open={openModalObservation}
-                onClose={() => setOpenModalObservation(false)}
-                onConfirm={(observationValue) => {
-                  setOpenModalObservation(false);
-                  handleAgregarEquipo(observationValue)
-                  
-                }}
-                title="Agregar observación"
-              />
+              open={openModalObservation}
+              onClose={() => setOpenModalObservation(false)}
+              onConfirm={(observationValue) => {
+                setOpenModalObservation(false);
+                handleAgregarEquipo(observationValue)
+
+              }}
+              title="Agregar observación"
+              message="¿Desea agregar una observación al equipo?"
+            />
             <StepComponentes
               perifericos={perifericos}
               componentes={componentes}
               handleAddComponents={handleAddComponents}
               eliminarComponente={eliminarComponente}
               showSuccessMessageComponentes={showSuccessMessageComponentes}
-              setShowSuccessMessageComponentes={
-                setShowSuccessMessageComponentes
-              }
+              setShowSuccessMessageComponentes={setShowSuccessMessageComponentes}
+              empresaComputadora={inventoryDataForm.empresa}
+              inventarioComputadora={inventoryDataForm.inventario}
             />
           </>
         );
@@ -325,7 +326,7 @@ export const FormLC = () => {
     >
       <Box sx={{ width: "60%" }}>
         <Stepper activeStep={activeStep} alternativeLabel sx={stepStyle}>
-          {steps.map((label:any, _:any) => {
+          {steps.map((label: any, _: any) => {
             const stepProps: { completed?: boolean } = {};
             const labelProps: {
               optional?: React.ReactNode;
@@ -360,53 +361,53 @@ export const FormLC = () => {
             </Button>
 
             {steps.length === 1 ? (
-                ""
-              ) : (
-                <Button
-                  variant="contained"
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                >
-                  Atrás
-                </Button>
-              )}
+              ""
+            ) : (
+              <Button
+                variant="contained"
+                disabled={activeStep === 0}
+                onClick={handleBack}
+              >
+                Atrás
+              </Button>
+            )}
 
             <Button
-                onClick={
-                  activeStep === steps.length - 1 && tipoInventario === "activo"
-                    ? handleModalBeforeAdd
-                    : activeStep - 1 === steps.length - 1 &&
-                      tipoInventario === "bodega"
+              onClick={
+                activeStep === steps.length - 1 && tipoInventario === "activo"
+                  ? handleModalBeforeAdd
+                  : activeStep - 1 === steps.length - 1 &&
+                    tipoInventario === "bodega"
                     ? handleModalBeforeAdd
                     : handleNext
-                }
-                variant="contained"
-                sx={{
-                  backgroundColor:
-                    activeStep === steps.length - 1 && tipoInventario === "activo"
-                      ? "#4CAF50"
-                      : activeStep - 1 === steps.length - 1 &&
-                        tipoInventario === "bodega"
+              }
+              variant="contained"
+              sx={{
+                backgroundColor:
+                  activeStep === steps.length - 1 && tipoInventario === "activo"
+                    ? "#4CAF50"
+                    : activeStep - 1 === steps.length - 1 &&
+                      tipoInventario === "bodega"
                       ? "#4CAF50"
                       : "#1976d2",
-                  "&:hover": {
-                    backgroundColor:
-                      activeStep === steps.length - 1 &&
+                "&:hover": {
+                  backgroundColor:
+                    activeStep === steps.length - 1 &&
                       tipoInventario === "activo"
-                        ? "#45a049"
-                        : activeStep - 1 === steps.length - 1 &&
-                          tipoInventario === "bodega"
+                      ? "#45a049"
+                      : activeStep - 1 === steps.length - 1 &&
+                        tipoInventario === "bodega"
                         ? "#45a049"
                         : "#1565c0",
-                  },
-                }}
-              >
+                },
+              }}
+            >
               {activeStep === steps.length - 1 && tipoInventario === "activo"
                 ? "Finalizar"
                 : activeStep - 1 === steps.length - 1 &&
                   tipoInventario === "bodega"
-                ? "Agregar Bodega"
-                : "Siguiente"}
+                  ? "Agregar Bodega"
+                  : "Siguiente"}
             </Button>
           </Box>
         </Fragment>

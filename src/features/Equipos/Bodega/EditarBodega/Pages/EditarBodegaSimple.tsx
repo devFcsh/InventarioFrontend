@@ -75,7 +75,7 @@ const EditarBodegaSimple = ({
       setSelectedInventarioInv(equipoSimpleBodega.inventario);
       setSelectedInventarioAnio(equipoSimpleBodega.anio_compra);
       setNewObservation(equipoSimpleBodega.observacion);
-      equipoSimpleBodega.inventario.length === 10
+      (equipoSimpleBodega.inventario.length === 10 || equipoSimpleBodega.inventario.length === 12)
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
@@ -323,12 +323,12 @@ const EditarBodegaSimple = ({
             }
             onChange={(e) => {
               const value = e.target.value;
-              if (empresa === "Espol" && value !== null && value.length > 6) {
+              if (empresa === "Espol" && value !== null && value.length > 8) {
                 return;
               } else if (
                 empresa === "EspolTech" &&
                 value !== null &&
-                value.length > 10
+                value.length > 12
               ) {
                 return;
               }

@@ -9,7 +9,7 @@ import {
   TextField,
 } from "@mui/material";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import { Componente } from "../../../types/Activo/Componente/index.ts";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
@@ -23,6 +23,8 @@ interface ModalProps {
   perifericos: Periferico[];
   onAddComponent: (nuevoComponente: Componente) => void;
   addedPerifericos: any;
+  empresaComputadora?: string;
+  inventarioComputadora?: string;
 }
 
 export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
@@ -32,6 +34,8 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
   perifericos = [],
   onAddComponent,
   addedPerifericos = [],
+  empresaComputadora = "",
+  inventarioComputadora = "",
 }) => {
   const [nuevoComponente, setNuevoComponente] = useState<Componente>({
     periferico: null,
@@ -49,7 +53,46 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
     handleComponentsErrors,
     handleUniqueComponentsError,
   } = useErrorsComponents();
-  const [empresa, setEmpresa] = useState("");
+  
+  const [empresa, setEmpresa] = useState(empresaComputadora);
+
+  const generateInventario = (periferico: Periferico | null, baseInventario: string): string => {
+    if (!periferico || !baseInventario) return "";
+    
+    if (empresa === "Espol" || empresa === "EspolTech") {
+      const sufijos: { [key: string]: string } = {
+        "monitor": "-1",
+        "teclado": "-2", 
+        "mouse": "-3",
+        "parlante": "-4",
+        "camara": "-5"
+      };
+      
+      const nombrePeriferico = periferico.nombre?.toLowerCase();
+      const sufijo = sufijos[nombrePeriferico] || "";
+      
+      return baseInventario + sufijo;
+    }
+    
+    return "";
+  };
+
+  useEffect(() => {
+    if (nuevoComponente.periferico && (empresa === "Espol" || empresa === "EspolTech") && inventarioComputadora) {
+      const nuevoInventario = generateInventario(nuevoComponente.periferico, inventarioComputadora);
+      setNuevoComponente(prev => ({
+        ...prev,
+        inventario: nuevoInventario
+      }));
+    }
+  }, [nuevoComponente.periferico, empresa, inventarioComputadora]);
+
+  useEffect(() => {
+    if (open) {
+      setEmpresa(empresaComputadora);
+    }
+  }, [open, empresaComputadora]);
+
   const filteredPerifericos = perifericos.filter((p) => {
     const nombre = p?.nombre?.toLowerCase();
     if (
@@ -100,18 +143,25 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
     nuevoComponente.marca?.id_marca ?? "",
     nuevoComponente.modelo?.id_modelo ?? ""
   );
+
   const handlePerifericoComponenteChange = (
     _event: React.SyntheticEvent<Element, Event>,
     newValue: Periferico | null
   ) => {
+    const nuevoInventario = (empresa === "Espol" || empresa === "EspolTech") && inventarioComputadora 
+      ? generateInventario(newValue, inventarioComputadora)
+      : "";
+    
     setNuevoComponente({
       ...nuevoComponente,
       periferico: newValue,
       marca: null,
       modelo: null,
       serie: null,
+      inventario: nuevoInventario
     });
   };
+
   const handleMarcaComponenteChange = (
     _event: React.SyntheticEvent<Element, Event>,
     newValue: Marca | null
@@ -123,18 +173,21 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
       serie: null,
     });
   };
+
   const handleModeloComponenteChange = (
     _event: React.SyntheticEvent<Element, Event>,
     newValue: Modelo | null
   ) => {
     setNuevoComponente({ ...nuevoComponente, modelo: newValue, serie: null });
   };
+
   const handleSerieComponenteChange = (
     _event: React.SyntheticEvent<Element, Event>,
     newValue: Serie | null
   ) => {
     setNuevoComponente({ ...nuevoComponente, serie: newValue });
   };
+
   const agregarComponente = () => {
     const errores = handleComponentsErrors({
       ...nuevoComponente,
@@ -178,17 +231,23 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
       inventario: "",
     });
   };
-  const handleEmpresaChange = (newValue: string) => {
-    if (newValue) {
-      setEmpresa(newValue);
-    } else {
-      setEmpresa("");
-      setNuevoComponente({
-        ...nuevoComponente,
-        inventario: "",
-      });
+
+  const getInventarioHelperText = () => {
+    if (empresa === "Espol") {
+      return "El inventario se genera automáticamente";
+    } else if (empresa === "EspolTech") {
+      return "El inventario se genera automáticamente, pero puedes editarlo";
     }
+    return "";
   };
+
+  const getMaxLength = () => {
+    if (empresa === "EspolTech") {
+      return 20;
+    }
+    return 10;
+  };
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>
@@ -320,14 +379,6 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 options={["Espol", "EspolTech"]}
                 getOptionLabel={(option) => (option ? option : "")}
                 value={empresa}
-                onChange={(_, newValue: any) => {
-                  handleEmpresaChange(newValue);
-                  handleUniqueComponentsError("empresa", newValue, {
-
-                    ...nuevoComponente,
-                    empresa,
-                  });
-                }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -343,6 +394,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                     sx={{ marginRight: 8, width: "100%" }}
                   />
                 )}
+                disabled={true}
               />
               <TextField
                 label="Inventario"
@@ -355,33 +407,27 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 helperText={
                   componentsErrors.inventario
                     ? "Por favor escribir un inventario válido"
-                    : ""
+                    : getInventarioHelperText()
                 }
                 onChange={(e) => {
-                  let value = e.target.value;
-                  if (
-                    empresa === "Espol" &&
-                    value !== null &&
-                    value.length > 6
-                  ) {
-                    value = value.slice(0, 6);
-                  } else if (
-                    empresa === "EspolTech" &&
-                    value !== null &&
-                    value.length > 10
-                  ) {
-                    value = value.slice(0, 10);
+                  if (empresa !== "Espol") {
+                    let value = e.target.value;
+                    const maxLength = getMaxLength();
+                    
+                    if (value !== null && value.length > maxLength) {
+                      value = value.slice(0, maxLength);
+                    }
+                    setNuevoComponente({
+                      ...nuevoComponente,
+                      inventario: value,
+                    });
+                    handleUniqueComponentsError("inventario", value, {
+                      ...nuevoComponente,
+                      empresa,
+                    });
                   }
-                  setNuevoComponente({
-                    ...nuevoComponente,
-                    inventario: value,
-                  });
-                  handleUniqueComponentsError("inventario", value, {
-                    ...nuevoComponente,
-                    empresa,
-                  });
                 }}
-                disabled={empresa === ""}
+                disabled={empresa === "Espol"}
               />
             </div>
           </div>

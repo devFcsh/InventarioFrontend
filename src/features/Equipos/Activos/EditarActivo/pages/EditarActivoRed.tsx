@@ -107,7 +107,7 @@ const EditarActivoRed = ({
       setSelectedPuertos(equipoRedActivo.puertos);
       setSelectedPuertoFTP(equipoRedActivo.puerto_ftp);
       setNombreEquipo(equipoRedActivo.nombre_equipo ?? "");
-      equipoRedActivo.inventario.length === 10
+      (equipoRedActivo.inventario.length === 10 || equipoRedActivo.inventario.length === 12)
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
@@ -418,12 +418,12 @@ const EditarActivoRed = ({
             }
             onChange={(e) => {
               const value = e.target.value;
-              if (empresa === "Espol" && value !== null && value.length > 6) {
+              if (empresa === "Espol" && value !== null && value.length > 8) {
                 return;
               } else if (
                 empresa === "EspolTech" &&
                 value !== null &&
-                value.length > 10
+                value.length > 12
               ) {
                 return;
               }

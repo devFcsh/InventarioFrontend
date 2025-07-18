@@ -103,7 +103,7 @@ const EditarActivoSimple = ({
       setSelectedInventarioAnio(equipoSimpleActivo.anio_compra);
       setCurrentImagePath(equipoSimpleActivo.imagenRuta);
       setNewObservation(equipoSimpleActivo.observacion);
-      equipoSimpleActivo.inventario.length === 10
+      (equipoSimpleActivo.inventario.length === 10 || equipoSimpleActivo.inventario.length === 12)
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
@@ -402,12 +402,12 @@ const EditarActivoSimple = ({
             }
             onChange={(e) => {
               const value = e.target.value;
-              if (empresa === "Espol" && value !== null && value.length > 6) {
+              if (empresa === "Espol" && value !== null && value.length > 8) {
                 return;
               } else if (
                 empresa === "EspolTech" &&
                 value !== null &&
-                value.length > 10
+                value.length > 12
               ) {
                 return;
               }

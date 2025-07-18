@@ -50,7 +50,7 @@ const VisualizarBodegaRed = ({
       setSelectedPuertos(equipoRedBodega.puertos);
       setSelectedPuertoFTP(equipoRedBodega.puerto_ftp);
       setNombreEquipo(equipoRedBodega.nombre_equipo ?? "");
-      equipoRedBodega.inventario.length === 10
+      (equipoRedBodega.inventario.length === 10 || equipoRedBodega.inventario.length === 12)
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
