@@ -160,65 +160,120 @@ const UsuariosSistema = () => {
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {loading ? (
-          <Loader/>
+          <Loader />
         ) : error ? (
           <p>Error al cargar los usuarios</p>
+        ) : usuariosFiltrados.length === 0 ? (
+          <p className="text-center text-gray-500 my-5">
+            No hay datos disponibles. Presiona "Buscar" para cargar resultados.
+          </p>
         ) : (
-          <table className="w-full text-left text-sm text-gray-500">
-            <thead className="text-xs uppercase bg-gray-50 text-gray-700">
-              <tr>
-                <th scope="col" className="px-4 py-3">
-                  Correo
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Rol
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {usuariosFiltrados.map((usuario) => (
-                <tr
-                  key={usuario.id_usuario_sistema}
-                  className="bg-white border-b hover:bg-gray-50"
-                >
-                  <td className="px-4 py-2">{usuario.correo}</td>
-                  <td className="px-4 py-2">{String(usuario.rol)}</td>
-                  <td className="px-4 py-3 flex items-center gap-2">
-                    <IconButton onClick={() => handleDeleteClick(usuario)}>
-                      <Tooltip title="Eliminar Usuario">
-                        <span>
-                          <Icon
-                            icon="weui:delete-outlined"
-                            width="25"
-                            height="25"
-                            className="cursor-pointer"
-                          />
-                        </span>
-                      </Tooltip>
-                    </IconButton>
-                    <Link
-                      to={{ pathname: "/editarUsuarioSistema" }}
-                      state={{ usuario }}
-                    >
-                      <Tooltip title="Editar Usuario">
-                        <span>
-                          <Icon
-                            icon="mage:edit"
-                            width="25"
-                            height="25"
-                            className="cursor-pointer"
-                          />
-                        </span>
-                      </Tooltip>
-                    </Link>
-                  </td>
+          <>
+            <table className="w-full text-left text-sm text-gray-500">
+              <thead className="text-xs uppercase bg-gray-50 text-gray-700">
+                <tr>
+                  <th scope="col" className="px-4 py-3">
+                    Correo
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Rol
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Acciones
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {usuariosFiltrados.map((usuario) => (
+                  <tr
+                    key={usuario.id_usuario_sistema}
+                    className="bg-white border-b hover:bg-gray-50"
+                  >
+                    <td className="px-4 py-2">{usuario.correo}</td>
+                    <td className="px-4 py-2">{String(usuario.rol)}</td>
+                    <td className="px-4 py-3 flex items-center gap-2">
+                      <IconButton onClick={() => handleDeleteClick(usuario)}>
+                        <Tooltip title="Eliminar Usuario">
+                          <span>
+                            <Icon
+                              icon="weui:delete-outlined"
+                              width="25"
+                              height="25"
+                              className="cursor-pointer"
+                            />
+                          </span>
+                        </Tooltip>
+                      </IconButton>
+                      <Link
+                        to={{ pathname: "/editarUsuarioSistema" }}
+                        state={{ usuario }}
+                      >
+                        <Tooltip title="Editar Usuario">
+                          <span>
+                            <Icon
+                              icon="mage:edit"
+                              width="25"
+                              height="25"
+                              className="cursor-pointer"
+                            />
+                          </span>
+                        </Tooltip>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <nav
+              className="flex flex-col md:flex-row justify-between items-center p-4"
+              aria-label="Table navigation"
+            >
+              <span className="text-sm font-normal text-gray-500"></span>
+              <div className="flex flex-col md:flex-row items-center gap-2">
+                <ul className="inline-flex items-center -space-x-px">
+                  <li>
+                    <Tooltip title="Página Anterior">
+                      <span>
+                        <button
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={currentPage === 1}
+                          className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                        >
+                          <Icon
+                            icon="iconamoon:arrow-left-2"
+                            width="20"
+                            height="20"
+                          />
+                        </button>
+                      </span>
+                    </Tooltip>
+                  </li>
+                  <li>
+                    <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
+                      Página {currentPage} de {totalPages}
+                    </div>
+                  </li>
+                  <li>
+                    <Tooltip title="Siguiente Página">
+                      <span>
+                        <button
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                          className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                        >
+                          <Icon
+                            icon="iconamoon:arrow-right-2"
+                            width="20"
+                            height="20"
+                          />
+                        </button>
+                      </span>
+                    </Tooltip>
+                  </li>
+                </ul>
+              </div>
+            </nav>
+          </>
         )}
       </div>
 
@@ -229,56 +284,6 @@ const UsuariosSistema = () => {
         title="Eliminar Usuario"
         message="¿Estás seguro de que deseas eliminar a este usuario?"
       />
-
-      <nav
-        className="flex flex-col md:flex-row justify-between items-center p-4"
-        aria-label="Table navigation"
-      >
-        <span className="text-sm font-normal text-gray-500"></span>
-        <div className="flex flex-col md:flex-row items-center gap-2">
-          <ul className="inline-flex items-center -space-x-px">
-            <li>
-              <Tooltip title="Página Anterior">
-                <span>
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-                  >
-                    <Icon
-                      icon="iconamoon:arrow-left-2"
-                      width="20"
-                      height="20"
-                    />
-                  </button>
-                </span>
-              </Tooltip>
-            </li>
-            <li>
-              <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
-                Página {currentPage} de {totalPages}
-              </div>
-            </li>
-            <li>
-              <Tooltip title="Siguiente Página">
-                <span>
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-                  >
-                    <Icon
-                      icon="iconamoon:arrow-right-2"
-                      width="20"
-                      height="20"
-                    />
-                  </button>
-                </span>
-              </Tooltip>
-            </li>
-          </ul>
-        </div>
-      </nav>
     </div>
   );
 };

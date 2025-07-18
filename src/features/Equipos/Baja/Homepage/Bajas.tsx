@@ -290,14 +290,16 @@ const Bajas = () => {
 
   const exportToExcel = () => {
     const ws = XLSX.utils.json_to_sheet(
-      equiposBaja.map(({ periferico, marca, modelo, serie, inventario, anio_compra }) => ({
-        Periférico: periferico,
-        Marca: marca,
-        Modelo: modelo,
-        Serie: serie,
-        Inventario: inventario,
-        AnioCompra: anio_compra,
-      }))
+      equiposBaja.map(
+        ({ periferico, marca, modelo, serie, inventario, anio_compra }) => ({
+          Periférico: periferico,
+          Marca: marca,
+          Modelo: modelo,
+          Serie: serie,
+          Inventario: inventario,
+          AnioCompra: anio_compra,
+        })
+      )
     );
 
     const wb = XLSX.utils.book_new();
@@ -472,75 +474,80 @@ const Bajas = () => {
           <Loader />
         ) : error ? (
           <p>Error al cargar los equipos</p>
+        ) : equiposBaja.length === 0 ? (
+          <p className="text-center text-gray-500 my-5">
+            No hay datos disponibles. Presiona "Buscar" para cargar resultados.
+          </p>
         ) : (
-          <table className="w-full text-left text-sm text-gray-500">
-            <thead className="text-xs uppercase bg-gray-50 text-gray-700">
-              <tr>
-                <th scope="col" className="flex items-center gap-2 px-4 py-3">
-                  <Tooltip title="Seleccionar Todos">
-                    <input
-                      type="checkbox"
-                      onChange={handleSelectAllChange}
-                      checked={selectedItems.length === equiposBaja.length}
-                      className="mr-2"
-                    />
-                  </Tooltip>
-                  {selectedItems.length > 0 && (
-                    <>
-                      <Tooltip title="Eliminar Equipos">
-                        <span>
-                          <Icon
-                            icon="weui:delete-outlined"
-                            width="20"
-                            height="20"
-                            onClick={handleDelete}
-                            className="cursor-pointer"
-                          />
-                        </span>
-                      </Tooltip>
-                    </>
-                  )}
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Equipo
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Marca
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Modelo
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Serie
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Inventario
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {equiposBaja.map((equipo) => (
-                <tr
-                  key={equipo.id_equipo}
-                  className="bg-white border-b hover:bg-gray-50"
-                >
-                  <td className="px-4 py-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedItems.includes(equipo.id_equipo)}
-                      onChange={() => handleCheckboxChange(equipo.id_equipo)}
-                    />
-                  </td>
-                  <td className="px-4 py-2">{equipo.periferico}</td>
-                  <td className="px-4 py-2">{equipo.marca}</td>
-                  <td className="px-4 py-2">{equipo.modelo}</td>
-                  <td className="px-4 py-2">{equipo.serie}</td>
-                  <td className="px-4 py-2">{equipo.inventario}</td>
-                  <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
-                    {/* <Tooltip title="Editar Equipo">
+          <>
+            <table className="w-full text-left text-sm text-gray-500">
+              <thead className="text-xs uppercase bg-gray-50 text-gray-700">
+                <tr>
+                  <th scope="col" className="flex items-center gap-2 px-4 py-3">
+                    <Tooltip title="Seleccionar Todos">
+                      <input
+                        type="checkbox"
+                        onChange={handleSelectAllChange}
+                        checked={selectedItems.length === equiposBaja.length}
+                        className="mr-2"
+                      />
+                    </Tooltip>
+                    {selectedItems.length > 0 && (
+                      <>
+                        <Tooltip title="Eliminar Equipos">
+                          <span>
+                            <Icon
+                              icon="weui:delete-outlined"
+                              width="20"
+                              height="20"
+                              onClick={handleDelete}
+                              className="cursor-pointer"
+                            />
+                          </span>
+                        </Tooltip>
+                      </>
+                    )}
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Equipo
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Marca
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Modelo
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Serie
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Inventario
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {equiposBaja.map((equipo) => (
+                  <tr
+                    key={equipo.id_equipo}
+                    className="bg-white border-b hover:bg-gray-50"
+                  >
+                    <td className="px-4 py-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.includes(equipo.id_equipo)}
+                        onChange={() => handleCheckboxChange(equipo.id_equipo)}
+                      />
+                    </td>
+                    <td className="px-4 py-2">{equipo.periferico}</td>
+                    <td className="px-4 py-2">{equipo.marca}</td>
+                    <td className="px-4 py-2">{equipo.modelo}</td>
+                    <td className="px-4 py-2">{equipo.serie}</td>
+                    <td className="px-4 py-2">{equipo.inventario}</td>
+                    <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
+                      {/* <Tooltip title="Editar Equipo">
                       <span>
                         <Icon
                           icon="gridicons:edit"
@@ -555,124 +562,125 @@ const Bajas = () => {
                         />
                       </span>
                     </Tooltip> */}
-                    <Tooltip title="Sacar de baja">
-                      <span
-                        className={
-                          unableActionEditor
-                            ? "opacity-50 pointer-events-none"
-                            : ""
-                        }
-                      >
-                        <Icon
-                          icon="streamline-sharp:upload-computer"
-                          width="25"
-                          height="25"
-                          onClick={
-                            !unableActionEditor
-                              ? () =>
-                                  handleOpenModal(
-                                    equipo.id_equipo,
-                                    "Sacar equipo de baja",
-                                    `¿Estás seguro de que deseas sacar de baja el equipo ${equipo.inventario}?`,
-                                    handleSacarDeBaja
-                                  )
-                              : undefined
+                      <Tooltip title="Sacar de baja">
+                        <span
+                          className={
+                            unableActionEditor
+                              ? "opacity-50 pointer-events-none"
+                              : ""
                           }
-                          className="cursor-pointer"
-                        />
-                      </span>
-                    </Tooltip>
-                    <Tooltip title="Eliminar Equipo">
-                      <span
-                        className={
-                          unableActionEditor
-                            ? "opacity-50 pointer-events-none"
-                            : ""
-                        }
-                      >
-                        <Icon
-                          icon="weui:delete-outlined"
-                          width="25"
-                          height="25"
-                          onClick={
-                            !unableActionEditor
-                              ? () =>
-                                  handleOpenModal(
-                                    equipo.id_equipo,
-                                    "Eliminar equipo",
-                                    `¿Estás seguro de que deseas eliminar el equipo ${equipo.inventario}?`,
-                                    deleteEquipo
-                                  )
-                              : undefined
+                        >
+                          <Icon
+                            icon="streamline-sharp:upload-computer"
+                            width="25"
+                            height="25"
+                            onClick={
+                              !unableActionEditor
+                                ? () =>
+                                    handleOpenModal(
+                                      equipo.id_equipo,
+                                      "Sacar equipo de baja",
+                                      `¿Estás seguro de que deseas sacar de baja el equipo ${equipo.inventario}?`,
+                                      handleSacarDeBaja
+                                    )
+                                : undefined
+                            }
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip title="Eliminar Equipo">
+                        <span
+                          className={
+                            unableActionEditor
+                              ? "opacity-50 pointer-events-none"
+                              : ""
                           }
-                          className="cursor-pointer"
-                        />
-                      </span>
-                    </Tooltip>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                        >
+                          <Icon
+                            icon="weui:delete-outlined"
+                            width="25"
+                            height="25"
+                            onClick={
+                              !unableActionEditor
+                                ? () =>
+                                    handleOpenModal(
+                                      equipo.id_equipo,
+                                      "Eliminar equipo",
+                                      `¿Estás seguro de que deseas eliminar el equipo ${equipo.inventario}?`,
+                                      deleteEquipo
+                                    )
+                                : undefined
+                            }
+                            className="cursor-pointer"
+                          />
+                        </span>
+                      </Tooltip>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <nav
+              className="flex flex-col md:flex-row justify-between items-center p-4"
+              aria-label="Table navigation"
+            >
+              <span className="text-sm font-normal text-gray-500"></span>
+              <div className="flex flex-col md:flex-row items-center gap-2">
+                <ul className="inline-flex items-center -space-x-px">
+                  <li>
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                    >
+                      <Tooltip title="Página Anterior">
+                        <span>
+                          <Icon
+                            icon="iconamoon:arrow-left-2"
+                            width="20"
+                            height="20"
+                          />
+                        </span>
+                      </Tooltip>
+                    </button>
+                  </li>
+                  <li>
+                    <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
+                      Página {currentPage} de {totalPages}
+                    </div>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                    >
+                      <Tooltip title="Siguiente Página">
+                        <span>
+                          <Icon
+                            icon="iconamoon:arrow-right-2"
+                            width="20"
+                            height="20"
+                          />
+                        </span>
+                      </Tooltip>
+                    </button>
+                  </li>
+                </ul>
+                <Tooltip title="Exportar a Excel">
+                  <button
+                    onClick={exportToExcel}
+                    className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+                  >
+                    <Icon icon="ph:export" width="20" height="20" />
+                  </button>
+                </Tooltip>
+              </div>
+            </nav>
+          </>
         )}
       </div>
-      <nav
-        className="flex flex-col md:flex-row justify-between items-center p-4"
-        aria-label="Table navigation"
-      >
-        <span className="text-sm font-normal text-gray-500"></span>
-        <div className="flex flex-col md:flex-row items-center gap-2">
-          <ul className="inline-flex items-center -space-x-px">
-            <li>
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-              >
-                <Tooltip title="Página Anterior">
-                  <span>
-                    <Icon
-                      icon="iconamoon:arrow-left-2"
-                      width="20"
-                      height="20"
-                    />
-                  </span>
-                </Tooltip>
-              </button>
-            </li>
-            <li>
-              <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
-                Página {currentPage} de {totalPages}
-              </div>
-            </li>
-            <li>
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-              >
-                <Tooltip title="Siguiente Página">
-                  <span>
-                    <Icon
-                      icon="iconamoon:arrow-right-2"
-                      width="20"
-                      height="20"
-                    />
-                  </span>
-                </Tooltip>
-              </button>
-            </li>
-          </ul>
-          <Tooltip title="Exportar a Excel">
-            <button
-              onClick={exportToExcel}
-              className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-            >
-              <Icon icon="ph:export" width="20" height="20" />
-            </button>
-          </Tooltip>
-        </div>
-      </nav>
       <ModalConfirmation
         open={openModal}
         onClose={handleCloseModal}
