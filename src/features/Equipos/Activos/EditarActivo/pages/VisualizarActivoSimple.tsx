@@ -59,7 +59,9 @@ const VisualizarActivoSimple = ({
   useEffect(() => {
     if (equipoSimpleActivo) {
       setSelectedInventarioInv(equipoSimpleActivo.inventario);
-      setEmpresa(equipoSimpleActivo.inventario.length === 10 ? "EspolTech" : "Espol");
+        (equipo.inventario.length === 10 || equipo.inventario.length === 12)
+        ? setEmpresa("EspolTech")
+        : setEmpresa("Espol");
     }
   }, [equipoSimpleActivo]);
 
