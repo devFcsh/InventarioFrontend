@@ -57,24 +57,28 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
   const [empresa, setEmpresa] = useState(empresaComputadora);
 
   const generateInventario = (periferico: Periferico | null, baseInventario: string): string => {
-    if (!periferico || empresa !== "Espol" || !baseInventario) return "";
+    if (!periferico || !baseInventario) return "";
     
-    const sufijos: { [key: string]: string } = {
-      "monitor": "-1",
-      "teclado": "-2", 
-      "mouse": "-3",
-      "parlante": "-4",
-      "camara": "-5"
-    };
+    if (empresa === "Espol" || empresa === "EspolTech") {
+      const sufijos: { [key: string]: string } = {
+        "monitor": "-1",
+        "teclado": "-2", 
+        "mouse": "-3",
+        "parlante": "-4",
+        "camara": "-5"
+      };
+      
+      const nombrePeriferico = periferico.nombre?.toLowerCase();
+      const sufijo = sufijos[nombrePeriferico] || "";
+      
+      return baseInventario + sufijo;
+    }
     
-    const nombrePeriferico = periferico.nombre?.toLowerCase();
-    const sufijo = sufijos[nombrePeriferico] || "";
-    
-    return baseInventario + sufijo;
+    return "";
   };
 
   useEffect(() => {
-    if (nuevoComponente.periferico && empresa === "Espol" && inventarioComputadora) {
+    if (nuevoComponente.periferico && (empresa === "Espol" || empresa === "EspolTech") && inventarioComputadora) {
       const nuevoInventario = generateInventario(nuevoComponente.periferico, inventarioComputadora);
       setNuevoComponente(prev => ({
         ...prev,
@@ -144,7 +148,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
     _event: React.SyntheticEvent<Element, Event>,
     newValue: Periferico | null
   ) => {
-    const nuevoInventario = empresa === "Espol" && inventarioComputadora 
+    const nuevoInventario = (empresa === "Espol" || empresa === "EspolTech") && inventarioComputadora 
       ? generateInventario(newValue, inventarioComputadora)
       : "";
     
@@ -226,6 +230,22 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
       serie: null,
       inventario: "",
     });
+  };
+
+  const getInventarioHelperText = () => {
+    if (empresa === "Espol") {
+      return "El inventario se genera automáticamente";
+    } else if (empresa === "EspolTech") {
+      return "El inventario se genera automáticamente, pero puedes editarlo";
+    }
+    return "";
+  };
+
+  const getMaxLength = () => {
+    if (empresa === "EspolTech") {
+      return 20;
+    }
+    return 10;
   };
 
   return (
@@ -387,13 +407,15 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 helperText={
                   componentsErrors.inventario
                     ? "Por favor escribir un inventario válido"
-                    : empresa === "Espol" ? "El inventario se genera automáticamente" : ""
+                    : getInventarioHelperText()
                 }
                 onChange={(e) => {
                   if (empresa !== "Espol") {
                     let value = e.target.value;
-                    if (empresa === "EspolTech" && value !== null && value.length > 10) {
-                      value = value.slice(0, 10);
+                    const maxLength = getMaxLength();
+                    
+                    if (value !== null && value.length > maxLength) {
+                      value = value.slice(0, maxLength);
                     }
                     setNuevoComponente({
                       ...nuevoComponente,
