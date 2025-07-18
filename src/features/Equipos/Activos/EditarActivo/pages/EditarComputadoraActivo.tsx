@@ -687,12 +687,12 @@ const EditarComputadoraActivo = ({
             }
             onChange={(e) => {
               const value = e.target.value;
-              if (empresa === "Espol" && value !== null && value.length > 6) {
+              if (empresa === "Espol" && value !== null && value.length > 8) {
                 return;
               } else if (
                 empresa === "EspolTech" &&
                 value !== null &&
-                value.length > 10
+                value.length > 12
               ) {
                 return;
               }
@@ -1135,13 +1135,13 @@ const EditarComputadoraActivo = ({
                   if (
                     empresaNuevoComponente === "Espol" &&
                     value !== null &&
-                    value.length > 6
+                    value.length > 8
                   ) {
                     return;
                   } else if (
                     empresaNuevoComponente === "EspolTech" &&
                     value !== null &&
-                    value.length > 10
+                    value.length > 12
                   ) {
                     return;
                   }

@@ -156,9 +156,9 @@ export const StepDatosInventarioSAP = ({
             helperText={inventorySAPErrors.inventario? "Por favor escribir un inventario válido" :""}
             onChange={(e) => {
               const value = e.target.value;
-              if (inventoryDataSAPForm.empresa==="Espol" && value !== null && value.length > 6) {
+              if (inventoryDataSAPForm.empresa==="Espol" && value !== null && value.length > 8) {
                 return
-              }else if(inventoryDataSAPForm.empresa==="EspolTech" && value !== null && value.length > 10){
+              }else if(inventoryDataSAPForm.empresa==="EspolTech" && value !== null && value.length > 12){
                 return
               }
               handleInventorySAPChange("inventario", value);
