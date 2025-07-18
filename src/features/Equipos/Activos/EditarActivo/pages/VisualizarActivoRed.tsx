@@ -59,7 +59,7 @@ const VisualizarActivoRed = ({
       setSelectedPuertos(equipoRedActivo.puertos);
       setSelectedPuertoFTP(equipoRedActivo.puerto_ftp);
       setNombreEquipo(equipoRedActivo.nombre_equipo ?? "");
-      (equipo.inventario.length === 10 || equipo.inventario.length === 12)
+      (equipoRedActivo.inventario.length === 10 || equipoRedActivo.inventario.length === 12)
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
