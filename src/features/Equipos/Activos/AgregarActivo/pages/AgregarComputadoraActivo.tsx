@@ -643,7 +643,13 @@ const AgregarComputadoraActivo = ({
             fullWidth
             size="small"
             value={nombreEquipo}
-            onChange={(e) => setNombreEquipo(e.target.value)}
+            onChange={(e) => {
+            let value = e.target.value;
+            if (value !== null && value.length > 10) {
+              value = value.slice(0, 10);
+            }
+            setNombreEquipo(value);
+          }}
           />
           <Autocomplete
             size="small"
