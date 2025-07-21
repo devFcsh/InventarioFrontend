@@ -4,7 +4,7 @@ import { List, ListItem, ListItemIcon, ListItemText, Collapse } from '@mui/mater
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import ComputerIcon from '@mui/icons-material/Computer';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { NavBarItemsProps } from "../PropsInterface";
 
 const AdminSections = [
@@ -53,6 +53,19 @@ export const NavBarItems: React.FC<NavBarItemsProps> = ({ currentSection, setCur
     navigate(`/${section.toLowerCase()}`);
     setIsDrawerOpen(false);
   };
+
+  useEffect(() => {
+    if (currentSection) {
+      localStorage.setItem('currentSection', currentSection);
+    }
+  }, [currentSection]);
+
+  useEffect(() => {
+    const savedSection = localStorage.getItem('currentSection');
+    if (savedSection) {
+      setCurrentSection(savedSection);
+    }
+  }, [setCurrentSection]);
 
   const toggleSection = (section: string) => {
     setOpenSections(prevState => ({
