@@ -8,7 +8,7 @@ import { ProtectedRoute } from "./router/ProtectedRoute";
 import NotRegistered from "@pages/NotRegistered";
 
 const App: React.FC = () => {
-  const [currentSection, setCurrentSection] = useState<string>("");
+  const [currentSection, setCurrentSection] = useState<string>("/activos");
 
   const allRoles = Array.from(
     new Set(routesConfig.flatMap((route) => route.allowedRoles))
