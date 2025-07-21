@@ -33,7 +33,7 @@ export const StepInformacionGeneralSAP = ({
                 : ""
             }
             onChange={(e) => {
-              let value = e.target.value.toUpperCase();
+              const value = e.target.value.toUpperCase();
               if (value !== null && value.length > 10) {
                 return
               }

@@ -804,7 +804,13 @@ const EditarComputadoraBodega = ({
           size="small"
           label="Nombre Equipo"
           value={nombreEquipo}
-          onChange={(e) => setNombreEquipo(e.target.value)}
+          onChange={(e) => {
+            let value = e.target.value;
+            if (value !== null && value.length > 10) {
+              value = value.slice(0, 10);
+            }
+            setNombreEquipo(value);
+          }}
           fullWidth
           variant="outlined"
         />
