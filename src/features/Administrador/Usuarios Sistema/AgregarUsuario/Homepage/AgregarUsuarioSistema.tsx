@@ -1,4 +1,4 @@
-import { Autocomplete, TextField, Button } from "@mui/material";
+import { Autocomplete, TextField, Button, InputAdornment } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAgregarUsuarioSistema } from "../hooks/useAgregarUsuarioSistema";
@@ -29,7 +29,7 @@ const AgregarUsuarioSistema = () => {
   const handleAgregarUsuario = async () => {
     if (validarCampos()) {
       try {
-        await agregarUsuarioSistema({ correo, rolId: selectedRolId! });
+        await agregarUsuarioSistema({ correo: correo + "@espol.edu.ec", rolId: selectedRolId! });
         setOpenModalAgregar(false);
         setCorreo("");
         setSelectedRolId(null);
@@ -86,6 +86,9 @@ const AgregarUsuarioSistema = () => {
                 return;
               }
               setCorreo(value);
+            }}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">@espol.edu.ec</InputAdornment>,
             }}
           />
           <Autocomplete
