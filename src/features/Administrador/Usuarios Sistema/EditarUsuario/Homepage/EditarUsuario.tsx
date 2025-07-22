@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { TextField, Button, Autocomplete } from "@mui/material";
+import { TextField, Button, Autocomplete, InputAdornment } from "@mui/material";
 import useEditarUsuarioSistema from "../hooks/useEditarUsuarioSistema";
 import { useSnackbar } from "@context/SnackbarContext";
 import useRoles from "@hooks/useRoles";
@@ -12,7 +12,7 @@ const EditarUsuarioSistema = () => {
 
   const { usuario } = location.state || {};
 
-  const [correo, setCorreo] = useState(usuario?.correo || "");
+  const [correo, setCorreo] = useState(usuario?.correo.replace("@espol.edu.ec", "") || "");
 
   const { showMessage } = useSnackbar();
   const { roles, loading: loadingRoles, error: errorRoles } = useRoles();
@@ -45,7 +45,7 @@ const EditarUsuarioSistema = () => {
       if (correo && selectedRolId) {
         await editarUsuarioSistema(
           usuario.id_usuario_sistema,
-          correo,
+          correo + "@espol.edu.ec", // Agregar el dominio al guardar
           String(selectedRolId)
         );
         showMessage("Usuario actualizado correctamente", "success");
@@ -64,7 +64,7 @@ const EditarUsuarioSistema = () => {
   };
 
   if (loading || loadingRoles) {
-    return <Loader/>;
+    return <Loader />;
   }
 
   if (error || errorRoles) {
@@ -85,10 +85,13 @@ const EditarUsuarioSistema = () => {
             value={correo}
             onChange={(e) => {
               const value = e.target.value;
-              if (value !== null && value.length > 50) {
+              if (value !== null && value.length > 15) {
                 return;
               }
               setCorreo(value);
+            }}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">@espol.edu.ec</InputAdornment>,
             }}
           />
 

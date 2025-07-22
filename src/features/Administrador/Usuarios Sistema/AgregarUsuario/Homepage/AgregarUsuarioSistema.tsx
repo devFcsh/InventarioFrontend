@@ -82,7 +82,7 @@ const AgregarUsuarioSistema = () => {
             value={correo}
             onChange={(e) => {
               const value = e.target.value;
-              if (value !== null && value.length > 50) {
+              if (value !== null && value.length > 15) {
                 return;
               }
               setCorreo(value);
