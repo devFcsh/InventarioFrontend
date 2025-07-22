@@ -70,7 +70,7 @@ export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSectio
         <div className="flex items-center gap-8 text-sm font-medium text-black">
           <div className="flex items-center gap-1">
             <PersonIcon />
-            <p>{user ? user.email : ""}</p>
+            <p>{user ? user.username : ""}</p>
           </div>
           <div 
             className={`flex items-center gap-1 cursor-pointer ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : 'hover:text-gray-700'}`}
