@@ -902,7 +902,7 @@ const EditarComputadoraActivo = ({
           }
           onChange={(e) => {
             const value = e.target.value;
-            if (value !== null && value.length > 10) {
+            if (value !== null && value.length > 14) {
               return;
             }
             handleNombreEquipo(value);

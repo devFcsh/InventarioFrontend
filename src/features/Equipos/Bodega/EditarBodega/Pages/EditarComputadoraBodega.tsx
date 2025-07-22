@@ -806,8 +806,8 @@ const EditarComputadoraBodega = ({
           value={nombreEquipo}
           onChange={(e) => {
             let value = e.target.value;
-            if (value !== null && value.length > 10) {
-              value = value.slice(0, 10);
+            if (value !== null && value.length > 14) {
+              value = value.slice(0, 14);
             }
             setNombreEquipo(value);
           }}

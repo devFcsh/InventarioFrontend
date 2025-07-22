@@ -34,7 +34,7 @@ export const StepInformacionGeneralSAP = ({
             }
             onChange={(e) => {
               const value = e.target.value.toUpperCase();
-              if (value !== null && value.length > 10) {
+              if (value !== null && value.length > 14) {
                 return
               }
               handleInformacionGeneralSAPChange("nombreEquipo",value);
