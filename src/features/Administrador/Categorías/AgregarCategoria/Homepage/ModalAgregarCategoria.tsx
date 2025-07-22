@@ -305,7 +305,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               value={ramTipo}
               onChange={(e) => {
               const value = e.target.value;
-              if (value !== null && value.length > 6) {
+              if (value !== null && value.length > 20) {
                 return;
               }
               setRamTipo(value);
@@ -578,7 +578,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
             value={newOption}
             onChange={(e) => {
               const value = e.target.value;
-              if (value !== null && value.length > 20) {
+              if (value !== null && value.length > 15) {
                 return;
               }
               setNewOption(e.target.value);
