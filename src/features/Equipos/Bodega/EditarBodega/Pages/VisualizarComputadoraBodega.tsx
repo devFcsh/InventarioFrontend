@@ -27,15 +27,15 @@ import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPor
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
 import { useNavigate } from "react-router-dom";
 import useProcesadores from "@hooks/useProcesadores";
-interface EditarComputadoraBodegaProps {
+interface VisualizarComputadoraBodegaProps {
   equipo: BodegaComputadoraEdit;
   componentesBodega: ComponenteBodega[];
 }
 
-const EditarComputadoraBodega = ({
+const VisualizarComputadoraBodega = ({
   equipo,
   componentesBodega,
-}: EditarComputadoraBodegaProps) => {
+}: VisualizarComputadoraBodegaProps) => {
   const [selectedInventarioMarca, setSelectedInventarioMarca] =
     useState<Marca | null>(null);
   const [selectedInventarioModelo, setSelectedInventarioModelo] =
@@ -193,7 +193,7 @@ const EditarComputadoraBodega = ({
       setDireccionIP(equipo.direccion_ip);
       setProtocolo(equipo.direccion_ip ? "0" : "1");
       setNewObservation(equipo.observacion);
-      (equipo.inventario.length === 10 || equipo.inventario.length === 12)
+      equipo.inventario.length === 10 || equipo.inventario.length === 12
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
@@ -469,17 +469,30 @@ const EditarComputadoraBodega = ({
                 </tr>
               </thead>
               <tbody>
-                {componentesBodega.map((comp, index) => (
-                  <tr key={index}>
-                    <td className="py-2 px-4 border">
-                      {comp.periferico?.nombre}
+                {componentesBodega.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="text-center py-4 px-4 text-gray-500"
+                    >
+                      No hay componentes en la bodega.
                     </td>
-                    <td className="py-2 px-4 border">{comp.marca?.nombre}</td>
-                    <td className="py-2 px-4 border">{comp.modelo?.nombre}</td>
-                    <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
-                    <td className="py-2 px-4 border">{comp.inventario}</td>
                   </tr>
-                ))}
+                ) : (
+                  componentesBodega.map((comp, index) => (
+                    <tr key={index}>
+                      <td className="py-2 px-4 border">
+                        {comp.periferico?.nombre}
+                      </td>
+                      <td className="py-2 px-4 border">{comp.marca?.nombre}</td>
+                      <td className="py-2 px-4 border">
+                        {comp.modelo?.nombre}
+                      </td>
+                      <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
+                      <td className="py-2 px-4 border">{comp.inventario}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -511,4 +524,4 @@ const EditarComputadoraBodega = ({
   );
 };
 
-export default EditarComputadoraBodega;
+export default VisualizarComputadoraBodega;

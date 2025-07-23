@@ -279,7 +279,7 @@ const EditarComputadoraBodega = ({
       setDireccionIP(equipo.direccion_ip);
       setProtocolo(equipo.direccion_ip ? "0" : "1");
       setNewObservation(equipo.observacion);
-      (equipo.inventario.length === 10 || equipo.inventario.length === 12)
+      equipo.inventario.length === 10 || equipo.inventario.length === 12
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
@@ -848,30 +848,43 @@ const EditarComputadoraBodega = ({
                 </tr>
               </thead>
               <tbody>
-                {componentesState.map((comp, index) => (
-                  <tr key={index}>
-                    <td className="py-2 px-4 border">
-                      {comp.periferico?.nombre}
-                    </td>
-                    <td className="py-2 px-4 border">{comp.marca?.nombre}</td>
-                    <td className="py-2 px-4 border">{comp.modelo?.nombre}</td>
-                    <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
-                    <td className="py-2 px-4 border">{comp.inventario}</td>
-                    <td className="py-2 px-1 border">
-                      <Tooltip title="Eliminar Componente">
-                        <span>
-                          <Icon
-                            icon="fluent-mdl2:disconnect-virtual-machine"
-                            width="25"
-                            height="25"
-                            onClick={() => eliminarComponente(index)}
-                            className="cursor-pointer mx-auto"
-                          />
-                        </span>
-                      </Tooltip>
+                {componentesState.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="text-center py-4 px-4 text-gray-500"
+                    >
+                      No hay componentes disponibles.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  componentesState.map((comp, index) => (
+                    <tr key={index}>
+                      <td className="py-2 px-4 border">
+                        {comp.periferico?.nombre}
+                      </td>
+                      <td className="py-2 px-4 border">{comp.marca?.nombre}</td>
+                      <td className="py-2 px-4 border">
+                        {comp.modelo?.nombre}
+                      </td>
+                      <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
+                      <td className="py-2 px-4 border">{comp.inventario}</td>
+                      <td className="py-2 px-1 border">
+                        <Tooltip title="Eliminar Componente">
+                          <span>
+                            <Icon
+                              icon="fluent-mdl2:disconnect-virtual-machine"
+                              width="25"
+                              height="25"
+                              onClick={() => eliminarComponente(index)}
+                              className="cursor-pointer mx-auto"
+                            />
+                          </span>
+                        </Tooltip>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
