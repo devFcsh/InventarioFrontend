@@ -294,7 +294,7 @@ export const StepDatosInventario = ({
                 } else if (
                   inventoryDataForm.empresa === "EspolTech" &&
                   value !== null &&
-                  value.length > 12
+                  value.length > 25
                 ) {
                   return;
                 }

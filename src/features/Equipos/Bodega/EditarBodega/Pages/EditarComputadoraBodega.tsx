@@ -619,7 +619,7 @@ const EditarComputadoraBodega = ({
               } else if (
                 empresa === "EspolTech" &&
                 value !== null &&
-                value.length > 12
+                value.length > 25
               ) {
                 return;
               }
@@ -1018,7 +1018,7 @@ const EditarComputadoraBodega = ({
                   } else if (
                     empresaNuevoComponente === "EspolTech" &&
                     value !== null &&
-                    value.length > 12
+                    value.length > 25
                   ) {
                     return;
                   }

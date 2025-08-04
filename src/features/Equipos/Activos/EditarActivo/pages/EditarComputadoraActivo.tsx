@@ -704,7 +704,7 @@ const EditarComputadoraActivo = ({
               } else if (
                 empresa === "EspolTech" &&
                 value !== null &&
-                value.length > 12
+                value.length > 25
               ) {
                 return;
               }
@@ -1184,7 +1184,7 @@ const EditarComputadoraActivo = ({
                   } else if (
                     empresaNuevoComponente === "EspolTech" &&
                     value !== null &&
-                    value.length > 12
+                    value.length > 25
                   ) {
                     return;
                   }
