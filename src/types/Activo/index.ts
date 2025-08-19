@@ -88,7 +88,7 @@ export type ActivoRedEdit = {
     id_usuario: string;
     imagenRuta: string | null;
     id_ubicacion: string;
-    id_serie: string;
+    serie: string;
     id_lampara: string;
     observacion: string;
   };

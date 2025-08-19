@@ -1,4 +1,3 @@
-// context/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface User {
@@ -24,82 +23,39 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
+  // Usuario quemado para desarrollo
+  const hardcodedUser: User = {
+    id: "1",
+    username: "devuser",
+    authenticatedAt: new Date().toISOString(),
+    attributes: { email: "devuser@ejemplo.com", displayName: "Usuario Dev" }
+  };
+
+  const [user, setUser] = useState<User | null>(hardcodedUser);
+  const [isLoading, setIsLoading] = useState(false);
 
   const isAuthenticated = !!user;
 
+  // checkAuth solo setea el usuario quemado
   const checkAuth = async () => {
-    try {
-      console.log('🔍 Verificando estado de autenticación...');
-      
-      const response = await fetch(`${API_BASE_URL}/auth/status`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const data = await response.json();
-      console.log('📊 Estado de autenticación:', data);
-
-      if (data.authenticated && data.user) {
-        setUser(data.user);
-        console.log('✅ Usuario autenticado:', data.user.username);
-      } else {
-        setUser(null);
-        console.log('❌ Usuario no autenticado');
-      }
-    } catch (error) {
-      console.error('❌ Error verificando autenticación:', error);
-      setUser(null);
-    } finally {
-      setIsLoading(false);
-    }
+    setIsLoading(true);
+    setUser(hardcodedUser);
+    setIsLoading(false);
   };
 
   const login = () => {
-    console.log('🚀 Iniciando proceso de login...');
-    window.location.href = `${API_BASE_URL}/auth/cas/login`;
+    // Solo simula login en desarrollo
+    setUser(hardcodedUser);
   };
 
   const logout = async () => {
-    try {
-      console.log('🚪 Cerrando sesión...');
-      
-      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setUser(null);
-        console.log('✅ Sesión cerrada exitosamente');
-        
-        // Redirigir al logout de CAS si está disponible
-        if (data.casLogoutUrl) {
-          window.location.href = data.casLogoutUrl;
-        } else {
-          window.location.href = '/login';
-        }
-      }
-    } catch (error) {
-      console.error('❌ Error cerrando sesión:', error);
-      // Aunque haya error, limpiar el estado local
-      setUser(null);
-      window.location.href = '/login';
-    }
+    setUser(null);
+    window.location.href = '/login';
   };
 
   useEffect(() => {
-    checkAuth();
+    setUser(hardcodedUser);
+    setIsLoading(false);
   }, []);
 
   const value: AuthContextType = {

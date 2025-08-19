@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+/** 
 
+import { useEffect, useState } from "react";
 const Login = () => {
   const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
   const [status, setStatus] = useState<"loading" | "redirecting" | "error">(
@@ -139,5 +140,15 @@ const Login = () => {
     </div>
   );
 };
+
+*/
+
+const Login = () => {
+  return (
+    <div>
+      <button onClick={() => window.location.href = "/activos"}>Iniciar Sesion</button>
+    </div>
+  )
+}
 
 export default Login;

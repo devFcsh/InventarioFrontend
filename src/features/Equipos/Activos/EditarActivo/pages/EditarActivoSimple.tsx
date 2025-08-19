@@ -3,7 +3,6 @@ import { Autocomplete, TextField, Button, Box } from "@mui/material";
 import {
   Marca,
   Modelo,
-  Serie,
   Ubicacion,
   Edificio,
   Lampara,
@@ -39,8 +38,7 @@ const EditarActivoSimple = ({
   const [selectedInventarioModelo, setSelectedInventarioModelo] =
     useState<Modelo | null>(null);
   const [selectedLampara, setSelectedLampara] = useState<Lampara | null>(null);
-  const [selectedInventarioSerie, setSelectedInventarioSerie] =
-    useState<Serie | null>(null);
+  const [serieNombre, setSerieNombre] = useState<string>("");
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
   const [selectedInventarioAnio, setSelectedInventarioAnio] =
@@ -103,7 +101,8 @@ const EditarActivoSimple = ({
       setSelectedInventarioAnio(equipoSimpleActivo.anio_compra);
       setCurrentImagePath(equipoSimpleActivo.imagenRuta);
       setNewObservation(equipoSimpleActivo.observacion);
-      (equipoSimpleActivo.inventario.length === 10 || equipoSimpleActivo.inventario.length === 12)
+      equipoSimpleActivo.inventario.length === 10 ||
+      equipoSimpleActivo.inventario.length === 12
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
@@ -131,11 +130,10 @@ const EditarActivoSimple = ({
 
   useEffect(() => {
     if (equipoSimpleActivo && series.length > 0) {
-      setSelectedInventarioSerie(
-        series.find(
-          (serie) => serie?.id_serie === equipoSimpleActivo.id_serie
-        ) || null
+      const serieObj = series.find(
+        (serie) => serie?.id_serie === equipoSimpleActivo.id_serie
       );
+      setSerieNombre(serieObj?.nombre || "");
     }
   }, [equipoSimpleActivo, series]);
 
@@ -202,7 +200,7 @@ const EditarActivoSimple = ({
       id_usuario: idUsuario ?? "",
       imagenRuta: image ? nuevaImagen : "",
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
-      id_serie: selectedInventarioSerie?.id_serie ?? "",
+      serie: serieNombre,
       observacion: observationValue,
       id_lampara: selectedLampara?.id_lampara ?? "",
     };
@@ -285,7 +283,7 @@ const EditarActivoSimple = ({
       errorInventario ||
       !selectedInventarioAnio ||
       errorAnio ||
-      !selectedInventarioSerie ||
+      !serieNombre ||
       !selectedUbicacion ||
       (perifericoName !== "Proyector" ? false : !selectedLampara)
     ) {
@@ -322,7 +320,6 @@ const EditarActivoSimple = ({
           onChange={(_, newValue) => {
             setSelectedInventarioMarca(newValue);
             setSelectedInventarioModelo(null);
-            setSelectedInventarioSerie(null);
             setSelectedLampara(null);
           }}
           getOptionLabel={(option) => option?.nombre || ""}
@@ -337,7 +334,6 @@ const EditarActivoSimple = ({
           value={selectedInventarioModelo}
           onChange={(_, newValue) => {
             setSelectedInventarioModelo(newValue);
-            setSelectedInventarioSerie(null);
           }}
           getOptionLabel={(option) => option?.nombre || ""}
           renderInput={(params) => (
@@ -349,16 +345,13 @@ const EditarActivoSimple = ({
             />
           )}
         />
-        <Autocomplete
+        <TextField
+          label="Serie"
+          variant="outlined"
+          fullWidth
           size="small"
-          disablePortal
-          options={series}
-          value={selectedInventarioSerie}
-          onChange={(_, newValue) => setSelectedInventarioSerie(newValue)}
-          getOptionLabel={(option) => option?.nombre || ""}
-          renderInput={(params) => (
-            <TextField {...params} label="Serie" variant="outlined" fullWidth />
-          )}
+          value={serieNombre}
+          onChange={(e) => setSerieNombre(e.target.value)}
         />
         <Box
           sx={{

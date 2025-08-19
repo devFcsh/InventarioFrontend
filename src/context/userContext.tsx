@@ -24,33 +24,34 @@ const UserContext = createContext<UserContextType>({
 });
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [rol, setRol] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Usuario quemado para desarrollo
+  const hardcodedUser: User = {
+    id: "1",
+    username: "devuser",
+    email: "devuser@ejemplo.com",
+    displayName: "Usuario Dev",
+    authenticatedAt: new Date().toISOString(),
+    source: "dev",
+  };
+  const hardcodedRol = "administrador"; // Cambia el rol si lo necesitas
 
+  const [user, setUser] = useState<User | null>(hardcodedUser);
+  const [rol, setRol] = useState<string | null>(hardcodedRol);
+  const [loading, setLoading] = useState(false);
+
+  // refreshUser solo vuelve a poner el usuario quemado
   const fetchUser = async () => {
     setLoading(true);
-    try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/status`, {
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (data.authenticated) {
-        setUser(data.user);
-        setRol(data.rol);
-      } else {
-        setUser(null);
-        setRol(null);
-      }
-    } catch {
-      setUser(null);
-      setRol(null);
-    }
+    setUser(hardcodedUser);
+    setRol(hardcodedRol);
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchUser();
+    // Solo setea el usuario quemado al montar
+    setUser(hardcodedUser);
+    setRol(hardcodedRol);
+    setLoading(false);
   }, []);
 
   return (
@@ -60,4 +61,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
-export const useUser = () => useContext(UserContext);
+export function useUser() {
+  return useContext(UserContext);
+}
