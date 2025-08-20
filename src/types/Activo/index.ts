@@ -154,4 +154,34 @@ export type ActivoComputadoraData = {
     puerto_ftp: string;
     nombreEquipo: string;
   };
-  
+
+export type ActivoComputadoraImport = {
+  tipo: string;
+  inventario: string;
+  anio_compra: number | string;
+  serie: string;
+  modelo: string;
+  usuario: string;
+  ubicacion: string;
+  nombreEquipo: string;
+  direccionIp?: string;
+  versionso?: string;
+  versionoffice?: string;
+  ram?: string;
+  disco?: string;
+  procesador?: string;
+  antivirus?: string;
+  dominio?: string;
+  imagenRuta?: string;
+  observacion?: string;
+  componentes?: Array<{
+    inventario: string;
+    serie: string;
+    tipo?: string;
+    anio_compra?: number | string;
+    modelo?: string;
+    imagenRuta?: string;
+    observacion?: string;
+    idLampara?: number;
+  }>;
+};

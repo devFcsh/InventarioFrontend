@@ -1,6 +1,6 @@
 import { Autocomplete, TextField, Tooltip } from "@mui/material";
 import { Icon } from "@iconify/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as XLSX from "xlsx";
 import { Link } from "react-router-dom";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
@@ -28,6 +28,7 @@ import {
 import { useSnackbar } from "@context/SnackbarContext.tsx";
 import { useUser } from "@context/userContext.tsx";
 import Loader from "@pages/Loader.tsx";
+import { useImportarEquipoActivo } from "../hooks/useImportarEquipoActivo.ts";
 
 const Activos = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -65,6 +66,9 @@ const Activos = () => {
   const { rol } = useUser();
   const unableAction = rol !== "administrador" && rol !== "editor";
   const unableActionEditor = rol !== "administrador";
+  const { importarEquiposActivos, loading: importLoading } =
+    useImportarEquipoActivo();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { showMessage } = useSnackbar();
   const { perifericos } = usePerifericos();
@@ -119,6 +123,93 @@ const Activos = () => {
       showMessage("Error al realizar la acción", "error");
     }
     handleCloseModal();
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  function transformarFilaExcel(row: any) {
+    // Normaliza los valores como en tu script Python
+    const normalize = (val: any) =>
+      val === undefined || val === null
+        ? "S/N"
+        : String(val).trim() === "S/N"
+        ? "S/N"
+        : String(val).trim();
+
+    // Extrae y transforma los campos necesarios
+    return {
+      tipo: normalize(row["Tipo"]),
+      inventario: String(row["Inventario CPU"] ?? ""),
+      anio_compra:
+        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
+          ? String(parseInt(row["Año Adq"]))
+          : "S/N",
+      serie: normalize(row["Serie CPU"]),
+      modelo: normalize(row["Modelo Case"]),
+      nombreEquipo: normalize(row["Nombre de equipo"]),
+      direccionIp: normalize(row["IP"]).toLowerCase().replace("dhcp", ""),
+      versionso: normalize(row["Unnamed: 14"]),
+      ram: normalize(String(row["Capacidad Memoria"]).split(" ")[0]),
+      tipo_ram: normalize(
+        String(row["Capacidad Memoria"]).split(" ").slice(1).join(" ")
+      ),
+      disco: normalize(
+        String(row["Capacidad HDD"]) + (row["Tipo Disco"] ?? "")
+      ),
+      procesador: normalize(row["Procesador"]),
+      dominio: normalize(row["Dominio"]),
+      usuario: normalize(row["Usuario"]),
+      ubicacion: normalize(row["Ubicacion"]),
+      observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
+      componentes: [
+        {
+          tipo: "Monitor",
+          modelo: normalize(row["Modelo monitor"]),
+          serie: normalize(row["Serie monitor"]),
+          inventario: String(row["Inventario Monitor"] ?? ""),
+        },
+        {
+          tipo: "Teclado",
+          modelo: normalize(row["Modelo teclado"]),
+          serie: normalize(row["Serie teclado"]),
+          inventario: String(row["Inventario Teclado"] ?? ""),
+        },
+        {
+          tipo: "Mouse",
+          modelo: normalize(row["Modelo mouse"]),
+          serie: normalize(row["Serie mouse"]),
+          inventario: String(row["Inventario Mouse"] ?? ""),
+        },
+      ],
+    };
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      const data = evt.target?.result;
+      if (!data) return;
+      const workbook = XLSX.read(data, { type: "binary" });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+      try {
+        const equiposImport = jsonData.map(transformarFilaExcel);
+
+        await importarEquiposActivos(equiposImport);
+        showMessage("Importación completada", "success");
+        setShouldFetch(true);
+      } catch {
+        showMessage("Error al importar equipos", "error");
+      }
+    };
+    reader.readAsBinaryString(file);
   };
 
   const deleteEquipo = async (equipoId: string) => {
@@ -1164,10 +1255,27 @@ const Activos = () => {
                     <Icon icon="ph:export" width="20" height="20" />
                   </button>
                 </Tooltip>
+                
               </div>
             </nav>
           </>
         )}
+        <Tooltip title="Importar desde Excel">
+                  <button
+                    onClick={handleImportClick}
+                    className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+                    disabled={importLoading}
+                  >
+                    <Icon icon="mdi:import" width="20" height="20" />
+                    <input
+                      type="file"
+                      accept=".xlsx, .xls"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
+                    />
+                  </button>
+                </Tooltip>
       </div>
 
       <ModalConfirmation
