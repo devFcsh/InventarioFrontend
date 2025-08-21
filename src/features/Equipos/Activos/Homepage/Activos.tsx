@@ -130,7 +130,6 @@ const Activos = () => {
   };
 
   function transformarFilaExcel(row: any) {
-    // Normaliza los valores como en tu script Python
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -138,7 +137,7 @@ const Activos = () => {
         ? "S/N"
         : String(val).trim();
 
-    // Extrae y transforma los campos necesarios
+    const ubicacion = row["Oficina"] !== "" ? row["Oficina"] : row["Aula"];
     return {
       tipo: normalize(row["Tipo"]),
       inventario: String(row["Inventario CPU"] ?? ""),
@@ -150,7 +149,7 @@ const Activos = () => {
       modelo: normalize(row["Modelo Case"]),
       nombreEquipo: normalize(row["Nombre de equipo"]),
       direccionIp: normalize(row["IP"]).toLowerCase().replace("dhcp", ""),
-      versionso: normalize(row["Unnamed: 14"]),
+      versionso: normalize(row["__EMPTY"]),
       ram: normalize(String(row["Capacidad Memoria"]).split(" ")[0]),
       tipo_ram: normalize(
         String(row["Capacidad Memoria"]).split(" ").slice(1).join(" ")
@@ -161,7 +160,7 @@ const Activos = () => {
       procesador: normalize(row["Procesador"]),
       dominio: normalize(row["Dominio"]),
       usuario: normalize(row["Usuario"]),
-      ubicacion: normalize(row["Ubicacion"]),
+      ubicacion: normalize(ubicacion),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
       componentes: [
         {
@@ -1255,27 +1254,26 @@ const Activos = () => {
                     <Icon icon="ph:export" width="20" height="20" />
                   </button>
                 </Tooltip>
-                
               </div>
             </nav>
           </>
         )}
         <Tooltip title="Importar desde Excel">
-                  <button
-                    onClick={handleImportClick}
-                    className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-                    disabled={importLoading}
-                  >
-                    <Icon icon="mdi:import" width="20" height="20" />
-                    <input
-                      type="file"
-                      accept=".xlsx, .xls"
-                      ref={fileInputRef}
-                      onChange={handleFileChange}
-                      style={{ display: "none" }}
-                    />
-                  </button>
-                </Tooltip>
+          <button
+            onClick={handleImportClick}
+            className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+            disabled={importLoading}
+          >
+            <Icon icon="mdi:import" width="20" height="20" />
+            <input
+              type="file"
+              accept=".xlsx, .xls"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              style={{ display: "none" }}
+            />
+          </button>
+        </Tooltip>
       </div>
 
       <ModalConfirmation
