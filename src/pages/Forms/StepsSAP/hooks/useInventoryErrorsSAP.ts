@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   Marca,
   Modelo,
-  Serie,
   Ubicacion,
 } from "../../../../types";
 import {validateInventario} from "../../../../pages/Forms/helpers/validateInventario.ts"
@@ -10,7 +9,7 @@ import {validateInventario} from "../../../../pages/Forms/helpers/validateInvent
 interface InventoryDataForm {
   marca: Marca;
   modelo: Modelo;
-  serie: Serie;
+  serie: string;
   inventario: string;
   empresa:string
   ubicacion: Ubicacion;
@@ -28,12 +27,12 @@ export const useInventoryErrorsSAP = (tipoInventario: string) => {
 
   const completeDatosInventario = (dataForm: InventoryDataForm)=>{
     if(tipoInventario==="activo"){
-      if(dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
+      if(dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !=="" &&
         dataForm.inventario !==""  && dataForm.ubicacion!==null && dataForm.empresa!=""
       ) return true
       return false;
     }else{
-      if(dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
+      if(dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !=="" &&
         dataForm.inventario !==""
       ) return true
       return false;

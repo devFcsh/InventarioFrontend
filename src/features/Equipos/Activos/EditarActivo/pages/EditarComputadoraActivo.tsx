@@ -10,7 +10,6 @@ import {
 import {
   Marca,
   Modelo,
-  Serie,
   SistemaOperativo,
   VersionSO,
   RAM,
@@ -64,7 +63,7 @@ const EditarComputadoraActivo = ({
   const [selectedInventarioModelo, setSelectedInventarioModelo] =
     useState<Modelo | null>(null);
   const [selectedInventarioSerie, setSelectedInventarioSerie] =
-    useState<Serie | null>(null);
+    useState<string>("");
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
   const [selectedInventarioAnio, setSelectedInventarioAnio] =
@@ -111,7 +110,7 @@ const EditarComputadoraActivo = ({
     periferico: null,
     marca: null,
     modelo: null,
-    serie: null,
+    serie: "",
     inventario: "",
   });
   const [newObservation, setNewObservation] = useState<string>("");
@@ -185,11 +184,6 @@ const EditarComputadoraActivo = ({
     nuevoComponente.marca?.id_marca ?? "",
     nuevoComponente.periferico?.id_periferico ?? ""
   );
-  const { series: seriesComponente } = useSeriesPorModelo(
-    nuevoComponente.periferico?.id_periferico ?? "",
-    nuevoComponente.marca?.id_marca ?? "",
-    nuevoComponente.modelo?.id_modelo ?? ""
-  );
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -212,7 +206,7 @@ const EditarComputadoraActivo = ({
   useEffect(() => {
     if (equipo && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipo.id_serie) || null
+        series.find((serie) => serie?.id_serie === equipo.id_serie)?.nombre || ""
       );
     }
   }, [equipo, series]);
@@ -363,7 +357,7 @@ const EditarComputadoraActivo = ({
         periferico: null,
         marca: null,
         modelo: null,
-        serie: null,
+        serie: "",
         inventario: "",
       });
     } else {
@@ -413,7 +407,9 @@ const EditarComputadoraActivo = ({
       id_versionoffice: selectedVersionOffice?.id_versionoffice ?? "",
       id_antivirus: selectedAntivirus?.id_antivirus ?? "",
       id_dominio: selectedDominio?.id_dominio ?? "",
-      id_serie: selectedInventarioSerie?.id_serie ?? "",
+      perifericoId: equipo?.id_periferico,
+      serie: selectedInventarioSerie ?? "",
+      modeloId: selectedInventarioModelo?.id_modelo ?? "",
       inventario: selectedInventarioInv,
       anio_compra: selectedInventarioAnio,
       nombre_equipo: nombreEquipo,
@@ -433,7 +429,8 @@ const EditarComputadoraActivo = ({
           componentes: componentesState.map((comp) => ({
             id_componente: comp.id_componente,
             inventario: comp.inventario,
-            serieId: Number(comp.serie?.id_serie) ?? 0,
+            perifericoId: Number(comp.periferico?.id_periferico) ?? 0,
+            serie: comp.serie,
           })),
           ubicacionId: Number(selectedUbicacion?.id_ubicacion) ?? 0,
           usuarioId: parseInt(idUsuario ?? "", 10),
@@ -467,24 +464,64 @@ const EditarComputadoraActivo = ({
     setOpenModalCancelar(true);
   };
   const validarCamposEquipo = () => {
-    if (
-      !selectedInventarioInv ||
-      errorInventario ||
-      selectedInventarioAnio ||
-      errorAnio ||
-      !selectedInventarioSerie ||
-      !nombreEquipo ||
-      errorNombreEquipo ||
-      !selectedVersionSO ||
-      !selectedVersionOffice ||
-      !selectedRAM ||
-      !selectedDisco ||
-      !selectedProcesador ||
-      !selectedDominio ||
-      !selectedUbicacion ||
-      !(protocolo === "0" ? validateIP(direccionIP) : true)
-    ) {
-      setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
+    if (!selectedInventarioInv) {
+      setErrorMensajeEquipo("El campo Inventario es obligatorio.");
+      return false;
+    }
+    if (errorInventario) {
+      setErrorMensajeEquipo("El inventario no es válido.");
+      return false;
+    }
+    if (!selectedInventarioAnio) {
+      setErrorMensajeEquipo("El campo Año de Compra es obligatorio.");
+      return false;
+    }
+    if (errorAnio) {
+      setErrorMensajeEquipo("El año de compra no es válido.");
+      return false;
+    }
+    if (!selectedInventarioSerie) {
+      setErrorMensajeEquipo("El campo Serie es obligatorio.");
+      return false;
+    }
+    if (!nombreEquipo) {
+      setErrorMensajeEquipo("El campo Nombre Equipo es obligatorio.");
+      return false;
+    }
+    if (errorNombreEquipo) {
+      setErrorMensajeEquipo("El nombre de equipo no es válido.");
+      return false;
+    }
+    if (!selectedVersionSO) {
+      setErrorMensajeEquipo("Debe seleccionar una versión de SO.");
+      return false;
+    }
+    if (!selectedVersionOffice) {
+      setErrorMensajeEquipo("Debe seleccionar una versión de Office.");
+      return false;
+    }
+    if (!selectedRAM) {
+      setErrorMensajeEquipo("Debe seleccionar la RAM.");
+      return false;
+    }
+    if (!selectedDisco) {
+      setErrorMensajeEquipo("Debe seleccionar el Disco.");
+      return false;
+    }
+    if (!selectedProcesador) {
+      setErrorMensajeEquipo("Debe seleccionar el Procesador.");
+      return false;
+    }
+    if (!selectedDominio) {
+      setErrorMensajeEquipo("Debe seleccionar el Dominio.");
+      return false;
+    }
+    if (!selectedUbicacion) {
+      setErrorMensajeEquipo("Debe seleccionar la Ubicación.");
+      return false;
+    }
+    if (protocolo === "0" && !validateIP(direccionIP)) {
+      setErrorMensajeEquipo("La dirección IP no es válida.");
       return false;
     }
     setErrorMensajeEquipo(null);
@@ -620,7 +657,6 @@ const EditarComputadoraActivo = ({
           onChange={(_, newValue) => {
             setSelectedInventarioMarca(newValue);
             setSelectedInventarioModelo(null);
-            setSelectedInventarioSerie(null);
           }}
           getOptionLabel={(option) => option?.nombre || ""}
           renderInput={(params) => (
@@ -634,7 +670,6 @@ const EditarComputadoraActivo = ({
           value={selectedInventarioModelo}
           onChange={(_, newValue) => {
             setSelectedInventarioModelo(newValue);
-            setSelectedInventarioSerie(null);
           }}
           getOptionLabel={(option) => option?.nombre || ""}
           renderInput={(params) => (
@@ -646,17 +681,19 @@ const EditarComputadoraActivo = ({
             />
           )}
         />
-        <Autocomplete
-          size="small"
-          disablePortal
-          options={series}
-          value={selectedInventarioSerie}
-          onChange={(_, newValue) => setSelectedInventarioSerie(newValue)}
-          getOptionLabel={(option) => option?.nombre || ""}
-          renderInput={(params) => (
-            <TextField {...params} label="Serie" variant="outlined" fullWidth />
-          )}
-        />
+        <TextField
+  label="Serie"
+  variant="outlined"
+  fullWidth
+  size="small"
+  value={
+    typeof selectedInventarioSerie === "string"
+      ? selectedInventarioSerie
+      : selectedInventarioSerie || ""
+  }
+  onChange={(e) => setSelectedInventarioSerie(e.target.value)}
+  disabled={!selectedInventarioModelo}
+/>
         <Box
           sx={{
             display: "inline-flex",
@@ -1033,7 +1070,7 @@ const EditarComputadoraActivo = ({
                       <td className="py-2 px-4 border">
                         {comp.modelo?.nombre}
                       </td>
-                      <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
+                      <td className="py-2 px-4 border">{comp.serie}</td>
                       <td className="py-2 px-4 border">{comp.inventario}</td>
                       <td className="py-2 px-1 border">
                         <Tooltip title="Desligar Componente">
@@ -1110,23 +1147,22 @@ const EditarComputadoraActivo = ({
               )}
               disabled={!nuevoComponente.marca}
             />
-            <Autocomplete
+            <TextField
+              label="Serie"
+              variant="outlined"
+              fullWidth
               size="small"
-              disablePortal
-              options={seriesComponente}
-              getOptionLabel={(option) => option?.nombre || ""}
-              onChange={(_, newValue) =>
-                setNuevoComponente({ ...nuevoComponente, serie: newValue })
+              value={
+                typeof nuevoComponente.serie === "string"
+                  ? nuevoComponente.serie
+                  : ""
               }
-              value={nuevoComponente.serie}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Serie"
-                  variant="outlined"
-                  fullWidth
-                />
-              )}
+              onChange={(e) =>
+                setNuevoComponente({
+                  ...nuevoComponente,
+                  serie: e.target.value,
+                })
+              }
               disabled={!nuevoComponente.modelo}
             />
             <Box

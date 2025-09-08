@@ -3,6 +3,7 @@ import {
   Lampara,
     Marca,
     Modelo,
+    Periferico,
     Serie,
     Ubicacion,
     Usuario,
@@ -12,7 +13,8 @@ interface InventoryDataForm{
   usuario: Usuario;
   marca: Marca;
   modelo: Modelo;
-  serie: Serie;
+  periferico: Periferico;
+  serie: string;
   inventario: string;
   anio_compra: string;
   empresa:string;
@@ -27,7 +29,8 @@ export const useFormDatosInventario = () => {
     usuario:  null,
     marca: null,
     modelo:  null,
-    serie: null,
+    periferico: null,
+    serie: "",
     inventario:  "",
     anio_compra: "",
     empresa:"",
@@ -44,10 +47,10 @@ export const useFormDatosInventario = () => {
       ...prevState,
       [field]: value,
       ...(field === 'usuario' && value && typeof value !== 'string' && 'id_usuario' in value ? { usuarioId: value.id_usuario } : {}),
-      ...(field === 'marca' && value && typeof value !== 'string' && 'id_marca' in value ? { modelo: null, serie: null,lampara:null } : {}),
-      ...(field === 'modelo' && value && typeof value !== 'string' && 'id_modelo' in value ? { serie: null,lampara:null } : {}),
-      ...(field === 'marca' && value === null? { modelo: null, serie: null, lampara:null } : {}),
-      ...(field === 'modelo' && value === null? {serie: null , lampara:null} : {}),
+      ...(field === 'marca' && value && typeof value !== 'string' && 'id_marca' in value ? { modelo: null,lampara:null } : {}),
+      ...(field === 'modelo' && value && typeof value !== 'string' && 'id_modelo' in value ? {lampara:null } : {}),
+      ...(field === 'marca' && value === null? { modelo: null, lampara:null } : {}),
+      ...(field === 'modelo' && value === null? {lampara:null} : {}),
       ...(field === 'usuario' && value === null? { usuarioId: "" } : {}),
       ...(field === 'empresa' && value === null? { inventario: "" } : {}),
       ...(field === 'empresa' && value? { inventario: "" } : {}),

@@ -201,6 +201,8 @@ const EditarActivoSimple = ({
       imagenRuta: image ? nuevaImagen : "",
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
       serie: serieNombre,
+      perifericoId: equipoSimpleActivo?.id_periferico,
+      modeloId: equipoSimpleActivo?.id_modelo,
       observacion: observationValue,
       id_lampara: selectedLampara?.id_lampara ?? "",
     };

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Autocomplete, TextField, Button, Box } from "@mui/material";
-import { Marca, Modelo, Serie } from "../../../../../types";
+import { Marca, Modelo } from "../../../../../types";
 import { BodegaRedEdit } from "../../../../../types/Bodega";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
@@ -27,7 +27,7 @@ const EditarBodegaRed = ({
     useState<Modelo | null>(null);
 
   const [selectedInventarioSerie, setSelectedInventarioSerie] =
-    useState<Serie | null>(null);
+    useState<string>("");
 
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
@@ -110,8 +110,8 @@ const EditarBodegaRed = ({
   useEffect(() => {
     if (equipoRedBodega && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipoRedBodega.id_serie) ||
-          null
+        series.find((serie) => serie?.id_serie === equipoRedBodega.id_serie)?.nombre ||
+          ""
       );
     }
   }, [equipoRedBodega, series]);
@@ -121,7 +121,8 @@ const EditarBodegaRed = ({
       tipo: "bodega",
       inventario: selectedInventarioInv,
       anio_compra: selectedInventarioAnio,
-      id_serie: selectedInventarioSerie?.id_serie ?? "",
+      serie: selectedInventarioSerie ?? "",
+      perifericoId: equipoRedBodega.id_periferico,
       observacion: observationValue ?? "",
       mac: selectedMAC ?? "",
       puertos: selectedPuertos ?? "",
@@ -243,7 +244,6 @@ const EditarBodegaRed = ({
           onChange={(_, newValue) => {
             setSelectedInventarioMarca(newValue);
             setSelectedInventarioModelo(null);
-            setSelectedInventarioSerie(null);
           }}
           getOptionLabel={(option) => option?.nombre || ""}
           renderInput={(params) => (
@@ -257,7 +257,6 @@ const EditarBodegaRed = ({
           value={selectedInventarioModelo}
           onChange={(_, newValue) => {
             setSelectedInventarioModelo(newValue);
-            setSelectedInventarioSerie(null);
           }}
           getOptionLabel={(option) => option?.nombre || ""}
           renderInput={(params) => (
@@ -269,17 +268,19 @@ const EditarBodegaRed = ({
             />
           )}
         />
-        <Autocomplete
-          size="small"
-          disablePortal
-          options={series}
-          value={selectedInventarioSerie}
-          onChange={(_, newValue) => setSelectedInventarioSerie(newValue)}
-          getOptionLabel={(option) => option?.nombre || ""}
-          renderInput={(params) => (
-            <TextField {...params} label="Serie" variant="outlined" fullWidth />
-          )}
-        />
+        <TextField
+  label="Serie"
+  variant="outlined"
+  fullWidth
+  size="small"
+  value={
+    typeof selectedInventarioSerie === "string"
+      ? selectedInventarioSerie
+      : selectedInventarioSerie || ""
+  }
+  onChange={(e) => setSelectedInventarioSerie(e.target.value)}
+  disabled={!selectedInventarioModelo}
+/>
         <Box
           sx={{
             display: "inline-flex",

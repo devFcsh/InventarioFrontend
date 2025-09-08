@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Marca, Modelo, Serie, Periferico } from "../../../types/index.ts";
+import { Marca, Modelo, Periferico } from "../../../types/index.ts";
 import { validateInventario } from "../helpers/validateInventario.ts";
 
 interface ComponentsData {
   periferico: Periferico;
   marca: Marca;
   modelo: Modelo;
-  serie: Serie;
+  serie: string;
   empresa: string;
   inventario: string;
 }
@@ -28,7 +28,7 @@ export const useErrorsComponents = () => {
       components.periferico !== null &&
       components.marca !== null &&
       components.modelo !== null &&
-      components.serie !== null &&
+      components.serie !== "" &&
       components.inventario !== "" &&
       components.empresa != ""
     )

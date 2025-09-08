@@ -199,7 +199,9 @@ export const FormPMTM = () => {
       tipo: "activo",
       inventario: inventoryDataForm.inventario || "",
       anio_compra: inventoryDataForm.anio_compra,
-      serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
+      perifericoId: Number(selectedPeriferico?.id_periferico) ?? 0,
+      serie: inventoryDataForm.serie || "",
+      modeloId: Number(inventoryDataForm.modelo?.id_modelo) ?? 0,
       idUbicacion: Number(inventoryDataForm.ubicacion?.id_ubicacion) ?? 0,
       idUsuario:
         selectedPeriferico?.nombre === "Proyector"
@@ -229,7 +231,9 @@ export const FormPMTM = () => {
       tipo: "bodega",
       inventario: inventoryDataForm.inventario || "",
       anio_compra: inventoryDataForm.anio_compra,
-      serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
+      perifericoId: Number(selectedPeriferico?.id_periferico) ?? 0,
+      serie: inventoryDataForm.serie || "",
+      modeloId: Number(inventoryDataForm.modelo?.id_modelo) ?? 0,
       observacion: observationValue,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,
     };
@@ -252,7 +256,9 @@ export const FormPMTM = () => {
       tipo: "baja",
       inventario: inventoryDataForm.inventario || "",
       anio_compra: inventoryDataForm.anio_compra,
-      serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
+      perifericoId: Number(selectedPeriferico?.id_periferico),
+      serie: inventoryDataForm.serie || "",
+      modeloId: Number(inventoryDataForm.modelo?.id_modelo) ?? 0,
       observacion: observationValue,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,
     };

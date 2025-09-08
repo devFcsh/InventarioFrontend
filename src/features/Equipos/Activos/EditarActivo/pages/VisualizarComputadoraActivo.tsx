@@ -593,7 +593,7 @@ const VisualizarComputadoraActivo = ({
                       <td className="py-2 px-4 border">
                         {comp.modelo?.nombre}
                       </td>
-                      <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
+                      <td className="py-2 px-4 border">{comp.serie}</td>
                       <td className="py-2 px-4 border">{comp.inventario}</td>
                     </tr>
                   ))

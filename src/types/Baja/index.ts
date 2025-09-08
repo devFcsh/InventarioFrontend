@@ -20,7 +20,9 @@ export type BajaSimpleEditSend = {
 export type BajaComputadoraData = {
     tipo: string;
     inventario: string;
-    serie: number;
+    perifericoId: number;
+    serie: string;
+    modeloId: number;
     nombreEquipo?: string; 
     direccionIp?: string; 
     versionso?: number;    
@@ -36,7 +38,9 @@ export type BajaComputadoraData = {
 export type BajaSimpleData = {
     tipo: string;
     inventario: string;
-    serie: number;
+    perifericoId: number;
+    serie: string;
+    modeloId: number;
     idLampara: number;
     observacion: string;
   };
@@ -44,7 +48,9 @@ export type BajaSimpleData = {
   export type BajaRedData = {
     tipo: string;
     inventario: string;
-    serie: number;
+    perifericoId: number;
+    serie: string;
+    modeloId: number;
     observacion: string;
     mac: string;
     puertos: string;

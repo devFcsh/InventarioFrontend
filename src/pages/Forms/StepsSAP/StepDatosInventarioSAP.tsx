@@ -1,8 +1,7 @@
 import { TextField, Box, Autocomplete } from "@mui/material";
-import { Marca, Modelo, Serie, Ubicacion } from "../../../types/index";
+import { Marca, Modelo, Ubicacion } from "../../../types/index";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
-import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import useUbicaciones from "@hooks/useUbicaciones";
 
 interface StepDatosInventarioSAPProps {
@@ -28,11 +27,6 @@ export const StepDatosInventarioSAP = ({
   const { modelos } = useModelosPorMarcaPeriferico(
     inventoryDataSAPForm.marca?.id_marca ?? "",
     periferico
-  );
-  const { series } = useSeriesPorModelo(
-    periferico,
-    inventoryDataSAPForm.marca?.id_marca ?? "",
-    inventoryDataSAPForm.modelo?.id_modelo ?? ""
   );
   const { ubicaciones } = useUbicaciones(edificio);
 
@@ -100,36 +94,32 @@ export const StepDatosInventarioSAP = ({
             )}
             disabled={!inventoryDataSAPForm.marca}
           />
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={series}
-            getOptionLabel={(option: Serie) => option?.nombre || ""}
-            onChange={(_, newValue: Serie | null) => {
-              handleInventorySAPChange("serie", newValue);
-              handleUniqueInventarioSAPError(
-                "serie",
-                newValue,
-                inventoryDataSAPForm
-              );
-            }}
-            value={inventoryDataSAPForm.serie}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Serie"
-                variant="outlined"
-                error={!!inventorySAPErrors.serie}
-                helperText={
-                  inventorySAPErrors.serie
-                    ? "Por favor seleccionar una serie"
-                    : ""
-                }
-                fullWidth
-              />
-            )}
-            disabled={!inventoryDataSAPForm.modelo}
-          />
+          <TextField
+  label="Serie"
+  variant="outlined"
+  fullWidth
+  size="small"
+  value={
+    typeof inventoryDataSAPForm.serie === "string"
+      ? inventoryDataSAPForm.serie
+      : inventoryDataSAPForm.serie?.nombre || ""
+  }
+  error={!!inventorySAPErrors.serie}
+  helperText={
+    inventorySAPErrors.serie
+      ? "Por favor escribir una serie"
+      : ""
+  }
+  onChange={(e) => {
+    handleInventorySAPChange("serie", e.target.value);
+    handleUniqueInventarioSAPError(
+      "serie",
+      e.target.value,
+      inventoryDataSAPForm
+    );
+  }}
+  disabled={!inventoryDataSAPForm.modelo}
+/>
           <Box
             sx={{
               display: "inline-flex",

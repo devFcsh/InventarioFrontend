@@ -4,11 +4,9 @@ import {
   Marca,
   Modelo,
   Periferico,
-  Serie,
   Ubicacion,
   Usuario,
 } from "../../../types/index";
-import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import useUbicaciones from "@hooks/useUbicaciones";
@@ -52,11 +50,6 @@ export const StepDatosInventario = ({
   const { modelos } = useModelosPorMarcaPeriferico(
     inventoryDataForm.marca?.id_marca ?? "",
     periferico?.id_periferico ?? ""
-  );
-  const { series } = useSeriesPorModelo(
-    periferico?.id_periferico ?? "",
-    inventoryDataForm.marca?.id_marca ?? "",
-    inventoryDataForm.modelo?.id_modelo ?? ""
   );
   const { ubicaciones } = useUbicaciones(edificio);
   const navigate = useNavigate();
@@ -176,28 +169,24 @@ export const StepDatosInventario = ({
             )}
             disabled={!inventoryDataForm.marca}
           />
-          <Autocomplete
+           <TextField
+            label="Serie"
+            variant="outlined"
+            fullWidth
             size="small"
-            disablePortal
-            options={series}
-            getOptionLabel={(option: Serie) => option?.nombre || ""}
-            onChange={(_, newValue: Serie | null) => {
-              handleInventoryChange("serie", newValue);
-              handleUniqueInventarioError("serie", newValue, inventoryDataForm);
+            value={inventoryDataForm.serie || ""}
+            error={!!inventoryErrors.serie}
+            helperText={
+              inventoryErrors.serie ? "Por favor escribir una serie" : ""
+            }
+            onChange={(e) => {
+              handleInventoryChange("serie", e.target.value);
+              handleUniqueInventarioError(
+                "serie",
+                e.target.value,
+                inventoryDataForm
+              );
             }}
-            value={inventoryDataForm.serie}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Serie"
-                variant="outlined"
-                error={!!inventoryErrors.serie}
-                helperText={
-                  inventoryErrors.serie ? "Por favor seleccionar una serie" : ""
-                }
-                fullWidth
-              />
-            )}
             disabled={!inventoryDataForm.modelo}
           />
           {periferico?.nombre === "Proyector" ? (

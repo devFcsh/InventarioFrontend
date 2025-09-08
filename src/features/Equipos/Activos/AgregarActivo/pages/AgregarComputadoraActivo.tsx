@@ -1,11 +1,9 @@
 import { Autocomplete, TextField, Button, Tooltip } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
-import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import {
   Marca,
   Modelo,
-  Serie,
   Periferico,
   SistemaOperativo,
   VersionSO,
@@ -54,7 +52,9 @@ const AgregarComputadoraActivo = ({
   const [selectedInventarioModelo, setSelectedInventarioModelo] =
     useState<Modelo | null>(null);
   const [selectedInventarioSerie, setSelectedInventarioSerie] =
-    useState<Serie | null>(null);
+    useState<
+    string | null
+  >("");
   const [selectedInventarioInv, setSelectedInventarioInv] = useState<
     string | null
   >("");
@@ -87,7 +87,7 @@ const AgregarComputadoraActivo = ({
     periferico: null,
     marca: null,
     modelo: null,
-    serie: null,
+    serie: "",
     inventario: "",
   });
   const [componentes, setComponentes] = useState<Componente[]>([]);
@@ -107,12 +107,6 @@ const AgregarComputadoraActivo = ({
     selectedInventarioMarca?.id_marca ?? "",
     periferico
   );
-  const { series } = useSeriesPorModelo(
-    periferico,
-    selectedInventarioMarca?.id_marca ?? "",
-    selectedInventarioModelo?.id_modelo ?? ""
-  );
-
   const { perifericos } = usePerifericos();
   const filteredPerifericos = perifericos.filter(
     (p) =>
@@ -125,11 +119,6 @@ const AgregarComputadoraActivo = ({
   const { modelos: modelosComponente } = useModelosPorMarcaPeriferico(
     nuevoComponente.marca?.id_marca ?? "",
     nuevoComponente.periferico?.id_periferico ?? ""
-  );
-  const { series: seriesComponente } = useSeriesPorModelo(
-    nuevoComponente.periferico?.id_periferico ?? "",
-    nuevoComponente.marca?.id_marca ?? "",
-    nuevoComponente.modelo?.id_modelo ?? ""
   );
 
   const { uploadImage } = useSubirImagen();
@@ -148,7 +137,7 @@ const AgregarComputadoraActivo = ({
       periferico: null,
       marca: null,
       modelo: null,
-      serie: null,
+      serie: "",
       inventario: "",
     });
   };
@@ -166,7 +155,7 @@ const AgregarComputadoraActivo = ({
         periferico: {} as Periferico,
         marca: {} as Marca,
         modelo: {} as Modelo,
-        serie: {} as Serie,
+        serie: "",
         inventario: "",
       });
       limpiarCamposDependientesComponente();
@@ -208,7 +197,9 @@ const AgregarComputadoraActivo = ({
       tipo: "activo",
       inventario: selectedInventarioInv || "",
       anio_compra: selectedInventarioAnio,
-      serie: Number(selectedInventarioSerie?.id_serie) ?? 0,
+      perifericoId: Number(periferico),
+      serie: selectedInventarioSerie || "",
+      modeloId: Number(selectedInventarioModelo?.id_modelo) ?? 0,
       nombreEquipo: nombreEquipo || "",
       direccionIp: direccionIP,
       versionso: Number(selectedVersionSO?.id_versionso) ?? 0,
@@ -232,7 +223,8 @@ const AgregarComputadoraActivo = ({
           equipoId: equipoId,
           componentes: componentes.map((comp) => ({
             inventario: comp.inventario,
-            serieId: Number(comp.serie?.id_serie) ?? 0,
+            perifericoId: Number(comp.periferico?.id_periferico) ?? 0,
+            serie: comp.serie,
           })),
           ubicacionId: Number(selectedUbicacion?.id_ubicacion) ?? 0,
           usuarioId: parseInt(idUsuario, 10),
@@ -278,7 +270,7 @@ const AgregarComputadoraActivo = ({
       periferico: null,
       marca: null,
       modelo: null,
-      serie: null,
+      serie: "",
       inventario: "",
     });
     setComponentes([]);
@@ -310,13 +302,6 @@ const AgregarComputadoraActivo = ({
     setSelectedInventarioSerie(null);
   };
 
-  const handleSerieChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Serie | null
-  ) => {
-    setSelectedInventarioSerie(newValue);
-  };
-
   const handlePerifericoComponenteChange = (
     _event: React.SyntheticEvent<Element, Event>,
     newValue: Periferico | null
@@ -326,7 +311,7 @@ const AgregarComputadoraActivo = ({
       periferico: newValue,
       marca: null,
       modelo: null,
-      serie: null,
+      serie: "",
     });
   };
 
@@ -338,7 +323,7 @@ const AgregarComputadoraActivo = ({
       ...nuevoComponente,
       marca: newValue,
       modelo: null,
-      serie: null,
+      serie: "",
     });
   };
 
@@ -346,16 +331,8 @@ const AgregarComputadoraActivo = ({
     _event: React.SyntheticEvent<Element, Event>,
     newValue: Modelo | null
   ) => {
-    setNuevoComponente({ ...nuevoComponente, modelo: newValue, serie: null });
+    setNuevoComponente({ ...nuevoComponente, modelo: newValue, serie: "" });
   };
-
-  const handleSerieComponenteChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Serie | null
-  ) => {
-    setNuevoComponente({ ...nuevoComponente, serie: newValue });
-  };
-
   const eliminarComponente = (index: number) => {
     setComponentes(componentes.filter((_, i) => i !== index));
   };
@@ -466,23 +443,15 @@ const AgregarComputadoraActivo = ({
             )}
             disabled={!selectedInventarioMarca}
           />
-          <Autocomplete
-            size="small"
-            disablePortal
-            options={series}
-            getOptionLabel={(option: Serie) => option?.nombre || ""}
-            onChange={handleSerieChange}
-            value={selectedInventarioSerie}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Serie"
-                variant="outlined"
-                fullWidth
-              />
-            )}
-            disabled={!selectedInventarioModelo}
-          />
+          <TextField
+  label="Serie"
+  variant="outlined"
+  fullWidth
+  size="small"
+  value={selectedInventarioSerie || ""}
+  onChange={(e) => setSelectedInventarioSerie(e.target.value)}
+  disabled={!selectedInventarioModelo}
+/>
           <TextField
             label="Inventario"
             placeholder="Inventario"
@@ -753,7 +722,7 @@ const AgregarComputadoraActivo = ({
                     </td>
                     <td className="py-2 px-4 border">{comp.marca?.nombre}</td>
                     <td className="py-2 px-4 border">{comp.modelo?.nombre}</td>
-                    <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
+                    <td className="py-2 px-4 border">{comp.serie}</td>
                     <td className="py-2 px-4 border">{comp.inventario}</td>
                     <td className="py-2 px-1 border">
                       <Tooltip title="Eliminar Componente">
@@ -824,23 +793,17 @@ const AgregarComputadoraActivo = ({
               )}
               disabled={!nuevoComponente.marca}
             />
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={seriesComponente}
-              getOptionLabel={(option: Serie) => option?.nombre || ""}
-              onChange={handleSerieComponenteChange}
-              value={nuevoComponente.serie}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Serie"
-                  variant="outlined"
-                  fullWidth
-                />
-              )}
-              disabled={!nuevoComponente.modelo}
-            />
+            <TextField
+  label="Serie"
+  variant="outlined"
+  fullWidth
+  size="small"
+  value={typeof nuevoComponente.serie === "string" ? nuevoComponente.serie : nuevoComponente.serie || ""}
+  onChange={(e) =>
+    setNuevoComponente({ ...nuevoComponente, serie: e.target.value })
+  }
+  disabled={!nuevoComponente.modelo}
+/>
             <TextField
               label="Inventario"
               placeholder="Inventario"

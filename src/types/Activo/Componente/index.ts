@@ -1,11 +1,11 @@
-import { Marca, Modelo, Serie, Periferico } from "../../";
+import { Marca, Modelo, Periferico } from "../../";
 
 export type Componente = {
     id_componente?: string
     periferico: Periferico;
     marca: Marca;
     modelo: Modelo;
-    serie: Serie;
+    serie: string;
     inventario: string;
   };
 
@@ -14,7 +14,8 @@ export type ComponenteData = {
     equipoId: number;
     componentes: {
       inventario: string;
-      serieId: number;
+      serie: string;
+      perifericoId: number;
     }[];
     ubicacionId: number;
     usuarioId: number;

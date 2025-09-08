@@ -31,7 +31,8 @@ export type BodegaComputadoraEditSend = {
   id_antivirus: string;
   nombre_equipo: string;
   direccion_ip: string;
-  id_serie: string;
+  serie: string;
+  perifericoId: string;
   id_procesador: string
   observacion: string;
 };
@@ -67,7 +68,8 @@ export type BodegaSimpleEditSend = {
   tipo: string;
   inventario: string;
   anio_compra: string;
-  id_serie: string;
+  serie: string;
+  perifericoId: string;
   id_lampara: string;
   observacion: string;
 };
@@ -76,7 +78,8 @@ export type BodegaRedEditSend = {
   tipo: string;
   inventario: string;
   anio_compra: string;
-  id_serie: string;
+  serie: string;
+  perifericoId: string;
   observacion: string;
   mac: string;
   puertos: string;
@@ -88,7 +91,9 @@ export type BodegaComputadoraData = {
     tipo: string;
     inventario: string;
     anio_compra: string;
-    serie: number;
+    perifericoId: number;
+    serie: string;
+    modeloId: number;
     nombreEquipo?: string; 
     direccionIp?: string; 
     versionso?: number;    
@@ -105,7 +110,9 @@ export type BodegaComputadoraData = {
     tipo: string;
     inventario: string;
     anio_compra: string;
-    serie: number;
+    perifericoId: number;
+    serie: string;
+    modeloId: number;
     idLampara: number;
     observacion: string;
   };
@@ -114,7 +121,9 @@ export type BodegaComputadoraData = {
     tipo: string;
     inventario: string;
     anio_compra: string;
-    serie: number;
+    perifericoId: number;
+    serie: string;
+    modeloId: number;
     observacion: string;
     mac: string;
     puertos: string;

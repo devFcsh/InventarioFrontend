@@ -10,10 +10,9 @@ import {
 } from "@mui/material";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import { useState, useEffect } from "react";
-import { useSeriesPorModelo } from "@hooks/useSeriesPorModelo";
 import { Componente } from "../../../types/Activo/Componente/index.ts";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
-import { Marca, Modelo, Serie, Periferico } from "../../../types/index.ts";
+import { Marca, Modelo, Periferico } from "../../../types/index.ts";
 import { useErrorsComponents } from "../hooks/useErrorsComponents.ts";
 
 interface ModalProps {
@@ -41,7 +40,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
     periferico: null,
     marca: null,
     modelo: null,
-    serie: null,
+    serie: "",
     inventario: "",
   });
   const [errorMensajeComponente, setErrorMensajeComponente] = useState<
@@ -138,11 +137,6 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
     nuevoComponente.marca?.id_marca ?? "",
     nuevoComponente.periferico?.id_periferico ?? ""
   );
-  const { series: seriesComponente } = useSeriesPorModelo(
-    nuevoComponente.periferico?.id_periferico ?? "",
-    nuevoComponente.marca?.id_marca ?? "",
-    nuevoComponente.modelo?.id_modelo ?? ""
-  );
 
   const handlePerifericoComponenteChange = (
     _event: React.SyntheticEvent<Element, Event>,
@@ -157,7 +151,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
       periferico: newValue,
       marca: null,
       modelo: null,
-      serie: null,
+      serie: "",
       inventario: nuevoInventario
     });
   };
@@ -170,7 +164,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
       ...nuevoComponente,
       marca: newValue,
       modelo: null,
-      serie: null,
+      serie: "",
     });
   };
 
@@ -178,14 +172,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
     _event: React.SyntheticEvent<Element, Event>,
     newValue: Modelo | null
   ) => {
-    setNuevoComponente({ ...nuevoComponente, modelo: newValue, serie: null });
-  };
-
-  const handleSerieComponenteChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    newValue: Serie | null
-  ) => {
-    setNuevoComponente({ ...nuevoComponente, serie: newValue });
+    setNuevoComponente({ ...nuevoComponente, modelo: newValue });
   };
 
   const agregarComponente = () => {
@@ -213,7 +200,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
       periferico: {} as Periferico,
       marca: {} as Marca,
       modelo: {} as Modelo,
-      serie: {} as Serie,
+      serie: "",
       inventario: "",
     });
     limpiarCamposDependientesComponente();
@@ -227,7 +214,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
       periferico: null,
       marca: null,
       modelo: null,
-      serie: null,
+      serie: "",
       inventario: "",
     });
   };
@@ -344,35 +331,27 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 )}
                 disabled={!nuevoComponente.marca}
               />
-              <Autocomplete
-                size="small"
-                disablePortal
-                options={seriesComponente}
-                getOptionLabel={(option: Serie) => option?.nombre || ""}
-                onChange={(_, newValue: Serie | null) => {
-                  handleSerieComponenteChange(_, newValue);
-                  handleUniqueComponentsError("serie", newValue, {
-                    ...nuevoComponente,
-                    empresa,
-                  });
-                }}
-                value={nuevoComponente.serie}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Serie"
-                    variant="outlined"
-                    error={!!componentsErrors.serie}
-                    helperText={
-                      componentsErrors.serie
-                        ? "Por favor seleccionar una serie"
-                        : ""
-                    }
-                    fullWidth
-                  />
-                )}
-                disabled={!nuevoComponente.modelo}
-              />
+              <TextField
+  label="Serie"
+  variant="outlined"
+  fullWidth
+  size="small"
+  value={typeof nuevoComponente.serie === "string" ? nuevoComponente.serie : nuevoComponente.serie || ""}
+  error={!!componentsErrors.serie}
+  helperText={
+    componentsErrors.serie
+      ? "Por favor escribir una serie"
+      : ""
+  }
+  onChange={(e) => {
+    setNuevoComponente({ ...nuevoComponente, serie: e.target.value });
+    handleUniqueComponentsError("serie", e.target.value, {
+      ...nuevoComponente,
+      empresa,
+    });
+  }}
+  disabled={!nuevoComponente.modelo}
+/>
               <Autocomplete
                 size="small"
                 disablePortal

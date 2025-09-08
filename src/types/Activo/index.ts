@@ -40,7 +40,9 @@ export type ActivoComputadoraEdit = {
     id_antivirus: string;
     nombre_equipo: string;
     direccion_ip: string;
-    id_serie: string;
+    perifericoId: string;
+    modeloId: string;
+    serie: string;
     observacion: string;
   };
 
@@ -89,6 +91,8 @@ export type ActivoRedEdit = {
     imagenRuta: string | null;
     id_ubicacion: string;
     serie: string;
+    perifericoId: string;
+    modeloId: string;
     id_lampara: string;
     observacion: string;
   };
@@ -100,7 +104,9 @@ export type ActivoRedEdit = {
     id_usuario: string;
     imagenRuta: string | null;
     id_ubicacion: string;
-    id_serie: string;
+    perifericoId: string;
+    modeloId: string;
+    serie: string;
     observacion: string;
     mac: string;
     puertos: string;
@@ -112,7 +118,9 @@ export type ActivoComputadoraData = {
     tipo: string;
     inventario: string;
     anio_compra: string;
-    serie: number;
+    perifericoId: number;
+    serie: string;
+    modeloId: number;     
     nombreEquipo?: string; 
     direccionIp?: string; 
     versionso?: number;    
@@ -132,7 +140,9 @@ export type ActivoComputadoraData = {
     tipo: string;
     inventario: string;
     anio_compra: string;
-    serie: number;     
+    perifericoId: number;
+    serie: string;
+    modeloId: number;     
     idLampara: number;
     idUbicacion: number;
     idUsuario: number;
@@ -144,7 +154,9 @@ export type ActivoComputadoraData = {
     tipo: string;
     inventario: string;
     anio_compra: string;
-    serie: number;     
+    perifericoId: number;
+    serie: string;
+    modeloId: number;          
     idUbicacion: number;
     idUsuario: number;
     imagenRuta: string;

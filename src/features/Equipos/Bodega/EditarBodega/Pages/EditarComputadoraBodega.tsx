@@ -10,7 +10,6 @@ import {
 import {
   Marca,
   Modelo,
-  Serie,
   SistemaOperativo,
   VersionSO,
   RAM,
@@ -57,7 +56,7 @@ const EditarComputadoraBodega = ({
   const [selectedInventarioModelo, setSelectedInventarioModelo] =
     useState<Modelo | null>(null);
   const [selectedInventarioSerie, setSelectedInventarioSerie] =
-    useState<Serie | null>(null);
+    useState<string>("");
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
   const [selectedInventarioAnio, setSelectedInventarioAnio] =
@@ -96,7 +95,7 @@ const EditarComputadoraBodega = ({
     periferico: null,
     marca: null,
     modelo: null,
-    serie: null,
+    serie: "",
     inventario: "",
   });
   const [newObservation, setNewObservation] = useState<string>("");
@@ -166,11 +165,6 @@ const EditarComputadoraBodega = ({
     nuevoComponente.marca?.id_marca ?? "",
     nuevoComponente.periferico?.id_periferico ?? ""
   );
-  const { series: seriesComponente } = useSeriesPorModelo(
-    nuevoComponente.periferico?.id_periferico ?? "",
-    nuevoComponente.marca?.id_marca ?? "",
-    nuevoComponente.modelo?.id_modelo ?? ""
-  );
 
   useEffect(() => {
     if (equipo && marcas.length > 0) {
@@ -191,7 +185,7 @@ const EditarComputadoraBodega = ({
   useEffect(() => {
     if (equipo && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipo.id_serie) || null
+        series.find((serie) => serie?.id_serie === equipo.id_serie)?.nombre || ""
       );
     }
   }, [equipo, series]);
@@ -321,7 +315,7 @@ const EditarComputadoraBodega = ({
         periferico: null,
         marca: null,
         modelo: null,
-        serie: null,
+        serie: "",
         inventario: "",
       });
     } else {
@@ -347,7 +341,8 @@ const EditarComputadoraBodega = ({
       id_versionoffice: selectedVersionOffice?.id_versionoffice ?? "",
       id_antivirus: selectedAntivirus?.id_antivirus ?? "",
       id_dominio: selectedDominio?.id_dominio ?? "",
-      id_serie: selectedInventarioSerie?.id_serie ?? "",
+      serie: selectedInventarioSerie ?? "",
+      perifericoId: equipo.id_periferico,
       inventario: selectedInventarioInv,
       anio_compra: selectedInventarioAnio,
       nombre_equipo: nombreEquipo,
@@ -364,7 +359,8 @@ const EditarComputadoraBodega = ({
           componentes: componentesState.map((comp) => ({
             id_componente: comp.id_componente,
             inventario: comp.inventario,
-            serieId: Number(comp.serie?.id_serie) ?? 0,
+            perifericoId: Number(comp.periferico?.id_periferico) ?? 0,
+            serie: comp.serie,
           })),
         });
       }
@@ -535,7 +531,6 @@ const EditarComputadoraBodega = ({
           onChange={(_, newValue) => {
             setSelectedInventarioMarca(newValue);
             setSelectedInventarioModelo(null);
-            setSelectedInventarioSerie(null);
           }}
           getOptionLabel={(option) => option?.nombre || ""}
           renderInput={(params) => (
@@ -549,7 +544,6 @@ const EditarComputadoraBodega = ({
           value={selectedInventarioModelo}
           onChange={(_, newValue) => {
             setSelectedInventarioModelo(newValue);
-            setSelectedInventarioSerie(null);
           }}
           getOptionLabel={(option) => option?.nombre || ""}
           renderInput={(params) => (
@@ -561,17 +555,15 @@ const EditarComputadoraBodega = ({
             />
           )}
         />
-        <Autocomplete
-          size="small"
-          disablePortal
-          options={series}
-          value={selectedInventarioSerie}
-          onChange={(_, newValue) => setSelectedInventarioSerie(newValue)}
-          getOptionLabel={(option) => option?.nombre || ""}
-          renderInput={(params) => (
-            <TextField {...params} label="Serie" variant="outlined" fullWidth />
-          )}
-        />
+        <TextField
+  label="Serie"
+  variant="outlined"
+  fullWidth
+  size="small"
+  value={selectedInventarioSerie ? (typeof selectedInventarioSerie === "string" ? selectedInventarioSerie : selectedInventarioSerie) : ""}
+  onChange={(e) => setSelectedInventarioSerie(e.target.value)}
+  disabled={!selectedInventarioModelo}
+/>
         <Box
           sx={{
             display: "inline-flex",
@@ -867,7 +859,7 @@ const EditarComputadoraBodega = ({
                       <td className="py-2 px-4 border">
                         {comp.modelo?.nombre}
                       </td>
-                      <td className="py-2 px-4 border">{comp.serie?.nombre}</td>
+                      <td className="py-2 px-4 border">{comp.serie}</td>
                       <td className="py-2 px-4 border">{comp.inventario}</td>
                       <td className="py-2 px-1 border">
                         <Tooltip title="Eliminar Componente">
@@ -944,25 +936,17 @@ const EditarComputadoraBodega = ({
               )}
               disabled={!nuevoComponente.marca}
             />
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={seriesComponente}
-              getOptionLabel={(option) => option?.nombre || ""}
-              onChange={(_, newValue) =>
-                setNuevoComponente({ ...nuevoComponente, serie: newValue })
-              }
-              value={nuevoComponente.serie}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Serie"
-                  variant="outlined"
-                  fullWidth
-                />
-              )}
-              disabled={!nuevoComponente.modelo}
-            />
+            <TextField
+  label="Serie"
+  variant="outlined"
+  fullWidth
+  size="small"
+  value={typeof nuevoComponente.serie === "string" ? nuevoComponente.serie : nuevoComponente.serie || ""}
+  onChange={(e) =>
+    setNuevoComponente({ ...nuevoComponente, serie: e.target.value })
+  }
+  disabled={!nuevoComponente.modelo}
+/>
             <Box
               sx={{
                 display: "inline-flex",

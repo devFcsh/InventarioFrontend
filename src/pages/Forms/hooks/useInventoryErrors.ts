@@ -3,7 +3,6 @@ import {
   Lampara,
   Marca,
   Modelo,
-  Serie,
   Ubicacion,
   Usuario,
 } from "../../../types";
@@ -13,7 +12,7 @@ interface InventoryDataForm {
   usuario: Usuario;
   marca: Marca;
   modelo: Modelo;
-  serie: Serie;
+  serie: string;
   inventario: string;
   anio_compra: string;
   empresa:string
@@ -38,13 +37,13 @@ export const useInventoryErrors = (tipoInventario: string,periferico:string | un
   const completeDatosInventario = (dataForm: InventoryDataForm)=>{
     if(tipoInventario==="activo"){
       if((periferico==="Proyector"?true:dataForm.usuario!==null)
-        &&dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
+        &&dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !=="" &&
         dataForm.inventario !=="" && dataForm.anio_compra !=="" && dataForm.ubicacion!==null && dataForm.empresa!=""
         && (periferico!=="Proyector"?true:dataForm.lampara!==null)
       ) return true
       return false;
     }else{
-      if(dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !==null &&
+      if(dataForm.marca !==null && dataForm.modelo !==null && dataForm.serie !=="" &&
         dataForm.inventario !=="" && dataForm.anio_compra !=="" && (periferico!=="Proyector"?true:dataForm.lampara!==null)
       ) return true
       return false;

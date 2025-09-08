@@ -3,7 +3,6 @@ import { Autocomplete, TextField, Button, Box } from "@mui/material";
 import {
   Marca,
   Modelo,
-  Serie,
   Ubicacion,
   Edificio,
 } from "../../../../../types";
@@ -36,7 +35,7 @@ const EditarActivoRed = ({
     useState<Modelo | null>(null);
 
   const [selectedInventarioSerie, setSelectedInventarioSerie] =
-    useState<Serie | null>(null);
+    useState<string>("");
 
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
@@ -135,8 +134,8 @@ const EditarActivoRed = ({
   useEffect(() => {
     if (equipoRedActivo && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipoRedActivo.id_serie) ||
-          null
+        series.find((serie) => serie?.id_serie === equipoRedActivo.id_serie)?.nombre ||
+          ""
       );
     }
   }, [equipoRedActivo, series]);
@@ -194,7 +193,9 @@ const EditarActivoRed = ({
       id_usuario: "1",
       imagenRuta: image ? nuevaImagen : "",
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
-      id_serie: selectedInventarioSerie?.id_serie ?? "",
+      perifericoId: equipoRedActivo?.id_periferico,
+      serie: selectedInventarioSerie ?? "",
+      modeloId: equipoRedActivo?.id_modelo,
       observacion: observationValue ?? "",
       mac: selectedMAC ?? "",
       puertos: selectedPuertos ?? "",
@@ -339,7 +340,6 @@ const EditarActivoRed = ({
           onChange={(_, newValue) => {
             setSelectedInventarioMarca(newValue);
             setSelectedInventarioModelo(null);
-            setSelectedInventarioSerie(null);
           }}
           getOptionLabel={(option) => option?.nombre || ""}
           renderInput={(params) => (
@@ -353,7 +353,6 @@ const EditarActivoRed = ({
           value={selectedInventarioModelo}
           onChange={(_, newValue) => {
             setSelectedInventarioModelo(newValue);
-            setSelectedInventarioSerie(null);
           }}
           getOptionLabel={(option) => option?.nombre || ""}
           renderInput={(params) => (
@@ -365,17 +364,19 @@ const EditarActivoRed = ({
             />
           )}
         />
-        <Autocomplete
-          size="small"
-          disablePortal
-          options={series}
-          value={selectedInventarioSerie}
-          onChange={(_, newValue) => setSelectedInventarioSerie(newValue)}
-          getOptionLabel={(option) => option?.nombre || ""}
-          renderInput={(params) => (
-            <TextField {...params} label="Serie" variant="outlined" fullWidth />
-          )}
-        />
+        <TextField
+  label="Serie"
+  variant="outlined"
+  fullWidth
+  size="small"
+  value={
+    typeof selectedInventarioSerie === "string"
+      ? selectedInventarioSerie
+      : selectedInventarioSerie || ""
+  }
+  onChange={(e) => setSelectedInventarioSerie(e.target.value)}
+  disabled={!selectedInventarioModelo}
+/>
         <Box
           sx={{
             display: "inline-flex",

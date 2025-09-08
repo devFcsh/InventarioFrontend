@@ -207,7 +207,9 @@ export const FormLC = () => {
       tipo: "activo",
       inventario: inventoryDataForm.inventario || "",
       anio_compra: inventoryDataForm.anio_compra,
-      serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
+      perifericoId: Number(selectedPeriferico?.id_periferico) ?? 0,
+      serie: inventoryDataForm.serie || "",
+      modeloId: Number(inventoryDataForm.modelo?.id_modelo) ?? 0,
       nombreEquipo: informacionGeneralDataForm.nombreEquipo || "",
       direccionIp: informacionGeneralDataForm.direccionIP,
       versionso:
@@ -236,7 +238,9 @@ export const FormLC = () => {
           equipoId: equipoId,
           componentes: componentes.map((comp) => ({
             inventario: comp.inventario,
-            serieId: Number(comp.serie?.id_serie) ?? 0,
+            perifericoId: Number(comp.periferico?.id_periferico) ?? 0,
+            serie: comp.serie || "",
+            modeloId: Number(comp.modelo?.id_modelo) ?? 0,
           })),
           ubicacionId: Number(inventoryDataForm.ubicacion?.id_ubicacion) ?? 0,
           usuarioId: parseInt(inventoryDataForm.usuarioId || "", 10),
@@ -255,7 +259,9 @@ export const FormLC = () => {
       tipo: "bodega",
       inventario: inventoryDataForm.inventario || "",
       anio_compra: inventoryDataForm.anio_compra,
-      serie: Number(inventoryDataForm.serie?.id_serie) ?? 0,
+      perifericoId: Number(selectedPeriferico?.id_periferico),
+      serie: inventoryDataForm.serie || "",
+      modeloId: Number(inventoryDataForm.modelo?.id_modelo) ?? 0,
       nombreEquipo: informacionGeneralDataForm.nombreEquipo || "",
       direccionIp: informacionGeneralDataForm.direccionIP,
       versionso:
@@ -279,7 +285,9 @@ export const FormLC = () => {
           equipoId: equipoId,
           componentes: componentes.map((comp) => ({
             inventario: comp.inventario,
-            serieId: Number(comp.serie?.id_serie) ?? 0,
+            perifericoId: Number(comp.periferico?.id_periferico) ?? 0,
+            serie: comp.serie || "",
+            modeloId: Number(comp.modelo?.id_modelo) ?? 0,
           })),
         });
       }
