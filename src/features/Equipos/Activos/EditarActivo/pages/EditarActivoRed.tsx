@@ -195,7 +195,7 @@ const EditarActivoRed = ({
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
       perifericoId: equipoRedActivo?.id_periferico,
       serie: selectedInventarioSerie ?? "",
-      modeloId: equipoRedActivo?.id_modelo,
+      modeloId: selectedInventarioModelo?.id_modelo ?? "",
       observacion: observationValue ?? "",
       mac: selectedMAC ?? "",
       puertos: selectedPuertos ?? "",

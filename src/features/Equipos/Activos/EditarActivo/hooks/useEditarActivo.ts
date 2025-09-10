@@ -8,6 +8,7 @@ const useEditarActivo = () => {
 
   const editarActivo = async (equipoId: string, payload: ActivoComputadoraEditSend) => {
     setLoading(true);
+    console.log(payload)
     try {
       const response = await clienteAxios.put(`/equipos/editarEquipo/${equipoId}`, payload, {
         headers: {

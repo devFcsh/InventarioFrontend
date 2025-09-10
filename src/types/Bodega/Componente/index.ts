@@ -16,5 +16,6 @@ export type ComponenteDataBodega = {
       inventario: string;
       perifericoId: number;
       serie: string;
+      modeloId: number;
     }[];
 };

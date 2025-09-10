@@ -202,7 +202,7 @@ const EditarActivoSimple = ({
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
       serie: serieNombre,
       perifericoId: equipoSimpleActivo?.id_periferico,
-      modeloId: equipoSimpleActivo?.id_modelo,
+      modeloId: selectedInventarioModelo?.id_modelo ?? "",
       observacion: observationValue,
       id_lampara: selectedLampara?.id_lampara ?? "",
     };

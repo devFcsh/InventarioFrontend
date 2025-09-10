@@ -431,6 +431,7 @@ const EditarComputadoraActivo = ({
             inventario: comp.inventario,
             perifericoId: Number(comp.periferico?.id_periferico) ?? 0,
             serie: comp.serie,
+            modeloId: Number(comp.modelo?.id_modelo) ?? 0,
           })),
           ubicacionId: Number(selectedUbicacion?.id_ubicacion) ?? 0,
           usuarioId: parseInt(idUsuario ?? "", 10),
@@ -1070,7 +1071,11 @@ const EditarComputadoraActivo = ({
                       <td className="py-2 px-4 border">
                         {comp.modelo?.nombre}
                       </td>
-                      <td className="py-2 px-4 border">{comp.serie}</td>
+                      <td className="py-2 px-4 border">
+                        {typeof comp.serie === "object" && comp.serie !== null && "nombre" in comp.serie
+                          ? comp.serie.nombre
+                          : comp.serie}
+                      </td>
                       <td className="py-2 px-4 border">{comp.inventario}</td>
                       <td className="py-2 px-1 border">
                         <Tooltip title="Desligar Componente">
