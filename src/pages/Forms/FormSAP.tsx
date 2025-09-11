@@ -218,7 +218,7 @@ export const FormSAP = () => {
       puertos: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertos,
       puerto_ftp: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertoFTP,
       idLampara:0,
-      nombre_equipo:informacionGeneralDataSAPForm.nombreEquipo || "",
+      nombreEquipo:informacionGeneralDataSAPForm.nombreEquipo || "",
     };
     try {
       await agregarRedBodega(bodegaComputadoraData);
@@ -243,7 +243,7 @@ export const FormSAP = () => {
       puertos: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertos,
       puerto_ftp: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertoFTP,
       idLampara:0,
-      nombre_equipo:informacionGeneralDataSAPForm.nombreEquipo || "",
+      nombreEquipo:informacionGeneralDataSAPForm.nombreEquipo || "",
     };
     try {
       await agregarRedBaja(bodegaComputadoraData);
