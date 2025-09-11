@@ -206,7 +206,8 @@ const EditarComputadoraActivo = ({
   useEffect(() => {
     if (equipo && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipo.id_serie)?.nombre || ""
+        series.find((serie) => serie?.id_serie === equipo.id_serie)?.nombre ||
+          ""
       );
     }
   }, [equipo, series]);
@@ -422,7 +423,7 @@ const EditarComputadoraActivo = ({
     try {
       await editarActivo(equipo.id_equipo, payload);
 
-      if (componentesState.length > 0 && equipo.id_equipo) {
+      if (equipo.id_equipo) {
         await gestionarComponentes({
           tipo: "activo",
           equipoId: Number(equipo.id_equipo),
@@ -683,18 +684,18 @@ const EditarComputadoraActivo = ({
           )}
         />
         <TextField
-  label="Serie"
-  variant="outlined"
-  fullWidth
-  size="small"
-  value={
-    typeof selectedInventarioSerie === "string"
-      ? selectedInventarioSerie
-      : selectedInventarioSerie || ""
-  }
-  onChange={(e) => setSelectedInventarioSerie(e.target.value)}
-  disabled={!selectedInventarioModelo}
-/>
+          label="Serie"
+          variant="outlined"
+          fullWidth
+          size="small"
+          value={
+            typeof selectedInventarioSerie === "string"
+              ? selectedInventarioSerie
+              : selectedInventarioSerie || ""
+          }
+          onChange={(e) => setSelectedInventarioSerie(e.target.value)}
+          disabled={!selectedInventarioModelo}
+        />
         <Box
           sx={{
             display: "inline-flex",
@@ -1072,7 +1073,9 @@ const EditarComputadoraActivo = ({
                         {comp.modelo?.nombre}
                       </td>
                       <td className="py-2 px-4 border">
-                        {typeof comp.serie === "object" && comp.serie !== null && "nombre" in comp.serie
+                        {typeof comp.serie === "object" &&
+                        comp.serie !== null &&
+                        "nombre" in comp.serie
                           ? comp.serie.nombre
                           : comp.serie}
                       </td>
