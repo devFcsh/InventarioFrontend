@@ -193,6 +193,7 @@ export const StepDatosInventarioSAP = ({
               }}
               disabled={inventoryDataSAPForm.empresa === ""}
             />
+          </Box>
             <TextField
               label="Año de Compra"
               placeholder="Año de Compra"
@@ -219,7 +220,6 @@ export const StepDatosInventarioSAP = ({
                 );
               }}
             />
-          </Box>
 
           {tipoInventario === "activo" ? (
             <Autocomplete

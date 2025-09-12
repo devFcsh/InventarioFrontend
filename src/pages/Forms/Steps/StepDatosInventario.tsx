@@ -296,6 +296,7 @@ export const StepDatosInventario = ({
               }}
               disabled={inventoryDataForm.empresa === ""}
             />
+          </Box>
              <TextField
               label="Año de Compra"
               placeholder="Año de Compra"
@@ -322,7 +323,6 @@ export const StepDatosInventario = ({
                 );
             }}
             />
-          </Box>
 
           {tipoInventario === "activo" ? (
             <Autocomplete
