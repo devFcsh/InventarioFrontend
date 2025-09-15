@@ -693,7 +693,13 @@ const EditarComputadoraActivo = ({
               ? selectedInventarioSerie
               : selectedInventarioSerie || ""
           }
-          onChange={(e) => setSelectedInventarioSerie(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value !== null && value.length > 30) {
+              return;
+            }
+            setSelectedInventarioSerie(value);
+          }}
           disabled={!selectedInventarioModelo}
         />
         <Box
@@ -1165,12 +1171,16 @@ const EditarComputadoraActivo = ({
                   ? nuevoComponente.serie
                   : ""
               }
-              onChange={(e) =>
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value !== null && value.length > 30) {
+                  return;
+                }
                 setNuevoComponente({
                   ...nuevoComponente,
-                  serie: e.target.value,
-                })
-              }
+                  serie: value,
+                });
+              }}
               disabled={!nuevoComponente.modelo}
             />
             <Box

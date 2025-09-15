@@ -185,7 +185,8 @@ const EditarComputadoraBodega = ({
   useEffect(() => {
     if (equipo && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipo.id_serie)?.nombre || ""
+        series.find((serie) => serie?.id_serie === equipo.id_serie)?.nombre ||
+          ""
       );
     }
   }, [equipo, series]);
@@ -557,14 +558,26 @@ const EditarComputadoraBodega = ({
           )}
         />
         <TextField
-  label="Serie"
-  variant="outlined"
-  fullWidth
-  size="small"
-  value={selectedInventarioSerie ? (typeof selectedInventarioSerie === "string" ? selectedInventarioSerie : selectedInventarioSerie) : ""}
-  onChange={(e) => setSelectedInventarioSerie(e.target.value)}
-  disabled={!selectedInventarioModelo}
-/>
+          label="Serie"
+          variant="outlined"
+          fullWidth
+          size="small"
+          value={
+            selectedInventarioSerie
+              ? typeof selectedInventarioSerie === "string"
+                ? selectedInventarioSerie
+                : selectedInventarioSerie
+              : ""
+          }
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value !== null && value.length > 30) {
+              return;
+            }
+            setSelectedInventarioSerie(value);
+          }}
+          disabled={!selectedInventarioModelo}
+        />
         <Box
           sx={{
             display: "inline-flex",
@@ -861,7 +874,9 @@ const EditarComputadoraBodega = ({
                         {comp.modelo?.nombre}
                       </td>
                       <td className="py-2 px-4 border">
-                        {typeof comp.serie === "object" && comp.serie !== null && "nombre" in comp.serie
+                        {typeof comp.serie === "object" &&
+                        comp.serie !== null &&
+                        "nombre" in comp.serie
                           ? comp.serie.nombre
                           : comp.serie}
                       </td>
@@ -942,16 +957,24 @@ const EditarComputadoraBodega = ({
               disabled={!nuevoComponente.marca}
             />
             <TextField
-  label="Serie"
-  variant="outlined"
-  fullWidth
-  size="small"
-  value={typeof nuevoComponente.serie === "string" ? nuevoComponente.serie : nuevoComponente.serie || ""}
-  onChange={(e) =>
-    setNuevoComponente({ ...nuevoComponente, serie: e.target.value })
-  }
-  disabled={!nuevoComponente.modelo}
-/>
+              label="Serie"
+              variant="outlined"
+              fullWidth
+              size="small"
+              value={
+                typeof nuevoComponente.serie === "string"
+                  ? nuevoComponente.serie
+                  : nuevoComponente.serie || ""
+              }
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value !== null && value.length > 30) {
+                  return;
+                }
+                setNuevoComponente({ ...nuevoComponente, serie: value });
+              }}
+              disabled={!nuevoComponente.modelo}
+            />
             <Box
               sx={{
                 display: "inline-flex",

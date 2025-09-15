@@ -95,31 +95,33 @@ export const StepDatosInventarioSAP = ({
             disabled={!inventoryDataSAPForm.marca}
           />
           <TextField
-  label="Serie"
-  variant="outlined"
-  fullWidth
-  size="small"
-  value={
-    typeof inventoryDataSAPForm.serie === "string"
-      ? inventoryDataSAPForm.serie
-      : inventoryDataSAPForm.serie?.nombre || ""
-  }
-  error={!!inventorySAPErrors.serie}
-  helperText={
-    inventorySAPErrors.serie
-      ? "Por favor escribir una serie"
-      : ""
-  }
-  onChange={(e) => {
-    handleInventorySAPChange("serie", e.target.value);
-    handleUniqueInventarioSAPError(
-      "serie",
-      e.target.value,
-      inventoryDataSAPForm
-    );
-  }}
-  disabled={!inventoryDataSAPForm.modelo}
-/>
+            label="Serie"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={
+              typeof inventoryDataSAPForm.serie === "string"
+                ? inventoryDataSAPForm.serie
+                : inventoryDataSAPForm.serie?.nombre || ""
+            }
+            error={!!inventorySAPErrors.serie}
+            helperText={
+              inventorySAPErrors.serie ? "Por favor escribir una serie" : ""
+            }
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value !== null && value.length > 30) {
+                return;
+              }
+              handleInventorySAPChange("serie", value);
+              handleUniqueInventarioSAPError(
+                "serie",
+                value,
+                inventoryDataSAPForm
+              );
+            }}
+            disabled={!inventoryDataSAPForm.modelo}
+          />
           <Box
             sx={{
               display: "inline-flex",
@@ -194,32 +196,32 @@ export const StepDatosInventarioSAP = ({
               disabled={inventoryDataSAPForm.empresa === ""}
             />
           </Box>
-            <TextField
-              label="Año de Compra"
-              placeholder="Año de Compra"
-              variant="outlined"
-              fullWidth
-              size="small"
-              value={inventoryDataSAPForm.anio_compra}
-              error={!!inventorySAPErrors.anio_compra}
-              helperText={
-                inventorySAPErrors.anio_compra
-                  ? "Por favor escribir un año de compra válido"
-                  : ""
+          <TextField
+            label="Año de Compra"
+            placeholder="Año de Compra"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={inventoryDataSAPForm.anio_compra}
+            error={!!inventorySAPErrors.anio_compra}
+            helperText={
+              inventorySAPErrors.anio_compra
+                ? "Por favor escribir un año de compra válido"
+                : ""
+            }
+            onChange={(e) => {
+              const value = e.target.value;
+              if (!/^\d*$/.test(value)) {
+                return;
               }
-              onChange={(e) => {
-                const value = e.target.value;
-                if (!(/^\d*$/.test(value))) {
-                  return;
-                }
-                handleInventorySAPChange("anio_compra", value);
-                handleUniqueInventarioSAPError(
-                  "anio_compra",
-                  value,
-                  inventoryDataSAPForm
-                );
-              }}
-            />
+              handleInventorySAPChange("anio_compra", value);
+              handleUniqueInventarioSAPError(
+                "anio_compra",
+                value,
+                inventoryDataSAPForm
+              );
+            }}
+          />
 
           {tipoInventario === "activo" ? (
             <Autocomplete

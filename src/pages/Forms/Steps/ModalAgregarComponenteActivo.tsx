@@ -52,36 +52,46 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
     handleComponentsErrors,
     handleUniqueComponentsError,
   } = useErrorsComponents();
-  
+
   const [empresa, setEmpresa] = useState(empresaComputadora);
 
-  const generateInventario = (periferico: Periferico | null, baseInventario: string): string => {
+  const generateInventario = (
+    periferico: Periferico | null,
+    baseInventario: string
+  ): string => {
     if (!periferico || !baseInventario) return "";
-    
+
     if (empresa === "Espol" || empresa === "EspolTech") {
       const sufijos: { [key: string]: string } = {
-        "monitor": "-1",
-        "teclado": "-2", 
-        "mouse": "-3",
-        "parlante": "-4",
-        "camara": "-5"
+        monitor: "-1",
+        teclado: "-2",
+        mouse: "-3",
+        parlante: "-4",
+        camara: "-5",
       };
-      
+
       const nombrePeriferico = periferico.nombre?.toLowerCase();
       const sufijo = sufijos[nombrePeriferico] || "";
-      
+
       return baseInventario + sufijo;
     }
-    
+
     return "";
   };
 
   useEffect(() => {
-    if (nuevoComponente.periferico && (empresa === "Espol" || empresa === "EspolTech") && inventarioComputadora) {
-      const nuevoInventario = generateInventario(nuevoComponente.periferico, inventarioComputadora);
-      setNuevoComponente(prev => ({
+    if (
+      nuevoComponente.periferico &&
+      (empresa === "Espol" || empresa === "EspolTech") &&
+      inventarioComputadora
+    ) {
+      const nuevoInventario = generateInventario(
+        nuevoComponente.periferico,
+        inventarioComputadora
+      );
+      setNuevoComponente((prev) => ({
         ...prev,
-        inventario: nuevoInventario
+        inventario: nuevoInventario,
       }));
     }
   }, [nuevoComponente.periferico, empresa, inventarioComputadora]);
@@ -142,17 +152,18 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
     _event: React.SyntheticEvent<Element, Event>,
     newValue: Periferico | null
   ) => {
-    const nuevoInventario = (empresa === "Espol" || empresa === "EspolTech") && inventarioComputadora 
-      ? generateInventario(newValue, inventarioComputadora)
-      : "";
-    
+    const nuevoInventario =
+      (empresa === "Espol" || empresa === "EspolTech") && inventarioComputadora
+        ? generateInventario(newValue, inventarioComputadora)
+        : "";
+
     setNuevoComponente({
       ...nuevoComponente,
       periferico: newValue,
       marca: null,
       modelo: null,
       serie: "",
-      inventario: nuevoInventario
+      inventario: nuevoInventario,
     });
   };
 
@@ -332,26 +343,32 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 disabled={!nuevoComponente.marca}
               />
               <TextField
-  label="Serie"
-  variant="outlined"
-  fullWidth
-  size="small"
-  value={typeof nuevoComponente.serie === "string" ? nuevoComponente.serie : nuevoComponente.serie || ""}
-  error={!!componentsErrors.serie}
-  helperText={
-    componentsErrors.serie
-      ? "Por favor escribir una serie"
-      : ""
-  }
-  onChange={(e) => {
-    setNuevoComponente({ ...nuevoComponente, serie: e.target.value });
-    handleUniqueComponentsError("serie", e.target.value, {
-      ...nuevoComponente,
-      empresa,
-    });
-  }}
-  disabled={!nuevoComponente.modelo}
-/>
+                label="Serie"
+                variant="outlined"
+                fullWidth
+                size="small"
+                value={
+                  typeof nuevoComponente.serie === "string"
+                    ? nuevoComponente.serie
+                    : nuevoComponente.serie || ""
+                }
+                error={!!componentsErrors.serie}
+                helperText={
+                  componentsErrors.serie ? "Por favor escribir una serie" : ""
+                }
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value !== null && value.length > 30) {
+                    return;
+                  }
+                  setNuevoComponente({ ...nuevoComponente, serie: value });
+                  handleUniqueComponentsError("serie", value, {
+                    ...nuevoComponente,
+                    empresa,
+                  });
+                }}
+                disabled={!nuevoComponente.modelo}
+              />
               <Autocomplete
                 size="small"
                 disablePortal
@@ -392,7 +409,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                   if (empresa !== "Espol") {
                     let value = e.target.value;
                     const maxLength = getMaxLength();
-                    
+
                     if (value !== null && value.length > maxLength) {
                       value = value.slice(0, maxLength);
                     }

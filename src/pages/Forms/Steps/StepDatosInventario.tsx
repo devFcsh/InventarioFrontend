@@ -169,7 +169,7 @@ export const StepDatosInventario = ({
             )}
             disabled={!inventoryDataForm.marca}
           />
-           <TextField
+          <TextField
             label="Serie"
             variant="outlined"
             fullWidth
@@ -180,12 +180,12 @@ export const StepDatosInventario = ({
               inventoryErrors.serie ? "Por favor escribir una serie" : ""
             }
             onChange={(e) => {
-              handleInventoryChange("serie", e.target.value);
-              handleUniqueInventarioError(
-                "serie",
-                e.target.value,
-                inventoryDataForm
-              );
+              const value = e.target.value;
+              if (value !== null && value.length > 30) {
+                return;
+              }
+              handleInventoryChange("serie", value);
+              handleUniqueInventarioError("serie", value, inventoryDataForm);
             }}
             disabled={!inventoryDataForm.modelo}
           />
@@ -297,32 +297,32 @@ export const StepDatosInventario = ({
               disabled={inventoryDataForm.empresa === ""}
             />
           </Box>
-             <TextField
-              label="Año de Compra"
-              placeholder="Año de Compra"
-              variant="outlined"
-              fullWidth
-              size="small"
-              value={inventoryDataForm.anio_compra}
-              error={!!inventoryErrors.anio_compra}
-              helperText={
-                inventoryErrors.anio_compra
-                  ? "Por favor escribir un año válido"
-                  : ""
-              }
-              onChange={(e) => {
+          <TextField
+            label="Año de Compra"
+            placeholder="Año de Compra"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={inventoryDataForm.anio_compra}
+            error={!!inventoryErrors.anio_compra}
+            helperText={
+              inventoryErrors.anio_compra
+                ? "Por favor escribir un año válido"
+                : ""
+            }
+            onChange={(e) => {
               const value = e.target.value;
-              if (!(/^\d*$/.test(value))) {
+              if (!/^\d*$/.test(value)) {
                 return;
               }
               handleInventoryChange("anio_compra", value);
-                handleUniqueInventarioError(
-                  "anio_compra",
-                  value,
-                  inventoryDataForm
-                );
+              handleUniqueInventarioError(
+                "anio_compra",
+                value,
+                inventoryDataForm
+              );
             }}
-            />
+          />
 
           {tipoInventario === "activo" ? (
             <Autocomplete

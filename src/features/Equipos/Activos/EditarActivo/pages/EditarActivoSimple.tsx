@@ -353,7 +353,14 @@ const EditarActivoSimple = ({
           fullWidth
           size="small"
           value={serieNombre}
-          onChange={(e) => setSerieNombre(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value !== null && value.length > 30) {
+              return;
+            }
+            setSerieNombre(value);
+          }}
+          disabled={!selectedInventarioModelo}
         />
         <Box
           sx={{

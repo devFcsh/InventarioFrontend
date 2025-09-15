@@ -75,7 +75,8 @@ const EditarBodegaSimple = ({
       setSelectedInventarioInv(equipoSimpleBodega.inventario);
       setSelectedInventarioAnio(equipoSimpleBodega.anio_compra);
       setNewObservation(equipoSimpleBodega.observacion);
-      (equipoSimpleBodega.inventario.length === 10 || equipoSimpleBodega.inventario.length === 12)
+      equipoSimpleBodega.inventario.length === 10 ||
+      equipoSimpleBodega.inventario.length === 12
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
@@ -104,9 +105,8 @@ const EditarBodegaSimple = ({
   useEffect(() => {
     if (equipoSimpleBodega && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find(
-          (serie) => serie?.id_serie === equipoSimpleBodega.id_serie
-        )?.nombre || ""
+        series.find((serie) => serie?.id_serie === equipoSimpleBodega.id_serie)
+          ?.nombre || ""
       );
     }
   }, [equipoSimpleBodega, series]);
@@ -270,18 +270,24 @@ const EditarBodegaSimple = ({
           )}
         />
         <TextField
-  label="Serie"
-  variant="outlined"
-  fullWidth
-  size="small"
-  value={
-    typeof selectedInventarioSerie === "string"
-      ? selectedInventarioSerie
-      : selectedInventarioSerie || ""
-  }
-  onChange={(e) => setSelectedInventarioSerie(e.target.value)}
-  disabled={!selectedInventarioModelo}
-/>
+          label="Serie"
+          variant="outlined"
+          fullWidth
+          size="small"
+          value={
+            typeof selectedInventarioSerie === "string"
+              ? selectedInventarioSerie
+              : selectedInventarioSerie || ""
+          }
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value !== null && value.length > 30) {
+              return;
+            }
+            setSelectedInventarioSerie(value);
+          }}
+          disabled={!selectedInventarioModelo}
+        />
         <Box
           sx={{
             display: "inline-flex",

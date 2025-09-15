@@ -1,11 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Autocomplete, TextField, Button, Box } from "@mui/material";
-import {
-  Marca,
-  Modelo,
-  Ubicacion,
-  Edificio,
-} from "../../../../../types";
+import { Marca, Modelo, Ubicacion, Edificio } from "../../../../../types";
 import { ActivoRedEdit } from "../../../../../types/Activo";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
 import useEdificios from "../../../../../hooks/useEdificios";
@@ -106,7 +101,8 @@ const EditarActivoRed = ({
       setSelectedPuertos(equipoRedActivo.puertos);
       setSelectedPuertoFTP(equipoRedActivo.puerto_ftp);
       setNombreEquipo(equipoRedActivo.nombre_equipo ?? "");
-      (equipoRedActivo.inventario.length === 10 || equipoRedActivo.inventario.length === 12)
+      equipoRedActivo.inventario.length === 10 ||
+      equipoRedActivo.inventario.length === 12
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
@@ -134,8 +130,8 @@ const EditarActivoRed = ({
   useEffect(() => {
     if (equipoRedActivo && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipoRedActivo.id_serie)?.nombre ||
-          ""
+        series.find((serie) => serie?.id_serie === equipoRedActivo.id_serie)
+          ?.nombre || ""
       );
     }
   }, [equipoRedActivo, series]);
@@ -365,18 +361,24 @@ const EditarActivoRed = ({
           )}
         />
         <TextField
-  label="Serie"
-  variant="outlined"
-  fullWidth
-  size="small"
-  value={
-    typeof selectedInventarioSerie === "string"
-      ? selectedInventarioSerie
-      : selectedInventarioSerie || ""
-  }
-  onChange={(e) => setSelectedInventarioSerie(e.target.value)}
-  disabled={!selectedInventarioModelo}
-/>
+          label="Serie"
+          variant="outlined"
+          fullWidth
+          size="small"
+          value={
+            typeof selectedInventarioSerie === "string"
+              ? selectedInventarioSerie
+              : selectedInventarioSerie || ""
+          }
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value !== null && value.length > 30) {
+              return;
+            }
+            setSelectedInventarioSerie(value);
+          }}
+          disabled={!selectedInventarioModelo}
+        />
         <Box
           sx={{
             display: "inline-flex",

@@ -82,7 +82,8 @@ const EditarBodegaRed = ({
       setSelectedPuertos(equipoRedBodega.puertos);
       setSelectedPuertoFTP(equipoRedBodega.puerto_ftp);
       setNombreEquipo(equipoRedBodega.nombre_equipo ?? "");
-      (equipoRedBodega.inventario.length === 10 || equipoRedBodega.inventario.length === 12)
+      equipoRedBodega.inventario.length === 10 ||
+      equipoRedBodega.inventario.length === 12
         ? setEmpresa("EspolTech")
         : setEmpresa("Espol");
     }
@@ -110,8 +111,8 @@ const EditarBodegaRed = ({
   useEffect(() => {
     if (equipoRedBodega && series.length > 0) {
       setSelectedInventarioSerie(
-        series.find((serie) => serie?.id_serie === equipoRedBodega.id_serie)?.nombre ||
-          ""
+        series.find((serie) => serie?.id_serie === equipoRedBodega.id_serie)
+          ?.nombre || ""
       );
     }
   }, [equipoRedBodega, series]);
@@ -269,18 +270,24 @@ const EditarBodegaRed = ({
           )}
         />
         <TextField
-  label="Serie"
-  variant="outlined"
-  fullWidth
-  size="small"
-  value={
-    typeof selectedInventarioSerie === "string"
-      ? selectedInventarioSerie
-      : selectedInventarioSerie || ""
-  }
-  onChange={(e) => setSelectedInventarioSerie(e.target.value)}
-  disabled={!selectedInventarioModelo}
-/>
+          label="Serie"
+          variant="outlined"
+          fullWidth
+          size="small"
+          value={
+            typeof selectedInventarioSerie === "string"
+              ? selectedInventarioSerie
+              : selectedInventarioSerie || ""
+          }
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value !== null && value.length > 30) {
+              return;
+            }
+            setSelectedInventarioSerie(value);
+          }}
+          disabled={!selectedInventarioModelo}
+        />
         <Box
           sx={{
             display: "inline-flex",
