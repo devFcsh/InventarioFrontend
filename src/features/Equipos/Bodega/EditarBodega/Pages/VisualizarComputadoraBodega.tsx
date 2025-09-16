@@ -492,7 +492,7 @@ const VisualizarComputadoraBodega = ({
                         {typeof comp.serie === "object" &&
                         comp.serie !== null &&
                         "nombre" in comp.serie
-                          ? comp.serie.nombre
+                          ? (comp.serie as { nombre: string }).nombre
                           : comp.serie}
                       </td>
                       <td className="py-2 px-4 border">{comp.inventario}</td>
