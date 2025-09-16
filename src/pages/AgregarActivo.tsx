@@ -1,6 +1,5 @@
 import { Autocomplete, TextField } from "@mui/material";
 import { useState } from "react";
-import AgregarComputadoraActivo from "../features/Equipos/Activos/AgregarActivo/pages/AgregarComputadoraActivo";
 import { useLocation } from "react-router-dom";
 import { Periferico, Uso, Usuario } from "../types";
 import useUsos from "../hooks/useUsos";
@@ -116,11 +115,7 @@ const AgregarActivo = () => {
 
         {perifericoId &&
         computadores.includes(selectedPeriferico?.nombre ?? "") ? (
-          <AgregarComputadoraActivo
-            periferico={perifericoId}
-            idUso={selectedUsoId}
-            idUsuario={selectedUsuarioId}
-          />
+          <></>
         ) : (
           perifericoId && (
             /** 
