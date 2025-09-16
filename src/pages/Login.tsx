@@ -1,5 +1,3 @@
-/** 
-
 import { useEffect, useState } from "react";
 const Login = () => {
   const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
@@ -140,9 +138,10 @@ const Login = () => {
     </div>
   );
 };
+export default Login;
 
-*/
-
+/*
+Desarrollo
 const Login = () => {
   return (
     <div>
@@ -152,3 +151,4 @@ const Login = () => {
 }
 
 export default Login;
+*/
