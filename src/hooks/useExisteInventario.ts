@@ -11,7 +11,7 @@ export const useExisteInventario = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await clienteAxios.get('/inventario/existeInventario', {
+      const response = await clienteAxios.get('/inventarios/existeInventario', {
         params: { inventario }
       });
       setExiste(response.data.existe);
