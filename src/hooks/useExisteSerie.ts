@@ -11,7 +11,7 @@ export const useExisteSerie = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await clienteAxios.get('/serie/existeSerie', {
+      const response = await clienteAxios.get('/series/existeSerie', {
         params: { nombre }
       });
       setExiste(response.data.existe);

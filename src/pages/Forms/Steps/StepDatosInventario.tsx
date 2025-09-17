@@ -14,6 +14,7 @@ import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
 import { useNavigate } from "react-router-dom";
 import { useExisteInventario } from "@hooks/useExisteInventario";
+import { useExisteSerie } from "@hooks/useExisteSerie";
 
 interface StepDatosInventarioProps {
   periferico?: Periferico;
@@ -54,10 +55,8 @@ export const StepDatosInventario = ({
   );
   const { ubicaciones } = useUbicaciones(edificio);
   const navigate = useNavigate();
-  const {
-    existe: existeSerie,
-    consultarInventario: consultarSerie,
-  } = useExisteInventario();
+  const { existe: existeInventario, consultarInventario } = useExisteInventario();
+  const { existe: existeSerie, consultarSerie } = useExisteSerie();
 
   return (
     <Box>
@@ -202,7 +201,12 @@ export const StepDatosInventario = ({
                 await consultarSerie(value);
               }
             }}
-            disabled={!inventoryDataForm.modelo}
+            disabled={
+              !!inventoryErrors.serie ||
+              !!inventoryErrors.inventario ||
+              (!!inventoryDataForm.serie && existeSerie) ||
+              (!!inventoryDataForm.inventario && existeInventario)
+            }
           />
           {periferico?.nombre === "Proyector" ? (
             <Autocomplete
@@ -281,13 +285,18 @@ export const StepDatosInventario = ({
               fullWidth
               size="small"
               value={inventoryDataForm.inventario}
-              error={!!inventoryErrors.inventario}
+              error={
+                !!inventoryErrors.inventario ||
+                (!!inventoryDataForm.inventario && existeInventario)
+              }
               helperText={
                 inventoryErrors.inventario
                   ? "Por favor escribir un inventario válido"
+                  : existeInventario
+                  ? "El inventario ya existe"
                   : ""
               }
-              onChange={(e) => {
+              onChange={async (e) => {
                 const value = e.target.value;
                 if (
                   inventoryDataForm.empresa === "Espol" &&
@@ -303,11 +312,10 @@ export const StepDatosInventario = ({
                   return;
                 }
                 handleInventoryChange("inventario", value);
-                handleUniqueInventarioError(
-                  "inventario",
-                  value,
-                  inventoryDataForm
-                );
+                handleUniqueInventarioError("inventario", value, inventoryDataForm);
+                if (value) {
+                  await consultarInventario(value);
+                }
               }}
               disabled={inventoryDataForm.empresa === ""}
             />

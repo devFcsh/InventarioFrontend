@@ -14,6 +14,8 @@ import { validateInventario } from "@pages/Forms/helpers/validateInventario";
 import useEditarActivoRed from "../hooks/useEditarActivoRed";
 import { validateMAC } from "@pages/Forms/StepsSAP/helpers/validateMAC";
 import { useSnackbar } from "@context/SnackbarContext";
+import { useExisteInventario } from "../../../../../hooks/useExisteInventario";
+import { useExisteSerie } from "../../../../../hooks/useExisteSerie";
 
 interface EditarActivoRedProps {
   equipoRedActivo: ActivoRedEdit;
@@ -88,6 +90,8 @@ const EditarActivoRed = ({
   const { edificios } = useEdificios();
   const { ubicaciones } = useUbicaciones(selectedEdificio?.id_edificio ?? "");
   const { editarActivoRed } = useEditarActivoRed();
+  const { existe: existeInventario, consultarInventario } = useExisteInventario();
+  const { existe: existeSerie, consultarSerie } = useExisteSerie();
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -310,6 +314,8 @@ const EditarActivoRed = ({
     return true;
   };
 
+  const serieOriginal = series.find((serie) => serie?.id_serie === equipoRedActivo.id_serie)?.nombre || "";
+
   return (
     <div>
       <ModalConfirmation
@@ -370,12 +376,24 @@ const EditarActivoRed = ({
               ? selectedInventarioSerie
               : selectedInventarioSerie || ""
           }
-          onChange={(e) => {
+          error={
+            existeSerie &&
+            selectedInventarioSerie !== serieOriginal
+          }
+          helperText={
+            existeSerie && selectedInventarioSerie !== serieOriginal
+              ? "La serie ya existe"
+              : ""
+          }
+          onChange={async (e) => {
             const value = e.target.value;
             if (value !== null && value.length > 30) {
               return;
             }
             setSelectedInventarioSerie(value);
+            if (value && value !== serieOriginal) {
+              await consultarSerie(value);
+            }
           }}
           disabled={!selectedInventarioModelo}
         />
@@ -415,11 +433,21 @@ const EditarActivoRed = ({
             fullWidth
             size="small"
             value={selectedInventarioInv}
-            error={!!errorInventario}
-            helperText={
-              errorInventario ? "Por favor escribir un inventario válido" : ""
+            error={
+              !!errorInventario ||
+              (
+                existeInventario &&
+                selectedInventarioInv !== equipoRedActivo.inventario
+              )
             }
-            onChange={(e) => {
+            helperText={
+              errorInventario
+                ? "Por favor escribir un inventario válido"
+                : existeInventario && selectedInventarioInv !== equipoRedActivo.inventario
+                ? "El inventario ya existe"
+                : ""
+            }
+            onChange={async (e) => {
               const value = e.target.value;
               if (empresa === "Espol" && value !== null && value.length > 8) {
                 return;
@@ -431,6 +459,9 @@ const EditarActivoRed = ({
                 return;
               }
               handleChangeInventario(value);
+              if (value && value !== equipoRedActivo.inventario) {
+                await consultarInventario(value);
+              }
             }}
             disabled={empresa === ""}
           />
@@ -649,6 +680,10 @@ const EditarActivoRed = ({
           }}
           onClick={handleConfirmEditarEquipo}
           fullWidth
+          disabled={
+            (existeInventario && selectedInventarioInv !== equipoRedActivo.inventario) ||
+            (existeSerie && selectedInventarioSerie !== serieOriginal)
+          }
         >
           Guardar Cambios
         </Button>
