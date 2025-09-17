@@ -13,6 +13,7 @@ import useUbicaciones from "@hooks/useUbicaciones";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
 import { useNavigate } from "react-router-dom";
+import { useExisteInventario } from "@hooks/useExisteInventario";
 
 interface StepDatosInventarioProps {
   periferico?: Periferico;
@@ -53,6 +54,10 @@ export const StepDatosInventario = ({
   );
   const { ubicaciones } = useUbicaciones(edificio);
   const navigate = useNavigate();
+  const {
+    existe: existeSerie,
+    consultarInventario: consultarSerie,
+  } = useExisteInventario();
 
   return (
     <Box>
@@ -175,17 +180,27 @@ export const StepDatosInventario = ({
             fullWidth
             size="small"
             value={inventoryDataForm.serie || ""}
-            error={!!inventoryErrors.serie}
-            helperText={
-              inventoryErrors.serie ? "Por favor escribir una serie" : ""
+            error={
+              !!inventoryErrors.serie ||
+              (!!inventoryDataForm.serie && existeSerie)
             }
-            onChange={(e) => {
+            helperText={
+              inventoryErrors.serie
+                ? "Por favor escribir una serie"
+                : existeSerie
+                ? "La serie ya existe"
+                : ""
+            }
+            onChange={async (e) => {
               const value = e.target.value;
               if (value !== null && value.length > 30) {
                 return;
               }
               handleInventoryChange("serie", value);
               handleUniqueInventarioError("serie", value, inventoryDataForm);
+              if (value) {
+                await consultarSerie(value);
+              }
             }}
             disabled={!inventoryDataForm.modelo}
           />
