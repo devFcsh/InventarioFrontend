@@ -3,9 +3,6 @@ import { Marca, Modelo, Ubicacion } from "../../../types/index";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
 import useUbicaciones from "@hooks/useUbicaciones";
-import { useExisteInventario } from "@hooks/useExisteInventario";
-import { useExisteSerie } from "@hooks/useExisteSerie";
-
 interface StepDatosInventarioSAPProps {
   periferico: string;
   edificio: string;
@@ -14,6 +11,10 @@ interface StepDatosInventarioSAPProps {
   inventorySAPErrors: any;
   handleUniqueInventarioSAPError: any;
   tipoInventario: string;
+  existeSerie: boolean;
+  existeInventario: boolean;
+  consultarSerie: (serie: string) => Promise<void>;
+  consultarInventario: (inventario: string) => Promise<void>;
 }
 
 export const StepDatosInventarioSAP = ({
@@ -24,6 +25,10 @@ export const StepDatosInventarioSAP = ({
   inventorySAPErrors,
   handleUniqueInventarioSAPError,
   tipoInventario,
+  existeSerie,
+  existeInventario,
+  consultarSerie,
+  consultarInventario,
 }: StepDatosInventarioSAPProps) => {
   const { marcas } = useMarcasPorPeriferico(periferico);
   const { modelos } = useModelosPorMarcaPeriferico(
@@ -31,8 +36,6 @@ export const StepDatosInventarioSAP = ({
     periferico
   );
   const { ubicaciones } = useUbicaciones(edificio);
-  const { existe: existeInventario, consultarInventario } = useExisteInventario();
-  const { existe: existeSerie, consultarSerie } = useExisteSerie();
 
   return (
     <Box>
@@ -136,11 +139,7 @@ export const StepDatosInventarioSAP = ({
             }}
             disabled={!inventoryDataSAPForm.modelo}
           />
-          <Box
-            sx={{
-              display: "inline-flex",
-            }}
-          >
+          <Box sx={{ display: "inline-flex" }}>
             <Autocomplete
               size="small"
               disablePortal

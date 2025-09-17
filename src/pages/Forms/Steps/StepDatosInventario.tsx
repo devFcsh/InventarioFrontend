@@ -13,8 +13,6 @@ import useUbicaciones from "@hooks/useUbicaciones";
 import useUsuariosPorUso from "@hooks/useUsuariosPorUso";
 import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
 import { useNavigate } from "react-router-dom";
-import { useExisteInventario } from "@hooks/useExisteInventario";
-import { useExisteSerie } from "@hooks/useExisteSerie";
 
 interface StepDatosInventarioProps {
   periferico?: Periferico;
@@ -25,6 +23,10 @@ interface StepDatosInventarioProps {
   inventoryErrors: any;
   handleUniqueInventarioError: any;
   tipoInventario: string;
+  existeSerie: boolean;
+  existeInventario: boolean;
+  consultarSerie: (serie: string) => Promise<void>;
+  consultarInventario: (inventario: string) => Promise<void>;
 }
 
 export const StepDatosInventario = ({
@@ -36,6 +38,10 @@ export const StepDatosInventario = ({
   inventoryErrors,
   handleUniqueInventarioError,
   tipoInventario,
+  existeSerie,
+  existeInventario,
+  consultarSerie,
+  consultarInventario,
 }: StepDatosInventarioProps) => {
   const {
     usuarios,
@@ -55,8 +61,6 @@ export const StepDatosInventario = ({
   );
   const { ubicaciones } = useUbicaciones(edificio);
   const navigate = useNavigate();
-  const { existe: existeInventario, consultarInventario } = useExisteInventario();
-  const { existe: existeSerie, consultarSerie } = useExisteSerie();
 
   return (
     <Box>
@@ -201,12 +205,7 @@ export const StepDatosInventario = ({
                 await consultarSerie(value);
               }
             }}
-            disabled={
-              !!inventoryErrors.serie ||
-              !!inventoryErrors.inventario ||
-              (!!inventoryDataForm.serie && existeSerie) ||
-              (!!inventoryDataForm.inventario && existeInventario)
-            }
+            disabled={!inventoryDataForm.modelo}
           />
           {periferico?.nombre === "Proyector" ? (
             <Autocomplete

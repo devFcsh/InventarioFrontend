@@ -11,6 +11,8 @@ import { ModalObservation } from "./components/ModalObservation.tsx";
 import {useCargarImagenErrors,useFormDataCargarImagen} from "./hooks/index.ts"
 import {StepCargarImagen} from "./Steps/StepCargarImagen.tsx"
 import { useSnackbar } from "@context/SnackbarContext.tsx";
+import { useExisteInventario } from "../../hooks/useExisteInventario";
+import { useExisteSerie } from "../../hooks/useExisteSerie";
 export const FormSAP = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
@@ -34,6 +36,9 @@ export const FormSAP = () => {
   const { inventorySAPErrors, completeDatosInventario, handleInventorySAPErrors, handleUniqueInventarioSAPError } = useInventoryErrorsSAP(tipoInventario);
   const { informacionGeneralSAPErrors, handleInformacionGeneralSAPErrors, handleUniqueInformacionGeneralError, completeDatosInformacionGeneral } = useInformacionGeneralErrorSAP(selectedPeriferico?.nombre);
   const { cargarImagenErrors, handleCargarImagenErrors, handleUniqueCargarImagenError, completeDatosCargarImagen } = useCargarImagenErrors();
+
+  const { existe: existeInventario, consultarInventario } = useExisteInventario();
+  const { existe: existeSerie, consultarSerie } = useExisteSerie();
 
   const { showMessage } = useSnackbar();
   const handleNext = () => {
@@ -113,6 +118,10 @@ export const FormSAP = () => {
             inventorySAPErrors={inventorySAPErrors}
             handleUniqueInventarioSAPError={handleUniqueInventarioSAPError}
             tipoInventario={tipoInventario}
+            existeSerie={existeSerie}
+            existeInventario={existeInventario}
+            consultarSerie={consultarSerie}
+            consultarInventario={consultarInventario}
           />
         );
         
@@ -355,6 +364,15 @@ export const FormSAP = () => {
                       activeStep === steps.length - 1 ? "#45a049" : "#1565c0",
                   },
                 }}
+                disabled={
+                  activeStep === 0 &&
+                  (
+                    !!inventorySAPErrors.serie ||
+                    !!inventorySAPErrors.inventario ||
+                    (!!inventoryDataSAPForm.serie && existeSerie) ||
+                    (!!inventoryDataSAPForm.inventario && existeInventario)
+                  )
+                }
               >
                 {activeStep === steps.length - 1
                   ? tipoInventario === "activo"
