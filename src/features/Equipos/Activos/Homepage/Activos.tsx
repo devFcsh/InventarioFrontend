@@ -125,8 +125,8 @@ const Activos = () => {
     handleCloseModal();
   };
 
-  function esFormatoExcelValido(jsonData: any[]): boolean {
-    if (!jsonData || jsonData.length === 0) return false;
+  function columnasFaltantesExcel(jsonData: any[]): string[] {
+    if (!jsonData || jsonData.length === 0) return [];
     const requiredColumns = [
       "Tipo",
       "Inventario CPU",
@@ -140,9 +140,22 @@ const Activos = () => {
       "Uso",
       "Usuario",
       "Edificio",
+      "Nombre de equipo",
+      "Año Adq",
+      "Oficina",
+      "Modelo monitor",
+      "Serie monitor",
+      "Inventario Monitor",
+      "Modelo teclado",
+      "Serie teclado",
+      "Inventario Teclado",
+      "Modelo mouse",
+      "Serie mouse",
+      "Inventario Mouse",
+      "Tipo Disco"
     ];
     const firstRow = jsonData[0];
-    return requiredColumns.every((col) => Object.keys(firstRow).includes(col));
+    return requiredColumns.filter((col) => !Object.keys(firstRow).includes(col));
   }
 
   const handleImportClick = () => {
@@ -157,7 +170,7 @@ const Activos = () => {
         ? "S/N"
         : String(val).trim();
 
-    const ubicacion = row["Oficina"] !== "" ? row["Oficina"] : row["Aula"];
+    const ubicacion = row["Oficina"] !== "" ? row["Oficina"] : row["No. Aula"];
     return {
       tipo: normalize(row["Tipo"]),
       inventario: String(row["Inventario CPU"] ?? ""),
@@ -220,9 +233,15 @@ const Activos = () => {
       const worksheet = workbook.Sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-      if (!esFormatoExcelValido(jsonData)) {
+      if (!jsonData || jsonData.length === 0) {
+        showMessage("El archivo Excel está vacío.", "warning");
+        return;
+      }
+
+      const faltantes = columnasFaltantesExcel(jsonData);
+      if (faltantes.length > 0) {
         showMessage(
-          "El formato del archivo Excel no es válido. Verifique las columnas requeridas.",
+          `El formato del archivo Excel no es válido. Faltan las columnas: ${faltantes.join(", ")}`,
           "error"
         );
         return;
