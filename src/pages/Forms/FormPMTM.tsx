@@ -17,6 +17,8 @@ import { useAgregarSimpleBodega } from "../../features/Equipos/Bodega/AgregarEqu
 import { useAgregarSimpleBaja } from "../../features/Equipos/Baja/AgregarEquipoBaja/hooks/useAgregarSimpleBaja";
 import { ModalObservation } from "./components/ModalObservation.tsx";
 import { useSnackbar } from "@context/SnackbarContext.tsx";
+import { useExisteInventario } from "../../hooks/useExisteInventario";
+import { useExisteSerie } from "../../hooks/useExisteSerie";
 
 let steps = ["Datos de inventario", "Cargar imagen"];
 
@@ -138,22 +140,24 @@ export const FormPMTM = () => {
     }
   }
 
+  const { existe: existeInventario, consultarInventario } = useExisteInventario();
+  const { existe: existeSerie, consultarSerie } = useExisteSerie();
+
+
   const renderStepContent = (stepIndex: number) => {
     switch (stepIndex) {
       case 0:
         return (
           <>
-              <ModalObservation
-                open={openModalObservation}
-                onClose={() => setOpenModalObservation(false)}
-                onConfirm={(observationValue) => {
-                  setOpenModalObservation(false);
-                  handleAgregarEquipo(observationValue)
-                  
-                }}
-                title="Agregar observación"
-              />
- 
+            <ModalObservation
+              open={openModalObservation}
+              onClose={() => setOpenModalObservation(false)}
+              onConfirm={(observationValue) => {
+                setOpenModalObservation(false);
+                handleAgregarEquipo(observationValue)
+              }}
+              title="Agregar observación"
+            />
             <StepDatosInventario
               periferico={selectedPeriferico || null}
               uso={selectedUso?.id_uso ?? ""}
@@ -163,6 +167,10 @@ export const FormPMTM = () => {
               inventoryErrors={inventoryErrors}
               handleUniqueInventarioError={handleUniqueInventarioError}
               tipoInventario={tipoInventario}
+              existeSerie={existeSerie}
+              existeInventario={existeInventario}
+              consultarSerie={consultarSerie}
+              consultarInventario={consultarInventario}
             />
           </>
         );
@@ -360,6 +368,15 @@ export const FormPMTM = () => {
                       activeStep === steps.length - 1 ? "#45a049" : "#1565c0",
                   },
                 }}
+                disabled={
+                  activeStep === 0 &&
+                  (
+                    !!inventoryErrors.serie ||
+                    !!inventoryErrors.inventario ||
+                    (!!inventoryDataForm.serie && existeSerie) ||
+                    (!!inventoryDataForm.inventario && existeInventario)
+                  )
+                }
               >
                 {activeStep === steps.length - 1
                   ? tipoInventario === "activo"

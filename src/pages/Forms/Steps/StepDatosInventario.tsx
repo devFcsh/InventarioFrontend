@@ -23,6 +23,10 @@ interface StepDatosInventarioProps {
   inventoryErrors: any;
   handleUniqueInventarioError: any;
   tipoInventario: string;
+  existeSerie: boolean;
+  existeInventario: boolean;
+  consultarSerie: (serie: string) => Promise<void>;
+  consultarInventario: (inventario: string) => Promise<void>;
 }
 
 export const StepDatosInventario = ({
@@ -34,6 +38,10 @@ export const StepDatosInventario = ({
   inventoryErrors,
   handleUniqueInventarioError,
   tipoInventario,
+  existeSerie,
+  existeInventario,
+  consultarSerie,
+  consultarInventario,
 }: StepDatosInventarioProps) => {
   const {
     usuarios,
@@ -175,17 +183,27 @@ export const StepDatosInventario = ({
             fullWidth
             size="small"
             value={inventoryDataForm.serie || ""}
-            error={!!inventoryErrors.serie}
-            helperText={
-              inventoryErrors.serie ? "Por favor escribir una serie" : ""
+            error={
+              !!inventoryErrors.serie ||
+              (!!inventoryDataForm.serie && existeSerie)
             }
-            onChange={(e) => {
+            helperText={
+              inventoryErrors.serie
+                ? "Por favor escribir una serie"
+                : existeSerie
+                ? "La serie ya existe"
+                : ""
+            }
+            onChange={async (e) => {
               const value = e.target.value;
               if (value !== null && value.length > 30) {
                 return;
               }
               handleInventoryChange("serie", value);
               handleUniqueInventarioError("serie", value, inventoryDataForm);
+              if (value) {
+                await consultarSerie(value);
+              }
             }}
             disabled={!inventoryDataForm.modelo}
           />
@@ -266,13 +284,18 @@ export const StepDatosInventario = ({
               fullWidth
               size="small"
               value={inventoryDataForm.inventario}
-              error={!!inventoryErrors.inventario}
+              error={
+                !!inventoryErrors.inventario ||
+                (!!inventoryDataForm.inventario && existeInventario)
+              }
               helperText={
                 inventoryErrors.inventario
                   ? "Por favor escribir un inventario válido"
+                  : existeInventario
+                  ? "El inventario ya existe"
                   : ""
               }
-              onChange={(e) => {
+              onChange={async (e) => {
                 const value = e.target.value;
                 if (
                   inventoryDataForm.empresa === "Espol" &&
@@ -288,11 +311,10 @@ export const StepDatosInventario = ({
                   return;
                 }
                 handleInventoryChange("inventario", value);
-                handleUniqueInventarioError(
-                  "inventario",
-                  value,
-                  inventoryDataForm
-                );
+                handleUniqueInventarioError("inventario", value, inventoryDataForm);
+                if (value) {
+                  await consultarInventario(value);
+                }
               }}
               disabled={inventoryDataForm.empresa === ""}
             />

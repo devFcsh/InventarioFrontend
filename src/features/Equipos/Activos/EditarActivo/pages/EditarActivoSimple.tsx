@@ -21,6 +21,8 @@ import { validateInventario } from "@pages/Forms/helpers/validateInventario";
 import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
 import useLamparas from "@hooks/useLamparas";
 import { useSnackbar } from "@context/SnackbarContext";
+import { useExisteInventario } from "../../../../../hooks/useExisteInventario";
+import { useExisteSerie } from "../../../../../hooks/useExisteSerie";
 
 interface EditarActivoSimpleProps {
   equipoSimpleActivo: ActivoSimpleEdit;
@@ -92,6 +94,8 @@ const EditarActivoSimple = ({
   const { lamparasTotales } = useLamparas();
   const { ubicaciones } = useUbicaciones(selectedEdificio?.id_edificio ?? "");
   const { editarActivoSimple } = useEditarActivoSimple();
+  const { existe: existeInventario, consultarInventario } = useExisteInventario();
+  const { existe: existeSerie, consultarSerie } = useExisteSerie();
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -296,6 +300,12 @@ const EditarActivoSimple = ({
     return true;
   };
 
+  // Serie original
+  const serieOriginal = serieNombre; // ya lo tienes en el estado
+
+  // Inventario original
+  const inventarioOriginal = equipoSimpleActivo.inventario;
+
   return (
     <div>
       <ModalConfirmation
@@ -353,12 +363,24 @@ const EditarActivoSimple = ({
           fullWidth
           size="small"
           value={serieNombre}
-          onChange={(e) => {
+          error={
+            existeSerie &&
+            serieNombre !== serieOriginal
+          }
+          helperText={
+            existeSerie && serieNombre !== serieOriginal
+              ? "La serie ya existe"
+              : ""
+          }
+          onChange={async (e) => {
             const value = e.target.value;
             if (value !== null && value.length > 30) {
               return;
             }
             setSerieNombre(value);
+            if (value && value !== serieOriginal) {
+              await consultarSerie(value);
+            }
           }}
           disabled={!selectedInventarioModelo}
         />
@@ -398,11 +420,18 @@ const EditarActivoSimple = ({
             fullWidth
             size="small"
             value={selectedInventarioInv}
-            error={!!errorInventario}
-            helperText={
-              errorInventario ? "Por favor escribir un inventario válido" : ""
+            error={
+              !!errorInventario ||
+              (existeInventario && selectedInventarioInv !== inventarioOriginal)
             }
-            onChange={(e) => {
+            helperText={
+              errorInventario
+                ? "Por favor escribir un inventario válido"
+                : existeInventario && selectedInventarioInv !== inventarioOriginal
+                ? "El inventario ya existe"
+                : ""
+            }
+            onChange={async (e) => {
               const value = e.target.value;
               if (empresa === "Espol" && value !== null && value.length > 8) {
                 return;
@@ -414,6 +443,9 @@ const EditarActivoSimple = ({
                 return;
               }
               handleChangeInventario(value);
+              if (value && value !== inventarioOriginal) {
+                await consultarInventario(value);
+              }
             }}
             disabled={empresa === ""}
           />
@@ -570,6 +602,10 @@ const EditarActivoSimple = ({
           }}
           onClick={handleConfirmEditarEquipo}
           fullWidth
+          disabled={
+            (existeInventario && selectedInventarioInv !== inventarioOriginal) ||
+            (existeSerie && serieNombre !== serieOriginal)
+          }
         >
           Guardar Cambios
         </Button>

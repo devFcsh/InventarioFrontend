@@ -21,6 +21,8 @@ import { useAgregarComputadoraBodega } from "../../features/Equipos/Bodega/Agreg
 import { useAgregarComponentesBodega } from "../../features/Equipos/Bodega/AgregarEquipoBodega/hooks/useAgregarComponentesBodega.ts";
 import { ModalObservation } from "./components/ModalObservation.tsx";
 import { useSnackbar } from "@context/SnackbarContext.tsx";
+import { useExisteInventario } from "../../hooks/useExisteInventario";
+import { useExisteSerie } from "../../hooks/useExisteSerie";
 
 export const FormLC = () => {
   const navigate = useNavigate();
@@ -71,6 +73,9 @@ export const FormLC = () => {
   } = useCargarImagenErrors();
 
   const { showMessage } = useSnackbar();
+
+  const { existe: existeInventario, consultarInventario } = useExisteInventario();
+  const { existe: existeSerie, consultarSerie } = useExisteSerie();
 
   const handleNext = () => {
     if (activeStep === 0) {
@@ -148,6 +153,10 @@ export const FormLC = () => {
             inventoryErrors={inventoryErrors}
             handleUniqueInventarioError={handleUniqueInventarioError}
             tipoInventario={tipoInventario}
+            existeSerie={existeSerie}
+            existeInventario={existeInventario}
+            consultarSerie={consultarSerie}
+            consultarInventario={consultarInventario}
           />
         );
 
@@ -409,6 +418,15 @@ export const FormLC = () => {
                         : "#1565c0",
                 },
               }}
+              disabled={
+                activeStep === 0 &&
+                (
+                  !!inventoryErrors.serie ||
+                  !!inventoryErrors.inventario ||
+                  (!!inventoryDataForm.serie && existeSerie) ||
+                  (!!inventoryDataForm.inventario && existeInventario)
+                )
+              }
             >
               {activeStep === steps.length - 1 && tipoInventario === "activo"
                 ? "Finalizar"

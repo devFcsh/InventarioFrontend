@@ -46,6 +46,8 @@ import useProcesadores from "@hooks/useProcesadores";
 import { validateIP } from "../../../../../pages/Forms/helpers/validateIP.ts";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario.ts";
 import { useSnackbar } from "@context/SnackbarContext.tsx";
+import { useExisteInventario } from "../../../../../hooks/useExisteInventario";
+import { useExisteSerie } from "../../../../../hooks/useExisteSerie";
 
 interface EditarComputadoraActivoProps {
   equipo: ActivoComputadoraEdit;
@@ -153,6 +155,8 @@ const EditarComputadoraActivo = ({
   const { editarActivo } = useEditarActivo();
   const { gestionarComponentes } = useGestionarComponentes();
   const { perifericos } = usePerifericos();
+  const { existe: existeInventario, consultarInventario } = useExisteInventario();
+  const { existe: existeSerie, consultarSerie } = useExisteSerie();
 
   const filteredPerifericos = perifericos.filter((p) => {
     const nombre = p?.nombre?.toLowerCase();
@@ -633,6 +637,12 @@ const EditarComputadoraActivo = ({
     }
   };
 
+  // Serie original
+  const serieOriginal = series.find((serie) => serie?.id_serie === equipo.id_serie)?.nombre || "";
+
+  // Inventario original
+  const inventarioOriginal = equipo.inventario;
+
   return (
     <div>
       <ModalConfirmation
@@ -693,12 +703,24 @@ const EditarComputadoraActivo = ({
               ? selectedInventarioSerie
               : selectedInventarioSerie || ""
           }
-          onChange={(e) => {
+          error={
+            existeSerie &&
+            selectedInventarioSerie !== serieOriginal
+          }
+          helperText={
+            existeSerie && selectedInventarioSerie !== serieOriginal
+              ? "La serie ya existe"
+              : ""
+          }
+          onChange={async (e) => {
             const value = e.target.value;
             if (value !== null && value.length > 30) {
               return;
             }
             setSelectedInventarioSerie(value);
+            if (value && value !== serieOriginal) {
+              await consultarSerie(value);
+            }
           }}
           disabled={!selectedInventarioModelo}
         />
@@ -738,11 +760,18 @@ const EditarComputadoraActivo = ({
             fullWidth
             size="small"
             value={selectedInventarioInv}
-            error={!!errorInventario}
-            helperText={
-              errorInventario ? "Por favor escribir un inventario válido" : ""
+            error={
+              !!errorInventario ||
+              (existeInventario && selectedInventarioInv !== inventarioOriginal)
             }
-            onChange={(e) => {
+            helperText={
+              errorInventario
+                ? "Por favor escribir un inventario válido"
+                : existeInventario && selectedInventarioInv !== inventarioOriginal
+                ? "El inventario ya existe"
+                : ""
+            }
+            onChange={async (e) => {
               const value = e.target.value;
               if (empresa === "Espol" && value !== null && value.length > 8) {
                 return;
@@ -754,6 +783,9 @@ const EditarComputadoraActivo = ({
                 return;
               }
               handleChangeInventario(value);
+              if (value && value !== inventarioOriginal) {
+                await consultarInventario(value);
+              }
             }}
             disabled={empresa === ""}
           />
@@ -1081,8 +1113,8 @@ const EditarComputadoraActivo = ({
                       <td className="py-2 px-4 border">
                         {typeof comp.serie === "object" &&
                         comp.serie !== null &&
-                        "nombre" in comp.serie
-                          ? comp.serie.nombre
+                        (comp.serie as { nombre?: string }).nombre !== undefined
+                          ? (comp.serie as { nombre?: string }).nombre
                           : comp.serie}
                       </td>
                       <td className="py-2 px-4 border">{comp.inventario}</td>
@@ -1289,6 +1321,10 @@ const EditarComputadoraActivo = ({
           }}
           onClick={handleConfirmEditarEquipo}
           fullWidth
+          disabled={
+            (existeInventario && selectedInventarioInv !== inventarioOriginal) ||
+            (existeSerie && selectedInventarioSerie !== serieOriginal)
+          }
         >
           Editar Activo
         </Button>

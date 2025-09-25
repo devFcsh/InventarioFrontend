@@ -14,6 +14,8 @@ import { Componente } from "../../../types/Activo/Componente/index.ts";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
 import { Marca, Modelo, Periferico } from "../../../types/index.ts";
 import { useErrorsComponents } from "../hooks/useErrorsComponents.ts";
+import { useExisteInventario } from "@hooks/useExisteInventario";
+import { useExisteSerie } from "@hooks/useExisteSerie";
 
 interface ModalProps {
   open: boolean;
@@ -54,6 +56,8 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
   } = useErrorsComponents();
 
   const [empresa, setEmpresa] = useState(empresaComputadora);
+  const { existe: existeInventario, consultarInventario } = useExisteInventario();
+  const { existe: existeSerie, consultarSerie } = useExisteSerie();
 
   const generateInventario = (
     periferico: Periferico | null,
@@ -352,11 +356,18 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                     ? nuevoComponente.serie
                     : nuevoComponente.serie || ""
                 }
-                error={!!componentsErrors.serie}
-                helperText={
-                  componentsErrors.serie ? "Por favor escribir una serie" : ""
+                error={
+                  !!componentsErrors.serie ||
+                  (!!nuevoComponente.serie && existeSerie)
                 }
-                onChange={(e) => {
+                helperText={
+                  componentsErrors.serie
+                    ? "Por favor escribir una serie"
+                    : existeSerie
+                    ? "La serie ya existe"
+                    : ""
+                }
+                onChange={async (e) => {
                   const value = e.target.value;
                   if (value !== null && value.length > 30) {
                     return;
@@ -366,6 +377,9 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                     ...nuevoComponente,
                     empresa,
                   });
+                  if (value) {
+                    await consultarSerie(value);
+                  }
                 }}
                 disabled={!nuevoComponente.modelo}
               />
@@ -399,13 +413,18 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 fullWidth
                 size="small"
                 value={nuevoComponente.inventario}
-                error={!!componentsErrors.inventario}
+                error={
+                  !!componentsErrors.inventario ||
+                  (!!nuevoComponente.inventario && existeInventario)
+                }
                 helperText={
                   componentsErrors.inventario
                     ? "Por favor escribir un inventario válido"
+                    : existeInventario
+                    ? "El inventario ya existe"
                     : getInventarioHelperText()
                 }
-                onChange={(e) => {
+                onChange={async (e) => {
                   if (empresa !== "Espol") {
                     let value = e.target.value;
                     const maxLength = getMaxLength();
@@ -421,6 +440,9 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                       ...nuevoComponente,
                       empresa,
                     });
+                    if (value) {
+                      await consultarInventario(value);
+                    }
                   }
                 }}
                 disabled={empresa === "Espol"}
@@ -458,6 +480,12 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 backgroundColor: "#45a049",
               },
             }}
+            disabled={
+              !!componentsErrors.serie ||
+              !!componentsErrors.inventario ||
+              (!!nuevoComponente.serie && existeSerie) ||
+              (!!nuevoComponente.inventario && existeInventario)
+            }
           >
             Agregar Componente
           </Button>

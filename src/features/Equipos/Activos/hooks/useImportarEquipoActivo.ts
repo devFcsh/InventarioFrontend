@@ -9,6 +9,8 @@ export type ImportarEquiposResultado = {
     totalProcesados: number;
     registrados: number;
     noRegistrados: number;
+    equiposAgregados: number;
+    seInsertaronNuevos: boolean;
   };
   registrados?: Array<{
     inventario: string;

@@ -3,7 +3,6 @@ import { Marca, Modelo, Ubicacion } from "../../../types/index";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
 import useUbicaciones from "@hooks/useUbicaciones";
-
 interface StepDatosInventarioSAPProps {
   periferico: string;
   edificio: string;
@@ -12,6 +11,10 @@ interface StepDatosInventarioSAPProps {
   inventorySAPErrors: any;
   handleUniqueInventarioSAPError: any;
   tipoInventario: string;
+  existeSerie: boolean;
+  existeInventario: boolean;
+  consultarSerie: (serie: string) => Promise<void>;
+  consultarInventario: (inventario: string) => Promise<void>;
 }
 
 export const StepDatosInventarioSAP = ({
@@ -22,6 +25,10 @@ export const StepDatosInventarioSAP = ({
   inventorySAPErrors,
   handleUniqueInventarioSAPError,
   tipoInventario,
+  existeSerie,
+  existeInventario,
+  consultarSerie,
+  consultarInventario,
 }: StepDatosInventarioSAPProps) => {
   const { marcas } = useMarcasPorPeriferico(periferico);
   const { modelos } = useModelosPorMarcaPeriferico(
@@ -104,11 +111,18 @@ export const StepDatosInventarioSAP = ({
                 ? inventoryDataSAPForm.serie
                 : inventoryDataSAPForm.serie?.nombre || ""
             }
-            error={!!inventorySAPErrors.serie}
-            helperText={
-              inventorySAPErrors.serie ? "Por favor escribir una serie" : ""
+            error={
+              !!inventorySAPErrors.serie ||
+              (!!inventoryDataSAPForm.serie && existeSerie)
             }
-            onChange={(e) => {
+            helperText={
+              inventorySAPErrors.serie
+                ? "Por favor escribir una serie"
+                : existeSerie
+                ? "La serie ya existe"
+                : ""
+            }
+            onChange={async (e) => {
               const value = e.target.value;
               if (value !== null && value.length > 30) {
                 return;
@@ -119,14 +133,13 @@ export const StepDatosInventarioSAP = ({
                 value,
                 inventoryDataSAPForm
               );
+              if (value) {
+                await consultarSerie(value);
+              }
             }}
             disabled={!inventoryDataSAPForm.modelo}
           />
-          <Box
-            sx={{
-              display: "inline-flex",
-            }}
-          >
+          <Box sx={{ display: "inline-flex" }}>
             <Autocomplete
               size="small"
               disablePortal
@@ -165,13 +178,18 @@ export const StepDatosInventarioSAP = ({
               fullWidth
               size="small"
               value={inventoryDataSAPForm.inventario}
-              error={!!inventorySAPErrors.inventario}
+              error={
+                !!inventorySAPErrors.inventario ||
+                (!!inventoryDataSAPForm.inventario && existeInventario)
+              }
               helperText={
                 inventorySAPErrors.inventario
                   ? "Por favor escribir un inventario válido"
+                  : existeInventario
+                  ? "El inventario ya existe"
                   : ""
               }
-              onChange={(e) => {
+              onChange={async (e) => {
                 const value = e.target.value;
                 if (
                   inventoryDataSAPForm.empresa === "Espol" &&
@@ -192,6 +210,9 @@ export const StepDatosInventarioSAP = ({
                   value,
                   inventoryDataSAPForm
                 );
+                if (value) {
+                  await consultarInventario(value);
+                }
               }}
               disabled={inventoryDataSAPForm.empresa === ""}
             />
