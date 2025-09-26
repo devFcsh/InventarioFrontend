@@ -125,6 +125,39 @@ const Activos = () => {
     handleCloseModal();
   };
 
+  function columnasFaltantesExcel(jsonData: any[]): string[] {
+    if (!jsonData || jsonData.length === 0) return [];
+    const requiredColumns = [
+      "Tipo",
+      "Inventario CPU",
+      "Serie CPU",
+      "Modelo Case",
+      "IP",
+      "Capacidad Memoria",
+      "Capacidad HDD",
+      "Procesador",
+      "Dominio",
+      "Uso",
+      "Usuario",
+      "Edificio",
+      "Nombre de equipo",
+      "Año Adq",
+      "Oficina",
+      "Modelo monitor",
+      "Serie monitor",
+      "Inventario Monitor",
+      "Modelo teclado",
+      "Serie teclado",
+      "Inventario Teclado",
+      "Modelo mouse",
+      "Serie mouse",
+      "Inventario Mouse",
+      "Tipo Disco"
+    ];
+    const firstRow = jsonData[0];
+    return requiredColumns.filter((col) => !Object.keys(firstRow).includes(col));
+  }
+
   const handleImportClick = () => {
     fileInputRef.current?.click();
   };
@@ -137,7 +170,7 @@ const Activos = () => {
         ? "S/N"
         : String(val).trim();
 
-    const ubicacion = row["Oficina"] !== "" ? row["Oficina"] : row["Aula"];
+    const ubicacion = row["Oficina"] !== "" ? row["Oficina"] : row["No. Aula"];
     return {
       tipo: normalize(row["Tipo"]),
       inventario: String(row["Inventario CPU"] ?? ""),
@@ -159,7 +192,9 @@ const Activos = () => {
       ),
       procesador: normalize(row["Procesador"]),
       dominio: normalize(row["Dominio"]),
+      uso: normalize(row["Uso"]),
       usuario: normalize(row["Usuario"]),
+      edificio: normalize(row["Edificio"]),
       ubicacion: normalize(ubicacion),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
       componentes: [
@@ -197,12 +232,36 @@ const Activos = () => {
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
-      console.log(jsonData)
+
+      if (!jsonData || jsonData.length === 0) {
+        showMessage("El archivo Excel está vacío.", "warning");
+        return;
+      }
+
+      const faltantes = columnasFaltantesExcel(jsonData);
+      if (faltantes.length > 0) {
+        showMessage(
+          `El formato del archivo Excel no es válido. Faltan las columnas: ${faltantes.join(", ")}`,
+          "error"
+        );
+        return;
+      }
+
       try {
         const equiposImport = jsonData.map(transformarFilaExcel);
 
-        await importarEquiposActivos(equiposImport);
-        showMessage("Importación completada", "success");
+        const resultado = await importarEquiposActivos(equiposImport);
+
+        if (
+          resultado?.resumen &&
+          typeof resultado.resumen.registrados === "number" &&
+          resultado.resumen.registrados > 0
+        ) {
+          showMessage(`Importación completada.`, "success");
+        } else {
+          showMessage("No se encontraron equipos nuevos para agregar.", "info");
+        }
+
         setShouldFetch(true);
       } catch {
         showMessage("Error al importar equipos", "error");
@@ -1274,6 +1333,14 @@ const Activos = () => {
             />
           </button>
         </Tooltip>
+        {importLoading && (
+          <div className="flex justify-center items-center my-8">
+            <Loader />
+            <span className="ml-4 text-lg font-semibold text-blue-700">
+              Importando equipos, por favor espere...
+            </span>
+          </div>
+        )}
       </div>
 
       <ModalConfirmation
