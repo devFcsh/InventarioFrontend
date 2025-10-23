@@ -33,7 +33,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     authenticatedAt: new Date().toISOString(),
     source: "dev",
   };
-  const hardcodedRol = "administrador"; // Cambia el rol si lo necesitas
+  const hardcodedRol = "editor"; // Cambia el rol si lo necesitas
 
   const [user, setUser] = useState<User | null>(hardcodedUser);
   const [rol, setRol] = useState<string | null>(hardcodedRol);

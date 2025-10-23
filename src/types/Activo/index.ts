@@ -197,3 +197,19 @@ export type ActivoComputadoraImport = {
     idLampara?: number;
   }>;
 };
+
+export type ActividadRealizada = {
+  id_actividad: number;
+  nombre: string;
+  realizada: boolean;
+};
+
+export type Mantenimiento = {
+  id_mantenimiento: number;
+  id_equipo: string;
+  fecha: string;
+  tipo: "preventivo" | "correctivo";
+  actividades: ActividadRealizada[];
+  hallazgos: string;
+  recomendaciones: string;
+};

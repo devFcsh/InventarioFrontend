@@ -19,6 +19,7 @@ import { useInventario } from "@hooks/useInventario.ts";
 import { usePasarActivoABodega } from "../hooks/usePasarActivoABodega.ts";
 import { useExportarEquiposActivos } from "../hooks/useExportarComputadorasActivos.ts";
 import {
+  Equipo,
   ExportarAP,
   ExportarComputadora,
   ExportarProyector,
@@ -29,6 +30,7 @@ import { useSnackbar } from "@context/SnackbarContext.tsx";
 import { useUser } from "@context/userContext.tsx";
 import Loader from "@pages/Loader.tsx";
 import { useImportarEquipoActivo } from "../hooks/useImportarEquipoActivo.ts";
+import { MantenimientoActivo } from "../MantenimientoActivo/Homepage/MantenimientoActivo.tsx";
 
 const Activos = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -36,6 +38,7 @@ const Activos = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [openModalActivos, setOpenModalActivos] = useState<boolean>(false);
+  const [openModalMantenimientos, setOpenModalMantenimientos] = useState(false);
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
@@ -55,6 +58,7 @@ const Activos = () => {
     title: "Agregar Activos",
     message: "Seleccione el periférico a registrar",
   });
+  
 
   const [inputPeriferico, setInputPeriferico] = useState("");
   const [inputMarca, setInputMarca] = useState("");
@@ -503,6 +507,16 @@ const Activos = () => {
   };
   const handleOpenActivos = () => setOpenModalActivos(true);
   const handleCloseActivos = () => setOpenModalActivos(false);
+
+  const [equipoSeleccionado, setEquipoSeleccionado] = useState<Equipo>();
+  const [tipoEquipoSeleccionado, setTipoEquipoSeleccionado] = useState<string>("");
+
+  const handleOpenMantenimientos = (equipo: Equipo) => {
+    setEquipoSeleccionado(equipo);
+    setTipoEquipoSeleccionado(equipo.periferico);
+    setOpenModalMantenimientos(true);
+  };
+  const handleCloseMantenimientos = () => setOpenModalMantenimientos(false);
 
   const handleBaja = () => {
     setModalContent({
@@ -1024,34 +1038,34 @@ const Activos = () => {
                       <>
                         <Tooltip title="Eliminar activos">
                           <span>
-                            <Icon
-                              icon="weui:delete-outlined"
-                              width="20"
-                              height="20"
-                              onClick={
-                                !unableActionEditor ? handleDelete : undefined
-                              }
-                              className={`cursor-pointer ${
-                                unableActionEditor
-                                  ? "opacity-50 pointer-events-none"
-                                  : ""
-                              }`}
-                            />
+                          <Icon
+                            icon="weui:delete-outlined"
+                            width="20"
+                            height="20"
+                            onClick={
+                            !unableActionEditor ? handleDelete : undefined
+                            }
+                            className={`cursor-pointer ${
+                            unableActionEditor
+                              ? "opacity-50 pointer-events-none"
+                              : ""
+                            }`}
+                          />
                           </span>
                         </Tooltip>
                         <Tooltip title="Dar de baja activos">
                           <span>
-                            <Icon
-                              icon="ph:arrow-fat-down-light"
-                              width="20"
-                              height="20"
-                              onClick={!unableAction ? handleBaja : undefined}
-                              className={`cursor-pointer ${
-                                unableAction
-                                  ? "opacity-50 pointer-events-none"
-                                  : ""
-                              }`}
-                            />
+                          <Icon
+                            icon="ph:arrow-fat-down-light"
+                            width="20"
+                            height="20"
+                            onClick={!unableActionEditor ? handleBaja : undefined}
+                            className={`cursor-pointer ${
+                            unableActionEditor
+                              ? "opacity-50 pointer-events-none"
+                              : ""
+                            }`}
+                          />
                           </span>
                         </Tooltip>
                         {/*
@@ -1147,108 +1161,119 @@ const Activos = () => {
                           </Link>
                         </span>
                       </Tooltip>
-                      <Tooltip title="Dar de baja equipo">
+                        <Tooltip title="Dar de baja equipo">
                         <span
                           className={
-                            unableAction ? "opacity-50 pointer-events-none" : ""
+                          unableActionEditor ? "opacity-50 pointer-events-none" : ""
                           }
                         >
                           <Icon
-                            icon="ph:arrow-fat-down-light"
-                            width="25"
-                            height="25"
-                            onClick={
-                              !unableAction
-                                ? () =>
-                                    handleOpenModal(
-                                      equipo.id_equipo,
-                                      "Dar de baja equipo",
-                                      `¿Estás seguro de que deseas dar de baja el equipo ${equipo.inventario}?`,
-                                      bajaEquipo
-                                    )
-                                : undefined
-                            }
-                            className="cursor-pointer"
+                          icon="ph:arrow-fat-down-light"
+                          width="25"
+                          height="25"
+                          onClick={
+                            !unableActionEditor
+                            ? () =>
+                              handleOpenModal(
+                                equipo.id_equipo,
+                                "Dar de baja equipo",
+                                `¿Estás seguro de que deseas dar de baja el equipo ${equipo.inventario}?`,
+                                bajaEquipo
+                              )
+                            : undefined
+                          }
+                          className="cursor-pointer"
                           />
                         </span>
-                      </Tooltip>
-                      <Tooltip title="Eliminar equipo">
+                        </Tooltip>
+                        <Tooltip title="Eliminar equipo">
                         <span
                           className={
-                            unableActionEditor
-                              ? "opacity-50 pointer-events-none"
-                              : ""
+                          unableActionEditor
+                            ? "opacity-50 pointer-events-none"
+                            : ""
                           }
                         >
                           <Icon
-                            icon="weui:delete-outlined"
-                            width="25"
-                            height="25"
-                            onClick={
-                              !unableActionEditor
-                                ? () =>
-                                    handleOpenModal(
-                                      equipo.id_equipo,
-                                      "Eliminar equipo",
-                                      `¿Estás seguro de que deseas eliminar el equipo con inventario ${equipo.inventario}?`,
-                                      deleteEquipo
-                                    )
-                                : undefined
-                            }
-                            className="cursor-pointer"
+                          icon="weui:delete-outlined"
+                          width="25"
+                          height="25"
+                          onClick={
+                            !unableActionEditor
+                            ? () =>
+                              handleOpenModal(
+                                equipo.id_equipo,
+                                "Eliminar equipo",
+                                `¿Estás seguro de que deseas eliminar el equipo con inventario ${equipo.inventario}?`,
+                                deleteEquipo
+                              )
+                            : undefined
+                          }
+                          className="cursor-pointer"
                           />
                         </span>
-                      </Tooltip>
-                      {!unableAction && (
+                        </Tooltip>
+                        {!unableAction && (
                         <Tooltip title="Editar equipo">
                           <span>
-                            <Link
-                              to="/editarActivo"
-                              state={{
-                                equipoId: equipo.id_equipo,
-                                perifericos,
-                                equipoName: equipo.periferico,
-                              }}
-                              tabIndex={unableAction ? -1 : 0}
-                              aria-disabled={unableAction}
-                              style={
-                                unableAction
-                                  ? { pointerEvents: "none", opacity: 0.5 }
-                                  : {}
-                              }
-                            >
-                              <Icon
-                                icon="mage:edit"
-                                width="25"
-                                height="25"
-                                className="cursor-pointer"
-                              />
-                            </Link>
+                          <Link
+                            to="/editarActivo"
+                            state={{
+                            equipoId: equipo.id_equipo,
+                            perifericos,
+                            equipoName: equipo.periferico,
+                            }}
+                            tabIndex={unableAction ? -1 : 0}
+                            aria-disabled={unableAction}
+                            style={
+                            unableAction
+                              ? { pointerEvents: "none", opacity: 0.5 }
+                              : {}
+                            }
+                          >
+                            <Icon
+                            icon="mage:edit"
+                            width="25"
+                            height="25"
+                            className="cursor-pointer"
+                            />
+                          </Link>
                           </span>
                         </Tooltip>
-                      )}
+                        )}
 
-                      <Tooltip title="Pasar a bodega">
+                        <Tooltip title="Pasar a bodega">
                         <span
                           className={
-                            unableAction ? "opacity-50 pointer-events-none" : ""
+                          unableActionEditor ? "opacity-50 pointer-events-none" : ""
                           }
                         >
                           <Icon
-                            icon="lucide:warehouse"
+                          icon="lucide:warehouse"
+                          width="25"
+                          height="25"
+                          onClick={
+                            !unableActionEditor
+                            ? () =>
+                              handleOpenModal(
+                                equipo.id_equipo,
+                                "Pasar equipo a bodega",
+                                `¿Estás seguro de que deseas pasar el equipo a bodega ${equipo.inventario}?`,
+                                pasarABodegaEquipo
+                              )
+                            : undefined
+                          }
+                          className="cursor-pointer"
+                          />
+                        </span>
+                        </Tooltip>
+                      <Tooltip title="Mantenimientos">
+                        <span className={unableAction ? "opacity-50 pointer-events-none" : ""}>
+                          <Icon
+                            icon="pajamas:issue-type-maintenance"
                             width="25"
                             height="25"
-                            onClick={
-                              !unableAction
-                                ? () =>
-                                    handleOpenModal(
-                                      equipo.id_equipo,
-                                      "Pasar equipo a bodega",
-                                      `¿Estás seguro de que deseas pasar el equipo a bodega ${equipo.inventario}?`,
-                                      pasarABodegaEquipo
-                                    )
-                                : undefined
-                            }
+                            onClick={() => handleOpenMantenimientos(equipo)}
                             className="cursor-pointer"
                           />
                         </span>
@@ -1317,22 +1342,42 @@ const Activos = () => {
             </nav>
           </>
         )}
-        <Tooltip title="Importar desde Excel">
-          <button
-            onClick={handleImportClick}
-            className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-            disabled={importLoading}
-          >
-            <Icon icon="mdi:import" width="20" height="20" />
-            <input
-              type="file"
-              accept=".xlsx, .xls"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              style={{ display: "none" }}
-            />
-          </button>
-        </Tooltip>
+        <div className="flex items-center gap-2">
+          <Tooltip title="Importar desde Excel">
+            <span>
+              <button
+                onClick={handleImportClick}
+                className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+                disabled={importLoading}
+                type="button"
+              >
+                <Icon icon="mdi:import" width="20" height="20" />
+                <input
+                  type="file"
+                  accept=".xlsx, .xls"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  style={{ display: "none" }}
+                />
+              </button>
+            </span>
+          </Tooltip>
+
+          <Tooltip title="Descargar formato">
+            <a
+              href="/formato_importar_activo.xlsx"
+              download="formato_activo.xlsx"
+              className="flex items-center"
+            >
+              <button
+                type="button"
+                className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+              >
+                <Icon icon="mdi:file-download" width="20" height="20" />
+              </button>
+            </a>
+          </Tooltip>
+        </div>
         {importLoading && (
           <div className="flex justify-center items-center my-8">
             <Loader />
@@ -1350,6 +1395,12 @@ const Activos = () => {
         title={modalContent.title}
         message={modalContent.message}
       />
+     <MantenimientoActivo
+  open={openModalMantenimientos}
+  onClose={handleCloseMantenimientos}
+  id_equipo={equipoSeleccionado?.id_equipo || ""}
+  tipoEquipo={tipoEquipoSeleccionado}
+/>
     </div>
   );
 };
