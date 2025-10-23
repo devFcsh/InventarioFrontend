@@ -66,7 +66,7 @@ const Activos = () => {
   const [inputSerie, setInputSerie] = useState("");
   const [inputInventario, setInputInventario] = useState("");
 
-  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+  const [shouldFetch, setShouldFetch] = useState<boolean>(true);
   const { rol } = useUser();
   const unableAction = rol !== "administrador" && rol !== "editor";
   const unableActionEditor = rol !== "administrador";

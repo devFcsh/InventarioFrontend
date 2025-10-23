@@ -64,7 +64,7 @@ const Bodega = () => {
   const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null);
 
   const { showMessage } = useSnackbar();
-  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+  const [shouldFetch, setShouldFetch] = useState<boolean>(true);
   const handleOpenBodega = () => setOpenModalBodega(true);
   const handleCloseBodega = () => setOpenModalBodega(false);
 
