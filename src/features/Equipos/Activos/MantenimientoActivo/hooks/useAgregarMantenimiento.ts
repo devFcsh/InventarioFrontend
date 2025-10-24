@@ -13,7 +13,7 @@ export const useAgregarMantenimiento = () => {
     setMessage(null);
 
     try {
-      const { data } = await clienteAxios.post(
+      await clienteAxios.post(
         "/mantenimientos/",
         mantenimientoData
       );

@@ -222,6 +222,7 @@ const AgregarComputadoraActivo = ({
           tipo: "activo",
           equipoId: equipoId,
           componentes: componentes.map((comp) => ({
+            modeloId: Number(comp.modelo?.id_modelo) ?? 0,
             inventario: comp.inventario,
             perifericoId: Number(comp.periferico?.id_periferico) ?? 0,
             serie: comp.serie,

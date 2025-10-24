@@ -16,7 +16,6 @@
     "@mui/icons-material": "^6.1.4",
     "@mui/joy": "^5.0.0-beta.51",
     "@mui/material": "^6.1.4",
-    "@mui/x-data-grid": "^8.15.0",
     "@vaadin/react-components": "^24.4.4",
     "axios": "^1.7.4",
     "dotenv": "^16.5.0",

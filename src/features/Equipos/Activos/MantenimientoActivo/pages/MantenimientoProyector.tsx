@@ -39,7 +39,6 @@ interface MantenimientosProyectorActivoProps {
 export const MantenimientosProyectorActivo: React.FC<MantenimientosProyectorActivoProps> = ({
   open,
   onClose,
-  id_equipo,
 }) => {
   const equipo = { inventario: "PR-001", modelo: "Epson X123", ubicacion: "Aula 101", horas_lampara: "1200" };
   const loading = false;

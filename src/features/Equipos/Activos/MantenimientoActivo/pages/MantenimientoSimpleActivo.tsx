@@ -31,7 +31,6 @@ interface MantenimientosSimpleActivoProps {
 export const MantenimientosSimpleActivo: React.FC<MantenimientosSimpleActivoProps> = ({
   open,
   onClose,
-  id_equipo,
 }) => {
   const equipo = { inventario: "GEN-001", modelo: "Genérico", ubicacion: "Depósito" };
   const loading = false;

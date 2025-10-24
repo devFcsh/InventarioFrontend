@@ -39,10 +39,8 @@ interface MantenimientosRedActivoProps {
 export const MantenimientosRedActivo: React.FC<MantenimientosRedActivoProps> = ({
   open,
   onClose,
-  id_equipo,
 }) => {
   const equipo = { inventario: "SW-001", modelo: "Cisco 2960", ubicacion: "Bloque A", direccion_ip: "192.168.1.2" };
-  const componentes: any[] = [];
   const loading = false;
   const error = null;
 
