@@ -596,8 +596,8 @@ const VisualizarComputadoraActivo = ({
                       <td className="py-2 px-4 border">
                         {typeof comp.serie === "object" &&
                         comp.serie !== null &&
-                        (comp.serie as { nombre?: string }).nombre !== undefined
-                          ? (comp.serie as { nombre?: string }).nombre
+                        "nombre" in comp.serie
+                          ? (comp.serie as { nombre: string }).nombre
                           : comp.serie}
                       </td>
                       <td className="py-2 px-4 border">{comp.inventario}</td>

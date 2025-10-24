@@ -64,7 +64,7 @@ const Bodega = () => {
   const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null);
 
   const { showMessage } = useSnackbar();
-  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+  const [shouldFetch, setShouldFetch] = useState<boolean>(true);
   const handleOpenBodega = () => setOpenModalBodega(true);
   const handleCloseBodega = () => setOpenModalBodega(false);
 
@@ -875,59 +875,59 @@ const Bodega = () => {
                           </Link>
                         </span>
                       </Tooltip>
-                      <Tooltip title="Dar de baja equipo">
+                        <Tooltip title="Dar de baja equipo">
                         <span
                           className={
-                            unableAction ? "opacity-50 pointer-events-none" : ""
+                          unableActionEditor ? "opacity-50 pointer-events-none" : ""
                           }
                         >
                           <Icon
-                            icon="ph:arrow-fat-down-light"
-                            width="25"
-                            height="25"
-                            onClick={
-                              !unableAction
-                                ? () =>
-                                    handleOpenModal(
-                                      equipo.id_equipo,
-                                      "Dar de baja equipo",
-                                      `¿Estás seguro de que deseas dar de baja el equipo ${equipo.inventario}?`,
-                                      bajaEquipo
-                                    )
-                                : undefined
-                            }
-                            className="cursor-pointer"
+                          icon="ph:arrow-fat-down-light"
+                          width="25"
+                          height="25"
+                          onClick={
+                            !unableActionEditor
+                            ? () =>
+                              handleOpenModal(
+                                equipo.id_equipo,
+                                "Dar de baja equipo",
+                                `¿Estás seguro de que deseas dar de baja el equipo ${equipo.inventario}?`,
+                                bajaEquipo
+                              )
+                            : undefined
+                          }
+                          className="cursor-pointer"
                           />
                         </span>
-                      </Tooltip>
-                      <Tooltip title="Eliminar equipo">
+                        </Tooltip>
+                        <Tooltip title="Eliminar equipo">
                         <span
                           className={
-                            unableActionEditor
-                              ? "opacity-50 pointer-events-none"
-                              : ""
+                          unableActionEditor
+                            ? "opacity-50 pointer-events-none"
+                            : ""
                           }
                         >
                           <Icon
-                            icon="weui:delete-outlined"
-                            width="25"
-                            height="25"
-                            onClick={
-                              !unableActionEditor
-                                ? () =>
-                                    handleOpenModal(
-                                      equipo.id_equipo,
-                                      "Eliminar equipo",
-                                      `¿Estás seguro de que deseas eliminar el equipo ${equipo.inventario}?`,
-                                      deleteEquipo
-                                    )
-                                : undefined
-                            }
-                            className="cursor-pointer"
+                          icon="weui:delete-outlined"
+                          width="25"
+                          height="25"
+                          onClick={
+                            !unableActionEditor
+                            ? () =>
+                              handleOpenModal(
+                                equipo.id_equipo,
+                                "Eliminar equipo",
+                                `¿Estás seguro de que deseas eliminar el equipo ${equipo.inventario}?`,
+                                deleteEquipo
+                              )
+                            : undefined
+                          }
+                          className="cursor-pointer"
                           />
                         </span>
-                      </Tooltip>
-                      <Link
+                        </Tooltip>
+                        <Link
                         to="/editarBodega"
                         state={{
                           equipoId: equipo.id_equipo,
@@ -938,43 +938,41 @@ const Bodega = () => {
                         aria-disabled={unableAction}
                         style={
                           unableAction
-                            ? { pointerEvents: "none", opacity: 0.5 }
-                            : {}
+                          ? { pointerEvents: "none", opacity: 0.5 }
+                          : {}
                         }
-                      >
+                        >
                         <Tooltip title="Editar equipo">
                           <span>
-                            <Icon
-                              icon="mage:edit"
-                              width="25"
-                              height="25"
-                              className="cursor-pointer"
-                            />
-                          </span>
-                        </Tooltip>
-                      </Link>
-                      <Tooltip title="Pasar a Activo">
-                        <span
-                          className={
-                            unableAction ? "opacity-50 pointer-events-none" : ""
-                          }
-                        >
                           <Icon
-                            icon="icon-park-outline:upload-computer"
+                            icon="mage:edit"
                             width="25"
                             height="25"
-                            onClick={
-                              !unableAction
-                                ? () =>
-                                    handleOpenModalPasarAActivo(
-                                      equipo.id_equipo
-                                    )
-                                : undefined
-                            }
                             className="cursor-pointer"
                           />
+                          </span>
+                        </Tooltip>
+                        </Link>
+                        <Tooltip title="Pasar a Activo">
+                        <span
+                          className={unableActionEditor ? "opacity-50 pointer-events-none" : ""}
+                        >
+                          <Icon
+                          icon="icon-park-outline:upload-computer"
+                          width="25"
+                          height="25"
+                          onClick={
+                            !unableActionEditor
+                            ? () =>
+                              handleOpenModalPasarAActivo(
+                                equipo.id_equipo
+                              )
+                            : undefined
+                          }
+                          className="cursor-pointer"
+                          />
                         </span>
-                      </Tooltip>
+                        </Tooltip>
                     </td>
                   </tr>
                 ))}

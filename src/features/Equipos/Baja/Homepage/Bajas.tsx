@@ -53,7 +53,7 @@ const Bajas = () => {
   const { eliminarEquipo } = useEliminarComputadora();
   const handleOpenBajas = () => setOpenModalBajas(true);
   const handleCloseBajas = () => setOpenModalBajas(false);
-  const [shouldFetch, setShouldFetch] = useState<boolean>(false);
+  const [shouldFetch, setShouldFetch] = useState<boolean>(true);
 
   const { showMessage } = useSnackbar();
   const { perifericos } = usePerifericos();

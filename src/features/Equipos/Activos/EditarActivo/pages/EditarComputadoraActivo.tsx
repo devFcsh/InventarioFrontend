@@ -357,6 +357,7 @@ const EditarComputadoraActivo = ({
     ) {
       const newComponent = { ...nuevoComponente };
       setComponentesState([...componentesState, newComponent]);
+      console.log(componentesState)
       setNuevoComponente({
         id_componente: undefined,
         periferico: null,
@@ -426,7 +427,7 @@ const EditarComputadoraActivo = ({
     };
     try {
       await editarActivo(equipo.id_equipo, payload);
-
+      console.log("skdjskds", componentesState)
       if (equipo.id_equipo) {
         await gestionarComponentes({
           tipo: "activo",
