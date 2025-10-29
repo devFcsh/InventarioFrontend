@@ -284,18 +284,20 @@ const EditarActivoSimple = ({
     setOpenModalCancelar(true);
   };
   const validarCamposEquipo = () => {
-    if (
-      !selectedInventarioInv ||
-      errorInventario ||
-      !selectedInventarioAnio ||
-      errorAnio ||
-      !serieNombre ||
-      !selectedUbicacion ||
-      (perifericoName !== "Proyector" ? false : !selectedLampara)
-    ) {
-      setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
+    const missing: string[] = [];
+
+    if (!selectedInventarioInv || errorInventario) missing.push("Inventario");
+    if (!serieNombre) missing.push("Serie");
+    if (!selectedUbicacion) missing.push("Ubicación");
+    if (perifericoName === "Proyector" && !selectedLampara) missing.push("Lámpara");
+
+    if (missing.length > 0) {
+      setErrorMensajeEquipo(
+        `Por favor complete los siguientes campos: ${missing.join(", ")}.`
+      );
       return false;
     }
+
     setErrorMensajeEquipo(null);
     return true;
   };

@@ -24,7 +24,7 @@ export const useObtenerActividadesEquipo = (id: string | null | undefined) => {
 
     const fetchActividades = async () => {
       try {
-        const response = await clienteAxios.get(`/mantenimiento/actividades/${id}`);
+        const response = await clienteAxios.get(`/mantenimientos/actividades/${id}`);
         setActividades(response.data.actividades || []);
       } catch (err: any) {
         setError("Error al obtener actividades: " + (err?.response?.data?.error || err.message));

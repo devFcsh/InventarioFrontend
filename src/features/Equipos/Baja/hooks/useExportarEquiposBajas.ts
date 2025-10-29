@@ -14,7 +14,6 @@ export const useExportarEquiposBajas = () => {
 
     try {
       const { data } = await clienteAxios.get("/equipos/exportarEquiposBaja");
-      console.log(data)
       setEquipos(data);
       return data;
     } catch (err) {
