@@ -12,7 +12,6 @@ export const useAgregarSimpleActivo = () => {
     setError(null);
 
     try {
-      console.log(equipoData)
       const { data } = await clienteAxios.post("/equipos/agregarEquipoSimple", equipoData);
       setMessage(data.message);
       return data.equipoId; 

@@ -184,6 +184,7 @@ const Activos = () => {
           : "S/N",
       serie: normalize(row["Serie CPU"]),
       modelo: normalize(row["Modelo Case"]),
+      marca: normalize(row["Marca Case"]),
       nombreEquipo: normalize(row["Nombre de equipo"]),
       direccionIp: normalize(row["IP"]).toLowerCase().replace("dhcp", ""),
       versionso: normalize(row["__EMPTY"]),
@@ -206,18 +207,21 @@ const Activos = () => {
           tipo: "Monitor",
           modelo: normalize(row["Modelo monitor"]),
           serie: normalize(row["Serie monitor"]),
+          marca: normalize(row["Marca monitor"]),
           inventario: String(row["Inventario Monitor"] ?? ""),
         },
         {
           tipo: "Teclado",
           modelo: normalize(row["Modelo teclado"]),
           serie: normalize(row["Serie teclado"]),
+          marca: normalize(row["Marca teclado"]),
           inventario: String(row["Inventario Teclado"] ?? ""),
         },
         {
           tipo: "Mouse",
           modelo: normalize(row["Modelo mouse"]),
           serie: normalize(row["Serie mouse"]),
+          marca: normalize(row["Marca mouse"]),
           inventario: String(row["Inventario Mouse"] ?? ""),
         },
       ],
@@ -508,15 +512,15 @@ const Activos = () => {
   const handleOpenActivos = () => setOpenModalActivos(true);
   const handleCloseActivos = () => setOpenModalActivos(false);
 
-  const [equipoSeleccionado] = useState<Equipo>();
-  const [tipoEquipoSeleccionado] = useState<string>("");
-  /** 
+  const [equipoSeleccionado, setEquipoSeleccionado] = useState<Equipo>();
+  const [tipoEquipoSeleccionado, setTipoEquipoSeleccionado] = useState<string>("");
+
   const handleOpenMantenimientos = (equipo: Equipo) => {
     setEquipoSeleccionado(equipo);
     setTipoEquipoSeleccionado(equipo.periferico);
     setOpenModalMantenimientos(true);
   };
-  */
+
   const handleCloseMantenimientos = () => setOpenModalMantenimientos(false);
 
   const handleBaja = () => {
@@ -1268,7 +1272,7 @@ const Activos = () => {
                           />
                         </span>
                         </Tooltip>
-                      {/*<Tooltip title="Mantenimientos">
+                      <Tooltip title="Mantenimientos">
                         <span className={unableAction ? "opacity-50 pointer-events-none" : ""}>
                           <Icon
                             icon="pajamas:issue-type-maintenance"
@@ -1278,7 +1282,7 @@ const Activos = () => {
                             className="cursor-pointer"
                           />
                         </span>
-                      </Tooltip>*/}
+                      </Tooltip>
                     </td>
                   </tr>
                 ))}

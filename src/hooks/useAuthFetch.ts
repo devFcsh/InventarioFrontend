@@ -34,13 +34,11 @@ const useAuthFetch = (): UseAuthFetchResult => {
         },
       };
 
-      console.log(`🌐 Haciendo petición autenticada a: ${fullUrl}`);
       
       const response = await fetch(fullUrl, fetchOptions);
       
       // Si la respuesta es 401, redirigir al login
       if (response.status === 401) {
-        console.log('❌ Sesión expirada o no autenticado, redirigiendo al login');
         window.location.href = '/login';
         throw new Error('Sesión expirada');
       }
@@ -53,7 +51,6 @@ const useAuthFetch = (): UseAuthFetchResult => {
 
       // Parsear respuesta JSON
       const data = await response.json();
-      console.log('✅ Petición exitosa:', data);
       
       setLoading(false);
       return data;
