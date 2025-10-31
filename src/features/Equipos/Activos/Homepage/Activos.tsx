@@ -512,14 +512,14 @@ const Activos = () => {
   const handleOpenActivos = () => setOpenModalActivos(true);
   const handleCloseActivos = () => setOpenModalActivos(false);
 
-  const [equipoSeleccionado, setEquipoSeleccionado] = useState<Equipo>();
-  const [tipoEquipoSeleccionado, setTipoEquipoSeleccionado] = useState<string>("");
+  const [equipoSeleccionado, ] = useState<Equipo>();
+  const [tipoEquipoSeleccionado, ] = useState<string>("");
 
-  const handleOpenMantenimientos = (equipo: Equipo) => {
+  /*const handleOpenMantenimientos = (equipo: Equipo) => {
     setEquipoSeleccionado(equipo);
     setTipoEquipoSeleccionado(equipo.periferico);
     setOpenModalMantenimientos(true);
-  };
+  };*/
 
   const handleCloseMantenimientos = () => setOpenModalMantenimientos(false);
 
@@ -1272,6 +1272,7 @@ const Activos = () => {
                           />
                         </span>
                         </Tooltip>
+                        {/** 
                       <Tooltip title="Mantenimientos">
                         <span className={unableAction ? "opacity-50 pointer-events-none" : ""}>
                           <Icon
@@ -1282,7 +1283,7 @@ const Activos = () => {
                             className="cursor-pointer"
                           />
                         </span>
-                      </Tooltip>
+                      </Tooltip>*/}
                     </td>
                   </tr>
                 ))}
