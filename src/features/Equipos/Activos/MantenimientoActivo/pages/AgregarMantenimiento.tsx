@@ -13,7 +13,11 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useAgregarMantenimiento } from "../hooks/useAgregarMantenimiento";
-import { ActividadMantenimiento } from "../../../../../types/Activo/Mantenimiento";
+import {
+  ActividadMantenimiento,
+  MantenimientoData,
+  ActividadMantenimientoRequest,
+} from "../../../../../types/Activo/Mantenimiento";
 import { useObtenerActividadesEquipo } from "../hooks/useObtenerActividades";
 
 
@@ -44,11 +48,13 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
   useEffect(() => {
     if (actividadesBackend && actividadesBackend.length > 0) {
       setActividades(
-        actividadesBackend.map((a) => ({
-          id_actividad_mantenimiento: a.id_actividad_mantenimiento,
-          nombre: a.nombre,
-          realizada: false,
-        }))
+        actividadesBackend
+          .filter((a) => a.id_actividad_mantenimiento !== undefined && a.id_actividad_mantenimiento !== null)
+          .map((a) => ({
+            id_actividad_mantenimiento: Number(a.id_actividad_mantenimiento),
+            nombre: a.nombre,
+            realizada: false,
+          }))
       );
     } else {
       setActividades([]);
@@ -68,13 +74,31 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
   const handleSubmit = async () => {
     const tipoToSend = tipoOption?.value || "";
 
-    await agregarMantenimiento({
+    if (!tipoToSend) {
+      // require selecting tipo
+      // could be replaced with a nicer UI validation
+      alert("Seleccione el tipo de mantenimiento (Correctivo o Preventivo)");
+      return;
+    }
+
+    // Build actividades payload following ActividadMantenimientoRequest type
+    const actividadesPayload: ActividadMantenimientoRequest[] = (actividades || []).map(
+      (a) => ({
+        id_actividad_mantenimiento: a.id_actividad_mantenimiento,
+        realizada: !!a.realizada,
+      })
+    );
+
+    const payload: MantenimientoData = {
       id_equipo: Number(id_equipo),
       tipo: tipoToSend,
-      hallazgos,
-      observaciones,
-      actividades,
-    });
+      hallazgos: hallazgos || undefined,
+      recomendaciones: undefined,
+      observaciones: observaciones || undefined,
+      actividades: actividadesPayload,
+    };
+
+    await agregarMantenimiento(payload);
     if (onSuccess) onSuccess();
     onClose();
   };
