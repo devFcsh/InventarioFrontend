@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import clienteAxios from "@hooks/index";
 import { MantenimientoData } from "../../../../../types/Activo/Mantenimiento";
 import { useState } from "react";
@@ -7,7 +8,7 @@ export const useAgregarMantenimiento = () => {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const agregarMantenimiento = async (mantenimientoData: MantenimientoData) => {
+  const agregarMantenimiento = async (mantenimientoData: MantenimientoData): Promise<{ ok: boolean; message?: string | null; error?: string | null }> => {
     setLoading(true);
     setError(null);
     setMessage(null);
@@ -16,13 +17,13 @@ export const useAgregarMantenimiento = () => {
       const payload = {
         id_equipo: mantenimientoData.id_equipo,
         tipo: mantenimientoData.tipo,
+        fecha: mantenimientoData.fecha ?? null,
         hallazgos: mantenimientoData.hallazgos ?? null,
         recomendaciones: mantenimientoData.recomendaciones ?? null,
         actividades: (mantenimientoData.actividades || []).map((a) => {
-          // Si ya tiene id_actividad_periferico_tipo preferirlo
-          if ((a as any).id_actividad_periferico_tipo) {
+          if (a.id_actividad_periferico_tipo) {
             return {
-              id_actividad_periferico_tipo: (a as any).id_actividad_periferico_tipo,
+              id_actividad_periferico_tipo: a.id_actividad_periferico_tipo,
               realizada: !!a.realizada,
             };
           }
@@ -34,9 +35,14 @@ export const useAgregarMantenimiento = () => {
       };
 
       await clienteAxios.post("/mantenimientos/", payload);
-      setMessage("Mantenimiento registrado correctamente");
-    } catch (err: any) {
-      setError("Error al registrar el mantenimiento: " + (err?.response?.data?.error || err.message));
+      const successMsg = "Mantenimiento registrado correctamente";
+      setMessage(successMsg);
+      return { ok: true, message: successMsg };
+    } catch (err) {
+      const message = (err as any)?.response?.data?.error || (err as any)?.message || String(err);
+      const errMsg = "Error al registrar el mantenimiento: " + message;
+      setError(errMsg);
+      return { ok: false, error: errMsg };
     } finally {
       setLoading(false);
     }

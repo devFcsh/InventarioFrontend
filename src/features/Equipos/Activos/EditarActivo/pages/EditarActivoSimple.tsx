@@ -1,29 +1,24 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Autocomplete, TextField, Button, Box } from "@mui/material";
-import {
-  Marca,
-  Modelo,
-  Ubicacion,
-  Edificio,
-  Lampara,
-} from "../../../../../types";
+import { Marca, Modelo, Lampara, Ubicacion, Edificio, Periferico } from "../../../../../types";
 import { ActivoSimpleEdit } from "../../../../../types/Activo";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
-import useEdificios from "../../../../../hooks/useEdificios";
-import useUbicaciones from "../../../../../hooks/useUbicaciones";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
+import { useLamparasPorModelo } from "../../../../../hooks/useLamparasPorModelo";
+import useLamparas from "../../../../../hooks/useLamparas";
+import useEdificios from "../../../../../hooks/useEdificios";
+import useUbicaciones from "../../../../../hooks/useUbicaciones";
+import usePerifericos from "../../../../../hooks/usePerifericos";
 import useSubirImagen from "../../../../../hooks/useSubirImagen";
 import useEditarActivoSimple from "../hooks/useEditarActivoSimple";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario";
-import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
-import useLamparas from "@hooks/useLamparas";
 import { useSnackbar } from "@context/SnackbarContext";
 import { useExisteInventario } from "../../../../../hooks/useExisteInventario";
 import { useExisteSerie } from "../../../../../hooks/useExisteSerie";
-
+import useComputadorasPorPeriferico, { ComputadoraSimple } from "../../../../../hooks/useComputadorasPorPeriferico";
 interface EditarActivoSimpleProps {
   equipoSimpleActivo: ActivoSimpleEdit;
   idUsuario: string | null;
@@ -35,11 +30,12 @@ const EditarActivoSimple = ({
   equipoSimpleActivo,
   idUsuario,
 }: EditarActivoSimpleProps) => {
-  const [selectedInventarioMarca, setSelectedInventarioMarca] =
-    useState<Marca | null>(null);
+  const [selectedInventarioMarca, setSelectedInventarioMarca] = useState<Marca | null>(null);
   const [selectedInventarioModelo, setSelectedInventarioModelo] =
     useState<Modelo | null>(null);
   const [selectedLampara, setSelectedLampara] = useState<Lampara | null>(null);
+  const [selectedPeriferico, setSelectedPeriferico] = useState<Periferico | null>(null);
+  const [selectedComputadora, setSelectedComputadora] = useState<ComputadoraSimple | null>(null);
   const [serieNombre, setSerieNombre] = useState<string>("");
   const [selectedInventarioInv, setSelectedInventarioInv] =
     useState<string>("");
@@ -93,6 +89,10 @@ const EditarActivoSimple = ({
   const { edificios } = useEdificios();
   const { lamparasTotales } = useLamparas();
   const { ubicaciones } = useUbicaciones(selectedEdificio?.id_edificio ?? "");
+  const { perifericos } = usePerifericos();
+  const { computadoras } = useComputadorasPorPeriferico(
+    selectedPeriferico?.id_periferico ?? ""
+  );
   const { editarActivoSimple } = useEditarActivoSimple();
   const { existe: existeInventario, consultarInventario } = useExisteInventario();
   const { existe: existeSerie, consultarSerie } = useExisteSerie();
@@ -140,6 +140,35 @@ const EditarActivoSimple = ({
       setSerieNombre(serieObj?.nombre || "");
     }
   }, [equipoSimpleActivo, series]);
+
+  useEffect(() => {
+    if (equipoSimpleActivo && perifericos.length > 0) {
+      const perifericoIdToUse =
+        equipoSimpleActivo.id_periferico_computadora ?? equipoSimpleActivo.id_periferico;
+      const found = perifericos.find(
+        (p) => String(p?.id_periferico) === String(perifericoIdToUse)
+      );
+      setSelectedPeriferico(found || null);
+    }
+  }, [equipoSimpleActivo, perifericos]);
+
+  useEffect(() => {
+    if (equipoSimpleActivo && computadoras && computadoras.length > 0) {
+      const foundComp = computadoras.find((c) => {
+        if (equipoSimpleActivo.id_computadora && String(c?.id_equipo) === String(equipoSimpleActivo.id_computadora)) {
+          return true;
+        }
+        if (
+          equipoSimpleActivo.id_serie_computadora &&
+          String(c?.serie) === String(equipoSimpleActivo.id_serie_computadora)
+        ) {
+          return true;
+        }
+        return false;
+      });
+      setSelectedComputadora(foundComp || null);
+    }
+  }, [equipoSimpleActivo, computadoras]);
 
   useEffect(() => {
     if (equipoSimpleActivo && edificios.length > 0) {
@@ -207,6 +236,7 @@ const EditarActivoSimple = ({
       serie: serieNombre,
       perifericoId: equipoSimpleActivo?.id_periferico,
       modeloId: selectedInventarioModelo?.id_modelo ?? "",
+      id_computadora: selectedComputadora ? String(selectedComputadora.id_equipo) : undefined,
       observacion: observationValue,
       id_lampara: selectedLampara?.id_lampara ?? "",
     };
@@ -302,10 +332,8 @@ const EditarActivoSimple = ({
     return true;
   };
 
-  // Serie original
-  const serieOriginal = serieNombre; // ya lo tienes en el estado
+  const serieOriginal = serieNombre;
 
-  // Inventario original
   const inventarioOriginal = equipoSimpleActivo.inventario;
 
   return (
@@ -386,6 +414,7 @@ const EditarActivoSimple = ({
           }}
           disabled={!selectedInventarioModelo}
         />
+        {/* (Los campos Periférico / Serie computadora se muestran en Información General) */}
         <Box
           sx={{
             display: "inline-flex",
@@ -501,6 +530,49 @@ const EditarActivoSimple = ({
 
       <h2 className="text-xl font-semibold mb-5">Información General</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
+        {/* Periférico (solo Computadora / Laptop) */}
+        {equipoSimpleActivo?.isComponente ? (
+          <>
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={perifericos.filter((p) => Number(p?.id_periferico) === 1 || Number(p?.id_periferico) === 2)}
+              value={selectedPeriferico}
+              onChange={(_, newValue: Periferico | null) => {
+                setSelectedPeriferico(newValue);
+                setSelectedComputadora(null);
+              }}
+              getOptionLabel={(option) => (option ? option.nombre : "")}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Periférico (opcional)"
+                  variant="outlined"
+                  fullWidth
+                />
+              )}
+            />
+
+            {/* Serie computadora (opcional) — muestra series de computadoras para el periférico seleccionado */}
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={computadoras}
+              value={selectedComputadora}
+              onChange={(_, newValue: ComputadoraSimple | null) => setSelectedComputadora(newValue)}
+              getOptionLabel={(option) => (option?.serie ? String(option.serie) : String(option?.id_equipo))}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Serie computadora (opcional)"
+                  variant="outlined"
+                  fullWidth
+                />
+              )}
+              disabled={!selectedPeriferico || !computadoras || computadoras.length === 0}
+            />
+          </>
+        ) : null}
         <Autocomplete
           size="small"
           disablePortal

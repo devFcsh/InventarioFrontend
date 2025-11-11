@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Dialog,
   DialogTitle,
@@ -12,7 +13,9 @@ import {
   Autocomplete,
 } from "@mui/material";
 import { useState, useEffect } from "react";
+import Loader from "@pages/Loader";
 import { useAgregarMantenimiento } from "../hooks/useAgregarMantenimiento";
+import { useSnackbar } from "@context/SnackbarContext";
 import {
   ActividadMantenimiento,
   MantenimientoData,
@@ -34,25 +37,31 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
   id_equipo,
   onSuccess,
 }) => {
-  const { agregarMantenimiento, loading, error, message } = useAgregarMantenimiento();
-  // tipo will be selected from the Autocomplete as an object { label, value }
+  const { agregarMantenimiento, loading } = useAgregarMantenimiento();
   const [tipoOption, setTipoOption] = useState<{ label: string; value: string } | null>(null);
   const [hallazgos, setHallazgos] = useState<string>("");
-  const [observaciones, setObservaciones] = useState<string>("");
+  const [recomendaciones, setRecomendaciones] = useState<string>("");
+  const [fecha, setFecha] = useState<string>(() => {
+    const d = new Date();
+    const tzOffset = d.getTimezoneOffset() * 60000;
+    const localISOTime = new Date(d.getTime() - tzOffset).toISOString().slice(0, 16);
+    return localISOTime;
+  });
   const [actividades, setActividades] = useState<ActividadMantenimiento[]>([]);
 
-  // Hook to fetch actividades desde el backend
-  const { actividades: actividadesBackend, loading: actividadesLoading, error: actividadesError } = useObtenerActividadesEquipo(id_equipo);
+  const selectedTipoForHook = tipoOption?.value ?? undefined;
+  const { actividades: actividadesBackend, loading: actividadesLoading, error: actividadesError } =
+    useObtenerActividadesEquipo(id_equipo, selectedTipoForHook);
 
-  // Map backend activities to local structure with 'realizada' flag
   useEffect(() => {
     if (actividadesBackend && actividadesBackend.length > 0) {
       setActividades(
-        actividadesBackend
-          .filter((a) => a.id_actividad_mantenimiento !== undefined && a.id_actividad_mantenimiento !== null)
+        (actividadesBackend as any[])
+          .filter((a) => a.id_actividad_mantenimiento || a.id_actividad_periferico_tipo)
           .map((a) => ({
-            id_actividad_mantenimiento: Number(a.id_actividad_mantenimiento),
-            nombre: a.nombre,
+            id_actividad_mantenimiento: a.id_actividad_mantenimiento ? Number(a.id_actividad_mantenimiento) : undefined,
+            id_actividad_periferico_tipo: a.id_actividad_periferico_tipo ? Number(a.id_actividad_periferico_tipo) : undefined,
+            nombre: a.actividad ?? a.nombre ?? "",
             realizada: false,
           }))
       );
@@ -64,50 +73,70 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
   const handleActividadChange = (id: number) => {
     setActividades((prev) =>
       prev.map((act) =>
-        act.id_actividad_mantenimiento === id
+        (act.id_actividad_mantenimiento ?? act.id_actividad_periferico_tipo) === id
           ? { ...act, realizada: !act.realizada }
           : act
       )
     );
   };
 
+  const { showMessage } = useSnackbar();
+
   const handleSubmit = async () => {
     const tipoToSend = tipoOption?.value || "";
 
     if (!tipoToSend) {
-      // require selecting tipo
-      // could be replaced with a nicer UI validation
       alert("Seleccione el tipo de mantenimiento (Correctivo o Preventivo)");
       return;
     }
 
-    // Build actividades payload following ActividadMantenimientoRequest type
     const actividadesPayload: ActividadMantenimientoRequest[] = (actividades || []).map(
       (a) => ({
         id_actividad_mantenimiento: a.id_actividad_mantenimiento,
+        id_actividad_periferico_tipo: a.id_actividad_periferico_tipo,
         realizada: !!a.realizada,
       })
     );
 
+    const formatFechaForServer = (localDatetime: string) => {
+      if (!localDatetime) return undefined;
+      const d = new Date(localDatetime);
+      const pad = (n: number) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(
+        d.getHours()
+      )}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    };
+
     const payload: MantenimientoData = {
       id_equipo: Number(id_equipo),
       tipo: tipoToSend,
+      fecha: fecha ? formatFechaForServer(fecha) : undefined,
       hallazgos: hallazgos || undefined,
-      recomendaciones: undefined,
-      observaciones: observaciones || undefined,
+      recomendaciones: recomendaciones || undefined,
       actividades: actividadesPayload,
     };
 
-    await agregarMantenimiento(payload);
-    if (onSuccess) onSuccess();
-    onClose();
+    try {
+      const result = await agregarMantenimiento(payload);
+
+      if (result?.ok) {
+        showMessage(result.message ?? "Mantenimiento registrado correctamente", "success");
+        if (onSuccess) onSuccess();
+        onClose();
+      } else {
+        showMessage(result?.error ?? "Error al agregar mantenimiento", "error");
+      }
+    } catch (e) {
+      showMessage("Error al agregar mantenimiento", "error");
+    }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>Agregar Mantenimiento</DialogTitle>
       <DialogContent>
-        <Grid container spacing={2} sx={{ mb: 2 }}>
+        {loading && <Loader />}
+        <Grid container spacing={2} sx={{ my: 2 }}>
           <Grid item xs={12} sm={6}>
             <Autocomplete
               size="small"
@@ -123,34 +152,55 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
               )}
             />
           </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Fecha"
+              type="datetime-local"
+              size="small"
+              fullWidth
+              value={fecha}
+              onChange={(e) => setFecha(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
           <Grid item xs={12}>
             <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
               Actividades realizadas
             </Typography>
-            {/* Scrollable grid to better display many activities in columns */}
             <Box sx={{ maxHeight: 360, overflow: "auto", pr: 1, mb: 2 }}>
-              <Grid container spacing={1}>
-                {actividades.map((actividad) => (
-                  <Grid
-                    item
-                    key={actividad.id_actividad_mantenimiento}
-                    xs={12}
-                    sm={6}
-                    md={4}
-                  >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={!!actividad.realizada}
-                          onChange={() => handleActividadChange(actividad.id_actividad_mantenimiento)}
-                          size="small"
+              {!tipoOption ? (
+                <Typography color="textSecondary" sx={{ p: 2 }}>
+                  Seleccione un tipo de mantenimiento para ver las actividades.
+                </Typography>
+              ) : actividadesLoading ? (
+                <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
+                  <Loader />
+                </Box>
+              ) : actividades.length === 0 ? (
+                <Typography color="textSecondary" sx={{ p: 2 }}>
+                  No hay actividades disponibles para el tipo seleccionado.
+                </Typography>
+              ) : (
+                <Grid container spacing={1}>
+                  {actividades.map((actividad) => {
+                    const key = actividad.id_actividad_mantenimiento ?? actividad.id_actividad_periferico_tipo ?? Math.random();
+                    const idKey = actividad.id_actividad_mantenimiento ?? actividad.id_actividad_periferico_tipo ?? 0;
+                    return (
+                      <Grid item xs={12} sm={6} md={4} key={key}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={!!actividad.realizada}
+                              onChange={() => handleActividadChange(idKey)}
+                            />
+                          }
+                          label={actividad.nombre}
                         />
-                      }
-                      label={actividad.nombre}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+              )}
             </Box>
           </Grid>
           <Grid item xs={12}>
@@ -166,9 +216,9 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
           </Grid>
           <Grid item xs={12}>
             <TextField
-              label="Recomendaciones / Observaciones"
-              value={observaciones}
-              onChange={(e) => setObservaciones(e.target.value)}
+              label="Recomendaciones"
+              value={recomendaciones}
+              onChange={(e) => setRecomendaciones(e.target.value)}
               fullWidth
               multiline
               minRows={2}
@@ -183,23 +233,22 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
           <Button
             variant="contained"
             onClick={handleSubmit}
-            disabled={loading || actividadesLoading}
+            disabled={loading || actividadesLoading || !tipoOption}
           >
             Agregar Mantenimiento
           </Button>
         </Box>
         {actividadesLoading && (
-          <Typography color="textSecondary" sx={{ mt: 2 }}>
-            Cargando actividades...
-          </Typography>
+          <Box sx={{ position: 'relative' }}>
+            <Loader />
+          </Box>
         )}
-        {actividadesError && (
+
+        {!actividadesLoading && actividadesError && (
           <Typography color="error" sx={{ mt: 2 }}>
             {actividadesError}
           </Typography>
         )}
-        {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
-        {message && <Typography color="primary" sx={{ mt: 2 }}>{message}</Typography>}
       </DialogContent>
     </Dialog>
   );

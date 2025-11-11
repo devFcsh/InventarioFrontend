@@ -12,6 +12,7 @@ import {
   Typography,
   Box,
 } from "@mui/material";
+import Loader from "@pages/Loader";
 import { AgregarMantenimiento } from "../pages/AgregarMantenimiento";
 
 interface MantenimientoProps {
@@ -35,15 +36,11 @@ export const MantenimientoActivo: React.FC<MantenimientoProps> = ({
   if (!open) return null;
   if (loading) {
     return (
-      <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-        <DialogTitle>Cargando...</DialogTitle>
-        <DialogContent>
-          <Typography>Cargando mantenimientos...</Typography>
-        </DialogContent>
-      </Dialog>
+          <Loader />
     );
   }
-  if (error) {
+
+  if (!loading && error) {
     return (
       <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
         <DialogTitle>Error</DialogTitle>
@@ -79,6 +76,7 @@ export const MantenimientoActivo: React.FC<MantenimientoProps> = ({
           id_equipo={id_equipo}
           onSuccess={() => {
             setOpenAgregar(false);
+            onClose();
           }}
         />
       </>
@@ -101,25 +99,15 @@ export const MantenimientoActivo: React.FC<MantenimientoProps> = ({
         onClose={onClose}
         id_equipo={id_equipo}
         mantenimientos={mantenimientos}
+        onOpenAgregar={() => setOpenAgregar(true)}
       />
-      <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-        <DialogContent>
-          <Box mt={2}>
-            <Button
-              variant="contained"
-              onClick={() => setOpenAgregar(true)}
-            >
-              Agregar mantenimiento
-            </Button>
-          </Box>
-        </DialogContent>
-      </Dialog>
       <AgregarMantenimiento
         open={openAgregar}
         onClose={() => setOpenAgregar(false)}
         id_equipo={id_equipo}
         onSuccess={() => {
           setOpenAgregar(false);
+          onClose();
         }}
       />
     </>

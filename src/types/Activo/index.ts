@@ -61,6 +61,10 @@ export type ActivoComputadoraEdit = {
     id_serie: string;
     observacion: string;
     id_lampara: string;
+    isComponente?: boolean;
+    id_computadora?: string | number;
+    id_serie_computadora?: string | number;
+    id_periferico_computadora?: string | number;
   };
 
 export type ActivoRedEdit = {
@@ -94,6 +98,7 @@ export type ActivoRedEdit = {
     perifericoId: string;
     modeloId: string;
     id_lampara: string;
+    id_computadora?: string;
     observacion: string;
   };
 
