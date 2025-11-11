@@ -142,18 +142,27 @@ const EditarActivoSimple = ({
   }, [equipoSimpleActivo, series]);
 
   useEffect(() => {
-    if (equipoSimpleActivo && perifericos.length > 0) {
+    // Only prefill periférico when the backend indicates this equipo is a componente
+    if (!perifericos || perifericos.length === 0) {
+      setSelectedPeriferico(null);
+      return;
+    }
+    if (equipoSimpleActivo?.isComponente) {
       const perifericoIdToUse =
         equipoSimpleActivo.id_periferico_computadora ?? equipoSimpleActivo.id_periferico;
       const found = perifericos.find(
         (p) => String(p?.id_periferico) === String(perifericoIdToUse)
       );
       setSelectedPeriferico(found || null);
+    } else {
+      // when not a componente, don't prefill; allow user to select if they want
+      setSelectedPeriferico(null);
     }
   }, [equipoSimpleActivo, perifericos]);
 
   useEffect(() => {
-    if (equipoSimpleActivo && computadoras && computadoras.length > 0) {
+    // Only prefill computadora when backend indicated this is a componente
+    if (equipoSimpleActivo?.isComponente && computadoras && computadoras.length > 0) {
       const foundComp = computadoras.find((c) => {
         if (equipoSimpleActivo.id_computadora && String(c?.id_equipo) === String(equipoSimpleActivo.id_computadora)) {
           return true;
@@ -167,6 +176,8 @@ const EditarActivoSimple = ({
         return false;
       });
       setSelectedComputadora(foundComp || null);
+    } else {
+      setSelectedComputadora(null);
     }
   }, [equipoSimpleActivo, computadoras]);
 
