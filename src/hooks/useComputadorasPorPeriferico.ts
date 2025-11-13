@@ -6,7 +6,10 @@ export type ComputadoraSimple = {
   serie?: string | null;
 };
 
-const useComputadorasPorPeriferico = (perifericoId: number | string | null | undefined) => {
+const useComputadorasPorPeriferico = (
+  perifericoId: number | string | null | undefined,
+  tipo?: string
+) => {
   const [computadoras, setComputadoras] = useState<ComputadoraSimple[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,10 +27,30 @@ const useComputadorasPorPeriferico = (perifericoId: number | string | null | und
 
     const fetch = async () => {
       try {
-        const response = await clienteAxios.get(`/equipos/computadorasPorPeriferico/${encodeURIComponent(String(perifericoId))}`);
+        let url = `/equipos/computadorasPorPeriferico/${encodeURIComponent(String(perifericoId))}`;
+        if (tipo) {
+          url += `?tipo=${encodeURIComponent(String(tipo))}`;
+        }
+        const response = await clienteAxios.get(url);
         setComputadoras(response.data.computadoras || []);
-      } catch (err: any) {
-        setError("Error al obtener computadoras: " + (err?.response?.data?.error || err.message || String(err)));
+      } catch (err: unknown) {
+          let message = "";
+          try {
+            if (err instanceof Error) message = err.message;
+            else if (typeof err === 'object' && err !== null) {
+              try {
+                const serialized = JSON.parse(JSON.stringify(err));
+                message = (serialized && (serialized.response?.data?.error || serialized.message)) || JSON.stringify(serialized);
+              } catch (e) {
+                message = String(err);
+              }
+            } else {
+              message = String(err);
+            }
+          } catch (e) {
+            message = String(err);
+          }
+          setError("Error al obtener computadoras: " + (message || ""));
         setComputadoras([]);
       } finally {
         setLoading(false);
@@ -35,7 +58,7 @@ const useComputadorasPorPeriferico = (perifericoId: number | string | null | und
     };
 
     fetch();
-  }, [perifericoId]);
+    }, [perifericoId, tipo]);
 
   return { computadoras, loading, error };
 };

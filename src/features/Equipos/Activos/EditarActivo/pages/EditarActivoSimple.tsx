@@ -91,7 +91,8 @@ const EditarActivoSimple = ({
   const { ubicaciones } = useUbicaciones(selectedEdificio?.id_edificio ?? "");
   const { perifericos } = usePerifericos();
   const { computadoras } = useComputadorasPorPeriferico(
-    selectedPeriferico?.id_periferico ?? ""
+    selectedPeriferico?.id_periferico ?? "",
+    'activo'
   );
   const { editarActivoSimple } = useEditarActivoSimple();
   const { existe: existeInventario, consultarInventario } = useExisteInventario();
@@ -142,7 +143,6 @@ const EditarActivoSimple = ({
   }, [equipoSimpleActivo, series]);
 
   useEffect(() => {
-    // Only prefill periférico when the backend indicates this equipo is a componente
     if (!perifericos || perifericos.length === 0) {
       setSelectedPeriferico(null);
       return;
@@ -155,13 +155,11 @@ const EditarActivoSimple = ({
       );
       setSelectedPeriferico(found || null);
     } else {
-      // when not a componente, don't prefill; allow user to select if they want
       setSelectedPeriferico(null);
     }
   }, [equipoSimpleActivo, perifericos]);
 
   useEffect(() => {
-    // Only prefill computadora when backend indicated this is a componente
     if (equipoSimpleActivo?.isComponente && computadoras && computadoras.length > 0) {
       const foundComp = computadoras.find((c) => {
         if (equipoSimpleActivo.id_computadora && String(c?.id_equipo) === String(equipoSimpleActivo.id_computadora)) {
@@ -425,7 +423,6 @@ const EditarActivoSimple = ({
           }}
           disabled={!selectedInventarioModelo}
         />
-        {/* (Los campos Periférico / Serie computadora se muestran en Información General) */}
         <Box
           sx={{
             display: "inline-flex",
@@ -541,13 +538,12 @@ const EditarActivoSimple = ({
 
       <h2 className="text-xl font-semibold mb-5">Información General</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
-        {/* Periférico (solo Computadora / Laptop) */}
         {equipoSimpleActivo?.isComponente ? (
           <>
             <Autocomplete
               size="small"
               disablePortal
-              options={perifericos.filter((p) => Number(p?.id_periferico) === 1 || Number(p?.id_periferico) === 2)}
+              options={perifericos.filter((p) => (p?.nombre === 'Computadora' || p?.nombre === 'Laptop'))}
               value={selectedPeriferico}
               onChange={(_, newValue: Periferico | null) => {
                 setSelectedPeriferico(newValue);
@@ -564,7 +560,6 @@ const EditarActivoSimple = ({
               )}
             />
 
-            {/* Serie computadora (opcional) — muestra series de computadoras para el periférico seleccionado */}
             <Autocomplete
               size="small"
               disablePortal

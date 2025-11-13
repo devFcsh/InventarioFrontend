@@ -67,6 +67,8 @@ const Activos = () => {
   const [inputInventario, setInputInventario] = useState("");
 
   const [shouldFetch, setShouldFetch] = useState<boolean>(true);
+  const [sortBy, setSortBy] = useState<string>("");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const { rol } = useUser();
   const unableAction = rol !== "administrador" && rol !== "editor";
   const unableActionEditor = rol !== "administrador";
@@ -99,7 +101,9 @@ const Activos = () => {
     filtros,
     currentPage,
     rowsPerPage,
-    shouldFetch
+    shouldFetch,
+    sortBy,
+    sortDir
   );
 
   useEffect(() => {
@@ -514,6 +518,7 @@ const Activos = () => {
 
   const [equipoSeleccionado, setEquipoSeleccionado] = useState<Equipo>();
   const [tipoEquipoSeleccionado, setTipoEquipoSeleccionado] = useState<string>("");
+  
 
   const handleOpenMantenimientos = (equipo: Equipo) => {
     setEquipoSeleccionado(equipo);
@@ -541,6 +546,18 @@ const Activos = () => {
   };
 
   const handleBuscar = () => {
+    setCurrentPage(1);
+    setShouldFetch(true);
+  };
+
+  const toggleSort = (column: string) => {
+    if (sortBy === column) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(column);
+      setSortDir("asc");
+    }
+    // when changing sort, go back to page 1 and request fresh data from backend
     setCurrentPage(1);
     setShouldFetch(true);
   };
@@ -1029,7 +1046,7 @@ const Activos = () => {
             <table className="w-full text-left text-sm text-gray-500">
               <thead className="text-xs uppercase bg-gray-50 text-gray-700">
                 <tr>
-                  <th scope="col" className="flex items-center gap-2 px-4 py-3">
+                  <th scope="col" className="flex items-center gap-2 px-4 py-3 w-12">
                     <Tooltip title="Seleccionar todos">
                       <input
                         type="checkbox"
@@ -1095,31 +1112,116 @@ const Activos = () => {
                       </>
                     )}
                   </th>
-                  <th scope="col" className="px-4 py-3">
-                    Equipo
+                  <th scope="col" className="px-4 py-3 w-14">
+                    <button
+                      type="button"
+                      onClick={() => toggleSort("periferico")}
+                      className="flex items-center gap-1"
+                    >
+                      Equipo
+                      {sortBy === "periferico" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
                   </th>
-                  <th scope="col" className="px-4 py-3">
-                    Marca
+                  <th scope="col" className="px-4 py-3 w-36">
+                    <button type="button" onClick={() => toggleSort("marca")} className="flex items-center gap-1">
+                      Marca {sortBy === "marca" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
                   </th>
-                  <th scope="col" className="px-4 py-3">
-                    Modelo
+                  <th scope="col" className="px-4 py-3 w-36">
+                    <button type="button" onClick={() => toggleSort("modelo")} className="flex items-center gap-1">
+                      Modelo {sortBy === "modelo" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
                   </th>
-                  <th scope="col" className="px-4 py-3">
-                    Serie
+                  <th scope="col" className="px-4 py-3 w-32">
+                    <button type="button" onClick={() => toggleSort("serie")} className="flex items-center gap-1">
+                      Serie {sortBy === "serie" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
                   </th>
-                  <th scope="col" className="px-4 py-3">
-                    Inventario
+                  <th scope="col" className="px-4 py-3 w-28">
+                    <button type="button" onClick={() => toggleSort("inventario")} className="flex items-center gap-1">
+                      Inventario {sortBy === "inventario" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
                   </th>
-                  <th scope="col" className="px-4 py-3">
-                    Usuario
+                  <th scope="col" className="px-4 py-3 w-48">
+                    <button type="button" onClick={() => toggleSort("usuario")} className="flex items-center gap-1">
+                      Usuario {sortBy === "usuario" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
                   </th>
-                  <th scope="col" className="px-4 py-3">
-                    Uso
+                  <th scope="col" className="px-4 py-3 w-32">
+                    <button type="button" onClick={() => toggleSort("uso")} className="flex items-center gap-1">
+                      Uso {sortBy === "uso" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
                   </th>
-                  <th scope="col" className="px-4 py-3">
-                    Edificio
+                  <th scope="col" className="px-4 py-3 w-36">
+                    <button type="button" onClick={() => toggleSort("edificio")} className="flex items-center gap-1">
+                      Edificio {sortBy === "edificio" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
                   </th>
-                  <th scope="col" className="px-4 py-3">
+                  <th scope="col" className="px-4 py-3 w-56">
                     Acciones
                   </th>
                 </tr>
@@ -1130,7 +1232,7 @@ const Activos = () => {
                     key={equipo.id_equipo}
                     className="bg-white border-b hover:bg-gray-50"
                   >
-                    <td className="px-4 py-2">
+                    <td className="px-4 py-2 w-12">
                       <input
                         type="checkbox"
                         checked={selectedItems.includes(equipo.id_equipo)}
@@ -1138,15 +1240,15 @@ const Activos = () => {
                         disabled={unableAction}
                       />
                     </td>
-                    <td className="px-4 py-2">{equipo.periferico}</td>
-                    <td className="px-4 py-2">{equipo.marca}</td>
-                    <td className="px-4 py-2">{equipo.modelo}</td>
-                    <td className="px-4 py-2">{equipo.serie}</td>
-                    <td className="px-4 py-2">{equipo.inventario}</td>
-                    <td className="px-4 py-2">{equipo.usuario}</td>
-                    <td className="px-4 py-2">{equipo.uso}</td>
-                    <td className="px-4 py-2">{equipo.edificio}</td>
-                    <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
+                    <td className="px-4 py-2 w-14">{equipo.periferico}</td>
+                    <td className="px-4 py-2 w-36">{equipo.marca}</td>
+                    <td className="px-4 py-2 w-36">{equipo.modelo}</td>
+                    <td className="px-4 py-2 w-32">{equipo.serie}</td>
+                    <td className="px-4 py-2 w-28">{equipo.inventario}</td>
+                    <td className="px-4 py-2 w-48">{equipo.usuario}</td>
+                    <td className="px-4 py-2 w-32">{equipo.uso}</td>
+                    <td className="px-4 py-2 w-36">{equipo.edificio}</td>
+                    <td className="px-4 py-3 flex items-center gap-2 truncate text-black w-56">
                       <Tooltip title="Ver detalles">
                         <span>
                           <Link

@@ -27,6 +27,8 @@ const Bajas = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [sortBy, setSortBy] = useState<string>("");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<
     () => Promise<{ success: boolean; message: string }>
@@ -43,7 +45,7 @@ const Bajas = () => {
     title: "Confirmar",
     message: "¿Estás seguro de que deseas realizar esta acción?",
   });
-  const [modalContentBajas, _] = useState<{
+  const [modalContentBajas] = useState<{
     title: string;
     message: string;
   }>({
@@ -76,8 +78,21 @@ const Bajas = () => {
     filtros,
     currentPage,
     rowsPerPage,
-    shouldFetch
+    shouldFetch,
+    sortBy,
+    sortDir
   );
+
+  const toggleSort = (column: string) => {
+    if (sortBy === column) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(column);
+      setSortDir("asc");
+    }
+    setCurrentPage(1);
+    setShouldFetch(true);
+  };
 
   useEffect(() => {
     if (totalCount > 0 && rowsPerPage > 0) {
@@ -483,7 +498,7 @@ const Bajas = () => {
             <table className="w-full text-left text-sm text-gray-500">
               <thead className="text-xs uppercase bg-gray-50 text-gray-700">
                 <tr>
-                  <th scope="col" className="flex items-center gap-2 px-4 py-3">
+                  <th scope="col" className="flex items-center gap-2 px-4 py-3 w-12">
                     <Tooltip title="Seleccionar Todos">
                       <input
                         type="checkbox"
@@ -508,22 +523,77 @@ const Bajas = () => {
                       </>
                     )}
                   </th>
-                  <th scope="col" className="px-4 py-3">
-                    Equipo
+                  <th scope="col" className="px-4 py-3 w-14">
+                    <button
+                      type="button"
+                      onClick={() => toggleSort("periferico")}
+                      className="flex items-center gap-1"
+                    >
+                      Equipo
+                      {sortBy === "periferico" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
                   </th>
-                  <th scope="col" className="px-4 py-3">
-                    Marca
+                  <th scope="col" className="px-4 py-3 w-36">
+                    <button type="button" onClick={() => toggleSort("marca")} className="flex items-center gap-1">
+                      Marca {sortBy === "marca" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
                   </th>
-                  <th scope="col" className="px-4 py-3">
-                    Modelo
+                  <th scope="col" className="px-4 py-3 w-36">
+                    <button type="button" onClick={() => toggleSort("modelo")} className="flex items-center gap-1">
+                      Modelo {sortBy === "modelo" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
                   </th>
-                  <th scope="col" className="px-4 py-3">
-                    Serie
+                  <th scope="col" className="px-4 py-3 w-32">
+                    <button type="button" onClick={() => toggleSort("serie")} className="flex items-center gap-1">
+                      Serie {sortBy === "serie" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
                   </th>
-                  <th scope="col" className="px-4 py-3">
-                    Inventario
+                  <th scope="col" className="px-4 py-3 w-28">
+                    <button type="button" onClick={() => toggleSort("inventario")} className="flex items-center gap-1">
+                      Inventario {sortBy === "inventario" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
                   </th>
-                  <th scope="col" className="px-4 py-3">
+                  <th scope="col" className="px-4 py-3 w-56">
                     Acciones
                   </th>
                 </tr>
@@ -534,19 +604,19 @@ const Bajas = () => {
                     key={equipo.id_equipo}
                     className="bg-white border-b hover:bg-gray-50"
                   >
-                    <td className="px-4 py-2">
+                    <td className="px-4 py-2 w-12">
                       <input
                         type="checkbox"
                         checked={selectedItems.includes(equipo.id_equipo)}
                         onChange={() => handleCheckboxChange(equipo.id_equipo)}
                       />
                     </td>
-                    <td className="px-4 py-2">{equipo.periferico}</td>
-                    <td className="px-4 py-2">{equipo.marca}</td>
-                    <td className="px-4 py-2">{equipo.modelo}</td>
-                    <td className="px-4 py-2">{equipo.serie}</td>
-                    <td className="px-4 py-2">{equipo.inventario}</td>
-                    <td className="px-4 py-3 flex items-center gap-2 max-w-[15rem] truncate text-black">
+                    <td className="px-4 py-2 w-14">{equipo.periferico}</td>
+                    <td className="px-4 py-2 w-36">{equipo.marca}</td>
+                    <td className="px-4 py-2 w-36">{equipo.modelo}</td>
+                    <td className="px-4 py-2 w-32">{equipo.serie}</td>
+                    <td className="px-4 py-2 w-28">{equipo.inventario}</td>
+                    <td className="px-4 py-3 flex items-center gap-2 truncate text-black w-56">
                       {/* <Tooltip title="Editar Equipo">
                       <span>
                         <Icon

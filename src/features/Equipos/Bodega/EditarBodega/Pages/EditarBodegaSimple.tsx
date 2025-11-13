@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Autocomplete, TextField, Button, Box } from "@mui/material";
-import { Marca, Modelo, Lampara } from "../../../../../types";
+import { Marca, Modelo, Lampara, Periferico, ComputadoraSimple } from "../../../../../types";
 import { BodegaSimpleEdit } from "../../../../../types/Bodega/index";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
+import usePerifericos from "../../../../../hooks/usePerifericos";
+import useComputadorasPorPeriferico from "../../../../../hooks/useComputadorasPorPeriferico";
 import useEditarBodegaSimple from "../hooks/useEditarBodegaSimple";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +31,8 @@ const EditarBodegaSimple = ({
   const [selectedInventarioModelo, setSelectedInventarioModelo] =
     useState<Modelo | null>(null);
   const [selectedLampara, setSelectedLampara] = useState<Lampara | null>(null);
+  const [selectedPeriferico, setSelectedPeriferico] = useState<Periferico | null>(null);
+  const [selectedComputadora, setSelectedComputadora] = useState<ComputadoraSimple | null>(null);
   const [selectedInventarioSerie, setSelectedInventarioSerie] =
     useState<string>("");
   const [selectedInventarioInv, setSelectedInventarioInv] =
@@ -52,6 +56,11 @@ const EditarBodegaSimple = ({
   const navigate = useNavigate();
   const { marcas } = useMarcasPorPeriferico(
     equipoSimpleBodega?.id_periferico ?? ""
+  );
+  const { perifericos } = usePerifericos();
+  const { computadoras } = useComputadorasPorPeriferico(
+    selectedPeriferico?.id_periferico ?? "",
+    'bodega'
   );
   const { modelos } = useModelosPorMarcaPeriferico(
     selectedInventarioMarca?.id_marca ?? "",
@@ -131,13 +140,48 @@ const EditarBodegaSimple = ({
     }
   }, [equipoSimpleBodega, lamparasTotales]);
 
+  // Prefill selectedPeriferico / selectedComputadora: only when backend indicates this is a componente
+  type MaybeComponente = {
+    isComponente?: boolean;
+    id_periferico_computadora?: string | number;
+    id_computadora?: string | number;
+    id_computadora_componente?: string | number;
+  };
+
+  useEffect(() => {
+    const meta = equipoSimpleBodega as MaybeComponente;
+    if (!perifericos || perifericos.length === 0) {
+      setSelectedPeriferico(null);
+      return;
+    }
+    if (meta.isComponente) {
+      const perifericoIdToUse = meta.id_periferico_computadora ?? equipoSimpleBodega.id_periferico;
+      const found = perifericos.find((p) => String(p?.id_periferico) === String(perifericoIdToUse));
+      setSelectedPeriferico(found || null);
+    } else {
+      setSelectedPeriferico(null);
+    }
+  }, [equipoSimpleBodega, perifericos]);
+
+  useEffect(() => {
+    const meta = equipoSimpleBodega as MaybeComponente;
+    if (meta.isComponente && computadoras && computadoras.length > 0) {
+      const compId = meta.id_computadora ?? meta.id_computadora_componente;
+      const foundComp = computadoras.find((c) => String(c?.id_equipo) === String(compId));
+      setSelectedComputadora(foundComp || null);
+    } else {
+      setSelectedComputadora(null);
+    }
+  }, [equipoSimpleBodega, computadoras]);
+
   const handleEditEquipo = async (observationValue: string) => {
     const payload = {
       tipo: "bodega",
       inventario: selectedInventarioInv,
       anio_compra: selectedInventarioAnio,
       serie: selectedInventarioSerie ?? "",
-      perifericoId: equipoSimpleBodega.id_periferico,
+      perifericoId: selectedPeriferico?.id_periferico ?? equipoSimpleBodega.id_periferico,
+      id_computadora: selectedComputadora ? String(selectedComputadora.id_equipo) : undefined,
       observacion: observationValue,
       id_lampara: selectedLampara?.id_lampara ?? "",
     };
@@ -394,6 +438,54 @@ const EditarBodegaSimple = ({
             }}
           />
         </Box>
+        {/* Periférico (opcional) y Serie computadora (opcional) lado a lado */}
+        <div className="col-span-2 flex gap-4">
+          <div className="w-1/2">
+            <Autocomplete
+              size="small"
+              freeSolo
+              options={perifericos.filter((p) => (p?.nombre === 'Computadora' || p?.nombre === 'Laptop'))}
+              getOptionLabel={(option) =>
+                typeof option === "string" ? option : option?.nombre || ""
+              }
+              value={selectedPeriferico}
+              onChange={(_, newValue) => {
+                if (typeof newValue === "string") {
+                  setSelectedPeriferico(null);
+                } else {
+                  setSelectedPeriferico(newValue as Periferico | null);
+                }
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Periférico (opcional)" variant="outlined" fullWidth />
+              )}
+            />
+          </div>
+          <div className="w-1/2">
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={computadoras || []}
+              getOptionLabel={(option) =>
+                typeof option === "string"
+                  ? option
+                  : `${option.serie ? option.serie : ""}`
+              }
+              value={selectedComputadora}
+              onChange={(_, newValue) => {
+                if (typeof newValue === "string") {
+                  setSelectedComputadora(null);
+                } else {
+                  setSelectedComputadora(newValue as ComputadoraSimple | null);
+                }
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Serie computadora (opcional)" variant="outlined" fullWidth />
+              )}
+              disabled={!selectedPeriferico}
+            />
+          </div>
+        </div>
         {perifericoName === "Proyector" ? (
           <Autocomplete
             size="small"
