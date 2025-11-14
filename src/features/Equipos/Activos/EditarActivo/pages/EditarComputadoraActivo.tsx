@@ -159,27 +159,36 @@ const EditarComputadoraActivo = ({
   const { existe: existeSerie, consultarSerie } = useExisteSerie();
 
   const filteredPerifericos = perifericos.filter((p) => {
-    const nombre = p?.nombre?.toLowerCase();
-    if (nombre !== "mouse" && nombre !== "teclado" && nombre !== "monitor") {
+    const normalize = (s?: string) =>
+      (s ?? "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "")
+        .trim();
+
+    const key = normalize(p?.nombre);
+
+    const allowedLimits: Record<string, number> = {
+      mouse: 1,
+      teclado: 1,
+      monitor: 2,
+      camara: 2, // acepta "cámara" o "camara"
+      "pantalla interactiva": 1,
+      microfono: 1, // acepta "micrófono" o "microfono"
+      televisor: 1,
+      "barra polycom": 1,
+    };
+
+    const limit = allowedLimits[key];
+    if (!limit) {
       return false;
     }
-    if (
-      (nombre === "mouse" || nombre === "teclado") &&
-      componentesState.some(
-        (comp) => comp.periferico?.nombre?.toLowerCase() === nombre
-      )
-    ) {
-      return false;
-    }
-    if (
-      nombre === "monitor" &&
-      componentesState.filter(
-        (comp) => comp.periferico?.nombre?.toLowerCase() === "monitor"
-      ).length >= 2
-    ) {
-      return false;
-    }
-    return true;
+
+    const existingCount = componentesState.filter(
+      (comp) => normalize(comp.periferico?.nombre) === key
+    ).length;
+
+    return existingCount < limit;
   });
   const { marcas: marcasComponente } = useMarcasPorPeriferico(
     nuevoComponente.periferico?.id_periferico ?? ""
