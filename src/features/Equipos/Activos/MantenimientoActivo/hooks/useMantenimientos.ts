@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import clienteAxios from "../../../../../hooks";
 import { Mantenimiento } from "../../../../../types/Activo/Mantenimiento";
 
 export const useMantenimientos = (id_equipo: string | null | undefined) => {
   const [mantenimientos, setMantenimientos] = useState<Mantenimiento[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(!!id_equipo);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -23,11 +24,15 @@ export const useMantenimientos = (id_equipo: string | null | undefined) => {
         const response = await clienteAxios.get(`/mantenimientos/${id_equipo}`);
         const raw: any[] = response.data.mantenimientos || [];
 
+        const capitalize = (s: any) => (typeof s === "string" && s.length ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : undefined);
+
         const normalized: Mantenimiento[] = raw.map((m: any) => ({
           id_mantenimiento: m.id_mantenimiento,
           fecha: m.fecha,
           hallazgos: m.hallazgos ?? null,
           recomendaciones: m.recomendaciones ?? null,
+          id_tipo_mantenimiento: m.id_tipo_mantenimiento ?? undefined,
+          tipo: capitalize(m.tipo_mantenimiento ?? m.tipo ?? (m.id_tipo_mantenimiento === 1 ? 'preventivo' : m.id_tipo_mantenimiento === 2 ? 'correctivo' : undefined)),
           actividades: (m.actividades || []).map((a: any) => ({
             id_actividad_periferico_tipo: a.id_actividad_periferico_tipo,
             id_actividad_mantenimiento: a.id_actividad_mantenimiento,

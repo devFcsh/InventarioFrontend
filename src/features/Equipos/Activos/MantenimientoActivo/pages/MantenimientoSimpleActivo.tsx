@@ -8,6 +8,7 @@ import {
   TextField,
   Divider,
   Grid,
+  Button,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import React, { useState, useEffect } from "react";
@@ -26,11 +27,13 @@ interface MantenimientosSimpleActivoProps {
   open: boolean;
   onClose: () => void;
   id_equipo: string;
+  onOpenAgregar?: () => void;
 }
 
 export const MantenimientosSimpleActivo: React.FC<MantenimientosSimpleActivoProps> = ({
   open,
   onClose,
+  onOpenAgregar,
 }) => {
   const equipo = { inventario: "GEN-001", modelo: "Genérico", ubicacion: "Depósito" };
   const loading = false;
@@ -52,6 +55,28 @@ export const MantenimientosSimpleActivo: React.FC<MantenimientosSimpleActivoProp
   useEffect(() => {
     setIndex(0);
   }, [open]);
+
+  const formatFecha = (f?: string | null) => {
+    if (!f) return "";
+    try {
+      const parseServerDate = (s: string) => {
+        if (!s) return null;
+        if (/[zZ]$/.test(s) || /[+-]\d{2}:?\d{2}$/.test(s)) return new Date(s);
+        const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?/);
+        if (m) {
+          const [, Y, M, D, hh, mm, ss] = m;
+          return new Date(Number(Y), Number(M) - 1, Number(D), Number(hh), Number(mm), Number(ss ?? '0'));
+        }
+        return new Date(s);
+      };
+
+      const dt = parseServerDate(f);
+      if (!dt || isNaN(dt.getTime())) return f as string;
+      return dt.toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" });
+    } catch {
+      return f as string;
+    }
+  };
 
   const handlePrev = () =>
     setIndex((prev) =>
@@ -140,6 +165,15 @@ export const MantenimientosSimpleActivo: React.FC<MantenimientosSimpleActivoProp
               InputProps={{ readOnly: true }}
             />
           </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Fecha del Mantenimiento"
+              value={formatFecha(mantenimiento?.fecha)}
+              fullWidth
+              size="small"
+              InputProps={{ readOnly: true }}
+            />
+          </Grid>
         </Grid>
 
         <Divider sx={{ my: 2 }} />
@@ -178,6 +212,13 @@ export const MantenimientosSimpleActivo: React.FC<MantenimientosSimpleActivoProp
           InputProps={{ readOnly: true }}
           sx={{ mb: 2 }}
         />
+        <Box mt={2} display="flex" justifyContent="flex-end">
+          {onOpenAgregar && (
+            <Button variant="contained" onClick={onOpenAgregar}>
+              Agregar mantenimiento
+            </Button>
+          )}
+        </Box>
       </DialogContent>
     </Dialog>
   );

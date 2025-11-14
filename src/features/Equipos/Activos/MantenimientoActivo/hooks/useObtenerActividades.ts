@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import clienteAxios from "../../../../../hooks";
 
@@ -11,7 +12,7 @@ export interface Actividad {
 
 export const useObtenerActividadesEquipo = (
   id: string | null | undefined,
-  tipo: string = "all" // 'preventivo' | 'correctivo' | 'all'
+  tipo?: string | null // 'preventivo' | 'correctivo' | undefined/null = don't fetch
 ) => {
   const [actividades, setActividades] = useState<Actividad[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -19,6 +20,13 @@ export const useObtenerActividadesEquipo = (
 
   useEffect(() => {
     if (!id) {
+      setActividades([]);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
+    if (!tipo) {
       setActividades([]);
       setLoading(false);
       setError(null);

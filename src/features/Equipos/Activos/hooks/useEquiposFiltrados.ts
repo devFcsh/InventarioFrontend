@@ -8,7 +8,9 @@ export const useEquiposFiltrados = (
   filtros: Filtros,
   currentPage: number,
   rowsPerPage: number,
-  shouldFetch: boolean
+  shouldFetch: boolean,
+  sortBy?: string,
+  sortDir?: "asc" | "desc"
 ) => {
   const [equipos, setEquipos] = useState<Equipo[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -27,6 +29,8 @@ export const useEquiposFiltrados = (
             ...filtros,
             limit: rowsPerPage,
             offset: (currentPage - 1) * rowsPerPage,
+            sortBy: sortBy || undefined,
+            sortDir: sortDir || undefined,
           },
         });
         setEquipos(data.equipos);
@@ -39,7 +43,7 @@ export const useEquiposFiltrados = (
     };
 
     fetchEquipos();
-  }, [filtros, currentPage, rowsPerPage, shouldFetch]);
+  }, [filtros, currentPage, rowsPerPage, shouldFetch, sortBy, sortDir]);
 
   return { equipos, loading, error, totalCount };
 };

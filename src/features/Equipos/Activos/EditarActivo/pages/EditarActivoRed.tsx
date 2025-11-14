@@ -100,7 +100,7 @@ const EditarActivoRed = ({
       setSelectedInventarioInv(equipoRedActivo.inventario);
       setSelectedInventarioAnio(equipoRedActivo.anio_compra);
       setCurrentImagePath(equipoRedActivo.imagenRuta);
-      setNewObservation(equipoRedActivo.observacion);
+      setNewObservation(equipoRedActivo.observacion ?? "");
       setSelectedMAC(equipoRedActivo.mac);
       setSelectedPuertos(equipoRedActivo.puertos);
       setSelectedPuertoFTP(equipoRedActivo.puerto_ftp);

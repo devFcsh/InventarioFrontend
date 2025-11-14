@@ -10,63 +10,59 @@ import {
   TextField,
   Divider,
   Grid,
+  Button,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import React, { useState, useEffect } from "react";
+import { Mantenimiento, ActividadMantenimientoResponse } from "../../../../../types/Activo/Mantenimiento";
 import Loader from "@pages/Loader";
 
-interface Actividad {
-  id_actividad_mantenimiento: number;
-  nombre: string;
-}
-
-interface Mantenimiento {
-  id_mantenimiento: number;
-  id_equipo: number;
-  fecha: string;
-  tipo: "Preventivo" | "Correctivo";
-  actividades_realizadas: number[];
-  hallazgos: string;
-  recomendaciones: string;
-}
 
 interface MantenimientosProyectorActivoProps {
   open: boolean;
   onClose: () => void;
   id_equipo: string;
+  mantenimientos: Mantenimiento[];
+  onOpenAgregar?: () => void;
 }
 
 export const MantenimientosProyectorActivo: React.FC<MantenimientosProyectorActivoProps> = ({
   open,
   onClose,
+  mantenimientos,
+  onOpenAgregar,
 }) => {
   const equipo = { inventario: "PR-001", modelo: "Epson X123", ubicacion: "Aula 101", horas_lampara: "1200" };
   const loading = false;
   const error = null;
-
-  const actividades: Actividad[] = [
-    { id_actividad_mantenimiento: 1, nombre: "Limpieza de filtro" },
-    { id_actividad_mantenimiento: 2, nombre: "Revisión de lámpara" },
-    { id_actividad_mantenimiento: 3, nombre: "Prueba de imagen" },
-  ];
-
-  const mantenimientos: Mantenimiento[] = [
-    {
-      id_mantenimiento: 1,
-      id_equipo: 1,
-      fecha: "2024-10-08",
-      tipo: "Preventivo",
-      actividades_realizadas: [1, 2],
-      hallazgos: "Filtro sucio.",
-      recomendaciones: "Limpiar filtro cada 3 meses.",
-    },
-  ];
 
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
     setIndex(0);
   }, [open]);
+
+  const formatFecha = (f?: string | null) => {
+    if (!f) return "";
+    try {
+      const parseServerDate = (s: string) => {
+        if (!s) return null;
+        if (/[zZ]$/.test(s) || /[+-]\d{2}:?\d{2}$/.test(s)) return new Date(s);
+        const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?/);
+        if (m) {
+          const [, Y, M, D, hh, mm, ss] = m;
+          return new Date(Number(Y), Number(M) - 1, Number(D), Number(hh), Number(mm), Number(ss ?? '0'));
+        }
+        return new Date(s);
+      };
+
+      const dt = parseServerDate(f);
+      if (!dt || isNaN(dt.getTime())) return f as string;
+      return dt.toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" });
+    } catch {
+      return f as string;
+    }
+  };
 
   const handlePrev = () =>
     setIndex((prev) =>
@@ -78,8 +74,6 @@ export const MantenimientosProyectorActivo: React.FC<MantenimientosProyectorActi
     );
 
   const mantenimiento = mantenimientos[index];
-  const isActividadRealizada = (id: number) =>
-    mantenimiento?.actividades_realizadas.includes(id);
 
   if (!open) return null;
   if (loading) {
@@ -166,6 +160,15 @@ export const MantenimientosProyectorActivo: React.FC<MantenimientosProyectorActi
               InputProps={{ readOnly: true }}
             />
           </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Fecha del Mantenimiento"
+              value={formatFecha(mantenimiento?.fecha)}
+              fullWidth
+              size="small"
+              InputProps={{ readOnly: true }}
+            />
+          </Grid>
         </Grid>
 
         <Divider sx={{ my: 2 }} />
@@ -198,18 +201,18 @@ export const MantenimientosProyectorActivo: React.FC<MantenimientosProyectorActi
           Actividades realizadas
         </Typography>
         <Box display="flex" flexWrap="wrap" gap={2} mb={2}>
-          {actividades.map((actividad) => (
-            <FormControlLabel
-              key={actividad.id_actividad_mantenimiento}
-              control={
-                <Checkbox
-                  checked={isActividadRealizada(actividad.id_actividad_mantenimiento)}
-                  readOnly
-                />
-              }
-              label={actividad.nombre}
-            />
-          ))}
+          {(mantenimiento?.actividades ?? []).map((actividad: ActividadMantenimientoResponse | { id_actividad_mantenimiento?: number; id_actividad_periferico_tipo?: number; nombre?: string; actividad?: string; realizada?: boolean }, idx: number) => {
+            const id = actividad.id_actividad_mantenimiento ?? actividad.id_actividad_periferico_tipo;
+            const done = actividad.realizada !== undefined ? !!actividad.realizada : false;
+            const label = 'actividad' in actividad && actividad.actividad ? actividad.actividad : ('nombre' in actividad && actividad.nombre ? actividad.nombre : "");
+            return (
+              <FormControlLabel
+                key={id ?? `act-${idx}`}
+                control={<Checkbox checked={done} readOnly />}
+                label={label}
+              />
+            );
+          })}
         </Box>
 
         <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
@@ -235,6 +238,13 @@ export const MantenimientosProyectorActivo: React.FC<MantenimientosProyectorActi
           InputProps={{ readOnly: true }}
           sx={{ mb: 2 }}
         />
+        <Box mt={2} display="flex" justifyContent="flex-end">
+          {onOpenAgregar && (
+            <Button variant="contained" onClick={onOpenAgregar}>
+              Agregar mantenimiento
+            </Button>
+          )}
+        </Box>
       </DialogContent>
     </Dialog>
   );

@@ -6,7 +6,7 @@ import clienteAxios from '../../../../../hooks';
 export const useObtenerComputadora = (id: string | null | undefined) => {
   const [equipo, setEquipo] = useState<ActivoComputadoraEdit | null>(null);
   const [componentes, setComponentes] = useState<Componente[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(!!id);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

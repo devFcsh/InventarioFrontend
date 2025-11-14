@@ -13,9 +13,21 @@ export const useObtenerComputadoraActivo = (id: string) => {
     const obtenerEquipoSimpleActivo = async () => {
       try {
         const response = await clienteAxios.get(`/equipos/equipoSimpleActivo/${id}`);
-        setEquipoSimpleActivo(response.data.equipo);
+        const equipo = response.data.equipo || null;
+        if (equipo) {
+          const merged = {
+            ...equipo,
+            isComponente: response.data.isComponente ?? equipo.isComponente,
+            id_computadora: response.data.id_computadora ?? equipo.id_computadora,
+            id_serie_computadora: response.data.id_serie_computadora ?? equipo.id_serie_computadora,
+            id_periferico_computadora: response.data.id_periferico_computadora ?? equipo.id_periferico_computadora,
+          };
+          setEquipoSimpleActivo(merged);
+        } else {
+          setEquipoSimpleActivo(null);
+        }
       } catch (err) {
-        setError("Error al obtener equipo" + err);
+        setError("Error al obtener equipo" + String(err));
       } finally {
         setLoading(false);
       }

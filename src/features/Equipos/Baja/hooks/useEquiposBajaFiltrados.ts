@@ -9,6 +9,9 @@ export const useEquiposBajaFiltrados = (
   currentPage: number,
   rowsPerPage: number,
   shouldFetch: boolean
+  ,
+  sortBy?: string,
+  sortDir?: "asc" | "desc"
 ) => {
   const [equiposBaja, setEquiposBaja] = useState<EquipoBaja[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -27,6 +30,8 @@ export const useEquiposBajaFiltrados = (
             ...filtros,
             limit: rowsPerPage,
             offset: (currentPage - 1) * rowsPerPage,
+            sortBy: sortBy || undefined,
+            sortDir: sortDir || undefined,
           },
         });
         setEquiposBaja(data.equipos);
@@ -39,7 +44,7 @@ export const useEquiposBajaFiltrados = (
     };
 
     fetchEquiposBaja();
-  }, [filtros, currentPage, rowsPerPage, shouldFetch]);
+  }, [filtros, currentPage, rowsPerPage, shouldFetch, sortBy, sortDir]);
 
   return { equiposBaja, loading, error, totalCount };
 };
