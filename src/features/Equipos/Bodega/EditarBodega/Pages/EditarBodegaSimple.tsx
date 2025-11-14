@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Autocomplete, TextField, Button, Box } from "@mui/material";
-import { Marca, Modelo, Lampara, Periferico, ComputadoraSimple } from "../../../../../types";
+import { Marca, Modelo, Lampara, Periferico } from "../../../../../types";
 import { BodegaSimpleEdit } from "../../../../../types/Bodega/index";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
 import usePerifericos from "../../../../../hooks/usePerifericos";
-import useComputadorasPorPeriferico from "../../../../../hooks/useComputadorasPorPeriferico";
+import useComputadorasPorPeriferico, { ComputadoraSimple } from "../../../../../hooks/useComputadorasPorPeriferico";
 import useEditarBodegaSimple from "../hooks/useEditarBodegaSimple";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
 import { useNavigate } from "react-router-dom";
