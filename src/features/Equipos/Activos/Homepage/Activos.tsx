@@ -557,7 +557,6 @@ const Activos = () => {
       setSortBy(column);
       setSortDir("asc");
     }
-    // when changing sort, go back to page 1 and request fresh data from backend
     setCurrentPage(1);
     setShouldFetch(true);
   };
@@ -1376,13 +1375,31 @@ const Activos = () => {
                         </Tooltip>
                         
                       <Tooltip title="Mantenimientos">
-                        <span className={unableAction ? "opacity-50 pointer-events-none" : ""}>
+                        <span
+                          className={
+                            !unableAction && (equipo.periferico === "Computadora" || equipo.periferico === "Laptop")
+                              ? ""
+                              : "opacity-50 pointer-events-none"
+                          }
+                        >
                           <Icon
                             icon="pajamas:issue-type-maintenance"
                             width="25"
                             height="25"
-                            onClick={() => handleOpenMantenimientos(equipo)}
-                            className="cursor-pointer"
+                            onClick={
+                              !unableAction && (equipo.periferico === "Computadora" || equipo.periferico === "Laptop")
+                                ? () => handleOpenMantenimientos(equipo)
+                                : undefined
+                            }
+                            className={
+                              !unableAction && (equipo.periferico === "Computadora" || equipo.periferico === "Laptop")
+                                ? "cursor-pointer"
+                                : "cursor-default"
+                            }
+                            role="button"
+                            aria-disabled={
+                              !( !unableAction && (equipo.periferico === "Computadora" || equipo.periferico === "Laptop") )
+                            }
                           />
                         </span>
                       </Tooltip>

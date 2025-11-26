@@ -20,6 +20,7 @@ import { useObtenerComputadora } from "../../EditarActivo/hooks/useComputadora";
 import { Mantenimiento, ActividadMantenimientoResponse } from "../../../../../types/Activo/Mantenimiento";
 import useEditarMantenimiento from "../hooks/useEditarMantenimiento";
 import { useSnackbar } from "@context/SnackbarContext";
+import { useAgregarActividadMantenimiento } from "../hooks/useAgregarActividadMantenimiento";
 import useMarcasPorPeriferico from "../../../../../hooks/useMarcasPorPeriferico";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
@@ -107,8 +108,10 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
   const [tipoOptionLocal, setTipoOptionLocal] = useState<{ label: string; value: string } | null>(null);
   const [localActividades, setLocalActividades] = useState<ActividadMantenimientoResponse[]>([]);
 
+  const [newActividadNombre, setNewActividadNombre] = useState<string>("");
   const { editarMantenimiento, error: editError, message: editMessage } = useEditarMantenimiento();
   const { showMessage } = useSnackbar();
+  const { agregarActividad, loading: addingActividad } = useAgregarActividadMantenimiento();
 
   const { marcas } = useMarcasPorPeriferico(equipo?.id_periferico ?? "");
   const { modelos } = useModelosPorMarcaPeriferico(equipo?.id_marca ?? "", equipo?.id_periferico ?? "");
@@ -483,6 +486,16 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Editar por:"
+              value={(mantenimiento as unknown as { autor?: string })?.autor ?? ""}
+              fullWidth
+              size="small"
+              InputProps={{ readOnly: true }}
+              disabled
+            />
+          </Grid>
         </Grid>
 
         <Divider sx={{ my: 2 }} />
@@ -505,6 +518,61 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
         <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
           Actividades realizadas
         </Typography>
+        {tipoOptionLocal ? (
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 1 }}>
+            <TextField
+              size="small"
+              label="Nueva actividad"
+              value={newActividadNombre}
+              onChange={(e) => setNewActividadNombre(e.target.value)}
+              sx={{ flex: 1 }}
+            />
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={async () => {
+                const tipoToSend = tipoOptionLocal?.value;
+                if (!tipoToSend) {
+                  showMessage("Seleccione el tipo de mantenimiento", "warning");
+                  return;
+                }
+                if (!newActividadNombre || newActividadNombre.trim() === "") {
+                  showMessage("Ingrese el nombre de la actividad", "warning");
+                  return;
+                }
+
+                const payload = { nombre: newActividadNombre.trim(), tipo: tipoToSend, id_periferico: Number(equipo?.id_periferico) };
+                const res = await agregarActividad(payload);
+                if (res.ok) {
+                  showMessage(res.message || "Actividad agregada", "success");
+                  const act = res.actividad
+                    ? ({
+                        id_actividad_mantenimiento: res.actividad.id_actividad_mantenimiento ? Number(res.actividad.id_actividad_mantenimiento) : undefined,
+                        id_actividad_periferico_tipo: res.actividad.id_actividad_periferico_tipo ? Number(res.actividad.id_actividad_periferico_tipo) : undefined,
+                        actividad: res.actividad.actividad || res.actividad.nombre || payload.nombre,
+                        tipo_mantenimiento: res.actividad.tipo_mantenimiento || tipoToSend,
+                        realizada: false,
+                      } as unknown as ActividadMantenimientoResponse)
+                    : ({
+                        id_actividad_mantenimiento: undefined,
+                        id_actividad_periferico_tipo: undefined,
+                        actividad: payload.nombre,
+                        tipo_mantenimiento: tipoToSend,
+                        realizada: false,
+                      } as unknown as ActividadMantenimientoResponse);
+
+                  setLocalActividades((prev) => [act, ...prev]);
+                  setNewActividadNombre("");
+                } else {
+                  showMessage(res.error || "Error al agregar actividad", "error");
+                }
+              }}
+              disabled={addingActividad}
+            >
+              {addingActividad ? "Agregando..." : "Agregar actividad"}
+            </Button>
+          </Box>
+        ) : null}
         <Box sx={{ mb: 2 }}>
           <Grid container spacing={1}>
             {(localActividades.length ? localActividades : mantenimiento.actividades)

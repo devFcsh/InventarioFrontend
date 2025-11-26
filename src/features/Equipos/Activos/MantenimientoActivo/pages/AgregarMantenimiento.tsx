@@ -15,6 +15,7 @@ import {
 import { useState, useEffect } from "react";
 import Loader from "@pages/Loader";
 import { useAgregarMantenimiento } from "../hooks/useAgregarMantenimiento";
+import { useAgregarActividadMantenimiento } from "../hooks/useAgregarActividadMantenimiento";
 import { useSnackbar } from "@context/SnackbarContext";
 import {
   ActividadMantenimiento,
@@ -22,6 +23,7 @@ import {
   ActividadMantenimientoRequest,
 } from "../../../../../types/Activo/Mantenimiento";
 import { useObtenerActividadesEquipo } from "../hooks/useObtenerActividades";
+import { useObtenerComputadora } from "../../EditarActivo/hooks/useComputadora";
 
 
 interface AgregarMantenimientoProps {
@@ -37,7 +39,10 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
   id_equipo,
   onSuccess,
 }) => {
+
+  const { equipo } = useObtenerComputadora(open && id_equipo ? id_equipo : null);
   const { agregarMantenimiento, loading } = useAgregarMantenimiento();
+  const { agregarActividad, loading: addingActividad } = useAgregarActividadMantenimiento();
   const [tipoOption, setTipoOption] = useState<{ label: string; value: string } | null>(null);
   const [hallazgos, setHallazgos] = useState<string>("");
   const [recomendaciones, setRecomendaciones] = useState<string>("");
@@ -52,6 +57,8 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
   const selectedTipoForHook = tipoOption?.value ?? undefined;
   const { actividades: actividadesBackend, loading: actividadesLoading, error: actividadesError } =
     useObtenerActividadesEquipo(id_equipo, selectedTipoForHook);
+
+  const [newActividadNombre, setNewActividadNombre] = useState<string>("");
 
   useEffect(() => {
     if (actividadesBackend && actividadesBackend.length > 0) {
@@ -167,6 +174,64 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
             <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
               Actividades realizadas
             </Typography>
+            {tipoOption ? (
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 1 }}>
+                <TextField
+                  size="small"
+                  label="Nueva actividad"
+                  value={newActividadNombre}
+                  onChange={(e) => setNewActividadNombre(e.target.value)}
+                  sx={{ flex: 1 }}
+                />
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={async () => {
+                    const tipoToSend = tipoOption?.value;
+                    if (!tipoToSend) {
+                      showMessage("Seleccione un tipo de mantenimiento antes de agregar una actividad", "warning");
+                      return;
+                    }
+                    if (!newActividadNombre || newActividadNombre.trim() === "") {
+                      showMessage("Ingrese el nombre de la actividad", "warning");
+                      return;
+                    }
+
+                    const payload = {
+                      nombre: newActividadNombre.trim(),
+                      tipo: tipoToSend,
+                      id_periferico: equipo?.id_periferico,
+                    };
+
+                    const res = await agregarActividad(payload as any);
+                    if (res.ok) {
+                      showMessage(res.message || "Actividad agregada", "success");
+                      const act = res.actividad
+                        ? {
+                            id_actividad_mantenimiento: res.actividad.id_actividad_mantenimiento ? Number(res.actividad.id_actividad_mantenimiento) : undefined,
+                            id_actividad_periferico_tipo: res.actividad.id_actividad_periferico_tipo ? Number(res.actividad.id_actividad_periferico_tipo) : undefined,
+                            nombre: res.actividad.actividad || res.actividad.nombre || payload.nombre,
+                            realizada: false,
+                          }
+                        : {
+                            id_actividad_mantenimiento: undefined,
+                            id_actividad_periferico_tipo: undefined,
+                            nombre: payload.nombre,
+                            realizada: false,
+                          };
+
+                      setActividades((prev) => [act as ActividadMantenimiento, ...prev]);
+                      setNewActividadNombre("");
+                    } else {
+                      showMessage(res.error || "Error al agregar actividad", "error");
+                    }
+                  }}
+                  disabled={addingActividad}
+                >
+                  {addingActividad ? "Agregando..." : "Agregar actividad"}
+                </Button>
+              </Box>
+            ) : null}
             <Box sx={{ maxHeight: 360, overflow: "auto", pr: 1, mb: 2 }}>
               {!tipoOption ? (
                 <Typography color="textSecondary" sx={{ p: 2 }}>
