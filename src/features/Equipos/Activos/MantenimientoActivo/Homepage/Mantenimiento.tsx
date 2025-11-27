@@ -11,6 +11,9 @@ import clienteAxios from "../../../../../hooks";
 import { useObtenerComputadora } from "../../EditarActivo/hooks/useComputadora";
 import MantenimientoDetalleView from "./MantenimientoDetalleView";
 import useSeries from "@hooks/useSeries";
+import { useSnackbar } from "@context/SnackbarContext";
+import useEliminarMantenimiento from "../hooks/useEliminarMantenimiento";
+import ModalConfirmation from "../../../../../components/ModalConfirmation";
 
 const Mantenimiento = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
@@ -40,6 +43,19 @@ const Mantenimiento = () => {
 
   const { series } = useSeries();
   const [exporting, setExporting] = useState<boolean>(false);
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [confirmAction, setConfirmAction] = useState<
+    () => Promise<{ success: boolean; message: string }>
+  >(() => async () => ({
+    success: false,
+    message: "",
+  }));
+  const [modalContent, setModalContent] = useState<{ title: string; message: string }>({
+    title: "Confirmar",
+    message: "¿Estás seguro de que deseas realizar esta acción?",
+  });
+  const { showMessage } = useSnackbar();
+  const { eliminarMantenimiento } = useEliminarMantenimiento();
   const [detalleId, setDetalleId] = useState<number | null>(null);
   const [openDetalle, setOpenDetalle] = useState(false);
   const { detalle, loading: loadingDetalle, error: errorDetalle } = useMantenimientoDetalle(detalleId ?? null);
@@ -124,6 +140,72 @@ const Mantenimiento = () => {
       setSelectedItems(mantenimientos.map((m: MantenimientoItem) => Number(m.id_mantenimiento)));
     } else {
       setSelectedItems([]);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const handleConfirm = async () => {
+    try {
+      const result = await confirmAction();
+      if (result?.success) {
+        showMessage(result.message || "Operación completada con éxito.", "success");
+        setSelectedItems([]);
+        setShouldFetch(true);
+      } else {
+        showMessage(result?.message || "La operación no se pudo completar.", "error");
+      }
+    } catch (error) {
+      showMessage("Error al realizar la operación.", "error");
+    } finally {
+      handleCloseModal();
+    }
+  };
+
+  const handleOpenModal = (
+    id: string,
+    title: string,
+    message: string,
+    action: (id: string) => Promise<{ success: boolean; message: string }>
+  ) => {
+    setModalContent({ title, message });
+    setConfirmAction(() => () => action(id));
+    setOpenModal(true);
+  };
+
+  const deleteMantenimiento = async (
+    id: string
+  ): Promise<{ success: boolean; message: string }> => {
+    if (!id) return { success: false, message: "ID inválido" };
+    try {
+      const res = await eliminarMantenimiento(id);
+      if (res.success) {
+        setShouldFetch(true);
+      }
+      return { success: res.success, message: res.message };
+    } catch (e) {
+      return { success: false, message: String(e) };
+    }
+  };
+
+  const deleteMantenimientos = async (ids: number[]) => {
+    try {
+      const errors: number[] = [];
+      for (const id of ids) {
+        const result = await eliminarMantenimiento(id);
+        if (!result.success) errors.push(id);
+      }
+      if (errors.length === 0) {
+        showMessage("Operación completada con éxito", "success");
+      } else {
+        showMessage(`No se pudieron eliminar los mantenimientos: ${errors.join(", ")}`, "error");
+      }
+      setShouldFetch(true);
+      setSelectedItems([]);
+    } catch (error) {
+      showMessage("Error al eliminar mantenimientos.", "error");
     }
   };
 
@@ -276,7 +358,7 @@ const Mantenimiento = () => {
         <div className="flex gap-2 items-center">
             <h1 className="text-2xl font-bold my-5">Mantenimientos</h1>
             {selectedItems.length > 0 && (
-              <div>
+              <div className="flex gap-2">
                 <Button
                   variant="contained"
                   color="primary"
@@ -362,6 +444,31 @@ const Mantenimiento = () => {
                       checked={selectedItems.length > 0 && selectedItems.length === (mantenimientos ? mantenimientos.length : 0)}
                       className="mr-2"
                     />
+                    {selectedItems.length > 0 && (
+                      <>
+                        <Tooltip title="Eliminar seleccionados">
+                          <span>
+                            <Icon
+                              icon="weui:delete-outlined"
+                              width="20"
+                              height="20"
+                              onClick={() => {
+                                setModalContent({
+                                  title: "Eliminar mantenimientos",
+                                  message: `¿Estás seguro de que deseas eliminar los ${selectedItems.length} mantenimientos seleccionados?`,
+                                });
+                                setConfirmAction(() => async () => {
+                                  await deleteMantenimientos(selectedItems);
+                                  return { success: true, message: "Mantenimientos eliminados" };
+                                });
+                                setOpenModal(true);
+                              }}
+                              className="cursor-pointer"
+                            />
+                          </span>
+                        </Tooltip>
+                      </>
+                    )}
                   </th>
                   <th scope="col" className="px-4 py-3 w-48">
                     <button type="button" onClick={() => toggleSort("periferico")} className="flex items-center gap-1">
@@ -437,7 +544,7 @@ const Mantenimiento = () => {
                     <td className="px-4 py-2 w-32">{m.serie ?? ""}</td>
                     <td className="px-4 py-2 w-32">{formatServerDate(m.fecha)}</td>
                     <td className="px-4 py-3 flex items-center gap-2 truncate text-black w-56">
-                      <Tooltip title="Mantenimientos">
+                      <Tooltip title="Detalle Mantenimiento">
                         <span>
                           <Icon
                             icon="pajamas:issue-type-maintenance"
@@ -451,6 +558,24 @@ const Mantenimiento = () => {
                           />
                         </span>
                       </Tooltip>
+                            <Tooltip title="Eliminar">
+                              <span>
+                                <Icon
+                                  icon="weui:delete-outlined"
+                                  width="22"
+                                  height="22"
+                                  className="cursor-pointer"
+                                  onClick={() =>
+                                    handleOpenModal(
+                                      String(m.id_mantenimiento),
+                                      "Eliminar mantenimiento",
+                                      `¿Estás seguro de que deseas eliminar el mantenimiento con ID ${m.id_mantenimiento}?`,
+                                      async (idStr: string) => await deleteMantenimiento(idStr)
+                                    )
+                                  }
+                                />
+                              </span>
+                            </Tooltip>
                     </td>
                   </tr>
                 ))}
@@ -597,6 +722,13 @@ const Mantenimiento = () => {
                 <Button onClick={() => { setOpenDetalle(false); setDetalleId(null); }}>Cerrar</Button>
               </DialogActions>
             </Dialog>
+            <ModalConfirmation
+              open={openModal}
+              onClose={handleCloseModal}
+              onConfirm={handleConfirm}
+              title={modalContent.title}
+              message={modalContent.message}
+            />
           </>
         )}
       </div>
