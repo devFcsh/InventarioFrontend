@@ -16,7 +16,7 @@ export interface ListaMantenimientosResponse {
 }
 
 export const useMantenimientosFiltrados = (
-  filtros: { inventario?: string; serie?: string },
+  filtros: { inventario?: string; serie?: string; fechaDesde?: string; fechaHasta?: string },
   currentPage: number,
   rowsPerPage: number,
   shouldFetch: boolean,
@@ -34,17 +34,22 @@ export const useMantenimientosFiltrados = (
       setLoading(true);
       setError(null);
       try {
+        const params: Record<string, unknown> = {
+          limit: rowsPerPage,
+          offset: (currentPage - 1) * rowsPerPage,
+          sortBy: sortBy || undefined,
+          sortDir: sortDir || undefined,
+        };
+        if (filtros) {
+          if (filtros.inventario) params.inventario = filtros.inventario;
+          if (filtros.serie) params.serie = filtros.serie;
+          if (filtros.fechaDesde) params.fechaDesde = filtros.fechaDesde;
+          if (filtros.fechaHasta) params.fechaHasta = filtros.fechaHasta;
+        }
+
         const { data } = await clienteAxios.get<ListaMantenimientosResponse>(
           "/mantenimientos/lista",
-          {
-            params: {
-              ...filtros,
-              limit: rowsPerPage,
-              offset: (currentPage - 1) * rowsPerPage,
-              sortBy: sortBy || undefined,
-              sortDir: sortDir || undefined,
-            },
-          }
+          { params }
         );
 
         setMantenimientos(data.mantenimientos || []);

@@ -25,11 +25,15 @@ const Mantenimiento = () => {
 
   const [inputSerie, setInputSerie] = useState<string>("");
   const [inputInventario, setInputInventario] = useState<string>("");
+  const [inputFechaDesde, setInputFechaDesde] = useState<string>("");
+  const [inputFechaHasta, setInputFechaHasta] = useState<string>("");
   const [totalPages, setTotalPages] = useState<number>(1);
 
   const filtros = {
-    serie: inputSerie || "",
-    inventario: inputInventario || "",
+    serie: inputSerie || undefined,
+    inventario: inputInventario || undefined,
+    fechaDesde: inputFechaDesde || undefined,
+    fechaHasta: inputFechaHasta || undefined,
   };
 
   const { mantenimientos, totalCount, loading, error } = useMantenimientosFiltrados(
@@ -371,56 +375,84 @@ const Mantenimiento = () => {
             )}
         </div>
         <div className="flex flex-wrap gap-4 my-6">
-          
+          <div className="w-full md:w-1/2 flex flex-col gap-3">
+            <div className="flex flex-col md:flex-row gap-3">
+              <Autocomplete
+                size="small"
+                freeSolo
+                options={series}
+                getOptionLabel={(option) => (typeof option === "string" ? option : option?.nombre || "")}
+                inputValue={inputSerie}
+                onInputChange={(_, newInputValue) => setInputSerie(newInputValue)}
+                onChange={(_, newValue) => {
+                  if (typeof newValue === "string") setInputSerie(newValue);
+                  else setInputSerie(newValue?.nombre || "");
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Serie" variant="outlined" />
+                )}
+                className="w-full md:w-1/2"
+              />
 
-          <Autocomplete
-            size="small"
-            freeSolo
-            options={series}
-            getOptionLabel={(option) => (typeof option === "string" ? option : option?.nombre || "")}
-            inputValue={inputSerie}
-            onInputChange={(_, newInputValue) => setInputSerie(newInputValue)}
-            onChange={(_, newValue) => {
-              if (typeof newValue === "string") setInputSerie(newValue);
-              else setInputSerie(newValue?.nombre || "");
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Serie" variant="outlined" />
-            )}
-            className="w-full md:w-1/4"
-          />
+              <TextField
+                size="small"
+                label="Inventario"
+                variant="outlined"
+                value={inputInventario}
+                onChange={(e) => setInputInventario(e.target.value)}
+                className="w-full md:w-1/2"
+              />
+            </div>
 
-          <TextField
-            size="small"
-            label="Inventario"
-            variant="outlined"
-            value={inputInventario}
-            onChange={(e) => setInputInventario(e.target.value)}
-            className="w-full md:w-1/4"
-          />
+            <div className="flex flex-col md:flex-row gap-3">
+              <TextField
+                size="small"
+                label="Fecha desde"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                value={inputFechaDesde}
+                onChange={(e) => setInputFechaDesde(e.target.value)}
+                className="w-full md:w-1/2"
+              />
 
-          <div className="flex flex-col w-full md:w-1/5 md:flex-row gap-4 md:gap-2 lg:ml-2">
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={filas}
-              onChange={handleRowsPerPageChange}
-              getOptionLabel={(option) => option.name}
-              value={filas.find((option) => option.id === rowsPerPage)}
-              renderInput={(params) => (
-                <TextField {...params} label="Filas" variant="outlined" />
-              )}
-              className="w-full md:w-1/2"
-            />
-            <button
-              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/2"
-              onClick={() => {
-                setCurrentPage(1);
-                setShouldFetch(true);
-              }}
-            >
-              Buscar
-            </button>
+              <TextField
+                size="small"
+                label="Fecha hasta"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                value={inputFechaHasta}
+                onChange={(e) => setInputFechaHasta(e.target.value)}
+                className="w-full md:w-1/2"
+              />
+            </div>
+          </div>
+
+          <div className="w-full md:w-1/3 flex items-start md:items-center">
+            <div className="w-full md:w-full">
+              <div className="flex flex-col md:flex-row gap-3 md:justify-end">
+                <Autocomplete
+                  size="small"
+                  disablePortal
+                  options={filas}
+                  onChange={handleRowsPerPageChange}
+                  getOptionLabel={(option) => option.name}
+                  value={filas.find((option) => option.id === rowsPerPage)}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Filas" variant="outlined" />
+                  )}
+                  className="w-full md:w-1/2"
+                />
+                <button
+                  className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/2"
+                  onClick={() => {
+                    setCurrentPage(1);
+                    setShouldFetch(true);
+                  }}
+                >
+                  Buscar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
