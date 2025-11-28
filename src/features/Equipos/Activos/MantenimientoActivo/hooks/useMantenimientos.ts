@@ -31,6 +31,8 @@ export const useMantenimientos = (id_equipo: string | null | undefined) => {
           fecha: m.fecha,
           hallazgos: m.hallazgos ?? null,
           recomendaciones: m.recomendaciones ?? null,
+          editor: m.editor ?? "No editado",
+          autor: m.autor ?? "",
           id_tipo_mantenimiento: m.id_tipo_mantenimiento ?? undefined,
           tipo: capitalize(m.tipo_mantenimiento ?? m.tipo ?? (m.id_tipo_mantenimiento === 1 ? 'preventivo' : m.id_tipo_mantenimiento === 2 ? 'correctivo' : undefined)),
           actividades: (m.actividades || []).map((a: any) => ({

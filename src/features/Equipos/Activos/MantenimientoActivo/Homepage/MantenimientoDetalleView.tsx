@@ -312,7 +312,10 @@ const MantenimientoDetalleView: React.FC<Props> = ({ detalleData, equipoDetalle,
           <FieldDisplay label="Fecha del Mantenimiento" value={formatServerDate(detalleData?.fecha)} />
         </Grid>
         <Grid item xs={12} md={6}>
-          <FieldDisplay label="Editar por:" value={(detalleData as DetalleData & { autor?: string })?.autor ?? ''} />
+          <FieldDisplay label="Creado por:" value={(detalleData as DetalleData & { autor?: string })?.autor ?? ''} />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <FieldDisplay label="Editado por:" value={(detalleData as DetalleData & { editor?: string })?.editor ?? 'No editado'} />
         </Grid>
       </Grid>
 

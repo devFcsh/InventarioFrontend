@@ -180,7 +180,8 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
                   size="small"
                   label="Nueva actividad"
                   value={newActividadNombre}
-                  onChange={(e) => setNewActividadNombre(e.target.value)}
+                    onChange={(e) => setNewActividadNombre(e.target.value)}
+                    inputProps={{ maxLength: 100 }}
                   sx={{ flex: 1 }}
                 />
                 <Button
@@ -192,16 +193,21 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
                       showMessage("Seleccione un tipo de mantenimiento antes de agregar una actividad", "warning");
                       return;
                     }
-                    if (!newActividadNombre || newActividadNombre.trim() === "") {
-                      showMessage("Ingrese el nombre de la actividad", "warning");
-                      return;
-                    }
+                      const nombreTrim = newActividadNombre ? newActividadNombre.trim() : "";
+                      if (!nombreTrim) {
+                        showMessage("Ingrese el nombre de la actividad", "warning");
+                        return;
+                      }
+                      if (nombreTrim.length > 100) {
+                        showMessage("La actividad no puede exceder 100 caracteres", "warning");
+                        return;
+                      }
 
-                    const payload = {
-                      nombre: newActividadNombre.trim(),
-                      tipo: tipoToSend,
-                      id_periferico: equipo?.id_periferico,
-                    };
+                      const payload = {
+                        nombre: nombreTrim,
+                        tipo: tipoToSend,
+                        id_periferico: equipo?.id_periferico,
+                      };
 
                     const res = await agregarActividad(payload as any);
                     if (res.ok) {
@@ -273,6 +279,7 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
               label="Hallazgos"
               value={hallazgos}
               onChange={(e) => setHallazgos(e.target.value)}
+              inputProps={{ maxLength: 200 }}
               fullWidth
               multiline
               minRows={2}
@@ -284,6 +291,7 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
               label="Recomendaciones"
               value={recomendaciones}
               onChange={(e) => setRecomendaciones(e.target.value)}
+              inputProps={{ maxLength: 200 }}
               fullWidth
               multiline
               minRows={2}

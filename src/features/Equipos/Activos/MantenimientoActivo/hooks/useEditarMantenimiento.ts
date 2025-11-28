@@ -19,7 +19,7 @@ const useEditarMantenimiento = () => {
         tipo: mantenimientoData.tipo,
         hallazgos: mantenimientoData.hallazgos ?? null,
         recomendaciones: mantenimientoData.recomendaciones ?? null,
-        autor: user?.email ?? null,
+        editor: user?.email ?? null,
         fecha: mantenimientoData.fecha ?? null,
         actividades: (mantenimientoData.actividades || []).map((a: unknown) => {
           const aa = a as Record<string, unknown>;

@@ -30,6 +30,8 @@ export type Mantenimiento = {
   tipo?: string;
   id_tipo_mantenimiento?: number;
   recomendaciones?: string;
+  autor?: string;
+  editor?: string;
   actividades: ActividadMantenimientoResponse[];
 };
 

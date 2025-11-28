@@ -109,6 +109,10 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
   const [localActividades, setLocalActividades] = useState<ActividadMantenimientoResponse[]>([]);
 
   const [newActividadNombre, setNewActividadNombre] = useState<string>("");
+  const [hallazgosLocal, setHallazgosLocal] = useState<string>("");
+  const [recomendacionesLocal, setRecomendacionesLocal] = useState<string>("");
+  const [autorLocal, setAutorLocal] = useState<string>("");
+  const [editorLocal, setEditorLocal] = useState<string>("");
   const { editarMantenimiento, error: editError, message: editMessage } = useEditarMantenimiento();
   const { showMessage } = useSnackbar();
   const { agregarActividad, loading: addingActividad } = useAgregarActividadMantenimiento();
@@ -157,8 +161,16 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
       } catch (e) {
         setFechaLocal("");
       }
+      setHallazgosLocal(m.hallazgos || "");
+      setRecomendacionesLocal(m.recomendaciones || "");
+      setAutorLocal(m.autor || "");
+      setEditorLocal(m.editor || "");
     } else {
       setFechaLocal("");
+      setHallazgosLocal("");
+      setRecomendacionesLocal("");
+      setAutorLocal("");
+      setEditorLocal("");
     }
   }, [index, mantenimientos, serverDateStringToInput]);
 
@@ -248,6 +260,10 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
       return;
     }
     setFechaLocal(serverDateStringToInput(m.fecha));
+    setHallazgosLocal(m.hallazgos || "");
+    setAutorLocal(m.autor || "");
+    setEditorLocal(m.editor || "");
+    setRecomendacionesLocal(m.recomendaciones || "");
     const tipoVal = (m.tipo || "").toString().toLowerCase();
     if (tipoVal === "preventivo") setTipoOptionLocal({ label: "Preventivo", value: "preventivo" });
     else if (tipoVal === "correctivo") setTipoOptionLocal({ label: "Correctivo", value: "correctivo" });
@@ -488,8 +504,18 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
           </Grid>
           <Grid item xs={6}>
             <TextField
-              label="Editar por:"
-              value={(mantenimiento as unknown as { autor?: string })?.autor ?? ""}
+              label="Creado por:"
+              value={autorLocal}
+              fullWidth
+              size="small"
+              InputProps={{ readOnly: true }}
+              disabled
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              label="Editado por:"
+              value={editorLocal}
               fullWidth
               size="small"
               InputProps={{ readOnly: true }}
@@ -525,6 +551,7 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
               label="Nueva actividad"
               value={newActividadNombre}
               onChange={(e) => setNewActividadNombre(e.target.value)}
+              inputProps={{ maxLength: 100 }}
               sx={{ flex: 1 }}
             />
             <Button
@@ -536,12 +563,17 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
                   showMessage("Seleccione el tipo de mantenimiento", "warning");
                   return;
                 }
-                if (!newActividadNombre || newActividadNombre.trim() === "") {
+                const nombreTrim = newActividadNombre ? newActividadNombre.trim() : "";
+                if (!nombreTrim) {
                   showMessage("Ingrese el nombre de la actividad", "warning");
                   return;
                 }
+                if (nombreTrim.length > 100) {
+                  showMessage("La actividad no puede exceder 100 caracteres", "warning");
+                  return;
+                }
 
-                const payload = { nombre: newActividadNombre.trim(), tipo: tipoToSend, id_periferico: Number(equipo?.id_periferico) };
+                const payload = { nombre: nombreTrim, tipo: tipoToSend, id_periferico: Number(equipo?.id_periferico) };
                 const res = await agregarActividad(payload);
                 if (res.ok) {
                   showMessage(res.message || "Actividad agregada", "success");
@@ -613,11 +645,12 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
           Hallazgos
         </Typography>
         <TextField
-          value={mantenimiento?.hallazgos || ""}
+          value={hallazgosLocal}
+          onChange={(e) => setHallazgosLocal(e.target.value)}
           fullWidth
           multiline
           minRows={2}
-          InputProps={{ readOnly: true }}
+          inputProps={{ maxLength: 200 }}
           sx={{ mb: 2 }}
         />
 
@@ -625,11 +658,12 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
           Recomendaciones
         </Typography>
         <TextField
-          value={mantenimiento?.recomendaciones || ""}
+          value={recomendacionesLocal}
+          onChange={(e) => setRecomendacionesLocal(e.target.value)}
           fullWidth
           multiline
           minRows={2}
-          InputProps={{ readOnly: true }}
+          inputProps={{ maxLength: 200 }}
           sx={{ mb: 2 }}
         />
 
@@ -686,8 +720,8 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
 
             const payload = {
               tipo: (mantenimiento.tipo || "").toString().toLowerCase(),
-              hallazgos: mantenimiento.hallazgos || undefined,
-              recomendaciones: mantenimiento.recomendaciones || undefined,
+              hallazgos: hallazgosLocal || undefined,
+              recomendaciones: recomendacionesLocal || undefined,
               fecha: fechaLocal ? fechaLocal.replace("T", " ") + ":00" : undefined,
               actividades: actividadesPayload,
             };
