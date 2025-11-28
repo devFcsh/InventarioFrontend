@@ -2,11 +2,13 @@
 import clienteAxios from "@hooks/index";
 import { MantenimientoData } from "../../../../../types/Activo/Mantenimiento";
 import { useState } from "react";
+import { useUser } from "@context/userContext";
 
 export const useAgregarMantenimiento = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const { user } = useUser();
 
   const agregarMantenimiento = async (mantenimientoData: MantenimientoData): Promise<{ ok: boolean; message?: string | null; error?: string | null }> => {
     setLoading(true);
@@ -20,6 +22,7 @@ export const useAgregarMantenimiento = () => {
         fecha: mantenimientoData.fecha ?? null,
         hallazgos: mantenimientoData.hallazgos ?? null,
         recomendaciones: mantenimientoData.recomendaciones ?? null,
+        autor: user?.email ?? null,
         actividades: (mantenimientoData.actividades || []).map((a) => {
           if (a.id_actividad_periferico_tipo) {
             return {

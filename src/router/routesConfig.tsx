@@ -24,6 +24,7 @@ import EditarUsuarioSistema from "../features/Administrador/Usuarios Sistema/Edi
 import AgregarUsuarioSistema from "../features/Administrador/Usuarios Sistema/AgregarUsuario/Homepage/AgregarUsuarioSistema";
 import VisualizarActivo from "@pages/VisualizarActivo";
 import VisualizarBodega from "@pages/VisualizarBodega";
+import Mantenimiento from "../features/Equipos/Activos/MantenimientoActivo/Homepage/Mantenimiento";
 
 export const routesConfig: RouteConfig[] = [
   {
@@ -34,6 +35,11 @@ export const routesConfig: RouteConfig[] = [
   {
     path: "/bajas",
     element: <Bajas />,
+    allowedRoles: ["administrador", "editor"],
+  },
+  {
+    path: "/mantenimientos",
+    element: <Mantenimiento />,
     allowedRoles: ["administrador", "editor"],
   },
   {

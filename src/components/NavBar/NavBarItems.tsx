@@ -12,6 +12,7 @@ const AdminSections = [
     { name: 'Activos', route: 'activos' },
     { name: 'Bodega', route: 'bodega' },
     { name: 'Bajas', route: 'bajas' },
+    { name: 'Mantenimientos', route: 'mantenimientos' },
   ]},
   { name: 'Admin', icon: <AdminPanelSettingsIcon />, subtypes: [
     { name: 'Usuarios Responsables', route: 'usuarios' },
@@ -25,6 +26,7 @@ const EditorSections = [
     { name: 'Activos', route: 'activos' },
     { name: 'Bodega', route: 'bodega' },
     { name: 'Bajas', route: 'bajas' },
+    { name: 'Mantenimientos', route: 'mantenimientos' },
   ]},
   { name: 'Editor', icon: <AdminPanelSettingsIcon />, subtypes: [
     { name: 'Usuarios Responsables', route: 'usuarios' },
