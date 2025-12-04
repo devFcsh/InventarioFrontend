@@ -6,7 +6,6 @@ import useDiscos from "@hooks/useDiscos";
 import useMarcas from "@hooks/useMarcas";
 import useModelos from "@hooks/useModelos";
 import usePerifericos from "@hooks/usePerifericos";
-import useSeries from "@hooks/useSeries";
 import useEdificios from "@hooks/useEdificios";
 import useSistemasOperativos from "@hooks/useSistemasOperativos";
 import useRam from "@hooks/useRam";
@@ -21,7 +20,6 @@ import {
   Marca,
   Modelo,
   Periferico,
-  Serie,
   Edificio,
   SistemaOperativo,
   VersionOffice,
@@ -38,7 +36,6 @@ import { useEditarUso } from "../../AgregarCategoria/hooks/useEditarUso";
 import { useEditarDisco } from "../../AgregarCategoria/hooks/useEditarDisco";
 import { useEditarMarca } from "../../AgregarCategoria/hooks/useEditarMarca";
 import { useEditarModelo } from "../../AgregarCategoria/hooks/useEditarModelo";
-import { useEditarSerie } from "../../AgregarCategoria/hooks/useEditarSerie";
 import { useEditarSistemaOperativo } from "../../AgregarCategoria/hooks/useEditarSistemaOperativo";
 import { useEditarEdificio } from "../../AgregarCategoria/hooks/useEditarEdificio";
 import { useEditarUbicacion } from "../../AgregarCategoria/hooks/useEditarUbicacion";
@@ -50,7 +47,6 @@ import { useEliminarPeriferico } from "../../AgregarCategoria/hooks/useEliminarP
 import { useEliminarUso } from "../../AgregarCategoria/hooks/useEliminarUso";
 import { useEliminarDisco } from "../../AgregarCategoria/hooks/useEliminarDisco";
 import { useEliminarMarca } from "../../AgregarCategoria/hooks/useEliminarMarca";
-import { useEliminarSerie } from "../../AgregarCategoria/hooks/useEliminarSerie";
 import { useEliminarSistemaOperativo } from "../../AgregarCategoria/hooks/useEliminarSistemaOperativo";
 import { useEliminarEdificio } from "../../AgregarCategoria/hooks/useEliminarEdificio";
 import { useEliminarUbicacion } from "../../AgregarCategoria/hooks/useEliminarUbicacion";
@@ -71,7 +67,6 @@ type Opcion =
   | Marca
   | Modelo
   | Periferico
-  | Serie
   | Lampara
   | Dominio
   | Edificio
@@ -105,8 +100,6 @@ const isMarca = (obj: Opcion | null): obj is Marca =>
   obj !== null && "id_marca" in obj;
 const isModelo = (obj: Opcion | null): obj is Modelo =>
   obj !== null && "id_modelo" in obj;
-const isSerie = (obj: Opcion | null): obj is Serie =>
-  obj !== null && "id_serie" in obj;
 const isLampara = (obj: Opcion | null): obj is Lampara =>
   obj !== null && "id_lampara" in obj;
 const isSistemaOperativo = (obj: Opcion | null): obj is SistemaOperativo =>
@@ -133,7 +126,6 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const { marcas } = useMarcas();
   const { modelos } = useModelos();
   const { perifericos } = usePerifericos();
-  const { series } = useSeries();
   const { lamparasTotales } = useLamparas();
   const { edificios } = useEdificios();
   const { sistemasOperativos } = useSistemasOperativos();
@@ -150,7 +142,6 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const { editarDisco } = useEditarDisco();
   const { editarMarca } = useEditarMarca();
   const { editarModelo } = useEditarModelo();
-  const { editarSerie } = useEditarSerie();
   const { editarLampara } = useEditarLampara();
   const { editarSistemaOperativo } = useEditarSistemaOperativo();
   const { editarEdificio } = useEditarEdificio();
@@ -166,7 +157,6 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const { eliminarDisco } = useEliminarDisco();
   const { eliminarMarca } = useEliminarMarca();
   const { eliminarModelo } = useEliminarModelo();
-  const { eliminarSerie } = useEliminarSerie();
   const { eliminarLampara } = useEliminarLampara();
   const { eliminarSistemaOperativo } = useEliminarSistemaOperativo();
   const { eliminarEdificio } = useEliminarEdificio();
@@ -190,8 +180,6 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
       ? marcas
       : selectedCategoria === "Modelo"
       ? modelos
-      : selectedCategoria === "Serie"
-      ? series
       : selectedCategoria === "Lampara"
       ? lamparasTotales
       : selectedCategoria === "Periférico"
@@ -284,14 +272,6 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
             if (isModelo(selectedOption)) {
               editarModelo({
                 id_modelo: Number(selectedOption.id_modelo),
-                nuevoNombre: editedValue,
-              });
-            }
-            break;
-          case "Serie":
-            if (isSerie(selectedOption)) {
-              editarSerie({
-                id_serie: Number(selectedOption.id_serie),
                 nuevoNombre: editedValue,
               });
             }
@@ -402,11 +382,6 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
           case "Modelo":
             if (isModelo(elemento)) {
               await eliminarModelo(Number(elemento.id_modelo));
-            }
-            break;
-          case "Serie":
-            if (isSerie(elemento)) {
-              await eliminarSerie(Number(elemento.id_serie));
             }
             break;
           case "Sistema Operativo":
@@ -591,7 +566,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
                 value={editedValue}
                 onChange={(e) => {
               const value = e.target.value;
-              if (value !== null && value.length > 10) {
+              if (value !== null && value.length > 30) {
                 return;
               }
               setEditedValue(e.target.value);

@@ -340,8 +340,13 @@ const Bodega = () => {
     _event: React.SyntheticEvent<Element, Event>,
     newValue: { id: number; name: string } | null
   ) => {
-    const rows = parseInt(newValue?.name || "10", 10);
-    setRowsPerPage(rows);
+    if (!newValue) return;
+    if (newValue.id === 0) {
+      setRowsPerPage(0);
+    } else {
+      const rows = parseInt(newValue?.name || "10", 10) || 10;
+      setRowsPerPage(rows);
+    }
     setCurrentPage(1);
   };
 

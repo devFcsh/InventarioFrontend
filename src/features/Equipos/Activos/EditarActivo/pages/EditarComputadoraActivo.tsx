@@ -172,9 +172,9 @@ const EditarComputadoraActivo = ({
       mouse: 1,
       teclado: 1,
       monitor: 2,
-      camara: 2, // acepta "cámara" o "camara"
+      camara: 2,
       "pantalla interactiva": 1,
-      microfono: 1, // acepta "micrófono" o "microfono"
+      microfono: 4,
       televisor: 1,
       "barra polycom": 1,
     };

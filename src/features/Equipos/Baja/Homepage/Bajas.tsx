@@ -291,8 +291,13 @@ const Bajas = () => {
     _event: React.SyntheticEvent<Element, Event>,
     newValue: { id: number; name: string } | null
   ) => {
-    const rows = parseInt(newValue?.name || "10", 10);
-    setRowsPerPage(rows);
+    if (!newValue) return;
+    if (newValue.id === 0) {
+      setRowsPerPage(0);
+    } else {
+      const rows = parseInt(newValue?.name || "10", 10) || 10;
+      setRowsPerPage(rows);
+    }
     setCurrentPage(1);
   };
 
@@ -347,7 +352,7 @@ const Bajas = () => {
             steps={[]}
           />
         </div>
-        <div className="flex flex-wrap gap-4 my-10">
+        <div className="grid gap-4 my-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           <Autocomplete
             size="small"
             freeSolo
@@ -369,7 +374,7 @@ const Bajas = () => {
             renderInput={(params) => (
               <TextField {...params} label="Periférico" variant="outlined" />
             )}
-            className="w-full md:w-cmbox"
+            className="w-full"
           />
 
           <Autocomplete
@@ -391,7 +396,7 @@ const Bajas = () => {
             renderInput={(params) => (
               <TextField {...params} label="Marca" variant="outlined" />
             )}
-            className="w-full md:w-cmbox"
+            className="w-full"
           />
 
           <Autocomplete
@@ -413,7 +418,7 @@ const Bajas = () => {
             renderInput={(params) => (
               <TextField {...params} label="Modelo" variant="outlined" />
             )}
-            className="w-full md:w-cmbox"
+            className="w-full"
           />
 
           <Autocomplete
@@ -435,7 +440,7 @@ const Bajas = () => {
             renderInput={(params) => (
               <TextField {...params} label="Serie" variant="outlined" />
             )}
-            className="w-full md:w-cmbox"
+            className="w-full"
           />
 
           <Autocomplete
@@ -459,10 +464,10 @@ const Bajas = () => {
             renderInput={(params) => (
               <TextField {...params} label="Inventario" variant="outlined" />
             )}
-            className="w-full md:w-cmbox"
+            className="w-full"
           />
 
-          <div className="flex flex-col w-full md:w-1/5 md:flex-row gap-4 md:gap-2 lg:ml-2">
+          <div className="flex items-end gap-2">
             <Autocomplete
               size="small"
               disablePortal
@@ -473,10 +478,10 @@ const Bajas = () => {
                 <TextField {...params} label="Filas" variant="outlined" />
               )}
               value={filas.find((option) => option.id === rowsPerPage)}
-              className="w-full md:w-1/2"
+              className="w-1/2"
             />
             <button
-              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/2"
+              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-1/2"
               onClick={handleBuscar}
             >
               Buscar

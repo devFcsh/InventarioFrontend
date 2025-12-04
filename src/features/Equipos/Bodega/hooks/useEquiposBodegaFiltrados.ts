@@ -20,24 +20,26 @@ export const useEquiposBodegaFiltrados = (
 
   useEffect(() => {
     const fetchEquiposBodega = async () => {
-      if (!shouldFetch) return; 
+      if (!shouldFetch) return;
       setLoading(true);
       setError(null);
 
       try {
-        const { data } = await clienteAxios.get('/equipos/bodega/', {
-          params: {
-            ...filtros,
-            limit: rowsPerPage,
-            offset: (currentPage - 1) * rowsPerPage,
-            sortBy: sortBy || undefined,
-            sortDir: sortDir || undefined,
-          },
-        });
-        setEquiposBodega(data.equipos);
-        setTotalCount(data.total); 
+        const noLimit = rowsPerPage === 0;
+        const params: Record<string, unknown> = {
+          ...filtros,
+          limit: noLimit ? "all" : rowsPerPage,
+          ...(noLimit ? {} : { offset: (currentPage - 1) * rowsPerPage }),
+          sortBy: sortBy || undefined,
+          sortDir: sortDir || undefined,
+        };
+
+        const { data } = await clienteAxios.get("/equipos/bodega/", { params });
+
+        setEquiposBodega(data.equipos ?? data.items ?? []);
+        setTotalCount(data.total ?? data.count ?? 0);
       } catch (err) {
-        setError("Error al cargar los equipos "+err);
+        setError("Error al cargar los equipos " + String(err));
       } finally {
         setLoading(false);
       }
