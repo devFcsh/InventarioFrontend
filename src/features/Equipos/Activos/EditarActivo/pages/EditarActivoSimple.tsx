@@ -452,42 +452,62 @@ const EditarActivoSimple = ({
               />
             )}
           />
-          <TextField
-            label="Inventario"
-            placeholder="Inventario"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={selectedInventarioInv}
-            error={
-              !!errorInventario ||
-              (existeInventario && selectedInventarioInv !== inventarioOriginal)
-            }
-            helperText={
-              errorInventario
-                ? "Por favor escribir un inventario válido"
-                : existeInventario && selectedInventarioInv !== inventarioOriginal
-                ? "El inventario ya existe"
-                : ""
-            }
-            onChange={async (e) => {
-              const value = e.target.value;
-              if (empresa === "Espol" && value !== null && value.length > 8) {
-                return;
-              } else if (
-                empresa === "EspolTech" &&
-                value !== null &&
-                value.length > 25
-              ) {
-                return;
+          <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+            <TextField
+              label="Inventario"
+              placeholder="Inventario"
+              variant="outlined"
+              fullWidth
+              size="small"
+              value={selectedInventarioInv}
+              error={
+                !!errorInventario ||
+                (selectedInventarioInv !== "S/N" && existeInventario && selectedInventarioInv !== inventarioOriginal)
               }
-              handleChangeInventario(value);
-              if (value && value !== inventarioOriginal) {
-                await consultarInventario(value);
+              helperText={
+                errorInventario && selectedInventarioInv !== "S/N"
+                  ? "Por favor escribir un inventario válido"
+                  : selectedInventarioInv !== "S/N" && existeInventario && selectedInventarioInv !== inventarioOriginal
+                  ? "El inventario ya existe"
+                  : ""
               }
-            }}
-            disabled={empresa === ""}
-          />
+              onChange={async (e) => {
+                const value = e.target.value;
+                if (empresa === "Espol" && value !== null && value.length > 8) {
+                  return;
+                } else if (
+                  empresa === "EspolTech" &&
+                  value !== null &&
+                  value.length > 25
+                ) {
+                  return;
+                }
+                handleChangeInventario(value);
+                if (value && value !== "S/N" && value !== inventarioOriginal) {
+                  await consultarInventario(value);
+                }
+              }}
+              disabled={empresa === "" || selectedInventarioInv === "S/N"}
+            />
+            <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
+              <input
+                type="checkbox"
+                id="sin-inventario-editar-simple"
+                checked={selectedInventarioInv === "S/N"}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedInventarioInv("S/N");
+                    setErrorInventario(false);
+                  } else {
+                    setSelectedInventarioInv("");
+                    setErrorInventario(true);
+                  }
+                }}
+                disabled={empresa === ""}
+              />
+              <label htmlFor="sin-inventario-editar-simple">Sin inventario</label>
+            </Box>
+          </Box>
           <TextField
             label="Año de Compra"
             placeholder="Año de Compra"
@@ -683,7 +703,7 @@ const EditarActivoSimple = ({
           onClick={handleConfirmEditarEquipo}
           fullWidth
           disabled={
-            (existeInventario && selectedInventarioInv !== inventarioOriginal) ||
+            (existeInventario && selectedInventarioInv !== inventarioOriginal && selectedInventarioInv !== "S/N") ||
             (existeSerie && serieNombre !== serieOriginal)
           }
         >

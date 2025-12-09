@@ -100,7 +100,6 @@ const Bodega = () => {
       setSortBy(column);
       setSortDir("asc");
     }
-    // when changing sort, go back to page 1 and request fresh data from backend
     setCurrentPage(1);
     setShouldFetch(true);
   };

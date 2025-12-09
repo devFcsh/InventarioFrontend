@@ -103,15 +103,15 @@ export const useInventoryErrors = (tipoInventario: string,periferico:string | un
       [tipo]: value === null || value === ""? true : false,
     }));
     if (tipo === "inventario") {
-      if (!validateInventario(value,formData.empresa)) {
+      if (value === "S/N" || validateInventario(value,formData.empresa)) {
         setInventoryErrors((prevErrors) => ({
           ...prevErrors,
-          ["inventario"]: true
+          ["inventario"]: false
         }));
       } else {
         setInventoryErrors((prevErrors) => ({
           ...prevErrors,
-          ["inventario"]: false
+          ["inventario"]: true
         }));
       }
     } 

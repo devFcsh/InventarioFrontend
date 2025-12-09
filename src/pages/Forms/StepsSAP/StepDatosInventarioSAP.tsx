@@ -171,51 +171,71 @@ export const StepDatosInventarioSAP = ({
                 />
               )}
             />
-            <TextField
-              label="Inventario"
-              placeholder="Inventario"
-              variant="outlined"
-              fullWidth
-              size="small"
-              value={inventoryDataSAPForm.inventario}
-              error={
-                !!inventorySAPErrors.inventario ||
-                (!!inventoryDataSAPForm.inventario && existeInventario)
-              }
-              helperText={
-                inventorySAPErrors.inventario
-                  ? "Por favor escribir un inventario válido"
-                  : existeInventario
-                  ? "El inventario ya existe"
-                  : ""
-              }
-              onChange={async (e) => {
-                const value = e.target.value;
-                if (
-                  inventoryDataSAPForm.empresa === "Espol" &&
-                  value !== null &&
-                  value.length > 8
-                ) {
-                  return;
-                } else if (
-                  inventoryDataSAPForm.empresa === "EspolTech" &&
-                  value !== null &&
-                  value.length > 25
-                ) {
-                  return;
+            <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+              <TextField
+                label="Inventario"
+                placeholder="Inventario"
+                variant="outlined"
+                fullWidth
+                size="small"
+                value={inventoryDataSAPForm.inventario}
+                error={
+                  !!inventorySAPErrors.inventario ||
+                  (inventoryDataSAPForm.inventario !== "S/N" && !!inventoryDataSAPForm.inventario && existeInventario)
                 }
-                handleInventorySAPChange("inventario", value);
-                handleUniqueInventarioSAPError(
-                  "inventario",
-                  value,
-                  inventoryDataSAPForm
-                );
-                if (value) {
-                  await consultarInventario(value);
+                helperText={
+                  inventorySAPErrors.inventario && inventoryDataSAPForm.inventario !== "S/N"
+                    ? "Por favor escribir un inventario válido"
+                    : inventoryDataSAPForm.inventario !== "S/N" && existeInventario
+                    ? "El inventario ya existe"
+                    : ""
                 }
-              }}
-              disabled={inventoryDataSAPForm.empresa === ""}
-            />
+                onChange={async (e) => {
+                  const value = e.target.value;
+                  if (
+                    inventoryDataSAPForm.empresa === "Espol" &&
+                    value !== null &&
+                    value.length > 8
+                  ) {
+                    return;
+                  } else if (
+                    inventoryDataSAPForm.empresa === "EspolTech" &&
+                    value !== null &&
+                    value.length > 25
+                  ) {
+                    return;
+                  }
+                  handleInventorySAPChange("inventario", value);
+                  handleUniqueInventarioSAPError(
+                    "inventario",
+                    value,
+                    inventoryDataSAPForm
+                  );
+                  if (value && value !== "S/N") {
+                    await consultarInventario(value);
+                  }
+                }}
+                disabled={inventoryDataSAPForm.empresa === "" || inventoryDataSAPForm.inventario === "S/N"}
+              />
+              <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
+                <input
+                  type="checkbox"
+                  id="sin-inventario-sap"
+                  checked={inventoryDataSAPForm.inventario === "S/N"}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      handleInventorySAPChange("inventario", "S/N");
+                      handleUniqueInventarioSAPError("inventario", "S/N", inventoryDataSAPForm);
+                    } else {
+                      handleInventorySAPChange("inventario", "");
+                      handleUniqueInventarioSAPError("inventario", "", inventoryDataSAPForm);
+                    }
+                  }}
+                  disabled={inventoryDataSAPForm.empresa === ""}
+                />
+                <label htmlFor="sin-inventario-sap">Sin inventario</label>
+              </Box>
+            </Box>
           </Box>
           <TextField
             label="Año de Compra"

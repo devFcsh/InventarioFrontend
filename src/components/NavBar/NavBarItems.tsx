@@ -3,6 +3,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { List, ListItem, ListItemIcon, ListItemText, Collapse } from '@mui/material';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import ComputerIcon from '@mui/icons-material/Computer';
+import ConstructionIcon from '@mui/icons-material/Construction';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { NavBarItemsProps } from "../PropsInterface";
@@ -12,6 +13,8 @@ const AdminSections = [
     { name: 'Activos', route: 'activos' },
     { name: 'Bodega', route: 'bodega' },
     { name: 'Bajas', route: 'bajas' },
+  ]},
+  { name: 'Mantenimientos', icon: <ConstructionIcon />, subtypes: [
     { name: 'Mantenimientos', route: 'mantenimientos' },
   ]},
   { name: 'Admin', icon: <AdminPanelSettingsIcon />, subtypes: [
@@ -26,11 +29,13 @@ const EditorSections = [
     { name: 'Activos', route: 'activos' },
     { name: 'Bodega', route: 'bodega' },
     { name: 'Bajas', route: 'bajas' },
+  ]},
+  { name: 'Mantenimientos', icon: <ConstructionIcon />, subtypes: [
     { name: 'Mantenimientos', route: 'mantenimientos' },
   ]},
   { name: 'Editor', icon: <AdminPanelSettingsIcon />, subtypes: [
     { name: 'Usuarios Responsables', route: 'usuarios' },
-    { name: 'Categorías', route: 'categorias' },    
+    { name: 'Categorías', route: 'categorias' },   
   ]},
 ];
 

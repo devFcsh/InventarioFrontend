@@ -424,7 +424,7 @@ export const FormLC = () => {
                   !!inventoryErrors.serie ||
                   !!inventoryErrors.inventario ||
                   (!!inventoryDataForm.serie && existeSerie) ||
-                  (!!inventoryDataForm.inventario && existeInventario)
+                  (!!inventoryDataForm.inventario && inventoryDataForm.inventario !== "S/N" && existeInventario)
                 )
               }
             >

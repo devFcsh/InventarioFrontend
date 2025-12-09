@@ -262,6 +262,12 @@ const MantenimientoDetalleView: React.FC<Props> = ({ detalleData, equipoDetalle,
         </Typography>
       </Box>
 
+      <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Grid item xs={12} md={6}>
+          <FieldDisplay label="Fecha del Mantenimiento" value={formatServerDate(detalleData?.fecha)} />
+        </Grid>
+      </Grid>
+
       <Typography className="section-title" variant="subtitle1" fontWeight="bold" gutterBottom>
         Datos generales
       </Typography>
@@ -303,13 +309,7 @@ const MantenimientoDetalleView: React.FC<Props> = ({ detalleData, equipoDetalle,
           <FieldDisplay label="Versión de Office" value={selectedVersionOffice?.nombre ?? detalleData?.equipo?.id_versionoffice ?? ''} />
         </Grid>
         <Grid item xs={12} md={6}>
-          <FieldDisplay
-            label="Versión Antivirus/Activado"
-            value={(antivirus.find((a) => Number(a.id_antivirus) === Number(equipoDetalle?.id_antivirus ?? detalleData?.equipo?.id_antivirus))?.nombre) ?? String(equipoDetalle?.id_antivirus ?? detalleData?.equipo?.id_antivirus ?? '')}
-          />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <FieldDisplay label="Fecha del Mantenimiento" value={formatServerDate(detalleData?.fecha)} />
+          <FieldDisplay label="Versión Antivirus/Activado" value={(antivirus.find((a) => Number(a.id_antivirus) === Number(equipoDetalle?.id_antivirus ?? detalleData?.equipo?.id_antivirus))?.nombre) ?? String(equipoDetalle?.id_antivirus ?? detalleData?.equipo?.id_antivirus ?? '')} />
         </Grid>
         <Grid item xs={12} md={6}>
           <FieldDisplay label="Creado por:" value={(detalleData as DetalleData & { autor?: string })?.autor ?? ''} />
@@ -325,7 +325,7 @@ const MantenimientoDetalleView: React.FC<Props> = ({ detalleData, equipoDetalle,
         Actividades
       </Typography>
       <Grid container spacing={1} sx={{ mb: 2 }}>
-        {actividades.map((a, i) => (
+        {actividades.filter((a) => !!a.realizada).map((a, i) => (
           <Grid item xs={12} sm={6} md={4} key={i}>
             <FormControlLabel
               control={<Checkbox size="small" checked={!!a.realizada} disabled />}

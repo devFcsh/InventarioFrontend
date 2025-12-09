@@ -161,13 +161,24 @@ export const AgregarMantenimiento: React.FC<AgregarMantenimientoProps> = ({
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
-              label="Fecha"
+              label="Fecha del Mantenimiento"
               type="datetime-local"
               size="small"
               fullWidth
               value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
+              onChange={(e) => {
+                const selectedDate = new Date(e.target.value);
+                const now = new Date();
+                if (selectedDate <= now) {
+                  setFecha(e.target.value);
+                } else {
+                  showMessage("No puede seleccionar una fecha futura", "warning");
+                }
+              }}
               InputLabelProps={{ shrink: true }}
+              inputProps={{
+                max: new Date().toISOString().slice(0, 16)
+              }}
             />
           </Grid>
           <Grid item xs={12}>
