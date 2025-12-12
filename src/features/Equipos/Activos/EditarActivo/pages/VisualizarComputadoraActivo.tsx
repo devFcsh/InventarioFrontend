@@ -45,8 +45,6 @@ const VisualizarComputadoraActivo = ({
   equipo,
   componentes,
   onOpenMantenimientos,
-  equipoId,
-  equipoName,
 }: VisualizarComputadoraActivoProps) => {
   const { rol } = useUser();
   const unableAction = rol !== "administrador" && rol !== "editor";

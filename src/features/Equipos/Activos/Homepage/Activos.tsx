@@ -1067,7 +1067,7 @@ const Activos = () => {
             getOptionLabel={(option) =>
               typeof option === "string"
                 ? option
-                : option?.nombre || option?.email || String(option?.id_usuario || "")
+                : (option as any)?.nombre || (option as any)?.email || String((option as any)?.id_usuario || "")
             }
             value={selectedUsuarioFilter}
             onChange={(_, newValue) => setSelectedUsuarioFilter(newValue as Record<string, unknown> | null)}
