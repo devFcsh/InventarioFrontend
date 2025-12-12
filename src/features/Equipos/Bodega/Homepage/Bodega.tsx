@@ -28,11 +28,21 @@ import { useUser } from "@context/userContext";
 import Loader from "@pages/Loader";
 
 const Bodega = () => {
-  const [inputPeriferico, setInputPeriferico] = useState("");
-  const [inputMarca, setInputMarca] = useState("");
-  const [inputModelo, setInputModelo] = useState("");
-  const [inputSerie, setInputSerie] = useState("");
-  const [inputInventario, setInputInventario] = useState("");
+  const [inputPeriferico, setInputPeriferico] = useState(() => {
+    return sessionStorage.getItem("bodega_filter_periferico") || "";
+  });
+  const [inputMarca, setInputMarca] = useState(() => {
+    return sessionStorage.getItem("bodega_filter_marca") || "";
+  });
+  const [inputModelo, setInputModelo] = useState(() => {
+    return sessionStorage.getItem("bodega_filter_modelo") || "";
+  });
+  const [inputSerie, setInputSerie] = useState(() => {
+    return sessionStorage.getItem("bodega_filter_serie") || "";
+  });
+  const [inputInventario, setInputInventario] = useState(() => {
+    return sessionStorage.getItem("bodega_filter_inventario") || "";
+  });
   const [openModalBodega, setOpenModalBodega] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
@@ -100,7 +110,6 @@ const Bodega = () => {
       setSortBy(column);
       setSortDir("asc");
     }
-    // when changing sort, go back to page 1 and request fresh data from backend
     setCurrentPage(1);
     setShouldFetch(true);
   };
@@ -118,6 +127,26 @@ const Bodega = () => {
       setShouldFetch(false);
     }
   }, [shouldFetch]);
+
+  useEffect(() => {
+    sessionStorage.setItem("bodega_filter_periferico", inputPeriferico);
+  }, [inputPeriferico]);
+
+  useEffect(() => {
+    sessionStorage.setItem("bodega_filter_marca", inputMarca);
+  }, [inputMarca]);
+
+  useEffect(() => {
+    sessionStorage.setItem("bodega_filter_modelo", inputModelo);
+  }, [inputModelo]);
+
+  useEffect(() => {
+    sessionStorage.setItem("bodega_filter_serie", inputSerie);
+  }, [inputSerie]);
+
+  useEffect(() => {
+    sessionStorage.setItem("bodega_filter_inventario", inputInventario);
+  }, [inputInventario]);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -340,8 +369,13 @@ const Bodega = () => {
     _event: React.SyntheticEvent<Element, Event>,
     newValue: { id: number; name: string } | null
   ) => {
-    const rows = parseInt(newValue?.name || "10", 10);
-    setRowsPerPage(rows);
+    if (!newValue) return;
+    if (newValue.id === 0) {
+      setRowsPerPage(0);
+    } else {
+      const rows = parseInt(newValue?.name || "10", 10) || 10;
+      setRowsPerPage(rows);
+    }
     setCurrentPage(1);
   };
 

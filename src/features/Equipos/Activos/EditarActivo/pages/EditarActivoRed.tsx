@@ -437,13 +437,14 @@ const EditarActivoRed = ({
               !!errorInventario ||
               (
                 existeInventario &&
-                selectedInventarioInv !== equipoRedActivo.inventario
+                selectedInventarioInv !== equipoRedActivo.inventario &&
+                selectedInventarioInv !== "S/N"
               )
             }
             helperText={
-              errorInventario
+              errorInventario && selectedInventarioInv !== "S/N"
                 ? "Por favor escribir un inventario válido"
-                : existeInventario && selectedInventarioInv !== equipoRedActivo.inventario
+                : existeInventario && selectedInventarioInv !== equipoRedActivo.inventario && selectedInventarioInv !== "S/N"
                 ? "El inventario ya existe"
                 : ""
             }
@@ -459,12 +460,33 @@ const EditarActivoRed = ({
                 return;
               }
               handleChangeInventario(value);
-              if (value && value !== equipoRedActivo.inventario) {
+              if (value && value !== equipoRedActivo.inventario && value !== "S/N") {
                 await consultarInventario(value);
               }
             }}
-            disabled={empresa === ""}
+            disabled={empresa === "" || selectedInventarioInv === "S/N"}
           />
+          <Box sx={{ display: "flex", alignItems: "center", mt: 0.5, gridColumn: "span 2" }}>
+            <input
+              type="checkbox"
+              id="sin-inventario-editar"
+              checked={selectedInventarioInv === "S/N"}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setSelectedInventarioInv("S/N");
+                  setErrorInventario(false);
+                } else {
+                  setSelectedInventarioInv("");
+                  setErrorInventario(true);
+                }
+              }}
+              disabled={empresa === ""}
+              style={{ marginRight: 4 }}
+            />
+            <label htmlFor="sin-inventario-editar" style={{ fontSize: "0.875rem", cursor: "pointer" }}>
+              Sin inventario
+            </label>
+          </Box>
           <TextField
             label="Año de Compra"
             placeholder="Año de Compra"
@@ -681,7 +703,7 @@ const EditarActivoRed = ({
           onClick={handleConfirmEditarEquipo}
           fullWidth
           disabled={
-            (existeInventario && selectedInventarioInv !== equipoRedActivo.inventario) ||
+            (existeInventario && selectedInventarioInv !== equipoRedActivo.inventario && selectedInventarioInv !== "S/N") ||
             (existeSerie && selectedInventarioSerie !== serieOriginal)
           }
         >

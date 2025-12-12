@@ -6,13 +6,17 @@ export const useEditarModelo = () => {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const editarModelo = async (modeloData: { id_modelo: number, nuevoNombre: string }): Promise<number | undefined> => {
+  const editarModelo = async (modeloData: { 
+    id_modelo: number, 
+    nuevoNombre?: string,
+    marcasIds?: number[]
+  }): Promise<number | undefined> => {
     setLoading(true);
     setError(null);
 
     try {
       const { data } = await clienteAxios.put("/modelos/", modeloData);
-      setMessage(data.mensaje);  
+      setMessage(data.message);  
       return data.id_modelo; 
     } catch (err) {
       setError("Error al editar el modelo: " + err); 

@@ -336,19 +336,45 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
       </DialogTitle>
   <DialogContent>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Box display="flex" alignItems="center">
-            <IconButton onClick={handlePrev}>
-              <Icon icon="ic:round-chevron-left" width={32} />
-            </IconButton>
-            <Typography sx={{ mx: 2 }}>
-              {mantenimientos.length > 0 ? `${index + 1} / ${mantenimientos.length}` : ""}
-            </Typography>
-            <IconButton onClick={handleNext}>
-              <Icon icon="ic:round-chevron-right" width={32} />
-            </IconButton>
-          </Box>
+          <Box></Box>
 
-          <Box>
+          <Box display="flex" alignItems="center" gap={2}>
+            <Box display="flex" alignItems="center" gap={1}>
+              <IconButton 
+                onClick={handlePrev}
+                sx={{ 
+                  bgcolor: 'primary.main',
+                  color: 'white',
+                  '&:hover': { bgcolor: 'primary.dark' },
+                  width: 30,
+                  height: 30
+                }}
+              >
+                <Icon icon="ic:round-chevron-left" width={30} />
+              </IconButton>
+              <Typography sx={{ 
+                mx: 1,
+                fontSize: '0.95rem',
+                fontWeight: 'bold',
+                minWidth: '20px',
+                textAlign: 'center'
+              }}>
+                {mantenimientos.length > 0 ? `${index + 1} / ${mantenimientos.length}` : ""}
+              </Typography>
+              <IconButton 
+                onClick={handleNext}
+                sx={{ 
+                  bgcolor: 'primary.main',
+                  color: 'white',
+                  '&:hover': { bgcolor: 'primary.dark' },
+                  width: 30,
+                  height: 30
+                }}
+              >
+                <Icon icon="ic:round-chevron-right" width={30} />
+              </IconButton>
+            </Box>
+
             {onOpenAgregar && (
               <Button variant="contained" onClick={onOpenAgregar}>
                 Agregar mantenimiento
@@ -356,6 +382,31 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
             )}
           </Box>
         </Box>
+
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={6}>
+            <TextField
+              label="Fecha del Mantenimiento"
+              type="datetime-local"
+              value={fechaLocal}
+              onChange={(e) => {
+                const selectedDate = new Date(e.target.value);
+                const now = new Date();
+                if (selectedDate <= now) {
+                  setFechaLocal(e.target.value);
+                } else {
+                  showMessage("No puede seleccionar una fecha futura", "warning");
+                }
+              }}
+              fullWidth
+              size="small"
+              InputLabelProps={{ shrink: true }}
+              inputProps={{
+                max: new Date().toISOString().slice(0, 16)
+              }}
+            />
+          </Grid>
+        </Grid>
 
         <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
           Datos generales
@@ -489,17 +540,6 @@ export const MantenimientosComputadoraActivo: React.FC<MantenimientosComputadora
               size="small"
               InputProps={{ readOnly: true }}
               disabled
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              label="Fecha del Mantenimiento"
-              type="datetime-local"
-              value={fechaLocal}
-              onChange={(e) => setFechaLocal(e.target.value)}
-              fullWidth
-              size="small"
-              InputLabelProps={{ shrink: true }}
             />
           </Grid>
           <Grid item xs={6}>

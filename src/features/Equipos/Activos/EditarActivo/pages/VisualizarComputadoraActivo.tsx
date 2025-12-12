@@ -31,16 +31,26 @@ import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPor
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
 import { useNavigate } from "react-router-dom";
 import useProcesadores from "@hooks/useProcesadores";
+import { useUser } from "@context/userContext";
 
 interface VisualizarComputadoraActivoProps {
   equipo: ActivoComputadoraEdit;
   componentes: Componente[];
+  onOpenMantenimientos?: () => void;
+  equipoId?: string;
+  equipoName?: string;
 }
 
 const VisualizarComputadoraActivo = ({
   equipo,
   componentes,
+  onOpenMantenimientos,
+  equipoId,
+  equipoName,
 }: VisualizarComputadoraActivoProps) => {
+  const { rol } = useUser();
+  const unableAction = rol !== "administrador" && rol !== "editor";
+  
   const [selectedInventarioMarca, setSelectedInventarioMarca] =
     useState<Marca | null>(null);
   const [selectedInventarioModelo, setSelectedInventarioModelo] =
@@ -246,6 +256,18 @@ const VisualizarComputadoraActivo = ({
 
   return (
     <div>
+      {onOpenMantenimientos && (
+        <div className="flex justify-end mb-5">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={onOpenMantenimientos}
+            disabled={unableAction}
+          >
+            Ver Mantenimientos
+          </Button>
+        </div>
+      )}
       <h2 className="text-xl font-semibold mb-5">Información de Inventario</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <Autocomplete

@@ -19,24 +19,27 @@ export const useEquiposFiltrados = (
 
   useEffect(() => {
     const fetchEquipos = async () => {
-      if (!shouldFetch) return; 
+      if (!shouldFetch) return;
       setLoading(true);
       setError(null);
 
       try {
-        const { data } = await clienteAxios.get('/equipos/', {
-          params: {
-            ...filtros,
-            limit: rowsPerPage,
-            offset: (currentPage - 1) * rowsPerPage,
-            sortBy: sortBy || undefined,
-            sortDir: sortDir || undefined,
-          },
-        });
-        setEquipos(data.equipos);
-        setTotalCount(data.total); 
+        const noLimit = rowsPerPage === 0;
+        const params: any = {
+          ...filtros,
+          limit: noLimit ? "all" : rowsPerPage,
+          ...(noLimit ? {} : { offset: (currentPage - 1) * rowsPerPage }),
+          sortBy: sortBy || undefined,
+          sortDir: sortDir || undefined,
+        };
+
+        const endpoint = "/equipos/";
+        const { data } = await clienteAxios.get(endpoint, { params });
+
+        setEquipos(data.equipos ?? data.items ?? []);
+        setTotalCount(data.total ?? data.count ?? 0);
       } catch (err) {
-        setError("Error al cargar los equipos: " + err);
+        setError("Error al cargar los equipos: " + (String(err)));
       } finally {
         setLoading(false);
       }

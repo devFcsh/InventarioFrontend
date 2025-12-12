@@ -11,9 +11,11 @@ import clienteAxios from "../../../../../hooks";
 import { useObtenerComputadora } from "../../EditarActivo/hooks/useComputadora";
 import MantenimientoDetalleView from "./MantenimientoDetalleView";
 import useSeries from "@hooks/useSeries";
+import useUsuarios from "@hooks/useUsuarios";
 import { useSnackbar } from "@context/SnackbarContext";
 import useEliminarMantenimiento from "../hooks/useEliminarMantenimiento";
 import ModalConfirmation from "../../../../../components/ModalConfirmation";
+import { useUser } from "@context/userContext";
 
 const Mantenimiento = () => {
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
@@ -27,6 +29,8 @@ const Mantenimiento = () => {
   const [inputInventario, setInputInventario] = useState<string>("");
   const [inputFechaDesde, setInputFechaDesde] = useState<string>("");
   const [inputFechaHasta, setInputFechaHasta] = useState<string>("");
+  const [selectedUsuarioFilter, setSelectedUsuarioFilter] = useState<Record<string, unknown> | null>(null);
+  const [selectedTipoFilter, setSelectedTipoFilter] = useState<{ label: string; value: string } | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
 
   const filtros = {
@@ -34,6 +38,8 @@ const Mantenimiento = () => {
     inventario: inputInventario || undefined,
     fechaDesde: inputFechaDesde || undefined,
     fechaHasta: inputFechaHasta || undefined,
+    usuarioId: selectedUsuarioFilter ? String(selectedUsuarioFilter.id_usuario ?? selectedUsuarioFilter.id ?? selectedUsuarioFilter) : undefined,
+    tipo: selectedTipoFilter?.value || undefined,
   };
 
   const { mantenimientos, totalCount, loading, error } = useMantenimientosFiltrados(
@@ -46,6 +52,7 @@ const Mantenimiento = () => {
   );
 
   const { series } = useSeries();
+  const { usuarios } = useUsuarios();
   const [exporting, setExporting] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<
@@ -60,6 +67,9 @@ const Mantenimiento = () => {
   });
   const { showMessage } = useSnackbar();
   const { eliminarMantenimiento } = useEliminarMantenimiento();
+  const { rol } = useUser();
+  const unableAction = rol !== "administrador" && rol !== "editor";
+  const unableActionEditor = rol !== "administrador";
   const [detalleId, setDetalleId] = useState<number | null>(null);
   const [openDetalle, setOpenDetalle] = useState(false);
   const { detalle, loading: loadingDetalle, error: errorDetalle } = useMantenimientoDetalle(detalleId ?? null);
@@ -374,85 +384,102 @@ const Mantenimiento = () => {
               </div>
             )}
         </div>
-        <div className="flex flex-wrap gap-4 my-6">
-          <div className="w-full md:w-1/2 flex flex-col gap-3">
-            <div className="flex flex-col md:flex-row gap-3">
-              <Autocomplete
-                size="small"
-                freeSolo
-                options={series}
-                getOptionLabel={(option) => (typeof option === "string" ? option : option?.nombre || "")}
-                inputValue={inputSerie}
-                onInputChange={(_, newInputValue) => setInputSerie(newInputValue)}
-                onChange={(_, newValue) => {
-                  if (typeof newValue === "string") setInputSerie(newValue);
-                  else setInputSerie(newValue?.nombre || "");
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Serie" variant="outlined" />
-                )}
-                className="w-full md:w-1/2"
-              />
+        <div className="grid gap-4 my-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <Autocomplete
+            size="small"
+            freeSolo
+            options={series}
+            getOptionLabel={(option) => (typeof option === "string" ? option : option?.nombre || "")}
+            inputValue={inputSerie}
+            onInputChange={(_, newInputValue) => setInputSerie(newInputValue)}
+            onChange={(_, newValue) => {
+              if (typeof newValue === "string") setInputSerie(newValue);
+              else setInputSerie(newValue?.nombre || "");
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Serie" variant="outlined" />
+            )}
+            className="w-full"
+          />
 
-              <TextField
-                size="small"
-                label="Inventario"
-                variant="outlined"
-                value={inputInventario}
-                onChange={(e) => setInputInventario(e.target.value)}
-                className="w-full md:w-1/2"
-              />
-            </div>
+          <TextField
+            size="small"
+            label="Inventario"
+            variant="outlined"
+            value={inputInventario}
+            onChange={(e) => setInputInventario(e.target.value)}
+            className="w-full"
+          />
 
-            <div className="flex flex-col md:flex-row gap-3">
-              <TextField
-                size="small"
-                label="Fecha desde"
-                type="date"
-                InputLabelProps={{ shrink: true }}
-                value={inputFechaDesde}
-                onChange={(e) => setInputFechaDesde(e.target.value)}
-                className="w-full md:w-1/2"
-              />
+          <Autocomplete
+            size="small"
+            options={usuarios}
+            getOptionLabel={(option) => option?.nombre || ""}
+            value={selectedUsuarioFilter}
+            onChange={(_, newValue) => setSelectedUsuarioFilter(newValue)}
+            renderInput={(params) => (
+              <TextField {...params} label="Usuario" variant="outlined" />
+            )}
+            className="w-full"
+          />
 
-              <TextField
-                size="small"
-                label="Fecha hasta"
-                type="date"
-                InputLabelProps={{ shrink: true }}
-                value={inputFechaHasta}
-                onChange={(e) => setInputFechaHasta(e.target.value)}
-                className="w-full md:w-1/2"
-              />
-            </div>
-          </div>
+          <Autocomplete
+            size="small"
+            options={[
+              { label: "Preventivo", value: "Preventivo" },
+              { label: "Correctivo", value: "Correctivo" }
+            ]}
+            getOptionLabel={(option) => option.label}
+            value={selectedTipoFilter}
+            onChange={(_, newValue) => setSelectedTipoFilter(newValue)}
+            renderInput={(params) => (
+              <TextField {...params} label="Tipo" variant="outlined" />
+            )}
+            className="w-full"
+          />
 
-          <div className="w-full md:w-1/3 flex items-start md:items-center">
-            <div className="w-full md:w-full">
-              <div className="flex flex-col md:flex-row gap-3 md:justify-end">
-                <Autocomplete
-                  size="small"
-                  disablePortal
-                  options={filas}
-                  onChange={handleRowsPerPageChange}
-                  getOptionLabel={(option) => option.name}
-                  value={filas.find((option) => option.id === rowsPerPage)}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Filas" variant="outlined" />
-                  )}
-                  className="w-full md:w-1/2"
-                />
-                <button
-                  className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/2"
-                  onClick={() => {
-                    setCurrentPage(1);
-                    setShouldFetch(true);
-                  }}
-                >
-                  Buscar
-                </button>
-              </div>
-            </div>
+          <TextField
+            size="small"
+            label="Fecha desde"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={inputFechaDesde}
+            onChange={(e) => setInputFechaDesde(e.target.value)}
+            className="w-full"
+          />
+
+          <TextField
+            size="small"
+            label="Fecha hasta"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={inputFechaHasta}
+            onChange={(e) => setInputFechaHasta(e.target.value)}
+            className="w-full"
+          />
+
+          <div className="flex items-end gap-2">
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={filas}
+              onChange={handleRowsPerPageChange}
+              getOptionLabel={(option) => option.name}
+              value={filas.find((option) => option.id === rowsPerPage)}
+              renderInput={(params) => (
+                <TextField {...params} label="Filas" variant="outlined" />
+              )}
+              className="w-full"
+            />
+            <button
+              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full"
+              onClick={() => {
+                setCurrentPage(1);
+                setShouldFetch(true);
+              }}
+            >
+              Buscar
+            </button>
           </div>
         </div>
       </div>
@@ -470,31 +497,44 @@ const Mantenimiento = () => {
               <thead className="text-xs uppercase bg-gray-50 text-gray-700">
                 <tr>
                   <th scope="col" className="flex items-center gap-2 px-4 py-3 w-12">
-                    <input
-                      type="checkbox"
-                      onChange={(e) => handleSelectAllChange(e.target.checked)}
-                      checked={selectedItems.length > 0 && selectedItems.length === (mantenimientos ? mantenimientos.length : 0)}
-                      className="mr-2"
-                    />
+                    <Tooltip title="Seleccionar Todos">
+                      <input
+                        type="checkbox"
+                        onChange={(e) => handleSelectAllChange(e.target.checked)}
+                        checked={selectedItems.length > 0 && selectedItems.length === (mantenimientos ? mantenimientos.length : 0)}
+                        className="mr-2"
+                        disabled={unableAction}
+                      />
+                    </Tooltip>
                     {selectedItems.length > 0 && (
                       <>
                         <Tooltip title="Eliminar seleccionados">
-                          <span>
+                          <span
+                            className={
+                              unableActionEditor
+                                ? "opacity-50 pointer-events-none"
+                                : ""
+                            }
+                          >
                             <Icon
                               icon="weui:delete-outlined"
                               width="20"
                               height="20"
-                              onClick={() => {
-                                setModalContent({
-                                  title: "Eliminar mantenimientos",
-                                  message: `¿Estás seguro de que deseas eliminar los ${selectedItems.length} mantenimientos seleccionados?`,
-                                });
-                                setConfirmAction(() => async () => {
-                                  await deleteMantenimientos(selectedItems);
-                                  return { success: true, message: "Mantenimientos eliminados" };
-                                });
-                                setOpenModal(true);
-                              }}
+                              onClick={
+                                !unableActionEditor
+                                  ? () => {
+                                      setModalContent({
+                                        title: "Eliminar mantenimientos",
+                                        message: `¿Estás seguro de que deseas eliminar los ${selectedItems.length} mantenimientos seleccionados?`,
+                                      });
+                                      setConfirmAction(() => async () => {
+                                        await deleteMantenimientos(selectedItems);
+                                        return { success: true, message: "Mantenimientos eliminados" };
+                                      });
+                                      setOpenModal(true);
+                                    }
+                                  : undefined
+                              }
                               className="cursor-pointer"
                             />
                           </span>
@@ -545,9 +585,37 @@ const Mantenimiento = () => {
                     </button>
                   </th>
                   <th scope="col" className="px-4 py-3 w-32">
+                    <button type="button" onClick={() => toggleSort("usuario")} className="flex items-center gap-1">
+                      Usuario
+                      {sortBy === "usuario" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
+                  </th>
+                  <th scope="col" className="px-4 py-3 w-32">
                     <button type="button" onClick={() => toggleSort("fecha")} className="flex items-center gap-1">
                       Fecha
                       {sortBy === "fecha" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
+                  </th>
+                  <th scope="col" className="px-4 py-3 w-32">
+                    <button type="button" onClick={() => toggleSort("tipo")} className="flex items-center gap-1">
+                      Tipo
+                      {sortBy === "tipo" ? (
                         sortDir === "asc" ? (
                           <Icon icon="mdi:sort-ascending" width="16" height="16" />
                         ) : (
@@ -569,12 +637,15 @@ const Mantenimiento = () => {
                         type="checkbox"
                         checked={selectedItems.includes(Number(m.id_mantenimiento))}
                         onChange={() => handleCheckboxChange(Number(m.id_mantenimiento))}
+                        disabled={unableAction}
                       />
                     </td>
-                    <td className="px-4 py-2 w-48">{m.periferico ?? ""}</td>
+                    <td className="px-4 py-2 w-32">{m.periferico ?? ""}</td>
                     <td className="px-4 py-2 w-32">{m.inventario ?? ""}</td>
                     <td className="px-4 py-2 w-32">{m.serie ?? ""}</td>
+                    <td className="px-4 py-2 w-32">{m.usuario ?? ""}</td>
                     <td className="px-4 py-2 w-32">{formatServerDate(m.fecha)}</td>
+                    <td className="px-4 py-2 w-32 capitalize">{m.tipo ? m.tipo.toLowerCase() : ""}</td>
                     <td className="px-4 py-3 flex items-center gap-2 truncate text-black w-56">
                       <Tooltip title="Detalle Mantenimiento">
                         <span>
@@ -591,19 +662,28 @@ const Mantenimiento = () => {
                         </span>
                       </Tooltip>
                             <Tooltip title="Eliminar">
-                              <span>
+                              <span
+                                className={
+                                  unableActionEditor
+                                    ? "opacity-50 pointer-events-none"
+                                    : ""
+                                }
+                              >
                                 <Icon
                                   icon="weui:delete-outlined"
                                   width="22"
                                   height="22"
                                   className="cursor-pointer"
-                                  onClick={() =>
-                                    handleOpenModal(
-                                      String(m.id_mantenimiento),
-                                      "Eliminar mantenimiento",
-                                      `¿Estás seguro de que deseas eliminar el mantenimiento con ID ${m.id_mantenimiento}?`,
-                                      async (idStr: string) => await deleteMantenimiento(idStr)
-                                    )
+                                  onClick={
+                                    !unableActionEditor
+                                      ? () =>
+                                          handleOpenModal(
+                                            String(m.id_mantenimiento),
+                                            "Eliminar mantenimiento",
+                                            `¿Estás seguro de que deseas eliminar el mantenimiento?`,
+                                            async (idStr: string) => await deleteMantenimiento(idStr)
+                                          )
+                                      : undefined
                                   }
                                 />
                               </span>

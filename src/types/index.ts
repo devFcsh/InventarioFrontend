@@ -116,6 +116,7 @@ export type Filtros = {
   modeloId?: string;
   serieId?: string;
   inventario?: string;
+  usuarioId?: string;
 };
 
 export type FiltrosUsuario = {

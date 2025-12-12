@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
 import { ModalAgregarActivo } from "../../../../features/Equipos/Activos/AgregarActivo/pages/ModalAgregarActivo.tsx";
 import usePerifericos from "../../../../hooks/usePerifericos";
+import useUsuarios from "../../../../hooks/useUsuarios";
 import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../../../../data";
 import { useDarDeBajaEquipo } from "../hooks/useDarDeBajaEquipo";
@@ -60,11 +61,26 @@ const Activos = () => {
   });
   
 
-  const [inputPeriferico, setInputPeriferico] = useState("");
-  const [inputMarca, setInputMarca] = useState("");
-  const [inputModelo, setInputModelo] = useState("");
-  const [inputSerie, setInputSerie] = useState("");
-  const [inputInventario, setInputInventario] = useState("");
+  const [inputPeriferico, setInputPeriferico] = useState(() => {
+    return sessionStorage.getItem("activos_filter_periferico") || "";
+  });
+  const [inputMarca, setInputMarca] = useState(() => {
+    return sessionStorage.getItem("activos_filter_marca") || "";
+  });
+  const [inputModelo, setInputModelo] = useState(() => {
+    return sessionStorage.getItem("activos_filter_modelo") || "";
+  });
+  const [inputSerie, setInputSerie] = useState(() => {
+    return sessionStorage.getItem("activos_filter_serie") || "";
+  });
+  const [inputInventario, setInputInventario] = useState(() => {
+    return sessionStorage.getItem("activos_filter_inventario") || "";
+  });
+  const { usuarios } = useUsuarios();
+  const [selectedUsuarioFilter, setSelectedUsuarioFilter] = useState<Record<string, unknown> | null>(() => {
+    const saved = sessionStorage.getItem("activos_filter_usuario");
+    return saved ? JSON.parse(saved) : null;
+  });
 
   const [shouldFetch, setShouldFetch] = useState<boolean>(true);
   const [sortBy, setSortBy] = useState<string>("");
@@ -93,6 +109,7 @@ const Activos = () => {
     modeloId: inputModelo || "",
     serieId: inputSerie || "",
     inventario: inputInventario || "",
+    usuarioId: selectedUsuarioFilter ? String(selectedUsuarioFilter.id_usuario ?? selectedUsuarioFilter.id ?? selectedUsuarioFilter) : "",
   };
 
   const { eliminarEquipo } = useEliminarComputadora();
@@ -119,6 +136,35 @@ const Activos = () => {
       setShouldFetch(false);
     }
   }, [shouldFetch]);
+
+  // Guardar filtros en sessionStorage cuando cambien
+  useEffect(() => {
+    sessionStorage.setItem("activos_filter_periferico", inputPeriferico);
+  }, [inputPeriferico]);
+
+  useEffect(() => {
+    sessionStorage.setItem("activos_filter_marca", inputMarca);
+  }, [inputMarca]);
+
+  useEffect(() => {
+    sessionStorage.setItem("activos_filter_modelo", inputModelo);
+  }, [inputModelo]);
+
+  useEffect(() => {
+    sessionStorage.setItem("activos_filter_serie", inputSerie);
+  }, [inputSerie]);
+
+  useEffect(() => {
+    sessionStorage.setItem("activos_filter_inventario", inputInventario);
+  }, [inputInventario]);
+
+  useEffect(() => {
+    if (selectedUsuarioFilter) {
+      sessionStorage.setItem("activos_filter_usuario", JSON.stringify(selectedUsuarioFilter));
+    } else {
+      sessionStorage.removeItem("activos_filter_usuario");
+    }
+  }, [selectedUsuarioFilter]);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -586,8 +632,14 @@ const Activos = () => {
     _event: React.SyntheticEvent<Element, Event>,
     newValue: { id: number; name: string } | null
   ) => {
-    const rows = parseInt(newValue?.name || "10", 10);
-    setRowsPerPage(rows);
+    if (!newValue) return;
+    // if user selected 'Todos' option (id === 0) set rowsPerPage to 0
+    if (newValue.id === 0) {
+      setRowsPerPage(0);
+    } else {
+      const rows = parseInt(newValue?.name || "10", 10) || 10;
+      setRowsPerPage(rows);
+    }
     setCurrentPage(1);
   };
 
@@ -894,7 +946,7 @@ const Activos = () => {
             steps={[]}
           />
         </div>
-        <div className="flex flex-wrap gap-4 my-10">
+        <div className="grid gap-4 my-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           <Autocomplete
             size="small"
             freeSolo
@@ -916,7 +968,7 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Periférico" variant="outlined" />
             )}
-            className="w-full md:w-cmbox"
+            className="w-full"
           />
 
           <Autocomplete
@@ -938,7 +990,7 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Marca" variant="outlined" />
             )}
-            className="w-full md:w-cmbox"
+            className="w-full"
           />
 
           <Autocomplete
@@ -960,7 +1012,7 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Modelo" variant="outlined" />
             )}
-            className="w-full md:w-cmbox"
+            className="w-full"
           />
 
           <Autocomplete
@@ -982,7 +1034,7 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Serie" variant="outlined" />
             )}
-            className="w-full md:w-cmbox"
+            className="w-full"
           />
 
           <Autocomplete
@@ -1006,29 +1058,44 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Inventario" variant="outlined" />
             )}
-            className="w-full md:w-cmbox"
+            className="w-full"
           />
 
-          <div className="flex flex-col w-full md:w-1/5 md:flex-row gap-4 md:gap-2 lg:ml-2">
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={filas}
-              onChange={handleRowsPerPageChange}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
-                <TextField {...params} label="Filas" variant="outlined" />
-              )}
-              value={filas.find((option) => option.id === rowsPerPage)}
-              className="w-full md:w-1/2"
-            />
-            <button
-              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full md:w-1/2"
-              onClick={handleBuscar}
-            >
-              Buscar
-            </button>
-          </div>
+          <Autocomplete
+            size="small"
+            options={usuarios || []}
+            getOptionLabel={(option) =>
+              typeof option === "string"
+                ? option
+                : option?.nombre || option?.email || String(option?.id_usuario || "")
+            }
+            value={selectedUsuarioFilter}
+            onChange={(_, newValue) => setSelectedUsuarioFilter(newValue as Record<string, unknown> | null)}
+            renderInput={(params) => (
+              <TextField {...params} label="Usuario" variant="outlined" />
+            )}
+            className="w-full"
+          />
+            <div className="flex items-end gap-2">
+              <Autocomplete
+                size="small"
+                disablePortal
+                options={filas}
+                onChange={handleRowsPerPageChange}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Filas" variant="outlined" />
+                )}
+                value={filas.find((option) => option.id === rowsPerPage)}
+                className="w-1/2"
+              />
+              <button
+                className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-1/2"
+                onClick={handleBuscar}
+              >
+                Buscar
+              </button>
+            </div>
         </div>
       </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">

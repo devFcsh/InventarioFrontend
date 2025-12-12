@@ -25,7 +25,6 @@ import useSistemasOperativos from "@hooks/useSistemasOperativos";
 import usePerifericos from "@hooks/usePerifericos";
 import { useAgregarMarca } from "../hooks/useAgregarMarca";
 import { useAgregarModelo } from "../hooks/useAgregarModelo";
-import { useAgregarSerie } from "../hooks/useAgregarSerie";
 import { useAgregarUbicacion } from "../hooks/useAgregarUbicacion";
 import { useAgregarLampara } from "../hooks/useAgregarLampara";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
@@ -84,7 +83,6 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   const { agregarProcesador } = useAgregarProcesador();
   const { agregarMarca } = useAgregarMarca();
   const { agregarModelo } = useAgregarModelo();
-  const { agregarSerie } = useAgregarSerie();
 
   const getAgregarFunction = (categoria: string) => {
     switch (categoria) {
@@ -114,8 +112,6 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
         return agregarMarca;
       case "Modelo":
         return agregarModelo;
-      case "Serie":
-        return agregarSerie;
       case "Lampara":
         return agregarLampara;
       default:
@@ -338,7 +334,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               value={capacidad}
               onChange={(e) => {
               const value = e.target.value;
-              if (value !== null && value.length > 10) {
+              if (value !== null && value.length > 20) {
                 return;
               }
               setCapacidad(value);
@@ -457,7 +453,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               value={newOption}
               onChange={(e) => {
               const value = e.target.value;
-              if (value !== null && value.length > 20) {
+              if (value !== null && value.length > 30) {
                 return;
               }
               setNewOption(e.target.value);
@@ -503,7 +499,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               value={newOption}
               onChange={(e) => {
               const value = e.target.value;
-              if (value !== null && value.length > 20) {
+              if (value !== null && value.length > 30) {
                 return;
               }
               setNewOption(e.target.value);
@@ -553,21 +549,6 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               )}
               disabled={!selectedMarca}
             />
-            <TextField
-              label={selectedCategoria === "Serie" ? "Nombre de Serie" : "Nombre de Lampara"}
-              variant="outlined"
-              error={!!error}
-                  helperText={error && "Por favor ingrese un nombre válido"}
-              fullWidth
-              value={newOption}
-              onChange={(e) => {
-              const value = e.target.value;
-              if (value !== null && value.length > 20) {
-                return;
-              }
-              setNewOption(e.target.value);
-              }}
-            />
           </Box>
         ) : (
           <Box className="flex flex-col mt-2 gap-3">
@@ -578,7 +559,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
             value={newOption}
             onChange={(e) => {
               const value = e.target.value;
-              if (value !== null && value.length > 15) {
+              if (value !== null && value.length > 20) {
                 return;
               }
               setNewOption(e.target.value);

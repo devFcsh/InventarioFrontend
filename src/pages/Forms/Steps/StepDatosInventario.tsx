@@ -277,47 +277,72 @@ export const StepDatosInventario = ({
                 />
               )}
             />
-            <TextField
-              label="Inventario"
-              placeholder="Inventario"
-              variant="outlined"
-              fullWidth
-              size="small"
-              value={inventoryDataForm.inventario}
-              error={
-                !!inventoryErrors.inventario ||
-                (!!inventoryDataForm.inventario && existeInventario)
-              }
-              helperText={
-                inventoryErrors.inventario
-                  ? "Por favor escribir un inventario válido"
-                  : existeInventario
-                  ? "El inventario ya existe"
-                  : ""
-              }
-              onChange={async (e) => {
-                const value = e.target.value;
-                if (
-                  inventoryDataForm.empresa === "Espol" &&
-                  value !== null &&
-                  value.length > 8
-                ) {
-                  return;
-                } else if (
-                  inventoryDataForm.empresa === "EspolTech" &&
-                  value !== null &&
-                  value.length > 25
-                ) {
-                  return;
+            <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+              <TextField
+                label="Inventario"
+                placeholder="Inventario"
+                variant="outlined"
+                fullWidth
+                size="small"
+                value={inventoryDataForm.inventario}
+                error={
+                  !!inventoryErrors.inventario ||
+                  (!!inventoryDataForm.inventario && 
+                   inventoryDataForm.inventario !== "S/N" && 
+                   existeInventario)
                 }
-                handleInventoryChange("inventario", value);
-                handleUniqueInventarioError("inventario", value, inventoryDataForm);
-                if (value) {
-                  await consultarInventario(value);
+                helperText={
+                  inventoryErrors.inventario && inventoryDataForm.inventario !== "S/N"
+                    ? "Por favor escribir un inventario válido"
+                    : existeInventario && inventoryDataForm.inventario !== "S/N"
+                    ? "El inventario ya existe"
+                    : ""
                 }
-              }}
-              disabled={inventoryDataForm.empresa === ""}
-            />
+                onChange={async (e) => {
+                  const value = e.target.value;
+                  if (
+                    inventoryDataForm.empresa === "Espol" &&
+                    value !== null &&
+                    value.length > 8
+                  ) {
+                    return;
+                  } else if (
+                    inventoryDataForm.empresa === "EspolTech" &&
+                    value !== null &&
+                    value.length > 25
+                  ) {
+                    return;
+                  }
+                  handleInventoryChange("inventario", value);
+                  handleUniqueInventarioError("inventario", value, inventoryDataForm);
+                  if (value && value !== "S/N") {
+                    await consultarInventario(value);
+                  }
+                }}
+                disabled={inventoryDataForm.empresa === "" || inventoryDataForm.inventario === "S/N"}
+              />
+              <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
+                <input
+                  type="checkbox"
+                  id="sin-inventario"
+                  checked={inventoryDataForm.inventario === "S/N"}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      handleInventoryChange("inventario", "S/N");
+                      handleUniqueInventarioError("inventario", "S/N", inventoryDataForm);
+                    } else {
+                      handleInventoryChange("inventario", "");
+                      handleUniqueInventarioError("inventario", "", inventoryDataForm);
+                    }
+                  }}
+                  disabled={inventoryDataForm.empresa === ""}
+                  style={{ marginRight: 4 }}
+                />
+                <label htmlFor="sin-inventario" style={{ fontSize: "0.875rem", cursor: "pointer" }}>
+                  Sin inventario
+                </label>
+              </Box>
+            </Box>
           </Box>
           <TextField
             label="Año de Compra"

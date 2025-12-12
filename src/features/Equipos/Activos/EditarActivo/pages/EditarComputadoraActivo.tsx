@@ -172,9 +172,9 @@ const EditarComputadoraActivo = ({
       mouse: 1,
       teclado: 1,
       monitor: 2,
-      camara: 2, // acepta "cámara" o "camara"
+      camara: 2,
       "pantalla interactiva": 1,
-      microfono: 1, // acepta "micrófono" o "microfono"
+      microfono: 4,
       televisor: 1,
       "barra polycom": 1,
     };
@@ -761,42 +761,62 @@ const EditarComputadoraActivo = ({
               />
             )}
           />
-          <TextField
-            label="Inventario"
-            placeholder="Inventario"
-            variant="outlined"
-            fullWidth
-            size="small"
-            value={selectedInventarioInv}
-            error={
-              !!errorInventario ||
-              (existeInventario && selectedInventarioInv !== inventarioOriginal)
-            }
-            helperText={
-              errorInventario
-                ? "Por favor escribir un inventario válido"
-                : existeInventario && selectedInventarioInv !== inventarioOriginal
-                ? "El inventario ya existe"
-                : ""
-            }
-            onChange={async (e) => {
-              const value = e.target.value;
-              if (empresa === "Espol" && value !== null && value.length > 8) {
-                return;
-              } else if (
-                empresa === "EspolTech" &&
-                value !== null &&
-                value.length > 25
-              ) {
-                return;
+          <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+            <TextField
+              label="Inventario"
+              placeholder="Inventario"
+              variant="outlined"
+              fullWidth
+              size="small"
+              value={selectedInventarioInv}
+              error={
+                !!errorInventario ||
+                (selectedInventarioInv !== "S/N" && existeInventario && selectedInventarioInv !== inventarioOriginal)
               }
-              handleChangeInventario(value);
-              if (value && value !== inventarioOriginal) {
-                await consultarInventario(value);
+              helperText={
+                errorInventario && selectedInventarioInv !== "S/N"
+                  ? "Por favor escribir un inventario válido"
+                  : selectedInventarioInv !== "S/N" && existeInventario && selectedInventarioInv !== inventarioOriginal
+                  ? "El inventario ya existe"
+                  : ""
               }
-            }}
-            disabled={empresa === ""}
-          />
+              onChange={async (e) => {
+                const value = e.target.value;
+                if (empresa === "Espol" && value !== null && value.length > 8) {
+                  return;
+                } else if (
+                  empresa === "EspolTech" &&
+                  value !== null &&
+                  value.length > 25
+                ) {
+                  return;
+                }
+                handleChangeInventario(value);
+                if (value && value !== "S/N" && value !== inventarioOriginal) {
+                  await consultarInventario(value);
+                }
+              }}
+              disabled={empresa === "" || selectedInventarioInv === "S/N"}
+            />
+            <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
+              <input
+                type="checkbox"
+                id="sin-inventario-editar-computadora"
+                checked={selectedInventarioInv === "S/N"}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedInventarioInv("S/N");
+                    setErrorInventario(false);
+                  } else {
+                    setSelectedInventarioInv("");
+                    setErrorInventario(true);
+                  }
+                }}
+                disabled={empresa === ""}
+              />
+              <label htmlFor="sin-inventario-editar-computadora">Sin inventario</label>
+            </Box>
+          </Box>
           <TextField
             label="Año de Compra"
             placeholder="Año de Compra"
@@ -1254,38 +1274,64 @@ const EditarComputadoraActivo = ({
                   />
                 )}
               />
-              <TextField
-                label="Inventario"
-                placeholder="Inventario"
-                variant="outlined"
-                fullWidth
-                size="small"
-                value={nuevoComponente.inventario}
-                error={!!errorNuevoComponenteInventario}
-                helperText={
-                  errorNuevoComponenteInventario
-                    ? "Por favor escribir un inventario válido"
-                    : ""
-                }
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (
-                    empresaNuevoComponente === "Espol" &&
-                    value !== null &&
-                    value.length > 8
-                  ) {
-                    return;
-                  } else if (
-                    empresaNuevoComponente === "EspolTech" &&
-                    value !== null &&
-                    value.length > 25
-                  ) {
-                    return;
+              <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+                <TextField
+                  label="Inventario"
+                  placeholder="Inventario"
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  value={nuevoComponente.inventario}
+                  error={!!errorNuevoComponenteInventario && nuevoComponente.inventario !== "S/N"}
+                  helperText={
+                    errorNuevoComponenteInventario && nuevoComponente.inventario !== "S/N"
+                      ? "Por favor escribir un inventario válido"
+                      : ""
                   }
-                  handleChangeNuevoComponenteInventario(value);
-                }}
-                disabled={empresa === ""}
-              />
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (
+                      empresaNuevoComponente === "Espol" &&
+                      value !== null &&
+                      value.length > 8
+                    ) {
+                      return;
+                    } else if (
+                      empresaNuevoComponente === "EspolTech" &&
+                      value !== null &&
+                      value.length > 25
+                    ) {
+                      return;
+                    }
+                    handleChangeNuevoComponenteInventario(value);
+                  }}
+                  disabled={empresa === "" || nuevoComponente.inventario === "S/N"}
+                />
+                <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
+                  <input
+                    type="checkbox"
+                    id="sin-inventario-componente"
+                    checked={nuevoComponente.inventario === "S/N"}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setNuevoComponente({
+                          ...nuevoComponente,
+                          inventario: "S/N"
+                        });
+                        setErrorNuevoComponenteInventario(false);
+                      } else {
+                        setNuevoComponente({
+                          ...nuevoComponente,
+                          inventario: ""
+                        });
+                        setErrorNuevoComponenteInventario(true);
+                      }
+                    }}
+                    disabled={empresaNuevoComponente === ""}
+                  />
+                  <label htmlFor="sin-inventario-componente">Sin inventario</label>
+                </Box>
+              </Box>
             </Box>
             <Button
               variant="contained"
@@ -1330,7 +1376,7 @@ const EditarComputadoraActivo = ({
           onClick={handleConfirmEditarEquipo}
           fullWidth
           disabled={
-            (existeInventario && selectedInventarioInv !== inventarioOriginal) ||
+            (existeInventario && selectedInventarioInv !== inventarioOriginal && selectedInventarioInv !== "S/N") ||
             (existeSerie && selectedInventarioSerie !== serieOriginal)
           }
         >

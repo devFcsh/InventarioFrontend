@@ -1,6 +1,10 @@
 export const validateInventario = (value: any, empresa: string) => {
   value = value.trim();
   
+  if (value === "S/N") {
+    return true;
+  }
+  
   const regexPattern = /^[\d-]*$/;
   
   if (regexPattern.test(value)) {
