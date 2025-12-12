@@ -414,9 +414,9 @@ const Mantenimiento = () => {
           <Autocomplete
             size="small"
             options={usuarios}
-            getOptionLabel={(option) => option?.nombre || ""}
+            getOptionLabel={(option) => (option as any)?.nombre || ""}
             value={selectedUsuarioFilter}
-            onChange={(_, newValue) => setSelectedUsuarioFilter(newValue)}
+            onChange={(_, newValue) => setSelectedUsuarioFilter(newValue as Record<string, unknown> | null)}
             renderInput={(params) => (
               <TextField {...params} label="Usuario" variant="outlined" />
             )}
