@@ -18,11 +18,21 @@ import { useUser } from "@context/userContext";
 import Loader from "@pages/Loader";
 
 const Bajas = () => {
-  const [inputPeriferico, setInputPeriferico] = useState("");
-  const [inputMarca, setInputMarca] = useState("");
-  const [inputModelo, setInputModelo] = useState("");
-  const [inputSerie, setInputSerie] = useState("");
-  const [inputInventario, setInputInventario] = useState("");
+  const [inputPeriferico, setInputPeriferico] = useState(() => {
+    return sessionStorage.getItem("bajas_filter_periferico") || "";
+  });
+  const [inputMarca, setInputMarca] = useState(() => {
+    return sessionStorage.getItem("bajas_filter_marca") || "";
+  });
+  const [inputModelo, setInputModelo] = useState(() => {
+    return sessionStorage.getItem("bajas_filter_modelo") || "";
+  });
+  const [inputSerie, setInputSerie] = useState(() => {
+    return sessionStorage.getItem("bajas_filter_serie") || "";
+  });
+  const [inputInventario, setInputInventario] = useState(() => {
+    return sessionStorage.getItem("bajas_filter_inventario") || "";
+  });
   const [openModalBajas, setOpenModalBajas] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
@@ -107,6 +117,26 @@ const Bajas = () => {
       setShouldFetch(false);
     }
   }, [shouldFetch]);
+
+  useEffect(() => {
+    sessionStorage.setItem("bajas_filter_periferico", inputPeriferico);
+  }, [inputPeriferico]);
+
+  useEffect(() => {
+    sessionStorage.setItem("bajas_filter_marca", inputMarca);
+  }, [inputMarca]);
+
+  useEffect(() => {
+    sessionStorage.setItem("bajas_filter_modelo", inputModelo);
+  }, [inputModelo]);
+
+  useEffect(() => {
+    sessionStorage.setItem("bajas_filter_serie", inputSerie);
+  }, [inputSerie]);
+
+  useEffect(() => {
+    sessionStorage.setItem("bajas_filter_inventario", inputInventario);
+  }, [inputInventario]);
 
   const handleCloseModal = () => {
     setOpenModal(false);

@@ -6,16 +6,20 @@ export const useEditarMarca = () => {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const editarMarca = async (marcaData: { id_marca: number, nuevoNombre: string }): Promise<number | undefined> => {
+  const editarMarca = async (marcaData: { 
+    id_marca: number, 
+    nuevoNombre?: string,
+    perifericosIds?: number[]
+  }): Promise<number | undefined> => {
     setLoading(true);
     setError(null);
 
     try {
       const { data } = await clienteAxios.put("/marcas/", marcaData);
-      setMessage(data.mensaje);  
+      setMessage(data.message);  
       return data.id_marca; 
     } catch (err) {
-      setError("Error al editar el marca: " + err); 
+      setError("Error al editar la marca: " + err); 
       throw err;
     } finally {
       setLoading(false);  

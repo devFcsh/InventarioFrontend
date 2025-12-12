@@ -9,6 +9,7 @@ import { Periferico, Uso, Usuario } from "../types";
 import VisualizarComputadoraActivo from "../features/Equipos/Activos/EditarActivo/pages/VisualizarComputadoraActivo";
 import VisualizarActivoRed from "../features/Equipos/Activos/EditarActivo/pages/VisualizarActivoRed";
 import VisualizarActivoSimple from "../features/Equipos/Activos/EditarActivo/pages/VisualizarActivoSimple";
+import { MantenimientoActivo } from "../features/Equipos/Activos/MantenimientoActivo/Homepage/MantenimientoActivo";
 import Loader from "./Loader";
 
 const computadores: string[] = ["Laptop", "Computadora"];
@@ -17,6 +18,7 @@ const VisualizarActivo = () => {
   const [perifericoId, setPerifericoId] = useState<string | null>(null);
   const [selectedUso, setSelectedUso] = useState<Uso | null>(null);
   const [selectedUsuario, setSelectedUsuario] = useState<Usuario | null>(null);
+  const [openModalMantenimientos, setOpenModalMantenimientos] = useState(false);
   const location = useLocation();
   const {
     equipoId,
@@ -25,6 +27,9 @@ const VisualizarActivo = () => {
   }: { equipoId: string; perifericos: Periferico[]; equipoName: string } = location.state || {};
   const { usos } = useUsos();
   const { usuarios } = useUsuariosPorUso(selectedUso?.id_uso || "");
+
+  const handleOpenMantenimientos = () => setOpenModalMantenimientos(true);
+  const handleCloseMantenimientos = () => setOpenModalMantenimientos(false);
 
   if (equipoName === "Computadora" || equipoName === "Laptop") {
     const { equipo, componentes, loading, error } = useObtenerComputadora(equipoId);
@@ -82,6 +87,9 @@ const VisualizarActivo = () => {
               <VisualizarComputadoraActivo
                 equipo={equipo}
                 componentes={componentes}
+                onOpenMantenimientos={handleOpenMantenimientos}
+                equipoId={equipoId}
+                equipoName={equipoName}
               />
             )
           ) : (
@@ -90,6 +98,12 @@ const VisualizarActivo = () => {
             )
           )}
         </div>
+        <MantenimientoActivo
+          open={openModalMantenimientos}
+          onClose={handleCloseMantenimientos}
+          id_equipo={equipoId}
+          tipoEquipo={equipoName}
+        />
       </div>
     );
   }
@@ -124,6 +138,12 @@ const VisualizarActivo = () => {
             />
           )}
         </div>
+        <MantenimientoActivo
+          open={openModalMantenimientos}
+          onClose={handleCloseMantenimientos}
+          id_equipo={equipoId}
+          tipoEquipo={equipoName}
+        />
       </div>
     );
   }
@@ -182,6 +202,12 @@ const VisualizarActivo = () => {
             />
           )}
         </div>
+        <MantenimientoActivo
+          open={openModalMantenimientos}
+          onClose={handleCloseMantenimientos}
+          id_equipo={equipoId}
+          tipoEquipo={equipoName}
+        />
       </div>
     );
   }

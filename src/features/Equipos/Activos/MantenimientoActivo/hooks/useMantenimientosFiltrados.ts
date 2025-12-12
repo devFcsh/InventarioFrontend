@@ -8,6 +8,7 @@ export interface MantenimientoItem {
   inventario: string | null;
   periferico: string | null;
   serie: string | null;
+  tipo: string | null;
   usuario: string | null;
 }
 
@@ -17,7 +18,7 @@ export interface ListaMantenimientosResponse {
 }
 
 export const useMantenimientosFiltrados = (
-  filtros: { inventario?: string; serie?: string; fechaDesde?: string; fechaHasta?: string; usuarioId?: string },
+  filtros: { inventario?: string; serie?: string; fechaDesde?: string; fechaHasta?: string; usuarioId?: string; tipo?: string },
   currentPage: number,
   rowsPerPage: number,
   shouldFetch: boolean,
@@ -47,6 +48,7 @@ export const useMantenimientosFiltrados = (
           if (filtros.fechaDesde) params.fechaDesde = filtros.fechaDesde;
           if (filtros.fechaHasta) params.fechaHasta = filtros.fechaHasta;
           if (filtros.usuarioId) params.usuarioId = filtros.usuarioId;
+          if (filtros.tipo) params.tipo = filtros.tipo;
         }
 
         const { data } = await clienteAxios.get<ListaMantenimientosResponse>(

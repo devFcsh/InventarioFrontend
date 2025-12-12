@@ -61,13 +61,26 @@ const Activos = () => {
   });
   
 
-  const [inputPeriferico, setInputPeriferico] = useState("");
-  const [inputMarca, setInputMarca] = useState("");
-  const [inputModelo, setInputModelo] = useState("");
-  const [inputSerie, setInputSerie] = useState("");
-  const [inputInventario, setInputInventario] = useState("");
+  const [inputPeriferico, setInputPeriferico] = useState(() => {
+    return sessionStorage.getItem("activos_filter_periferico") || "";
+  });
+  const [inputMarca, setInputMarca] = useState(() => {
+    return sessionStorage.getItem("activos_filter_marca") || "";
+  });
+  const [inputModelo, setInputModelo] = useState(() => {
+    return sessionStorage.getItem("activos_filter_modelo") || "";
+  });
+  const [inputSerie, setInputSerie] = useState(() => {
+    return sessionStorage.getItem("activos_filter_serie") || "";
+  });
+  const [inputInventario, setInputInventario] = useState(() => {
+    return sessionStorage.getItem("activos_filter_inventario") || "";
+  });
   const { usuarios } = useUsuarios();
-  const [selectedUsuarioFilter, setSelectedUsuarioFilter] = useState<Record<string, unknown> | null>(null);
+  const [selectedUsuarioFilter, setSelectedUsuarioFilter] = useState<Record<string, unknown> | null>(() => {
+    const saved = sessionStorage.getItem("activos_filter_usuario");
+    return saved ? JSON.parse(saved) : null;
+  });
 
   const [shouldFetch, setShouldFetch] = useState<boolean>(true);
   const [sortBy, setSortBy] = useState<string>("");
@@ -123,6 +136,35 @@ const Activos = () => {
       setShouldFetch(false);
     }
   }, [shouldFetch]);
+
+  // Guardar filtros en sessionStorage cuando cambien
+  useEffect(() => {
+    sessionStorage.setItem("activos_filter_periferico", inputPeriferico);
+  }, [inputPeriferico]);
+
+  useEffect(() => {
+    sessionStorage.setItem("activos_filter_marca", inputMarca);
+  }, [inputMarca]);
+
+  useEffect(() => {
+    sessionStorage.setItem("activos_filter_modelo", inputModelo);
+  }, [inputModelo]);
+
+  useEffect(() => {
+    sessionStorage.setItem("activos_filter_serie", inputSerie);
+  }, [inputSerie]);
+
+  useEffect(() => {
+    sessionStorage.setItem("activos_filter_inventario", inputInventario);
+  }, [inputInventario]);
+
+  useEffect(() => {
+    if (selectedUsuarioFilter) {
+      sessionStorage.setItem("activos_filter_usuario", JSON.stringify(selectedUsuarioFilter));
+    } else {
+      sessionStorage.removeItem("activos_filter_usuario");
+    }
+  }, [selectedUsuarioFilter]);
 
   const handleCloseModal = () => {
     setOpenModal(false);

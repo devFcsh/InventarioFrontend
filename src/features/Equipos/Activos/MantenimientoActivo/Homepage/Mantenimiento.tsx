@@ -30,6 +30,7 @@ const Mantenimiento = () => {
   const [inputFechaDesde, setInputFechaDesde] = useState<string>("");
   const [inputFechaHasta, setInputFechaHasta] = useState<string>("");
   const [selectedUsuarioFilter, setSelectedUsuarioFilter] = useState<Record<string, unknown> | null>(null);
+  const [selectedTipoFilter, setSelectedTipoFilter] = useState<{ label: string; value: string } | null>(null);
   const [totalPages, setTotalPages] = useState<number>(1);
 
   const filtros = {
@@ -38,6 +39,7 @@ const Mantenimiento = () => {
     fechaDesde: inputFechaDesde || undefined,
     fechaHasta: inputFechaHasta || undefined,
     usuarioId: selectedUsuarioFilter ? String(selectedUsuarioFilter.id_usuario ?? selectedUsuarioFilter.id ?? selectedUsuarioFilter) : undefined,
+    tipo: selectedTipoFilter?.value || undefined,
   };
 
   const { mantenimientos, totalCount, loading, error } = useMantenimientosFiltrados(
@@ -421,6 +423,21 @@ const Mantenimiento = () => {
             className="w-full"
           />
 
+          <Autocomplete
+            size="small"
+            options={[
+              { label: "Preventivo", value: "Preventivo" },
+              { label: "Correctivo", value: "Correctivo" }
+            ]}
+            getOptionLabel={(option) => option.label}
+            value={selectedTipoFilter}
+            onChange={(_, newValue) => setSelectedTipoFilter(newValue)}
+            renderInput={(params) => (
+              <TextField {...params} label="Tipo" variant="outlined" />
+            )}
+            className="w-full"
+          />
+
           <TextField
             size="small"
             label="Fecha desde"
@@ -595,6 +612,20 @@ const Mantenimiento = () => {
                       )}
                     </button>
                   </th>
+                  <th scope="col" className="px-4 py-3 w-32">
+                    <button type="button" onClick={() => toggleSort("tipo")} className="flex items-center gap-1">
+                      Tipo
+                      {sortBy === "tipo" ? (
+                        sortDir === "asc" ? (
+                          <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                        ) : (
+                          <Icon icon="mdi:sort-descending" width="16" height="16" />
+                        )
+                      ) : (
+                        <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                      )}
+                    </button>
+                  </th>
                   <th scope="col" className="px-4 py-3 w-56">Acciones</th>
                 </tr>
               </thead>
@@ -609,11 +640,12 @@ const Mantenimiento = () => {
                         disabled={unableAction}
                       />
                     </td>
-                    <td className="px-4 py-2 w-48">{m.periferico ?? ""}</td>
+                    <td className="px-4 py-2 w-32">{m.periferico ?? ""}</td>
                     <td className="px-4 py-2 w-32">{m.inventario ?? ""}</td>
                     <td className="px-4 py-2 w-32">{m.serie ?? ""}</td>
                     <td className="px-4 py-2 w-32">{m.usuario ?? ""}</td>
                     <td className="px-4 py-2 w-32">{formatServerDate(m.fecha)}</td>
+                    <td className="px-4 py-2 w-32 capitalize">{m.tipo ? m.tipo.toLowerCase() : ""}</td>
                     <td className="px-4 py-3 flex items-center gap-2 truncate text-black w-56">
                       <Tooltip title="Detalle Mantenimiento">
                         <span>

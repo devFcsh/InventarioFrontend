@@ -1,5 +1,5 @@
-import { FC, useState } from "react";
-import { Dialog, TextField, Tooltip } from "@mui/material";
+import { FC, useState, useEffect } from "react";
+import { Dialog, TextField, Tooltip, Autocomplete } from "@mui/material";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import useUsos from "@hooks/useUsos";
 import useDiscos from "@hooks/useDiscos";
@@ -59,7 +59,10 @@ import { useEditarLampara } from "../../AgregarCategoria/hooks/useEditarLampara"
 import { useEliminarLampara } from "../../AgregarCategoria/hooks/useEliminarLampara";
 import { useEditarRAM } from "../../AgregarCategoria/hooks/useEditarRAM";
 import { useEliminarRAM } from "../../AgregarCategoria/hooks/useEliminarRAM";
+import { useObtenerMarcaDetalle } from "../../AgregarCategoria/hooks/useObtenerMarcaDetalle";
+import { useObtenerModeloDetalle } from "../../AgregarCategoria/hooks/useObtenerModeloDetalle";
 import { useSnackbar } from "@context/SnackbarContext";
+import Loader from "@pages/Loader";
 
 type Opcion =
   | Uso
@@ -170,6 +173,13 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const [selectedOption, setSelectedOption] = useState<Opcion | null>(null);
   const [editedValue, setEditedValue] = useState<string>("");
   const [editedTipo, setEditedTipo] = useState<string>("");
+  const [selectedPerifericosIds, setSelectedPerifericosIds] = useState<number[]>([]);
+  const [marcaIdForDetalle, setMarcaIdForDetalle] = useState<number | null>(null);
+  const [selectedMarcasIds, setSelectedMarcasIds] = useState<number[]>([]);
+  const [modeloIdForDetalle, setModeloIdForDetalle] = useState<number | null>(null);
+  
+  const { marcaDetalle, loading: loadingMarcaDetalle } = useObtenerMarcaDetalle(marcaIdForDetalle);
+  const { modeloDetalle, loading: loadingModeloDetalle } = useObtenerModeloDetalle(modeloIdForDetalle);
 
   const elementos: Opcion[] =
     selectedCategoria === "Uso"
@@ -212,8 +222,35 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
     } else if (elemento && "nombre" in elemento) {
       setEditedValue(elemento.nombre || "");
     }
+    
+    if (selectedCategoria === "Marca" && isMarca(elemento) && elemento) {
+      setMarcaIdForDetalle(Number(elemento.id_marca));
+    } else {
+      setMarcaIdForDetalle(null);
+      setSelectedPerifericosIds([]);
+    }
+    
+    if (selectedCategoria === "Modelo" && isModelo(elemento) && elemento) {
+      setModeloIdForDetalle(Number(elemento.id_modelo));
+    } else {
+      setModeloIdForDetalle(null);
+      setSelectedMarcasIds([]);
+    }
+    
     setOpenEditModal(true);
   };
+  
+  useEffect(() => {
+    if (marcaDetalle && marcaDetalle.perifericos) {
+      setSelectedPerifericosIds(marcaDetalle.perifericos);
+    }
+  }, [marcaDetalle]);
+  
+  useEffect(() => {
+    if (modeloDetalle && modeloDetalle.marcas) {
+      setSelectedMarcasIds(modeloDetalle.marcas);
+    }
+  }, [modeloDetalle]);
 
   const handleSaveEdit = () => {
     if (selectedOption) {
@@ -265,6 +302,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
               editarMarca({
                 id_marca: Number(selectedOption.id_marca),
                 nuevoNombre: editedValue,
+                perifericosIds: selectedPerifericosIds,
               });
             }
             break;
@@ -273,6 +311,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
               editarModelo({
                 id_modelo: Number(selectedOption.id_modelo),
                 nuevoNombre: editedValue,
+                marcasIds: selectedMarcasIds,
               });
             }
             break;
@@ -527,7 +566,87 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
         <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
           <div className="p-5">
             <h3 className="text-xl font-semibold mb-4">Editar Subcategoría</h3>
-            {selectedCategoria === "RAM" ? (
+            {selectedCategoria === "Marca" ? (
+              <>
+                <TextField
+                  label="Nombre de Marca"
+                  variant="outlined"
+                  fullWidth
+                  value={editedValue}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.length <= 100) {
+                      setEditedValue(value);
+                    }
+                  }}
+                  className="mb-4"
+                />
+                {loadingMarcaDetalle ? (
+                  <div className="flex justify-center items-center py-8">
+                    <Loader />
+                  </div>
+                ) : (
+                  <Autocomplete
+                    multiple
+                    options={perifericos}
+                    value={perifericos.filter(p => p && selectedPerifericosIds.includes(Number(p.id_periferico)))}
+                    getOptionLabel={(option) => option?.nombre || ""}
+                    onChange={(_, newValue) => {
+                      setSelectedPerifericosIds(newValue.filter(p => p).map(p => Number(p!.id_periferico)));
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Periféricos Relacionados"
+                        variant="outlined"
+                        placeholder="Seleccionar periféricos"
+                      />
+                    )}
+                    className="my-4"
+                  />
+                )}
+              </>
+            ) : selectedCategoria === "Modelo" ? (
+              <>
+                <TextField
+                  label="Nombre de Modelo"
+                  variant="outlined"
+                  fullWidth
+                  value={editedValue}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.length <= 100) {
+                      setEditedValue(value);
+                    }
+                  }}
+                  className="mb-4"
+                />
+                {loadingModeloDetalle ? (
+                  <div className="flex justify-center items-center py-8">
+                    <Loader />
+                  </div>
+                ) : (
+                  <Autocomplete
+                    multiple
+                    options={marcas}
+                    value={marcas.filter(m => m && selectedMarcasIds.includes(Number(m.id_marca)))}
+                    getOptionLabel={(option) => option?.nombre || ""}
+                    onChange={(_, newValue) => {
+                      setSelectedMarcasIds(newValue.filter(m => m).map(m => Number(m!.id_marca)));
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Marcas Relacionadas"
+                        variant="outlined"
+                        placeholder="Seleccionar marcas"
+                      />
+                    )}
+                    className="my-4"
+                  />
+                )}
+              </>
+            ) : selectedCategoria === "RAM" ? (
               <>
                 <TextField
                   label="Nuevo Tipo"
