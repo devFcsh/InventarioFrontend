@@ -43,6 +43,7 @@ import { validateInventario } from "@pages/Forms/helpers/validateInventario.ts";
 import { useSnackbar } from "@context/SnackbarContext.tsx";
 import { useExisteInventario } from "../../../../../hooks/useExisteInventario";
 import { useExisteSerie } from "../../../../../hooks/useExisteSerie";
+import { useUser } from "@context/userContext.tsx";
 
 interface EditarComputadoraBodegaProps {
   equipo: BodegaComputadoraEdit;
@@ -136,6 +137,7 @@ const EditarComputadoraBodega = ({
   const { editarBodega } = useEditarBodega();
   const { gestionarComponentesBodega } = useGestionarComponentesBodega();
   const { perifericos } = usePerifericos();
+  const { user } = useUser();
   const { existe: existeInventario, consultarInventario } = useExisteInventario();
   const { existe: existeSerie, consultarSerie } = useExisteSerie();
 
@@ -368,6 +370,7 @@ const EditarComputadoraBodega = ({
       nombre_equipo: nombreEquipo,
       direccion_ip: protocolo === "0" ? direccionIP : "",
       observacion: observationValue,
+      editor: user?.email ?? undefined,
     };
     try {
       await editarBodega(equipo.id_equipo, payload);
@@ -383,6 +386,7 @@ const EditarComputadoraBodega = ({
             serie: comp.serie,
             modeloId: Number(comp.modelo?.id_modelo) ?? 0,
           })),
+          editor: user?.email ?? undefined,
         });
       }
       showMessage("Equipo editado exitosamente", "success");
@@ -701,14 +705,25 @@ const EditarComputadoraBodega = ({
             fullWidth
             size="small"
             error={!!errorAnio}
-            helperText={errorAnio ? "Por favor escribir un año válido" : ""}
+            helperText={errorAnio ? "El año debe tener 4 dígitos y ser menor o igual al año actual" : ""}
             value={selectedInventarioAnio}
             onChange={(e) => {
               const value = e.target.value;
-              if (/^\d*$/.test(value)) {
+              if (/^\d*$/.test(value) && value.length <= 4) {
                 setSelectedInventarioAnio(value);
-              } else {
-                setErrorAnio(true);
+                if (value.length === 4) {
+                  const year = parseInt(value, 10);
+                  const currentYear = new Date().getFullYear();
+                  if (year > currentYear) {
+                    setErrorAnio(true);
+                  } else {
+                    setErrorAnio(false);
+                  }
+                } else if (value.length < 4 && value.length > 0) {
+                  setErrorAnio(true);
+                } else {
+                  setErrorAnio(false);
+                }
               }
             }}
           />

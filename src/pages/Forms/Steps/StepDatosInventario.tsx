@@ -65,24 +65,26 @@ export const StepDatosInventario = ({
   return (
     <Box>
       <div className="mt-8">
-        <div className="flex items-center mt-8 mb-4">
-          <span>¿No encuentras tu usuario? </span>
-          <a
-            href="#"
-            style={{
-              color: "#1976d2",
-              marginLeft: 4,
-              textDecoration: "underline",
-              cursor: "pointer",
-            }}
-            onClick={(e) => {
-              e.preventDefault();
-              navigate("/agregarUsuario");
-            }}
-          >
-            Agrégalo
-          </a>
-        </div>
+        {tipoInventario === "activo" && (
+          <div className="flex items-center mt-8 mb-4">
+            <span>¿No encuentras tu usuario? </span>
+            <a
+              href="#"
+              style={{
+                color: "#1976d2",
+                marginLeft: 4,
+                textDecoration: "underline",
+                cursor: "pointer",
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/agregarUsuario");
+              }}
+            >
+              Agrégalo
+            </a>
+          </div>
+        )}
         <div className="grid grid-cols-2 gap-4">
           {tipoInventario === "activo" && periferico?.nombre !== "Proyector" ? (
             <Autocomplete
@@ -354,20 +356,46 @@ export const StepDatosInventario = ({
             error={!!inventoryErrors.anio_compra}
             helperText={
               inventoryErrors.anio_compra
-                ? "Por favor escribir un año válido"
+                ? "El año debe tener 4 dígitos y ser menor o igual al año actual"
                 : ""
             }
             onChange={(e) => {
               const value = e.target.value;
-              if (!/^\d*$/.test(value)) {
+              if (!/^\d*$/.test(value) || value.length > 4) {
                 return;
               }
               handleInventoryChange("anio_compra", value);
-              handleUniqueInventarioError(
-                "anio_compra",
-                value,
-                inventoryDataForm
-              );
+              
+              // Validar año
+              if (value.length === 4) {
+                const year = parseInt(value, 10);
+                const currentYear = new Date().getFullYear();
+                if (year > currentYear) {
+                  handleUniqueInventarioError(
+                    "anio_compra",
+                    value,
+                    inventoryDataForm
+                  );
+                } else {
+                  handleUniqueInventarioError(
+                    "anio_compra",
+                    value,
+                    inventoryDataForm
+                  );
+                }
+              } else if (value.length > 0) {
+                handleUniqueInventarioError(
+                  "anio_compra",
+                  value,
+                  inventoryDataForm
+                );
+              } else {
+                handleUniqueInventarioError(
+                  "anio_compra",
+                  value,
+                  inventoryDataForm
+                );
+              }
             }}
           />
 

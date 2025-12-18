@@ -8,6 +8,9 @@ export type Equipo = {
     usuario: string;
     uso: string;
     edificio: string;
+    autor?: string;
+    editor?: string;
+    fecha_creacion?: string;
 };
 
 export type ExportarComputadora = {

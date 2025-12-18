@@ -13,6 +13,7 @@ import {StepCargarImagen} from "./Steps/StepCargarImagen.tsx"
 import { useSnackbar } from "@context/SnackbarContext.tsx";
 import { useExisteInventario } from "../../hooks/useExisteInventario";
 import { useExisteSerie } from "../../hooks/useExisteSerie";
+import { useUser } from "@context/userContext.tsx";
 export const FormSAP = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
@@ -30,6 +31,7 @@ export const FormSAP = () => {
   const { agregarRedActivo } = useAgregarRedActivo();
   const { agregarRedBodega } = useAgregarRedBodega();
   const { agregarRedBaja } = useAgregarRedBaja();
+  const { user } = useUser();
   const { inventoryDataSAPForm, handleInventorySAPChange } = useFormDatosInventarioSAP();
   const { informacionGeneralDataSAPForm, handleInformacionGeneralSAPChange } = useFormDataInformacionGeneralSAP();
   const { imageData, handleImageChange, error } = useFormDataCargarImagen();
@@ -200,6 +202,7 @@ export const FormSAP = () => {
       puerto_ftp: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertoFTP,
       idLampara:0,
       nombreEquipo: informacionGeneralDataSAPForm.nombreEquipo || "",
+      autor: user?.email ?? undefined,
     };
 
     try {
@@ -228,6 +231,7 @@ export const FormSAP = () => {
       puerto_ftp: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertoFTP,
       idLampara:0,
       nombreEquipo:informacionGeneralDataSAPForm.nombreEquipo || "",
+      autor: user?.email ?? undefined,
     };
     try {
       await agregarRedBodega(bodegaComputadoraData);
@@ -253,6 +257,7 @@ export const FormSAP = () => {
       puerto_ftp: selectedPeriferico?.nombre==="AP"?"":informacionGeneralDataSAPForm.puertoFTP,
       idLampara:0,
       nombreEquipo:informacionGeneralDataSAPForm.nombreEquipo || "",
+      autor: user?.email ?? undefined,
     };
     try {
       await agregarRedBaja(bodegaComputadoraData);

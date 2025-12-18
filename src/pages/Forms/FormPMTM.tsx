@@ -19,6 +19,7 @@ import { ModalObservation } from "./components/ModalObservation.tsx";
 import { useSnackbar } from "@context/SnackbarContext.tsx";
 import { useExisteInventario } from "../../hooks/useExisteInventario";
 import { useExisteSerie } from "../../hooks/useExisteSerie";
+import { useUser } from "@context/userContext.tsx";
 
 let steps = ["Datos de inventario", "Cargar imagen"];
 
@@ -53,6 +54,7 @@ export const FormPMTM = () => {
   const { agregarSimpleActivo } = useAgregarSimpleActivo();
   const { agregarSimpleBodega } = useAgregarSimpleBodega();
   const { agregarSimpleBaja } = useAgregarSimpleBaja();
+  const { user } = useUser();
   const stepStyle = {
     "& .Mui-active": {
       "&.MuiStepIcon-root": {
@@ -218,6 +220,7 @@ export const FormPMTM = () => {
       imagenRuta: imageData.imagePath,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,
       observacion: observationValue,
+      autor: user?.email ?? undefined,
     };
     try {
       if (
@@ -244,6 +247,7 @@ export const FormPMTM = () => {
       modeloId: Number(inventoryDataForm.modelo?.id_modelo) ?? 0,
       observacion: observationValue,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,
+      autor: user?.email ?? undefined,
     };
     try {
       if (
@@ -269,6 +273,7 @@ export const FormPMTM = () => {
       modeloId: Number(inventoryDataForm.modelo?.id_modelo) ?? 0,
       observacion: observationValue,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,
+      autor: user?.email ?? undefined,
     };
     try {
       if (

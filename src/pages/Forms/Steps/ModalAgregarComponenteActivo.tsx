@@ -406,7 +406,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                 )}
                 disabled={true}
               />
-              <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+                <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
                 <TextField
                   label="Inventario"
                   placeholder="Inventario"
@@ -415,74 +415,71 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
                   size="small"
                   value={nuevoComponente.inventario}
                   error={
-                    !!componentsErrors.inventario ||
-                    (nuevoComponente.inventario !== "S/N" && !!nuevoComponente.inventario && existeInventario)
+                  !!componentsErrors.inventario ||
+                  (nuevoComponente.inventario !== "S/N" && !!nuevoComponente.inventario && existeInventario)
                   }
                   helperText={
-                    componentsErrors.inventario && nuevoComponente.inventario !== "S/N"
-                      ? "Por favor escribir un inventario válido"
-                      : nuevoComponente.inventario !== "S/N" && existeInventario
-                      ? "El inventario ya existe"
-                      : getInventarioHelperText()
+                  componentsErrors.inventario && nuevoComponente.inventario !== "S/N"
+                    ? "Por favor escribir un inventario válido"
+                    : nuevoComponente.inventario !== "S/N" && existeInventario
+                    ? "El inventario ya existe"
+                    : getInventarioHelperText()
                   }
                   onChange={async (e) => {
-                    if (empresa !== "Espol") {
-                      let value = e.target.value;
-                      const maxLength = getMaxLength();
+                  let value = e.target.value;
+                  const maxLength = getMaxLength();
 
-                      if (value !== null && value.length > maxLength) {
-                        value = value.slice(0, maxLength);
-                      }
-                      setNuevoComponente({
-                        ...nuevoComponente,
-                        inventario: value,
-                      });
-                      handleUniqueComponentsError("inventario", value, {
-                        ...nuevoComponente,
-                        empresa,
-                      });
-                      if (value && value !== "S/N") {
-                        await consultarInventario(value);
-                      }
-                    }
+                  if (value !== null && value.length > maxLength) {
+                    value = value.slice(0, maxLength);
+                  }
+                  setNuevoComponente({
+                    ...nuevoComponente,
+                    inventario: value,
+                  });
+                  handleUniqueComponentsError("inventario", value, {
+                    ...nuevoComponente,
+                    empresa,
+                  });
+                  if (value && value !== "S/N") {
+                    await consultarInventario(value);
+                  }
                   }}
-                  disabled={empresa === "Espol" || nuevoComponente.inventario === "S/N"}
+                  disabled={nuevoComponente.inventario === "S/N"}
                 />
                 <Box sx={{ display: "flex", alignItems: "center", mt: 0.5 }}>
                   <input
-                    type="checkbox"
-                    id="sin-inventario-modal-componente"
-                    checked={nuevoComponente.inventario === "S/N"}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setNuevoComponente({
-                          ...nuevoComponente,
-                          inventario: "S/N"
-                        });
-                        handleUniqueComponentsError("inventario", "S/N", {
-                          ...nuevoComponente,
-                          empresa,
-                        });
-                      } else {
-                        const nuevoInventario =
-                          (empresa === "Espol" || empresa === "EspolTech") && inventarioComputadora
-                            ? generateInventario(nuevoComponente.periferico, inventarioComputadora)
-                            : "";
-                        setNuevoComponente({
-                          ...nuevoComponente,
-                          inventario: nuevoInventario
-                        });
-                        handleUniqueComponentsError("inventario", nuevoInventario, {
-                          ...nuevoComponente,
-                          empresa,
-                        });
-                      }
-                    }}
-                    disabled={empresa === "Espol"}
+                  type="checkbox"
+                  id="sin-inventario-modal-componente"
+                  checked={nuevoComponente.inventario === "S/N"}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                    setNuevoComponente({
+                      ...nuevoComponente,
+                      inventario: "S/N"
+                    });
+                    handleUniqueComponentsError("inventario", "S/N", {
+                      ...nuevoComponente,
+                      empresa,
+                    });
+                    } else {
+                    const nuevoInventario =
+                      (empresa === "Espol" || empresa === "EspolTech") && inventarioComputadora
+                      ? generateInventario(nuevoComponente.periferico, inventarioComputadora)
+                      : "";
+                    setNuevoComponente({
+                      ...nuevoComponente,
+                      inventario: nuevoInventario
+                    });
+                    handleUniqueComponentsError("inventario", nuevoInventario, {
+                      ...nuevoComponente,
+                      empresa,
+                    });
+                    }
+                  }}
                   />
                   <label htmlFor="sin-inventario-modal-componente">Sin inventario</label>
                 </Box>
-              </Box>
+                </Box>
             </div>
           </div>
         </Box>

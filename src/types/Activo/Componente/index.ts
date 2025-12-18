@@ -21,4 +21,6 @@ export type ComponenteData = {
     ubicacionId: number;
     usuarioId: number;
     imagenRuta: string;
+    editor?: string;
+    autor?: string;
   };

@@ -44,6 +44,7 @@ export type ActivoComputadoraEdit = {
     modeloId: string;
     serie: string;
     observacion: string;
+    editor?: string;
   };
 
   export type ActivoSimpleEdit = {
@@ -100,6 +101,7 @@ export type ActivoRedEdit = {
     id_lampara: string;
     id_computadora?: string;
     observacion: string;
+    editor?: string;
   };
 
   export type ActivoRedEditSend = {
@@ -117,6 +119,7 @@ export type ActivoRedEdit = {
     puertos: string;
     puerto_ftp: string;
     nombre_equipo: string;
+    editor?: string;
   };
 
 export type ActivoComputadoraData = {
@@ -139,6 +142,7 @@ export type ActivoComputadoraData = {
     idUsuario: number;
     imagenRuta: string;
     observacion: string;
+    autor?: string;
   };
   
   export type ActivoSimpleData = {
@@ -153,6 +157,7 @@ export type ActivoComputadoraData = {
     idUsuario: number;
     imagenRuta: string;
     observacion: string;
+    autor?: string;
   };
 
   export type ActivoRedData = {
@@ -170,6 +175,7 @@ export type ActivoComputadoraData = {
     puertos: string;
     puerto_ftp: string;
     nombreEquipo: string;
+    autor?: string;
   };
 
 export type ActivoComputadoraImport = {

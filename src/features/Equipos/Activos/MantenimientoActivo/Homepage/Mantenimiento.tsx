@@ -370,7 +370,7 @@ const Mantenimiento = () => {
       {exporting && <Loader />}
       <div className="mb-4">
         <div className="flex gap-2 items-center">
-            <h1 className="text-2xl font-bold my-5">Mantenimientos</h1>
+            <h1 className="text-2xl font-bold my-5">Historial de Mantenimientos</h1>
             {selectedItems.length > 0 && (
               <div className="flex gap-2">
                 <Button

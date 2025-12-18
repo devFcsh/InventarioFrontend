@@ -13,6 +13,7 @@ interface FormProps {
   setShowSuccessMessageComponentes: any;
   empresaComputadora?: string;
   inventarioComputadora?: string;
+  esComputadora?: boolean;
 }
 
 export const StepComponentes: React.FC<FormProps> = ({
@@ -23,7 +24,8 @@ export const StepComponentes: React.FC<FormProps> = ({
   showSuccessMessageComponentes,
   setShowSuccessMessageComponentes,
   empresaComputadora = "",
-  inventarioComputadora = ""
+  inventarioComputadora = "",
+  esComputadora = false
 }) => {
   const [openModalComponentes, setOpenModalComponentes] =
     useState<boolean>(false);
@@ -39,8 +41,32 @@ export const StepComponentes: React.FC<FormProps> = ({
   const handleOpenModalComponentes = () => setOpenModalComponentes(true);
   const handleCloseModalComponentes = () => setOpenModalComponentes(false);
 
+  // Verificar componentes requeridos para Computadora
+  const tieneMonitor = componentes.some(
+    (comp: any) => comp.periferico?.nombre?.toLowerCase() === "monitor"
+  );
+  const tieneMouse = componentes.some(
+    (comp: any) => comp.periferico?.nombre?.toLowerCase() === "mouse"
+  );
+  const tieneTeclado = componentes.some(
+    (comp: any) => comp.periferico?.nombre?.toLowerCase() === "teclado"
+  );
+
+  const componentesFaltantes = esComputadora
+    ? [
+        !tieneMonitor && "Monitor",
+        !tieneMouse && "Mouse",
+        !tieneTeclado && "Teclado",
+      ].filter(Boolean)
+    : [];
+
   return (
     <div className="mt-8">
+      {esComputadora && componentesFaltantes.length > 0 && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          Se requiere agregar los siguientes componentes para poder finalizar: {componentesFaltantes.join(", ")}
+        </Alert>
+      )}
       <Button
         onClick={handleOpenModalComponentes}
         color="primary"

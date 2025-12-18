@@ -34,6 +34,7 @@ import useSubirImagen from "@hooks/useSubirImagen";
 import { useAgregarComputadoraActivo } from "../hooks/useAgregarComputadoraActivo";
 import { useAgregarComponentes } from "../../../../../hooks/useAgregarComponentes.ts";
 import { useSnackbar } from "@context/SnackbarContext.tsx";
+import { useUser } from "@context/userContext.tsx";
 
 interface AgregarComputadoraActivoProps {
   periferico: string;
@@ -100,6 +101,7 @@ const AgregarComputadoraActivo = ({
   const [openModalAgregar, setOpenModalAgregar] = useState(false);
   const [openModalCancelar, setOpenModalCancelar] = useState(false);
   const { showMessage } = useSnackbar();
+  const { user } = useUser();
   const { agregarComputadoraActivo } = useAgregarComputadoraActivo();
   const { agregarComponentes } = useAgregarComponentes();
   const { marcas } = useMarcasPorPeriferico(periferico);
@@ -230,6 +232,7 @@ const AgregarComputadoraActivo = ({
           ubicacionId: Number(selectedUbicacion?.id_ubicacion) ?? 0,
           usuarioId: parseInt(idUsuario, 10),
           imagenRuta: imagePath,
+          autor: user?.email ?? undefined,
         });
       }
 
@@ -420,10 +423,10 @@ const AgregarComputadoraActivo = ({
             value={selectedInventarioMarca}
             renderInput={(params) => (
               <TextField
-                {...params}
-                label="Marca"
-                variant="outlined"
-                fullWidth
+          {...params}
+          label="Marca"
+          variant="outlined"
+          fullWidth
               />
             )}
           />
@@ -436,23 +439,23 @@ const AgregarComputadoraActivo = ({
             value={selectedInventarioModelo}
             renderInput={(params) => (
               <TextField
-                {...params}
-                label="Modelo"
-                variant="outlined"
-                fullWidth
+          {...params}
+          label="Modelo"
+          variant="outlined"
+          fullWidth
               />
             )}
             disabled={!selectedInventarioMarca}
           />
           <TextField
-  label="Serie"
-  variant="outlined"
-  fullWidth
-  size="small"
-  value={selectedInventarioSerie || ""}
-  onChange={(e) => setSelectedInventarioSerie(e.target.value)}
-  disabled={!selectedInventarioModelo}
-/>
+            label="Serie"
+            variant="outlined"
+            fullWidth
+            size="small"
+            value={selectedInventarioSerie || ""}
+            onChange={(e) => setSelectedInventarioSerie(e.target.value)}
+            disabled={!selectedInventarioModelo}
+          />
           <TextField
             label="Inventario"
             placeholder="Inventario"
@@ -471,10 +474,19 @@ const AgregarComputadoraActivo = ({
             value={selectedInventarioAnio}
             onChange={(e) => {
               const value = e.target.value;
-              if (/^\d*$/.test(value)) {
-                setSelectedInventarioAnio(value);
+              const currentYear = new Date().getFullYear();
+              if (/^\d*$/.test(value) && value.length <= 4) {
+          if (value.length === 4) {
+            const year = parseInt(value, 10);
+            if (year <= currentYear) {
+              setSelectedInventarioAnio(value);
+            }
+          } else {
+            setSelectedInventarioAnio(value);
+          }
               }
-            }}/>
+            }}
+          />
         </div>
       </div>
 

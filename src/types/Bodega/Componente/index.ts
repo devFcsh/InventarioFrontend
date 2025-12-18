@@ -18,4 +18,6 @@ export type ComponenteDataBodega = {
       serie: string;
       modeloId: number;
     }[];
+    editor?: string;
+    autor?: string;
 };

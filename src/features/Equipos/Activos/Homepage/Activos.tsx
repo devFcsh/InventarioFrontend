@@ -1287,6 +1287,49 @@ const Activos = () => {
                       )}
                     </button>
                   </th>
+                  {rol === "administrador" && (
+                    <>
+                      <th scope="col" className="px-4 py-3 w-36">
+                        <button type="button" onClick={() => toggleSort("autor")} className="flex items-center gap-1">
+                          Autor {sortBy === "autor" ? (
+                            sortDir === "asc" ? (
+                              <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                            ) : (
+                              <Icon icon="mdi:sort-descending" width="16" height="16" />
+                            )
+                          ) : (
+                            <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                          )}
+                        </button>
+                      </th>
+                      <th scope="col" className="px-4 py-3 w-36">
+                        <button type="button" onClick={() => toggleSort("editor")} className="flex items-center gap-1">
+                          Editor {sortBy === "editor" ? (
+                            sortDir === "asc" ? (
+                              <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                            ) : (
+                              <Icon icon="mdi:sort-descending" width="16" height="16" />
+                            )
+                          ) : (
+                            <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                          )}
+                        </button>
+                      </th>
+                      <th scope="col" className="px-4 py-3 w-40">
+                        <button type="button" onClick={() => toggleSort("fecha_creacion")} className="flex items-center gap-1">
+                          Fecha Creación {sortBy === "fecha_creacion" ? (
+                            sortDir === "asc" ? (
+                              <Icon icon="mdi:sort-ascending" width="16" height="16" />
+                            ) : (
+                              <Icon icon="mdi:sort-descending" width="16" height="16" />
+                            )
+                          ) : (
+                            <Icon icon="mdi:sort" width="16" height="16" className="opacity-60" />
+                          )}
+                        </button>
+                      </th>
+                    </>
+                  )}
                   <th scope="col" className="px-4 py-3 w-56">
                     Acciones
                   </th>
@@ -1314,6 +1357,24 @@ const Activos = () => {
                     <td className="px-4 py-2 w-48">{equipo.usuario}</td>
                     <td className="px-4 py-2 w-32">{equipo.uso}</td>
                     <td className="px-4 py-2 w-36">{equipo.edificio}</td>
+                    {rol === "administrador" && (
+                      <>
+                        <td className="px-4 py-2 w-36">{equipo.autor || "-"}</td>
+                        <td className="px-4 py-2 w-36">{equipo.editor || "-"}</td>
+                        <td className="px-4 py-2 w-40">
+                          {equipo.fecha_creacion 
+                            ? new Date(equipo.fecha_creacion).toLocaleString("es-ES", {
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                                hour: "2-digit",
+                                minute: "2-digit"
+                              })
+                            : "-"
+                          }
+                        </td>
+                      </>
+                    )}
                     <td className="px-4 py-3 flex items-center gap-2 truncate text-black w-56">
                       <Tooltip title="Ver detalles">
                         <span>
@@ -1441,7 +1502,7 @@ const Activos = () => {
                         </span>
                         </Tooltip>
                         
-                      <Tooltip title="Mantenimientos">
+                      <Tooltip title="Agregar y Ver Mantenimientos">
                         <span
                           className={
                             !unableAction && (equipo.periferico === "Computadora" || equipo.periferico === "Laptop")

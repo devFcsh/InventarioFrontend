@@ -23,6 +23,7 @@ import { ModalObservation } from "./components/ModalObservation.tsx";
 import { useSnackbar } from "@context/SnackbarContext.tsx";
 import { useExisteInventario } from "../../hooks/useExisteInventario";
 import { useExisteSerie } from "../../hooks/useExisteSerie";
+import { useUser } from "@context/userContext.tsx";
 
 export const FormLC = () => {
   const navigate = useNavigate();
@@ -73,9 +74,27 @@ export const FormLC = () => {
   } = useCargarImagenErrors();
 
   const { showMessage } = useSnackbar();
+  const { user } = useUser();
 
   const { existe: existeInventario, consultarInventario } = useExisteInventario();
   const { existe: existeSerie, consultarSerie } = useExisteSerie();
+
+  // Validar componentes mínimos para Computadora
+  const validarComponentesMinimos = () => {
+    if (selectedPeriferico?.id_periferico === "1" || selectedPeriferico?.nombre === "Computadora") {
+      const tieneMonitor = componentes.some(
+        (comp: any) => comp.periferico?.nombre?.toLowerCase() === "monitor"
+      );
+      const tieneMouse = componentes.some(
+        (comp: any) => comp.periferico?.nombre?.toLowerCase() === "mouse"
+      );
+      const tieneTeclado = componentes.some(
+        (comp: any) => comp.periferico?.nombre?.toLowerCase() === "teclado"
+      );
+      return tieneMonitor && tieneMouse && tieneTeclado;
+    }
+    return true; // Si no es computadora, no requiere validación
+  };
 
   const handleNext = () => {
     if (activeStep === 0) {
@@ -204,6 +223,7 @@ export const FormLC = () => {
               setShowSuccessMessageComponentes={setShowSuccessMessageComponentes}
               empresaComputadora={inventoryDataForm.empresa}
               inventarioComputadora={inventoryDataForm.inventario}
+              esComputadora={selectedPeriferico?.id_periferico === "1" || selectedPeriferico?.nombre === "Computadora"}
             />
           </>
         );
@@ -235,7 +255,8 @@ export const FormLC = () => {
       idUbicacion: Number(inventoryDataForm.ubicacion?.id_ubicacion) ?? 0,
       idUsuario: parseInt(inventoryDataForm.usuarioId || "", 10),
       imagenRuta: imageData.imagePath,
-      observacion: observationValue
+      observacion: observationValue,
+      autor: user?.email ?? undefined
     };
 
     try {
@@ -254,6 +275,7 @@ export const FormLC = () => {
           ubicacionId: Number(inventoryDataForm.ubicacion?.id_ubicacion) ?? 0,
           usuarioId: parseInt(inventoryDataForm.usuarioId || "", 10),
           imagenRuta: imageData.imagePath,
+          autor: user?.email ?? undefined,
         });
       }
       showMessage("Equipo agregado exitosamente", "success");
@@ -285,6 +307,7 @@ export const FormLC = () => {
         Number(informacionGeneralDataForm.antivirus?.id_antivirus) ?? 0,
       dominio: Number(informacionGeneralDataForm.dominio?.id_dominio) ?? 0,
       observacion: observationValue,
+      autor: user?.email ?? undefined,
     };
     try {
       const equipoId = await agregarComputadoraBodega(bodegaComputadoraData);
@@ -298,6 +321,7 @@ export const FormLC = () => {
             serie: comp.serie || "",
             modeloId: Number(comp.modelo?.id_modelo) ?? 0,
           })),
+          autor: user?.email ?? undefined,
         });
       }
       showMessage("Equipo agregado exitosamente", "success");
@@ -419,13 +443,14 @@ export const FormLC = () => {
                 },
               }}
               disabled={
-                activeStep === 0 &&
-                (
-                  !!inventoryErrors.serie ||
-                  !!inventoryErrors.inventario ||
-                  (!!inventoryDataForm.serie && existeSerie) ||
-                  (!!inventoryDataForm.inventario && inventoryDataForm.inventario !== "S/N" && existeInventario)
-                )
+                (activeStep === 0 &&
+                  (
+                    !!inventoryErrors.serie ||
+                    !!inventoryErrors.inventario ||
+                    (!!inventoryDataForm.serie && existeSerie) ||
+                    (!!inventoryDataForm.inventario && inventoryDataForm.inventario !== "S/N" && existeInventario)
+                  )) ||
+                (activeStep === steps.length - 1 && !validarComponentesMinimos())
               }
             >
               {activeStep === steps.length - 1 && tipoInventario === "activo"
