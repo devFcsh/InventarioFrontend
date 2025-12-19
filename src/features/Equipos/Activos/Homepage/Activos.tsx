@@ -1112,71 +1112,73 @@ const Activos = () => {
             <table className="w-full text-left text-sm text-gray-500">
               <thead className="text-xs uppercase bg-gray-50 text-gray-700">
                 <tr>
-                  <th scope="col" className="flex items-center gap-2 px-4 py-3 w-12">
-                    <Tooltip title="Seleccionar todos">
-                      <input
-                        type="checkbox"
-                        onChange={handleSelectAllChange}
-                        checked={selectedItems.length === equipos.length}
-                        className="mr-2"
-                        disabled={unableAction}
-                      />
-                    </Tooltip>
-                    {selectedItems.length > 0 && (
-                      <>
-                        <Tooltip title="Eliminar activos">
-                          <span>
-                          <Icon
-                            icon="weui:delete-outlined"
-                            width="20"
-                            height="20"
-                            onClick={
-                            !unableActionEditor ? handleDelete : undefined
-                            }
-                            className={`cursor-pointer ${
-                            unableActionEditor
-                              ? "opacity-50 pointer-events-none"
-                              : ""
-                            }`}
-                          />
-                          </span>
-                        </Tooltip>
-                        <Tooltip title="Dar de baja activos">
-                          <span>
-                          <Icon
-                            icon="ph:arrow-fat-down-light"
-                            width="20"
-                            height="20"
-                            onClick={!unableActionEditor ? handleBaja : undefined}
-                            className={`cursor-pointer ${
-                            unableActionEditor
-                              ? "opacity-50 pointer-events-none"
-                              : ""
-                            }`}
-                          />
-                          </span>
-                        </Tooltip>
-                        {/*
-                      <Tooltip title="Pasar activos a bodega">
-                        <span>
-                          <Icon
-                            icon="lucide:warehouse"
-                            width="20"
-                            height="20"
-                            onClick={
-                              !unableAction ? handlePasarABodega : undefined
-                            }
-                            className={`cursor-pointer ${
-                              unableAction
+                  <th scope="col" className="px-4 py-3 min-w-32">
+                    <div className="flex items-center gap-2">
+                      <Tooltip title="Seleccionar todos">
+                        <input
+                          type="checkbox"
+                          onChange={handleSelectAllChange}
+                          checked={selectedItems.length === equipos.length}
+                          className="flex-shrink-0"
+                          disabled={unableAction}
+                        />
+                      </Tooltip>
+                      {selectedItems.length > 0 && (
+                        <>
+                          <Tooltip title="Eliminar activos">
+                            <span>
+                            <Icon
+                              icon="weui:delete-outlined"
+                              width="20"
+                              height="20"
+                              onClick={
+                              !unableActionEditor ? handleDelete : undefined
+                              }
+                              className={`cursor-pointer flex-shrink-0 ${
+                              unableActionEditor
                                 ? "opacity-50 pointer-events-none"
                                 : ""
-                            }`}
-                          />
-                        </span>
-                      </Tooltip>
-                      */}
-                      </>
-                    )}
+                              }`}
+                            />
+                            </span>
+                          </Tooltip>
+                          <Tooltip title="Dar de baja activos">
+                            <span>
+                            <Icon
+                              icon="ph:arrow-fat-down-light"
+                              width="20"
+                              height="20"
+                              onClick={!unableActionEditor ? handleBaja : undefined}
+                              className={`cursor-pointer flex-shrink-0 ${
+                              unableActionEditor
+                                ? "opacity-50 pointer-events-none"
+                                : ""
+                              }`}
+                            />
+                            </span>
+                          </Tooltip>
+                        {/*
+                        <Tooltip title="Pasar activos a bodega">
+                          <span>
+                            <Icon
+                              icon="lucide:warehouse"
+                              width="20"
+                              height="20"
+                              onClick={
+                                !unableAction ? handlePasarABodega : undefined
+                              }
+                              className={`cursor-pointer flex-shrink-0 ${
+                                unableAction
+                                  ? "opacity-50 pointer-events-none"
+                                  : ""
+                              }`}
+                            />
+                          </span>
+                        </Tooltip>
+                        */}
+                        </>
+                      )}
+                    </div>
                   </th>
                   <th scope="col" className="px-4 py-3 w-14">
                     <button
@@ -1341,7 +1343,7 @@ const Activos = () => {
                     key={equipo.id_equipo}
                     className="bg-white border-b hover:bg-gray-50"
                   >
-                    <td className="px-4 py-2 w-12">
+                    <td className="px-4 py-2">
                       <input
                         type="checkbox"
                         checked={selectedItems.includes(equipo.id_equipo)}
