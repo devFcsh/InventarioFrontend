@@ -257,7 +257,6 @@ export const StepDatosInventarioSAP = ({
               }
               handleInventorySAPChange("anio_compra", value);
               
-              // Validar año
               if (value.length === 4) {
                 const year = parseInt(value, 10);
                 const currentYear = new Date().getFullYear();

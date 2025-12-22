@@ -15,9 +15,10 @@ const useEditarActivoSimple = () => {
         },
       });
       return response.data;
-    } catch (err) {
-      setError("Error al editar activo" + err);
-      throw err;
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.error || "Error al editar activo";
+      setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }

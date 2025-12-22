@@ -22,6 +22,7 @@ const categorias = [
   "RAM",
   "Disco",
   "Procesador",
+  "Actividad de Mantenimiento",
 ];
 
 const itemsData = [
@@ -39,6 +40,7 @@ const itemsData = [
   { id: 14, categoria: "Procesador" },
   { id: 15, categoria: "Versión Office" },
   { id: 16, categoria: "Lampara" },
+  { id: 17, categoria: "Actividad de Mantenimiento" },
 ];
 
 type FilteredItem = {

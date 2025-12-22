@@ -23,7 +23,6 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  // Usuario quemado para desarrollo
   const hardcodedUser: User = {
     id: "1",
     username: "devuser",
@@ -36,7 +35,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const isAuthenticated = !!user;
 
-  // checkAuth solo setea el usuario quemado
   const checkAuth = async () => {
     setIsLoading(true);
     setUser(hardcodedUser);
@@ -44,7 +42,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const login = () => {
-    // Solo simula login en desarrollo
     setUser(hardcodedUser);
   };
 

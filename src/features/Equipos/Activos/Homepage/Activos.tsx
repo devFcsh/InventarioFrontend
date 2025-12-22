@@ -137,7 +137,6 @@ const Activos = () => {
     }
   }, [shouldFetch]);
 
-  // Guardar filtros en sessionStorage cuando cambien
   useEffect(() => {
     sessionStorage.setItem("activos_filter_periferico", inputPeriferico);
   }, [inputPeriferico]);
@@ -1112,7 +1111,7 @@ const Activos = () => {
             <table className="w-full text-left text-sm text-gray-500">
               <thead className="text-xs uppercase bg-gray-50 text-gray-700">
                 <tr>
-                  <th scope="col" className="px-4 py-3 min-w-32">
+                  <th scope="col" className="px-4 py-3 min-w-16">
                     <div className="flex items-center gap-2">
                       <Tooltip title="Seleccionar todos">
                         <input

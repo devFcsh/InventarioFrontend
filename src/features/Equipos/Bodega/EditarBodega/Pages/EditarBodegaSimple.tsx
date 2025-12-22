@@ -142,7 +142,6 @@ const EditarBodegaSimple = ({
     }
   }, [equipoSimpleBodega, lamparasTotales]);
 
-  // Prefill selectedPeriferico / selectedComputadora: only when backend indicates this is a componente
   type MaybeComponente = {
     isComponente?: boolean;
     id_periferico_computadora?: string | number;
@@ -183,7 +182,7 @@ const EditarBodegaSimple = ({
       anio_compra: selectedInventarioAnio,
       serie: selectedInventarioSerie ?? "",
       perifericoId: selectedPeriferico?.id_periferico ?? equipoSimpleBodega.id_periferico,
-      id_computadora: selectedComputadora ? String(selectedComputadora.id_equipo) : undefined,
+      id_computadora: selectedComputadora ? String(selectedComputadora.id_equipo) : null,
       observacion: observationValue,
       id_lampara: selectedLampara?.id_lampara ?? "",
       editor: user?.email ?? undefined,
@@ -262,15 +261,20 @@ const EditarBodegaSimple = ({
     setOpenModalCancelar(true);
   };
   const validarCamposEquipo = () => {
-    if (
-      !selectedInventarioInv ||
-      errorInventario ||
-      !selectedInventarioSerie ||
-      (perifericoName !== "Proyector" ? false : !selectedLampara)
-    ) {
-      setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
+    const missing: string[] = [];
+
+    if (!selectedInventarioInv || errorInventario) missing.push("Inventario");
+    if (!selectedInventarioSerie) missing.push("Serie");
+    if (perifericoName === "Proyector" && !selectedLampara) missing.push("Lámpara");
+    if (selectedPeriferico && !selectedComputadora) missing.push("Serie de Equipo Principal");
+
+    if (missing.length > 0) {
+      setErrorMensajeEquipo(
+        `Por favor complete los siguientes campos: ${missing.join(", ")}.`
+      );
       return false;
     }
+
     setErrorMensajeEquipo(null);
     return true;
   };
@@ -472,7 +476,6 @@ const EditarBodegaSimple = ({
             }}
           />
         </Box>
-        {/* Periférico (opcional) y Serie computadora (opcional) lado a lado */}
         <div className="col-span-2 flex gap-4">
           <div className="w-1/2">
             <Autocomplete
@@ -491,7 +494,7 @@ const EditarBodegaSimple = ({
                 }
               }}
               renderInput={(params) => (
-                <TextField {...params} label="Periférico (opcional)" variant="outlined" fullWidth />
+                <TextField {...params} label="Tipo Equipo Principal (Opcional)" variant="outlined" fullWidth />
               )}
             />
           </div>
@@ -514,7 +517,7 @@ const EditarBodegaSimple = ({
                 }
               }}
               renderInput={(params) => (
-                <TextField {...params} label="Serie computadora (opcional)" variant="outlined" fullWidth />
+                <TextField {...params} label={selectedPeriferico ? "Serie de Equipo Principal *" : "Serie de Equipo Principal (opcional)"} variant="outlined" fullWidth />
               )}
               disabled={!selectedPeriferico}
             />

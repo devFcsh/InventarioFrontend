@@ -24,7 +24,6 @@ const UserContext = createContext<UserContextType>({
 });
 
 export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Usuario quemado para desarrollo
   const hardcodedUser: User = {
     id: "1",
     username: "devuser",
@@ -33,13 +32,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     authenticatedAt: new Date().toISOString(),
     source: "dev",
   };
-  const hardcodedRol = "administrador"; // Cambia el rol si lo necesitas
+  const hardcodedRol = "administrador"; // Cambia el rol
 
   const [user, setUser] = useState<User | null>(hardcodedUser);
   const [rol, setRol] = useState<string | null>(hardcodedRol);
   const [loading, setLoading] = useState(false);
 
-  // refreshUser solo vuelve a poner el usuario quemado
   const fetchUser = async () => {
     setLoading(true);
     setUser(hardcodedUser);
@@ -48,7 +46,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   useEffect(() => {
-    // Solo setea el usuario quemado al montar
     setUser(hardcodedUser);
     setRol(hardcodedRol);
     setLoading(false);

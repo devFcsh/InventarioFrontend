@@ -45,7 +45,7 @@ const EditarUsuarioSistema = () => {
       if (correo && selectedRolId) {
         await editarUsuarioSistema(
           usuario.id_usuario_sistema,
-          correo + "@espol.edu.ec", // Agregar el dominio al guardar
+          correo + "@espol.edu.ec",
           String(selectedRolId)
         );
         showMessage("Usuario actualizado correctamente", "success");

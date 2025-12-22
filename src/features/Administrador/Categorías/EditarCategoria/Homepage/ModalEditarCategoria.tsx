@@ -63,6 +63,15 @@ import { useObtenerMarcaDetalle } from "../../AgregarCategoria/hooks/useObtenerM
 import { useObtenerModeloDetalle } from "../../AgregarCategoria/hooks/useObtenerModeloDetalle";
 import { useSnackbar } from "@context/SnackbarContext";
 import Loader from "@pages/Loader";
+import { useObtenerTodasActividadesMantenimiento } from "@hooks/useObtenerTodasActividadesMantenimiento";
+import { useEditarActividadMantenimiento } from "@hooks/useEditarActividadMantenimiento";
+import { useEliminarActividadMantenimiento } from "@hooks/useEliminarActividadMantenimiento";
+
+interface Actividad {
+  id: number;
+  actividad: string;
+  tipo: string;
+}
 
 type Opcion =
   | Uso
@@ -78,7 +87,8 @@ type Opcion =
   | VersionOffice
   | VersionSO
   | Procesador
-  | RAM;
+  | RAM
+  | Actividad;
 
 interface ModalEditarCategoriaProps {
   open: boolean;
@@ -117,6 +127,8 @@ const isProcesador = (obj: Opcion | null): obj is Procesador =>
   obj !== null && "id_procesador" in obj;
 const isVersionOffice = (obj: Opcion | null): obj is VersionOffice =>
   obj !== null && "id_versionoffice" in obj;
+const isActividad = (obj: Opcion | null): obj is Actividad =>
+  obj !== null && "id" in obj && "actividad" in obj && "tipo" in obj;
 
 const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   open,
@@ -138,6 +150,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const { ram } = useRam();
   const { procesadores } = useProcesadores();
   const { versionesOffice } = useVersionesOffice();
+  const { actividades } = useObtenerTodasActividadesMantenimiento();
 
   const { editarDominio } = useEditarDominio();
   const { editarPeriferico } = useEditarPeriferico();
@@ -153,6 +166,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const { editarProcesador } = useEditarProcesador();
   const { editarVersionOffice } = useEditarVersionOffice();
   const { editarRAM } = useEditarRAM();
+  const { editarActividad } = useEditarActividadMantenimiento();
 
   const { eliminarDominio } = useEliminarDominio();
   const { eliminarPeriferico } = useEliminarPeriferico();
@@ -168,6 +182,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
   const { eliminarProcesador } = useEliminarProcesador();
   const { eliminarVersionOffice } = useEliminarVersionOffice();
   const { eliminarRAM } = useEliminarRAM();
+  const { eliminarActividad } = useEliminarActividadMantenimiento();
 
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState<Opcion | null>(null);
@@ -210,6 +225,8 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
       ? procesadores
       : selectedCategoria === "Versión Office"
       ? versionesOffice
+      : selectedCategoria === "Actividad de Mantenimiento"
+      ? actividades
       : [];
 
   const handleEditarCategoria = (elemento: Opcion) => {
@@ -219,6 +236,9 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
       setEditedTipo(elemento?.tipo || "");
     } else if (selectedCategoria === "Disco" && isDisco(elemento)) {
       setEditedValue(elemento?.capacidad || "");
+    } else if (selectedCategoria === "Actividad de Mantenimiento" && isActividad(elemento)) {
+      setEditedValue(elemento?.actividad || "");
+      setEditedTipo(elemento?.tipo || "");
     } else if (elemento && "nombre" in elemento) {
       setEditedValue(elemento.nombre || "");
     }
@@ -371,6 +391,13 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
               });
             }
             break;
+          case "Actividad de Mantenimiento":
+            if (isActividad(selectedOption)) {
+              editarActividad(selectedOption.id, {
+                nombre: editedValue,
+              });
+            }
+            break;
           default:
             showMessage(
               `No se puede editar la categoría ${selectedCategoria}`, "error")
@@ -465,6 +492,18 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
               await eliminarLampara(Number(elemento.id_lampara));
             }
             break;
+          case "Actividad de Mantenimiento":
+            if (isActividad(elemento)) {
+              const result = await eliminarActividad(elemento.id);
+              if (result.enUso) {
+                showMessage(
+                  `No se puede eliminar la actividad porque está relacionada con ${result.cantidadMantenimientos} mantenimiento(s)`, 
+                  "error"
+                );
+                return;
+              }
+            }
+            break;
           default:
             showMessage(
               `No se puede eliminar la categoría ${selectedCategoria}`, "error")
@@ -493,7 +532,7 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
               <thead>
                 <tr className="bg-gray-100 border-b">
                   <th className="py-2 px-4 border">Subcategoría</th>
-                  {selectedCategoria === "RAM" ? (
+                  {(selectedCategoria === "RAM" || selectedCategoria === "Actividad de Mantenimiento") ? (
                     <th className="py-2 px-4 border">Subcategoría Tipo</th>
                   ) : (
                     <></>
@@ -520,6 +559,10 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
                             selectedCategoria === "Disco" &&
                             isDisco(elemento)
                           ? elemento.capacidad
+                          : elemento &&
+                            selectedCategoria === "Actividad de Mantenimiento" &&
+                            isActividad(elemento)
+                          ? elemento.actividad
                           : elemento && "nombre" in elemento
                           ? elemento.nombre
                           : ""}
@@ -527,6 +570,10 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
                       {selectedCategoria === "RAM" ? (
                         <td className="py-2 px-4 border">
                           {elemento && isRAM(elemento) ? elemento.tipo : ""}
+                        </td>
+                      ) : selectedCategoria === "Actividad de Mantenimiento" ? (
+                        <td className="py-2 px-4 border">
+                          {elemento && isActividad(elemento) ? elemento.tipo : ""}
                         </td>
                       ) : (
                         <></>
@@ -674,6 +721,31 @@ const ModalEditarCategoria: FC<ModalEditarCategoriaProps> = ({
                   }
                   setEditedValue(e.target.value);
                   }}
+                  className="mt-3"
+                />
+              </>
+            ) : selectedCategoria === "Actividad de Mantenimiento" ? (
+              <>
+                <TextField
+                  label="Nombre de la Actividad"
+                  variant="outlined"
+                  fullWidth
+                  value={editedValue}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value !== null && value.length > 100) {
+                      return;
+                    }
+                    setEditedValue(e.target.value);
+                  }}
+                />
+                <div style={{ marginBottom: "1rem" }}></div>
+                <TextField
+                  label="Tipo (Preventivo/Correctivo)"
+                  variant="outlined"
+                  fullWidth
+                  value={editedTipo}
+                  disabled
                   className="mt-3"
                 />
               </>
