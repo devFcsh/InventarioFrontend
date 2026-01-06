@@ -78,12 +78,12 @@ export const ModalAgregarBaja: FC<ModalConfirmationProps> = ({
   );
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
         <p className="text-2xl font-semibold">{title}</p>
       </DialogTitle>
       <DialogContent>
-        <Box sx={{ width: "100%", height: "280" }}>
+        <Box sx={{ width: "100%", minHeight: "400px", paddingTop: "8px" }}>
           <br />
           {!hasPerifericos || filteredPerifericos.length === 0 ? (
             <Alert severity="warning" sx={{ mb: 2 }}>
@@ -96,7 +96,7 @@ export const ModalAgregarBaja: FC<ModalConfirmationProps> = ({
                 disablePortal
                 options={filteredPerifericos}
                 getOptionLabel={(option) => option?.nombre || ""}
-                sx={{ width: "100%", height: 200 }}
+                sx={{ width: "100%" }}
                 value={selectedPeriferico}
                 onChange={handlePerifericoChange}
                 renderInput={(params) => (

@@ -46,6 +46,10 @@ export const ModalObservation: React.FC<ModalProps> = ({
 
   const handleConfirm = () => {
     if (addObservation) {
+      if (newObservation.trim() === "") {
+        setErrorMensajeComponente("La observación no puede estar vacía.");
+        return;
+      }
       onConfirm(newObservation);
     } else {
       onConfirm("");
@@ -126,6 +130,7 @@ export const ModalObservation: React.FC<ModalProps> = ({
             onClick={handleConfirm}
             fullWidth
             variant="contained"
+            disabled={addObservation && newObservation.trim() === ""}
             sx={{
               backgroundColor: "#4CAF50",
               "&:hover": { backgroundColor: "#45a049" },

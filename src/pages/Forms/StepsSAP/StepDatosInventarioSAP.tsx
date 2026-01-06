@@ -247,20 +247,45 @@ export const StepDatosInventarioSAP = ({
             error={!!inventorySAPErrors.anio_compra}
             helperText={
               inventorySAPErrors.anio_compra
-                ? "Por favor escribir un año de compra válido"
+                ? "El año debe tener 4 dígitos y ser menor o igual al año actual"
                 : ""
             }
             onChange={(e) => {
               const value = e.target.value;
-              if (!/^\d*$/.test(value)) {
+              if (!/^\d*$/.test(value) || value.length > 4) {
                 return;
               }
               handleInventorySAPChange("anio_compra", value);
-              handleUniqueInventarioSAPError(
-                "anio_compra",
-                value,
-                inventoryDataSAPForm
-              );
+              
+              if (value.length === 4) {
+                const year = parseInt(value, 10);
+                const currentYear = new Date().getFullYear();
+                if (year > currentYear) {
+                  handleUniqueInventarioSAPError(
+                    "anio_compra",
+                    value,
+                    inventoryDataSAPForm
+                  );
+                } else {
+                  handleUniqueInventarioSAPError(
+                    "anio_compra",
+                    value,
+                    inventoryDataSAPForm
+                  );
+                }
+              } else if (value.length > 0) {
+                handleUniqueInventarioSAPError(
+                  "anio_compra",
+                  value,
+                  inventoryDataSAPForm
+                );
+              } else {
+                handleUniqueInventarioSAPError(
+                  "anio_compra",
+                  value,
+                  inventoryDataSAPForm
+                );
+              }
             }}
           />
 

@@ -35,6 +35,7 @@ export type BodegaComputadoraEditSend = {
   perifericoId: string;
   id_procesador: string
   observacion: string;
+  editor?: string;
 };
 
 export type BodegaSimpleEdit = {
@@ -72,6 +73,7 @@ export type BodegaSimpleEditSend = {
   perifericoId: string;
   id_lampara: string;
   observacion: string;
+  editor?: string;
 };
 
 export type BodegaRedEditSend = {
@@ -85,6 +87,7 @@ export type BodegaRedEditSend = {
   puertos: string;
   puerto_ftp: string;
   nombre_equipo:string;
+  editor?: string;
 };
 
 export type BodegaComputadoraData = {
@@ -104,6 +107,7 @@ export type BodegaComputadoraData = {
     dominio?: number;
     procesador?: number;
     observacion: string;
+    autor?: string;
   };
   
   export type BodegaSimpleData = {
@@ -115,6 +119,7 @@ export type BodegaComputadoraData = {
     modeloId: number;
     idLampara: number;
     observacion: string;
+    autor?: string;
   };
 
   export type BodegarRedData = {
@@ -130,5 +135,6 @@ export type BodegaComputadoraData = {
     puerto_ftp: string;
     idLampara: number;
     nombreEquipo:string;
+    autor?: string;
   };
   

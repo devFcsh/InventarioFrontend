@@ -29,6 +29,7 @@ import { useAgregarUbicacion } from "../hooks/useAgregarUbicacion";
 import { useAgregarLampara } from "../hooks/useAgregarLampara";
 import useMarcasPorPeriferico from "@hooks/useMarcasPorPeriferico";
 import { useModelosPorMarcaPeriferico } from "@hooks/useModelosPorMarcaPeriferico";
+import { useAgregarActividadMantenimiento } from "../../../../Equipos/Activos/MantenimientoActivo/hooks/useAgregarActividadMantenimiento";
 
 interface ModalAgregarCategoriaProps {
   open: boolean;
@@ -58,6 +59,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   const [ramTipo, setRamTipo] = useState("");
   const [capacidad, setCapacidad] = useState("");
   const [newOption, setNewOption] = useState<string>("");
+  const [tipoActividad, setTipoActividad] = useState<string>("");
+  const [selectedPerifericoActividad, setSelectedPerifericoActividad] = useState<Periferico | null>(null);
 
   const { perifericos } = usePerifericos(); 
   const { edificios } = useEdificios();
@@ -83,6 +86,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
   const { agregarProcesador } = useAgregarProcesador();
   const { agregarMarca } = useAgregarMarca();
   const { agregarModelo } = useAgregarModelo();
+  const { agregarActividad } = useAgregarActividadMantenimiento();
 
   const getAgregarFunction = (categoria: string) => {
     switch (categoria) {
@@ -114,6 +118,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
         return agregarModelo;
       case "Lampara":
         return agregarLampara;
+      case "Actividad de Mantenimiento":
+        return agregarActividad;
       default:
         return null;
     }
@@ -163,12 +169,34 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
       return;
     }
 
+    if (
+      !newOption && selectedCategoria === "Actividad de Mantenimiento" ) {
+      setError("Por favor, ingrese una subcategoría válida.");
+      return;
+    }
+
+    if (
+      !tipoActividad && selectedCategoria === "Actividad de Mantenimiento" ) {
+      setError("Por favor, seleccione el tipo de actividad.");
+      return;
+    }
+
+    try {
+      if (selectedCategoria === "Actividad de Mantenimiento") {
+        await agregarActividad({
+          nombre: newOption,
+          id_periferico: selectedPerifericoActividad?.id_periferico ? Number(selectedPerifericoActividad.id_periferico) : null,
+          tipo: tipoActividad,
+        });
+        onClose();
+        return;
+      }
+
     const agregarFunc = getAgregarFunction(selectedCategoria || "");
     if (!agregarFunc) {
       setError("Función no definida para esta categoría.");
       return;
     }
-    try {
       if (selectedCategoria === "RAM") {
         await agregarFunc({
           tipo: ramTipo,
@@ -272,6 +300,8 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
       setSelectedMarca(null);
       setSelectedPeriferico(null);
       setSelectedModelo(null);
+      setTipoActividad("");
+      setSelectedPerifericoActividad(null);
     }
   }, [open]);
 
@@ -550,8 +580,60 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
               disabled={!selectedMarca}
             />
           </Box>
-        ) : (
+        ) : selectedCategoria === "Actividad de Mantenimiento" ? (
           <Box className="flex flex-col mt-2 gap-3">
+            <TextField
+              label="Nombre de la Actividad"
+              variant="outlined"
+              fullWidth
+              value={newOption}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value !== null && value.length > 100) {
+                  return;
+                }
+                setNewOption(e.target.value);
+              }}
+              error={Boolean(error)}
+              helperText={error}
+            />
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={["Preventivo", "Correctivo"]}
+              getOptionLabel={(option) => option}
+              value={tipoActividad || null}
+              onChange={(_, newValue) => setTipoActividad(newValue || "")}
+              renderInput={(params) => (
+                <TextField 
+                  {...params} 
+                  label="Tipo de Actividad" 
+                  variant="outlined" 
+                  error={Boolean(error)}
+                  helperText={error && "Por favor seleccione el tipo de actividad"}
+                  fullWidth 
+                />
+              )}
+            />
+            <Autocomplete
+              size="small"
+              disablePortal
+              options={perifericos}
+              getOptionLabel={(option) => option?.nombre || ""}
+              value={selectedPerifericoActividad}
+              onChange={(_, newValue) => setSelectedPerifericoActividad(newValue)}
+              renderInput={(params) => (
+                <TextField 
+                  {...params} 
+                  label="Periférico (Opcional)" 
+                  variant="outlined" 
+                  fullWidth 
+                />
+              )}
+            />
+          </Box>
+        ) : (
+          <Box className="flex flex-col mt-2 gap-3">"
           <TextField
             label={`Nuevo ${selectedCategoria || "Elemento"}`}
             variant="outlined"

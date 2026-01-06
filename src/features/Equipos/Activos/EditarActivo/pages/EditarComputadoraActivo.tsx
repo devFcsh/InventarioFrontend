@@ -48,6 +48,7 @@ import { validateInventario } from "@pages/Forms/helpers/validateInventario.ts";
 import { useSnackbar } from "@context/SnackbarContext.tsx";
 import { useExisteInventario } from "../../../../../hooks/useExisteInventario";
 import { useExisteSerie } from "../../../../../hooks/useExisteSerie";
+import { useUser } from "@context/userContext.tsx";
 
 interface EditarComputadoraActivoProps {
   equipo: ActivoComputadoraEdit;
@@ -155,6 +156,7 @@ const EditarComputadoraActivo = ({
   const { editarActivo } = useEditarActivo();
   const { gestionarComponentes } = useGestionarComponentes();
   const { perifericos } = usePerifericos();
+  const { user } = useUser();
   const { existe: existeInventario, consultarInventario } = useExisteInventario();
   const { existe: existeSerie, consultarSerie } = useExisteSerie();
 
@@ -432,6 +434,7 @@ const EditarComputadoraActivo = ({
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
       imagenRuta: image ? nuevaImagen : "",
       observacion: observationValue,
+      editor: user?.email ?? undefined,
     };
     try {
       await editarActivo(equipo.id_equipo, payload);
@@ -449,6 +452,7 @@ const EditarComputadoraActivo = ({
           ubicacionId: Number(selectedUbicacion?.id_ubicacion) ?? 0,
           usuarioId: parseInt(idUsuario ?? "", 10),
           imagenRuta: nuevaImagen ?? "",
+          editor: user?.email ?? undefined,
         });
       }
       showMessage("Equipo editado correctamente", "success");
@@ -824,14 +828,25 @@ const EditarComputadoraActivo = ({
             fullWidth
             size="small"
             error={!!errorAnio}
-            helperText={errorAnio ? "Por favor escribir un año válido" : ""}
+            helperText={errorAnio ? "El año debe tener 4 dígitos y ser menor o igual al año actual" : ""}
             value={selectedInventarioAnio}
             onChange={(e) => {
               const value = e.target.value;
-              if (/^\d*$/.test(value)) {
+              if (/^\d*$/.test(value) && value.length <= 4) {
                 setSelectedInventarioAnio(value);
-              } else {
-                setErrorAnio(true);
+                if (value.length === 4) {
+                  const year = parseInt(value, 10);
+                  const currentYear = new Date().getFullYear();
+                  if (year > currentYear) {
+                    setErrorAnio(true);
+                  } else {
+                    setErrorAnio(false);
+                  }
+                } else if (value.length < 4 && value.length > 0) {
+                  setErrorAnio(true);
+                } else {
+                  setErrorAnio(false);
+                }
               }
             }}
           />

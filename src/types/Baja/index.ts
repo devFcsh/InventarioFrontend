@@ -15,6 +15,7 @@ export type BajaSimpleEditSend = {
   id_serie: string;
   id_lampara: string;
   observacion: string;
+  editor?: string;
 };
 
 export type BajaComputadoraData = {
@@ -43,6 +44,7 @@ export type BajaSimpleData = {
     modeloId: number;
     idLampara: number;
     observacion: string;
+    autor?: string;
   };
   
   export type BajaRedData = {
@@ -57,4 +59,5 @@ export type BajaSimpleData = {
     puerto_ftp: string;
     idLampara: number;
     nombreEquipo:string;
+    autor?: string;
   };

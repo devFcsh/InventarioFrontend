@@ -19,6 +19,7 @@ import { useSnackbar } from "@context/SnackbarContext";
 import { useExisteInventario } from "../../../../../hooks/useExisteInventario";
 import { useExisteSerie } from "../../../../../hooks/useExisteSerie";
 import useComputadorasPorPeriferico, { ComputadoraSimple } from "../../../../../hooks/useComputadorasPorPeriferico";
+import { useUser } from "@context/userContext.tsx";
 interface EditarActivoSimpleProps {
   equipoSimpleActivo: ActivoSimpleEdit;
   idUsuario: string | null;
@@ -95,6 +96,7 @@ const EditarActivoSimple = ({
     'activo'
   );
   const { editarActivoSimple } = useEditarActivoSimple();
+  const { user } = useUser();
   const { existe: existeInventario, consultarInventario } = useExisteInventario();
   const { existe: existeSerie, consultarSerie } = useExisteSerie();
 
@@ -248,13 +250,15 @@ const EditarActivoSimple = ({
       id_computadora: selectedComputadora ? String(selectedComputadora.id_equipo) : undefined,
       observacion: observationValue,
       id_lampara: selectedLampara?.id_lampara ?? "",
+      editor: user?.email ?? undefined,
     };
     try {
       await editarActivoSimple(equipoSimpleActivo.id_equipo, payload);
       showMessage("Equipo editado correctamente", "success");
       navigate("/activos");
-    } catch (error) {
-      showMessage("Error al editar el equipo", "error");
+    } catch (error: any) {
+      const errorMessage = error?.message || "Error al editar el equipo";
+      showMessage(errorMessage, "error");
     }
   };
 
@@ -329,6 +333,7 @@ const EditarActivoSimple = ({
     if (!serieNombre) missing.push("Serie");
     if (!selectedUbicacion) missing.push("Ubicación");
     if (perifericoName === "Proyector" && !selectedLampara) missing.push("Lámpara");
+    if (selectedPeriferico && !selectedComputadora) missing.push("Serie de Equipo Principal");
 
     if (missing.length > 0) {
       setErrorMensajeEquipo(
@@ -515,14 +520,25 @@ const EditarActivoSimple = ({
             fullWidth
             size="small"
             error={!!errorAnio}
-            helperText={errorAnio ? "Por favor escribir un año válido" : ""}
+            helperText={errorAnio ? "El año debe tener 4 dígitos y ser menor o igual al año actual" : ""}
             value={selectedInventarioAnio}
             onChange={(e) => {
               const value = e.target.value;
-              if (/^\d*$/.test(value)) {
+              if (/^\d*$/.test(value) && value.length <= 4) {
                 setSelectedInventarioAnio(value);
-              } else {
-                setErrorAnio(true);
+                if (value.length === 4) {
+                  const year = parseInt(value, 10);
+                  const currentYear = new Date().getFullYear();
+                  if (year > currentYear) {
+                    setErrorAnio(true);
+                  } else {
+                    setErrorAnio(false);
+                  }
+                } else if (value.length < 4 && value.length > 0) {
+                  setErrorAnio(true);
+                } else {
+                  setErrorAnio(false);
+                }
               }
             }}
           />
@@ -558,8 +574,6 @@ const EditarActivoSimple = ({
 
       <h2 className="text-xl font-semibold mb-5">Información General</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
-        {equipoSimpleActivo?.isComponente ? (
-          <>
             <Autocomplete
               size="small"
               disablePortal
@@ -573,7 +587,7 @@ const EditarActivoSimple = ({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Periférico (opcional)"
+                  label="Tipo Equipo Principal (Opcional)"
                   variant="outlined"
                   fullWidth
                 />
@@ -590,15 +604,13 @@ const EditarActivoSimple = ({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Serie computadora (opcional)"
+                  label={selectedPeriferico ? "Serie de Equipo Principal *" : "Serie de Equipo Principal (opcional)"}
                   variant="outlined"
                   fullWidth
                 />
               )}
               disabled={!selectedPeriferico || !computadoras || computadoras.length === 0}
             />
-          </>
-        ) : null}
         <Autocomplete
           size="small"
           disablePortal
