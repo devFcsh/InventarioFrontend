@@ -812,7 +812,7 @@ const Bodega = () => {
             <table className="w-full text-left text-sm text-gray-500">
               <thead className="text-xs uppercase bg-gray-50 text-gray-700">
                 <tr>
-                  <th scope="col" className="flex items-center gap-2 px-4 py-3 w-12">
+                  <th scope="col" className="flex items-center gap-2 px-4 py-3 w-16">
                     <Tooltip title="Seleccionar Todos">
                       <input
                         type="checkbox"
@@ -944,7 +944,7 @@ const Bodega = () => {
                     key={equipo.id_equipo}
                     className="bg-white border-b hover:bg-gray-50"
                   >
-                    <td className="px-4 py-2 w-12">
+                    <td className="px-4 py-2 w-16">
                       <input
                         type="checkbox"
                         checked={selectedItems.includes(equipo.id_equipo)}
