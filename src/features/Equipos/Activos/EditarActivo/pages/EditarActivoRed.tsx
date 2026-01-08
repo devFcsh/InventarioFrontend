@@ -307,8 +307,8 @@ const EditarActivoRed = ({
       !selectedInventarioSerie ||
       !selectedUbicacion ||
       !selectedMAC ||
-      (perifericoName === "AP" ? false : !selectedPuertos) ||
-      (perifericoName === "AP" ? false : !selectedPuertoFTP)
+      (perifericoName === "AccessPoint" ? false : !selectedPuertos) ||
+      (perifericoName === "AccessPoint" ? false : !selectedPuertoFTP)
     ) {
       setErrorMensajeEquipo("Por favor verificar todos los campos del equipo.");
       return false;

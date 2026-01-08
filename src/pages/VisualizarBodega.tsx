@@ -67,8 +67,8 @@ const VisualizarBodega = () => {
       </div>
     );
   }
-  // Switch o AP
-  else if (equipoName === "Switch" || equipoName === "AP") {
+  // Switch o AccessPoint
+  else if (equipoName === "Switch" || equipoName === "AccessPoint") {
     const { equipoRedBodega, loading, error } = useObtenerRedBodega(equipoId);
 
     useEffect(() => {

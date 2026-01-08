@@ -86,7 +86,7 @@ export const MantenimientoActivo: React.FC<MantenimientoProps> = ({
   let MantenimientoComponent: React.FC<any> = MantenimientosSimpleActivo;
   if (tipoEquipo === "Computadora" || tipoEquipo === "Laptop") {
     MantenimientoComponent = MantenimientosComputadoraActivo;
-  } else if (tipoEquipo === "Switch" || tipoEquipo === "AP") {
+  } else if (tipoEquipo === "Switch" || tipoEquipo === "AccessPoint") {
     MantenimientoComponent = MantenimientosRedActivo;
   } else if (tipoEquipo === "Proyector") {
     MantenimientoComponent = MantenimientosProyectorActivo;

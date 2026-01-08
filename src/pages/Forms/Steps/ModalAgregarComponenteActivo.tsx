@@ -112,7 +112,7 @@ export const ModalAgregarComponenteActivo: React.FC<ModalProps> = ({
       nombre === "computadora" ||
       nombre === "laptop" ||
       nombre === "proyector" ||
-      nombre === "ap" ||
+      nombre === "accesspoint" ||
       nombre === "switch"
     ) {
       return false;

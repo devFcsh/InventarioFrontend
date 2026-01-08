@@ -55,7 +55,7 @@ export const ModalAgregarBodega: FC<ModalConfirmationProps> = ({
         ];
         state = { periferico: selectedPeriferico, perifericos, tipoInventario: "bodega" ,steps};
         navigate('/FormLC', { state });
-      } else if(selectedPeriferico.nombre === 'Switch' || selectedPeriferico.nombre === 'AP'){
+      } else if(selectedPeriferico.nombre === 'Switch' || selectedPeriferico.nombre === 'AccessPoint'){
         steps = [
           "Datos de inventario",
           "Información general",

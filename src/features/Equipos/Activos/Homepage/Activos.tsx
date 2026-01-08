@@ -85,7 +85,7 @@ const Activos = () => {
   const [shouldFetch, setShouldFetch] = useState<boolean>(true);
   const [sortBy, setSortBy] = useState<string>("");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
-  const { rol } = useUser();
+  const { rol, user } = useUser();
   const unableAction = rol !== "administrador" && rol !== "editor";
   const unableActionEditor = rol !== "administrador";
   const { importarEquiposActivos, loading: importLoading } =
@@ -178,37 +178,98 @@ const Activos = () => {
     handleCloseModal();
   };
 
-  function columnasFaltantesExcel(jsonData: any[]): string[] {
+  function columnasFaltantesExcel(jsonData: any[], tipoEquipo: string): string[] {
     if (!jsonData || jsonData.length === 0) return [];
-    const requiredColumns = [
-      "Tipo",
-      "Inventario CPU",
-      "Serie CPU",
-      "Modelo Case",
-      "IP",
-      "Capacidad Memoria",
-      "Capacidad HDD",
-      "Procesador",
-      "Dominio",
-      "Uso",
-      "Usuario",
-      "Edificio",
-      "Nombre de equipo",
-      "Año Adq",
-      "Oficina",
-      "Modelo monitor",
-      "Serie monitor",
-      "Inventario Monitor",
-      "Modelo teclado",
-      "Serie teclado",
-      "Inventario Teclado",
-      "Modelo mouse",
-      "Serie mouse",
-      "Inventario Mouse",
-      "Tipo Disco"
-    ];
+    
+    let requiredColumns: string[] = [];
+    
+    switch(tipoEquipo) {
+      case "Computadora":
+        requiredColumns = [
+          "Tipo",
+          "Inventario CPU",
+          "Serie CPU",
+          "Modelo Case",
+          "IP",
+          "Capacidad Memoria",
+          "Capacidad HDD",
+          "Procesador",
+          "Dominio",
+          "Uso",
+          "Usuario",
+          "Edificio",
+          "Nombre de equipo",
+          "Año Adq",
+          "Oficina",
+          "Modelo monitor",
+          "Serie monitor",
+          "Inventario Monitor",
+          "Modelo teclado",
+          "Serie teclado",
+          "Inventario Teclado",
+          "Modelo mouse",
+          "Serie mouse",
+          "Inventario Mouse",
+          "Tipo Disco"
+        ];
+        break;
+      case "Switch":
+        requiredColumns = [
+          "Nombre",
+          "Inventario",
+          "Bloque",
+          "Ubicación",
+          "Marca",
+          "Modelo",
+          "Serie",
+          "MAC",
+          "Puertos",
+          "Puertos FTP",
+          "Observación"
+        ];
+        break;
+      case "AccessPoint":
+        requiredColumns = [
+          "Nombre",
+          "Inventario",
+          "Bloque",
+          "Ubicación",
+          "Marca",
+          "Modelo",
+          "Serie",
+          "MAC",
+          "Observación"
+        ];
+        break;
+      case "Proyector":
+        requiredColumns = [
+          "Inventario",
+          "Bloque",
+          "Ubicación",
+          "Marca",
+          "Modelo",
+          "Serie",
+          "Lámpara",
+          "Observación"
+        ];
+        break;
+      default:
+        return [];
+    }
+    
+    const normalizar = (str: string) => 
+      str.toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    
     const firstRow = jsonData[0];
-    return requiredColumns.filter((col) => !Object.keys(firstRow).includes(col));
+    const columnasExcel = Object.keys(firstRow);
+    const columnasExcelNormalizadas = columnasExcel.map(normalizar);
+    
+    return requiredColumns.filter((col) => {
+      const colNormalizada = normalizar(col);
+      return !columnasExcelNormalizadas.includes(colNormalizada);
+    });
   }
 
   const handleImportClick = () => {
@@ -277,6 +338,73 @@ const Activos = () => {
     };
   }
 
+  function transformarFilaSwitch(row: any) {
+    const normalize = (val: any) =>
+      val === undefined || val === null
+        ? "S/N"
+        : String(val).trim() === "S/N"
+        ? "S/N"
+        : String(val).trim();
+
+    return {
+      tipo: "Switch",
+      nombre: normalize(row["Nombre"]),
+      inventario: String(row["Inventario"] ?? ""),
+      edificio: normalize(row["Bloque"]),
+      ubicacion: normalize(row["Ubicación"]),
+      marca: normalize(row["Marca"]),
+      modelo: normalize(row["Modelo"]),
+      serie: normalize(row["Serie"]),
+      mac: normalize(row["MAC"]),
+      puertos: normalize(row["Puertos"]),
+      puerto_ftp: normalize(row["Puertos FTP"]),
+      observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
+    };
+  }
+
+  function transformarFilaAccessPoint(row: any) {
+    const normalize = (val: any) =>
+      val === undefined || val === null
+        ? "S/N"
+        : String(val).trim() === "S/N"
+        ? "S/N"
+        : String(val).trim();
+
+    return {
+      tipo: "AccessPoint",
+      nombre: normalize(row["Nombre"]),
+      inventario: String(row["Inventario"] ?? ""),
+      edificio: normalize(row["Bloque"]),
+      ubicacion: normalize(row["Ubicación"]),
+      marca: normalize(row["Marca"]),
+      modelo: normalize(row["Modelo"]),
+      serie: normalize(row["Serie"]),
+      mac: normalize(row["MAC"]),
+      observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
+    };
+  }
+
+  function transformarFilaProyector(row: any) {
+    const normalize = (val: any) =>
+      val === undefined || val === null
+        ? "S/N"
+        : String(val).trim() === "S/N"
+        ? "S/N"
+        : String(val).trim();
+
+    return {
+      tipo: "Proyector",
+      inventario: String(row["Inventario"] ?? ""),
+      edificio: normalize(row["Bloque"]),
+      ubicacion: normalize(row["Ubicación"]),
+      marca: normalize(row["Marca"]),
+      modelo: normalize(row["Modelo"]),
+      serie: normalize(row["Serie"]),
+      lampara: normalize(row["Lámpara"]),
+      observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
+    };
+  }
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -286,28 +414,88 @@ const Activos = () => {
       const data = evt.target?.result;
       if (!data) return;
       const workbook = XLSX.read(data, { type: "binary" });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+      
+      const equiposImportTodos: any[] = [];
+      const errores: string[] = [];
 
-      if (!jsonData || jsonData.length === 0) {
-        showMessage("El archivo Excel está vacío.", "warning");
+      if (workbook.SheetNames.includes("Computadora")) {
+        const worksheet = workbook.Sheets["Computadora"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        if (jsonData && jsonData.length > 0) {
+          const faltantes = columnasFaltantesExcel(jsonData, "Computadora");
+          if (faltantes.length > 0) {
+            errores.push(`Computadora - Faltan columnas: ${faltantes.join(", ")}`);
+          } else {
+            const equiposComputadora = jsonData.map(transformarFilaExcel);
+            equiposImportTodos.push(...equiposComputadora);
+          }
+        }
+      }
+
+      if (workbook.SheetNames.includes("Switch")) {
+        const worksheet = workbook.Sheets["Switch"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        if (jsonData && jsonData.length > 0) {
+          const faltantes = columnasFaltantesExcel(jsonData, "Switch");
+          if (faltantes.length > 0) {
+            errores.push(`Switch - Faltan columnas: ${faltantes.join(", ")}`);
+          } else {
+            const equiposSwitch = jsonData.map(transformarFilaSwitch);
+            equiposImportTodos.push(...equiposSwitch);
+          }
+        }
+      }
+
+      if (workbook.SheetNames.includes("AccessPoint")) {
+        const worksheet = workbook.Sheets["AccessPoint"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        if (jsonData && jsonData.length > 0) {
+          const faltantes = columnasFaltantesExcel(jsonData, "AccessPoint");
+          if (faltantes.length > 0) {
+            errores.push(`AccessPoint - Faltan columnas: ${faltantes.join(", ")}`);
+          } else {
+            const equiposAP = jsonData.map(transformarFilaAccessPoint);
+            equiposImportTodos.push(...equiposAP);
+          }
+        }
+      }
+
+      if (workbook.SheetNames.includes("Proyector")) {
+        const worksheet = workbook.Sheets["Proyector"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        if (jsonData && jsonData.length > 0) {
+          const faltantes = columnasFaltantesExcel(jsonData, "Proyector");
+          if (faltantes.length > 0) {
+            errores.push(`Proyector - Faltan columnas: ${faltantes.join(", ")}`);
+          } else {
+            const equiposProyector = jsonData.map(transformarFilaProyector);
+            equiposImportTodos.push(...equiposProyector);
+          }
+        }
+      }
+
+      if (equiposImportTodos.length === 0 && errores.length === 0) {
+        showMessage(
+          "El archivo no contiene ninguna hoja válida (Computadora, Switch, AccessPoint, Proyector).",
+          "warning"
+        );
         return;
       }
 
-      const faltantes = columnasFaltantesExcel(jsonData);
-      if (faltantes.length > 0) {
+      if (errores.length > 0) {
         showMessage(
-          `El formato del archivo Excel no es válido. Faltan las columnas: ${faltantes.join(", ")}`,
+          `Error en formato: ${errores.join(" | ")}`,
           "error"
         );
         return;
       }
 
       try {
-        const equiposImport = jsonData.map(transformarFilaExcel);
-
-        const resultado = await importarEquiposActivos(equiposImport);
+        const resultado = await importarEquiposActivos(equiposImportTodos, user?.email);
 
         if (
           resultado?.resumen &&
@@ -798,7 +986,7 @@ const Activos = () => {
               fecha_ultimo_cambio,
               observacion,
             }) => ({
-              tipo: "AP",
+              tipo: "AccessPoint",
               empresa,
               inventario,
               anio_compra,
@@ -884,7 +1072,7 @@ const Activos = () => {
       const wsComputadoras = XLSX.utils.json_to_sheet(
         formatComputadora(allEquipos.Computadoras)
       );
-      const wsAP = XLSX.utils.json_to_sheet(formatAP(allEquipos.AP));
+      const wsAP = XLSX.utils.json_to_sheet(formatAP(allEquipos.AccessPoint));
       const wsSwitch = XLSX.utils.json_to_sheet(
         formatSwitch(allEquipos.Switch)
       );
@@ -897,7 +1085,7 @@ const Activos = () => {
 
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, wsComputadoras, "Computadoras");
-      XLSX.utils.book_append_sheet(wb, wsAP, "AP");
+      XLSX.utils.book_append_sheet(wb, wsAP, "AccessPoint");
       XLSX.utils.book_append_sheet(wb, wsSwitch, "Switch");
       XLSX.utils.book_append_sheet(wb, wsProyector, "Proyector");
       XLSX.utils.book_append_sheet(wb, wsEquiposSimples, "Equipos Simples");

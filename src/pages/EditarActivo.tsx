@@ -149,7 +149,7 @@ const EditarActivo = () => {
         </div>
       </div>
     );
-  }else if(equipoName==="Switch" || equipoName==="AP"){
+  }else if(equipoName==="Switch" || equipoName==="AccessPoint"){
     const{ equipoRedActivo, loadingActivoRed, errorActivoRed} = useObtenerRedActivo(equipoId)
     useEffect(() => {
       if (equipoRedActivo && perifericos.length > 0) {

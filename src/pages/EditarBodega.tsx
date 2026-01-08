@@ -92,7 +92,7 @@ export const EditarBodega = () => {
         </div>
       </div>
     );
-  }else if(equipoName==="Switch" || equipoName==="AP"){
+  }else if(equipoName==="Switch" || equipoName==="AccessPoint"){
     const{ equipoRedBodega, loading, error} = useObtenerRedBodega(equipoId)
     useEffect(() => {
       if (equipoRedBodega && perifericos.length > 0) {
