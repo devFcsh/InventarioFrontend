@@ -65,7 +65,7 @@ export const StepInformacionGeneralSAP = ({
               handleUniqueInformacionGeneralError("mac", value);
             }}
           />
-          {periferico !== "AP" ? (
+          {periferico !== "AccessPoint" ? (
             <>
               <TextField
                 label="Puertos 10-100-1000"

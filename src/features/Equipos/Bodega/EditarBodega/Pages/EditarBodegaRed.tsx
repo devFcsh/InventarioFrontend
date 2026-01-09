@@ -222,8 +222,8 @@ const EditarBodegaRed = ({
       !selectedInventarioSerie ||
       !selectedInventarioAnio ||
       !selectedMAC ||
-      (perifericoName === "AP" ? false : !selectedPuertos) ||
-      (perifericoName === "AP" ? false : !selectedPuertoFTP)
+      (perifericoName === "AccessPoint" ? false : !selectedPuertos) ||
+      (perifericoName === "AccessPoint" ? false : !selectedPuertoFTP)
     ) {
       setErrorMensajeEquipo("Por favor, complete todos los campos del equipo.");
       return false;

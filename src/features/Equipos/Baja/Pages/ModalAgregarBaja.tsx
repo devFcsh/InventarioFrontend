@@ -55,7 +55,7 @@ export const ModalAgregarBaja: FC<ModalConfirmationProps> = ({
       ];
       state = { periferico: selectedPeriferico, perifericos, tipoInventario: "baja",steps };
       navigate('/FormLC', { state });
-    } else if(selectedPeriferico.nombre === 'Switch' || selectedPeriferico.nombre === 'AP'){
+    } else if(selectedPeriferico.nombre === 'Switch' || selectedPeriferico.nombre === 'AccessPoint'){
       steps = [
         "Datos de inventario",
         "Información general",

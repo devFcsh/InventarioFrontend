@@ -633,7 +633,7 @@ const ModalAgregarCategoria: FC<ModalAgregarCategoriaProps> = ({
             />
           </Box>
         ) : (
-          <Box className="flex flex-col mt-2 gap-3">"
+          <Box className="flex flex-col mt-2 gap-3">
           <TextField
             label={`Nuevo ${selectedCategoria || "Elemento"}`}
             variant="outlined"

@@ -31,13 +31,14 @@ export const useImportarEquipoActivo = () => {
   const [error, setError] = useState<string | null>(null);
   const [resultado, setResultado] = useState<ImportarEquiposResultado | null>(null);
 
-  const importarEquiposActivos = async (equiposData: ActivoComputadoraImport[]) => {
+  const importarEquiposActivos = async (equiposData: ActivoComputadoraImport[], autor?: string) => {
     setLoading(true);
     setError(null);
     setResultado(null);
 
     try {
-      const { data } = await clienteAxios.post<ImportarEquiposResultado>("/equipos/importarEquiposActivos", equiposData);
+      const payload = autor ? { equipos: equiposData, autor } : equiposData;
+      const { data } = await clienteAxios.post<ImportarEquiposResultado>("/equipos/importarEquiposActivos", payload);
       setResultado(data);
       return data;
     } catch (err) {

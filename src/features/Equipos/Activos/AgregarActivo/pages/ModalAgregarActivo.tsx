@@ -80,7 +80,7 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
       return;
     }
     
-    if(selectedPeriferico?.nombre!=="Switch" && selectedPeriferico?.nombre!=="AP" && selectedPeriferico?.nombre!=="Proyector"){
+    if(selectedPeriferico?.nombre!=="Switch" && selectedPeriferico?.nombre!=="AccessPoint" && selectedPeriferico?.nombre!=="Proyector"){
         if (!selectedUso) {
           setErrors({
             ...errors,
@@ -109,7 +109,7 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
       ];
       state = { periferico: selectedPeriferico, perifericos, tipoInventario: "activo", steps, edificio: selectedEdificio, uso: selectedUso };
       navigate('/FormLC', { state });
-    } else if(selectedPeriferico.nombre === 'Switch' || selectedPeriferico.nombre === 'AP'){
+    } else if(selectedPeriferico.nombre === 'Switch' || selectedPeriferico.nombre === 'AccessPoint'){
         steps = [
           "Datos de inventario",
           "Información general",
@@ -189,7 +189,7 @@ export const ModalAgregarActivo: React.FC<ModalConfirmationProps> = ({
                 )}
               />
               {
-                selectedPeriferico?.nombre !== 'Switch' && selectedPeriferico?.nombre !== "AP" && selectedPeriferico?.nombre !== "Proyector"?
+                selectedPeriferico?.nombre !== 'Switch' && selectedPeriferico?.nombre !== "AccessPoint" && selectedPeriferico?.nombre !== "Proyector"?
                 <Autocomplete
                 size="small"
                 disablePortal

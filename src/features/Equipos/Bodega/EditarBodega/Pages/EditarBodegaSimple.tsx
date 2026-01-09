@@ -476,53 +476,55 @@ const EditarBodegaSimple = ({
             }}
           />
         </Box>
-        <div className="col-span-2 flex gap-4">
-          <div className="w-1/2">
-            <Autocomplete
-              size="small"
-              freeSolo
-              options={perifericos.filter((p) => (p?.nombre === 'Computadora' || p?.nombre === 'Laptop'))}
-              getOptionLabel={(option) =>
-                typeof option === "string" ? option : option?.nombre || ""
-              }
-              value={selectedPeriferico}
-              onChange={(_, newValue) => {
-                if (typeof newValue === "string") {
-                  setSelectedPeriferico(null);
-                } else {
-                  setSelectedPeriferico(newValue as Periferico | null);
+        {perifericoName !== "Proyector" && (
+          <div className="col-span-2 flex gap-4">
+            <div className="w-1/2">
+              <Autocomplete
+                size="small"
+                freeSolo
+                options={perifericos.filter((p) => (p?.nombre === 'Computadora' || p?.nombre === 'Laptop'))}
+                getOptionLabel={(option) =>
+                  typeof option === "string" ? option : option?.nombre || ""
                 }
-              }}
-              renderInput={(params) => (
-                <TextField {...params} label="Tipo Equipo Principal (Opcional)" variant="outlined" fullWidth />
-              )}
-            />
-          </div>
-          <div className="w-1/2">
-            <Autocomplete
-              size="small"
-              disablePortal
-              options={computadoras || []}
-              getOptionLabel={(option) =>
-                typeof option === "string"
-                  ? option
-                  : `${option.serie ? option.serie : ""}`
-              }
-              value={selectedComputadora}
-              onChange={(_, newValue) => {
-                if (typeof newValue === "string") {
-                  setSelectedComputadora(null);
-                } else {
-                  setSelectedComputadora(newValue as ComputadoraSimple | null);
+                value={selectedPeriferico}
+                onChange={(_, newValue) => {
+                  if (typeof newValue === "string") {
+                    setSelectedPeriferico(null);
+                  } else {
+                    setSelectedPeriferico(newValue as Periferico | null);
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Tipo Equipo Principal (Opcional)" variant="outlined" fullWidth />
+                )}
+              />
+            </div>
+            <div className="w-1/2">
+              <Autocomplete
+                size="small"
+                disablePortal
+                options={computadoras || []}
+                getOptionLabel={(option) =>
+                  typeof option === "string"
+                    ? option
+                    : `${option.serie ? option.serie : ""}`
                 }
-              }}
-              renderInput={(params) => (
-                <TextField {...params} label={selectedPeriferico ? "Serie de Equipo Principal *" : "Serie de Equipo Principal (opcional)"} variant="outlined" fullWidth />
-              )}
-              disabled={!selectedPeriferico}
-            />
+                value={selectedComputadora}
+                onChange={(_, newValue) => {
+                  if (typeof newValue === "string") {
+                    setSelectedComputadora(null);
+                  } else {
+                    setSelectedComputadora(newValue as ComputadoraSimple | null);
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label={selectedPeriferico ? "Serie de Equipo Principal *" : "Serie de Equipo Principal (opcional)"} variant="outlined" fullWidth />
+                )}
+                disabled={!selectedPeriferico}
+              />
+            </div>
           </div>
-        </div>
+        )}
         {perifericoName === "Proyector" ? (
           <Autocomplete
             size="small"

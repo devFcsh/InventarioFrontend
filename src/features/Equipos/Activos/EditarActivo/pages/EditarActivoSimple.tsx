@@ -574,6 +574,8 @@ const EditarActivoSimple = ({
 
       <h2 className="text-xl font-semibold mb-5">Información General</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
+        {perifericoName !== "Proyector" && (
+          <>
             <Autocomplete
               size="small"
               disablePortal
@@ -611,6 +613,8 @@ const EditarActivoSimple = ({
               )}
               disabled={!selectedPeriferico || !computadoras || computadoras.length === 0}
             />
+          </>
+        )}
         <Autocomplete
           size="small"
           disablePortal

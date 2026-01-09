@@ -521,7 +521,7 @@ const Bodega = () => {
               fecha_ultimo_cambio,
               observacion,
             }) => ({
-              tipo: "AP",
+              tipo: "AccessPoint",
               empresa,
               inventario,
               anio_compra,
@@ -601,7 +601,7 @@ const Bodega = () => {
       const wsComputadoras = XLSX.utils.json_to_sheet(
         formatComputadora(allEquipos.Computadoras)
       );
-      const wsAP = XLSX.utils.json_to_sheet(formatAP(allEquipos.AP));
+      const wsAP = XLSX.utils.json_to_sheet(formatAP(allEquipos.AccessPoint));
       const wsSwitch = XLSX.utils.json_to_sheet(
         formatSwitch(allEquipos.Switch)
       );
@@ -614,7 +614,7 @@ const Bodega = () => {
 
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, wsComputadoras, "Computadoras");
-      XLSX.utils.book_append_sheet(wb, wsAP, "AP");
+      XLSX.utils.book_append_sheet(wb, wsAP, "AccessPoint");
       XLSX.utils.book_append_sheet(wb, wsSwitch, "Switch");
       XLSX.utils.book_append_sheet(wb, wsProyector, "Proyector");
       XLSX.utils.book_append_sheet(wb, wsEquiposSimples, "Equipos Simples");

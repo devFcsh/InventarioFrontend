@@ -17,8 +17,8 @@ export const useInformacionGeneralErrorSAP = (periferico:string | undefined) => 
   });
 
   const completeDatosInformacionGeneral = (dataForm: InformacionGeneralDataForm)=>{
-    if(dataForm.nombreEquipo!== "" && dataForm.mac !=="" && (periferico==="AP"?true:dataForm.puertos !=="")
-      && (periferico==="AP"?true:(dataForm.puertoFTP!=="" && validateMAC(dataForm.mac)))
+    if(dataForm.nombreEquipo!== "" && dataForm.mac !=="" && (periferico==="AccessPoint"?true:dataForm.puertos !=="")
+      && (periferico==="AccessPoint"?true:(dataForm.puertoFTP!=="" && validateMAC(dataForm.mac)))
     ) return true
     return false;
   }
@@ -38,7 +38,7 @@ export const useInformacionGeneralErrorSAP = (periferico:string | undefined) => 
         }));
       }
     });
-    if(periferico==="AP"){
+    if(periferico==="AccessPoint"){
       setInformacionGeneralErrors((prevErrors) => ({
         ...prevErrors,
         ["puertos"]: false,

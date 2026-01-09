@@ -4,7 +4,7 @@ import clienteAxios from "../../../../hooks";
 
 interface ExportarEquiposResponse {
   Computadoras: ExportarComputadora[];
-  AP: ExportarAP[];
+  AccessPoint: ExportarAP[];
   Switch: ExportarSwitch[];
   Proyector: ExportarProyector[];
   EquiposSimples: ExportarSimples[];
