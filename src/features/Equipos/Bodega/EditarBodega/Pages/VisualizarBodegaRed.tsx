@@ -179,7 +179,7 @@ const VisualizarBodegaRed = ({
         />
         {perifericoName === "Switch" ? (
           <TextField
-            label="Puertos 10-100-1000"
+            label="Puertos 1000"
             placeholder="Puertos"
             variant="outlined"
             fullWidth
