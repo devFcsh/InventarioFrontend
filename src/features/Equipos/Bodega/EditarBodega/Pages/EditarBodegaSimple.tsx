@@ -315,7 +315,11 @@ const EditarBodegaSimple = ({
         <Autocomplete
           size="small"
           disablePortal
-          options={modelos}
+          options={modelos.filter(
+            (modelo) =>
+              perifericoName !== "Proyector" ||
+              (modelo?.nombre && modelo.nombre.length <= 10)
+          )}
           value={selectedInventarioModelo}
           onChange={(_, newValue) => {
             setSelectedInventarioModelo(newValue);
@@ -326,6 +330,11 @@ const EditarBodegaSimple = ({
               {...params}
               label="Modelo"
               variant="outlined"
+              helperText={
+                perifericoName === "Proyector"
+                  ? "Solo modelos de máximo 10 caracteres"
+                  : ""
+              }
               fullWidth
             />
           )}

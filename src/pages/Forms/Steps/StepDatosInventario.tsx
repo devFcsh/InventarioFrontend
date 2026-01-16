@@ -152,7 +152,11 @@ export const StepDatosInventario = ({
           <Autocomplete
             size="small"
             disablePortal
-            options={modelos}
+            options={modelos.filter(
+              (modelo) =>
+                periferico?.nombre !== "Proyector" ||
+                (modelo?.nombre && modelo.nombre.length <= 10)
+            )}
             getOptionLabel={(option: Modelo) => option?.nombre || ""}
             onChange={(_, newValue: Modelo | null) => {
               handleInventoryChange("modelo", newValue);
@@ -172,6 +176,8 @@ export const StepDatosInventario = ({
                 helperText={
                   inventoryErrors.modelo
                     ? "Por favor seleccionar un modelo"
+                    : periferico?.nombre === "Proyector"
+                    ? "Solo modelos de máximo 10 caracteres"
                     : ""
                 }
                 fullWidth

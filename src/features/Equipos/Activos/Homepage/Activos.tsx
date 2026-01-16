@@ -250,6 +250,7 @@ const Activos = () => {
           "Modelo",
           "Serie",
           "Lámpara",
+          "Categoria",
           "Observación"
         ];
         break;
@@ -401,6 +402,7 @@ const Activos = () => {
       modelo: normalize(row["Modelo"]),
       serie: normalize(row["Serie"]),
       lampara: normalize(row["Lámpara"]),
+      categoria: normalize(row["Categoria"]),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
     };
   }
