@@ -1480,7 +1480,7 @@ const Activos = () => {
                   </th>
                   {rol === "administrador" && (
                     <>
-                      <th scope="col" className="px-4 py-3 w-36">
+                      <th scope="col" className="px-4 py-3 w-8">
                         <button type="button" onClick={() => toggleSort("autor")} className="flex items-center gap-1">
                           Autor {sortBy === "autor" ? (
                             sortDir === "asc" ? (
@@ -1493,7 +1493,7 @@ const Activos = () => {
                           )}
                         </button>
                       </th>
-                      <th scope="col" className="px-4 py-3 w-36">
+                      <th scope="col" className="px-4 py-3 w-8">
                         <button type="button" onClick={() => toggleSort("editor")} className="flex items-center gap-1">
                           Editor {sortBy === "editor" ? (
                             sortDir === "asc" ? (
@@ -1550,8 +1550,8 @@ const Activos = () => {
                     <td className="px-4 py-2 w-36">{equipo.edificio}</td>
                     {rol === "administrador" && (
                       <>
-                        <td className="px-4 py-2 w-36">{equipo.autor || "-"}</td>
-                        <td className="px-4 py-2 w-36">{equipo.editor || "-"}</td>
+                        <td className="px-4 py-2 w-8">{equipo.autor || "-"}</td>
+                        <td className="px-4 py-2 w-8">{equipo.editor || "-"}</td>
                         <td className="px-4 py-2 w-40">
                           {equipo.fecha_creacion 
                             ? new Date(equipo.fecha_creacion).toLocaleString("es-ES", {
@@ -1731,7 +1731,42 @@ const Activos = () => {
               className="flex flex-col md:flex-row justify-between items-center p-4"
               aria-label="Table navigation"
             >
-              <span className="text-sm font-normal text-gray-500"></span>
+              <div className="flex items-center gap-2">
+                <Tooltip title="Importar desde Excel">
+                  <span>
+                    <button
+                      onClick={handleImportClick}
+                      className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+                      disabled={importLoading}
+                      type="button"
+                    >
+                      <Icon icon="mdi:import" width="20" height="20" />
+                      <input
+                        type="file"
+                        accept=".xlsx, .xls"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        style={{ display: "none" }}
+                      />
+                    </button>
+                  </span>
+                </Tooltip>
+
+                <Tooltip title="Descargar formato">
+                  <a
+                    href="/formato_importar_activo.xlsx"
+                    download="formato_activo.xlsx"
+                    className="flex items-center"
+                  >
+                    <button
+                      type="button"
+                      className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+                    >
+                      <Icon icon="mdi:file-download" width="20" height="20" />
+                    </button>
+                  </a>
+                </Tooltip>
+              </div>
               <div className="flex flex-col md:flex-row items-center gap-2">
                 <ul className="inline-flex items-center -space-x-px">
                   <li>
@@ -1786,42 +1821,6 @@ const Activos = () => {
             </nav>
           </>
         )}
-        <div className="flex items-center gap-2">
-          <Tooltip title="Importar desde Excel">
-            <span>
-              <button
-                onClick={handleImportClick}
-                className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-                disabled={importLoading}
-                type="button"
-              >
-                <Icon icon="mdi:import" width="20" height="20" />
-                <input
-                  type="file"
-                  accept=".xlsx, .xls"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  style={{ display: "none" }}
-                />
-              </button>
-            </span>
-          </Tooltip>
-
-          <Tooltip title="Descargar formato">
-            <a
-              href="/formato_importar_activo.xlsx"
-              download="formato_activo.xlsx"
-              className="flex items-center"
-            >
-              <button
-                type="button"
-                className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-              >
-                <Icon icon="mdi:file-download" width="20" height="20" />
-              </button>
-            </a>
-          </Tooltip>
-        </div>
         {importLoading && (
           <div className="flex justify-center items-center my-8">
             <Loader />
