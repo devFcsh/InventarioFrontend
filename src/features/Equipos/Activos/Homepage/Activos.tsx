@@ -217,6 +217,7 @@ const Activos = () => {
         requiredColumns = [
           "Nombre",
           "Inventario",
+          "Año Adq",
           "Bloque",
           "Ubicación",
           "Marca",
@@ -232,6 +233,7 @@ const Activos = () => {
         requiredColumns = [
           "Nombre",
           "Inventario",
+          "Año Adq",
           "Bloque",
           "Ubicación",
           "Marca",
@@ -244,6 +246,7 @@ const Activos = () => {
       case "Proyector":
         requiredColumns = [
           "Inventario",
+          "Año Adq",
           "Bloque",
           "Ubicación",
           "Marca",
@@ -351,6 +354,10 @@ const Activos = () => {
       tipo: "Switch",
       nombre: normalize(row["Nombre"]),
       inventario: String(row["Inventario"] ?? ""),
+      anio_compra:
+        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
+          ? String(parseInt(row["Año Adq"]))
+          : "S/N",
       edificio: normalize(row["Bloque"]),
       ubicacion: normalize(row["Ubicación"]),
       marca: normalize(row["Marca"]),
@@ -375,6 +382,10 @@ const Activos = () => {
       tipo: "AccessPoint",
       nombre: normalize(row["Nombre"]),
       inventario: String(row["Inventario"] ?? ""),
+      anio_compra:
+        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
+          ? String(parseInt(row["Año Adq"]))
+          : "S/N",
       edificio: normalize(row["Bloque"]),
       ubicacion: normalize(row["Ubicación"]),
       marca: normalize(row["Marca"]),
@@ -396,6 +407,10 @@ const Activos = () => {
     return {
       tipo: "Proyector",
       inventario: String(row["Inventario"] ?? ""),
+      anio_compra:
+        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
+          ? String(parseInt(row["Año Adq"]))
+          : "S/N",
       edificio: normalize(row["Bloque"]),
       ubicacion: normalize(row["Ubicación"]),
       marca: normalize(row["Marca"]),
@@ -934,7 +949,6 @@ const Activos = () => {
         return addIDColumn(
           equipos.map(
             ({
-              empresa,
               inventario,
               anio_compra,
               edificio,
@@ -950,7 +964,6 @@ const Activos = () => {
               observacion,
             }) => ({
               tipo: "Switch",
-              empresa,
               inventario,
               anio_compra,
               edificio,
@@ -975,7 +988,6 @@ const Activos = () => {
         return addIDColumn(
           equipos.map(
             ({
-              empresa,
               inventario,
               anio_compra,
               edificio,
@@ -989,7 +1001,6 @@ const Activos = () => {
               observacion,
             }) => ({
               tipo: "AccessPoint",
-              empresa,
               inventario,
               anio_compra,
               edificio,
@@ -1012,7 +1023,6 @@ const Activos = () => {
         return addIDColumn(
           equipos.map(
             ({
-              empresa,
               inventario,
               anio_compra,
               edificio,
@@ -1025,7 +1035,6 @@ const Activos = () => {
               observacion,
             }) => ({
               tipo: "Proyector",
-              empresa,
               inventario,
               anio_compra,
               edificio,
@@ -1293,9 +1302,11 @@ const Activos = () => {
         ) : error ? (
           <p>Error al cargar los equipos</p>
         ) : equipos.length === 0 ? (
-          <p className="text-center text-gray-500 my-5">
-            No hay datos disponibles. Presiona "Buscar" para cargar resultados.
-          </p>
+          <>
+            <p className="text-center text-gray-500 my-5">
+              No hay datos disponibles. Presiona "Buscar" para cargar resultados.
+            </p>
+          </>
         ) : (
           <>
             <table className="w-full text-left text-sm text-gray-500">
@@ -1727,100 +1738,104 @@ const Activos = () => {
                 ))}
               </tbody>
             </table>
-            <nav
-              className="flex flex-col md:flex-row justify-between items-center p-4"
-              aria-label="Table navigation"
-            >
-              <div className="flex items-center gap-2">
-                <Tooltip title="Importar desde Excel">
-                  <span>
-                    <button
-                      onClick={handleImportClick}
-                      className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-                      disabled={importLoading}
-                      type="button"
-                    >
-                      <Icon icon="mdi:import" width="20" height="20" />
-                      <input
-                        type="file"
-                        accept=".xlsx, .xls"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        style={{ display: "none" }}
-                      />
-                    </button>
-                  </span>
-                </Tooltip>
-
-                <Tooltip title="Descargar formato">
-                  <a
-                    href="/formato_importar_activo.xlsx"
-                    download="formato_activo.xlsx"
-                    className="flex items-center"
-                  >
-                    <button
-                      type="button"
-                      className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-                    >
-                      <Icon icon="mdi:file-download" width="20" height="20" />
-                    </button>
-                  </a>
-                </Tooltip>
-              </div>
-              <div className="flex flex-col md:flex-row items-center gap-2">
-                <ul className="inline-flex items-center -space-x-px">
-                  <li>
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-                    >
-                      <Tooltip title="Página Anterior">
-                        <span>
-                          <Icon
-                            icon="iconamoon:arrow-left-2"
-                            width="20"
-                            height="20"
-                          />
-                        </span>
-                      </Tooltip>
-                    </button>
-                  </li>
-                  <li>
-                    <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
-                      Página {currentPage} de {totalPages}
-                    </div>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-                    >
-                      <Tooltip title="Siguiente Página">
-                        <span>
-                          <Icon
-                            icon="iconamoon:arrow-right-2"
-                            width="20"
-                            height="20"
-                          />
-                        </span>
-                      </Tooltip>
-                    </button>
-                  </li>
-                </ul>
-                <Tooltip title="Exportar a Excel">
-                  <button
-                    onClick={exportToExcel}
-                    className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-                  >
-                    <Icon icon="ph:export" width="20" height="20" />
-                  </button>
-                </Tooltip>
-              </div>
-            </nav>
           </>
         )}
+        
+        <nav
+          className="flex flex-col md:flex-row justify-between items-center p-4"
+          aria-label="Table navigation"
+        >
+          <div className="flex items-center gap-2">
+            <Tooltip title="Importar desde Excel">
+              <span>
+                <button
+                  onClick={handleImportClick}
+                  className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+                  disabled={importLoading}
+                  type="button"
+                >
+                  <Icon icon="mdi:import" width="20" height="20" />
+                  <input
+                    type="file"
+                    accept=".xlsx, .xls"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                  />
+                </button>
+              </span>
+            </Tooltip>
+
+            <Tooltip title="Descargar formato">
+              <a
+                href="/formato_importar_activo.xlsx"
+                download="formato_activo.xlsx"
+                className="flex items-center"
+              >
+                <button
+                  type="button"
+                  className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+                >
+                  <Icon icon="mdi:file-download" width="20" height="20" />
+                </button>
+              </a>
+            </Tooltip>
+          </div>
+          {!loading && !error && equipos.length > 0 && (
+            <div className="flex flex-col md:flex-row items-center gap-2">
+              <ul className="inline-flex items-center -space-x-px">
+                <li>
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                  >
+                    <Tooltip title="Página Anterior">
+                      <span>
+                        <Icon
+                          icon="iconamoon:arrow-left-2"
+                          width="20"
+                          height="20"
+                        />
+                      </span>
+                    </Tooltip>
+                  </button>
+                </li>
+                <li>
+                  <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
+                    Página {currentPage} de {totalPages}
+                  </div>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                  >
+                    <Tooltip title="Siguiente Página">
+                      <span>
+                        <Icon
+                          icon="iconamoon:arrow-right-2"
+                          width="20"
+                          height="20"
+                        />
+                      </span>
+                    </Tooltip>
+                  </button>
+                </li>
+              </ul>
+              <Tooltip title="Exportar a Excel">
+                <button
+                  onClick={exportToExcel}
+                  className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+                >
+                  <Icon icon="ph:export" width="20" height="20" />
+                </button>
+              </Tooltip>
+            </div>
+          )}
+        </nav>
+        
         {importLoading && (
           <div className="flex justify-center items-center my-8">
             <Loader />
