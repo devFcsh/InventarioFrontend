@@ -200,7 +200,6 @@ const Activos = () => {
           "Edificio",
           "Nombre de equipo",
           "Año Adq",
-          "Oficina",
           "Modelo monitor",
           "Serie monitor",
           "Inventario Monitor",
@@ -210,7 +209,8 @@ const Activos = () => {
           "Modelo mouse",
           "Serie mouse",
           "Inventario Mouse",
-          "Tipo Disco"
+          "Tipo Disco",
+          "Empresa"
         ];
         break;
       case "Switch":
@@ -226,7 +226,7 @@ const Activos = () => {
           "MAC",
           "Puertos",
           "Puertos FTP",
-          "Observación"
+          "Empresa"
         ];
         break;
       case "AccessPoint":
@@ -240,7 +240,7 @@ const Activos = () => {
           "Modelo",
           "Serie",
           "MAC",
-          "Observación"
+          "Empresa"
         ];
         break;
       case "Proyector":
@@ -254,7 +254,7 @@ const Activos = () => {
           "Serie",
           "Lámpara",
           "Categoria",
-          "Observación"
+          "Empresa"
         ];
         break;
       default:
@@ -316,6 +316,7 @@ const Activos = () => {
       edificio: normalize(row["Edificio"]),
       ubicacion: normalize(ubicacion),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
+      empresa: normalize(row["Empresa"]),
       componentes: [
         {
           tipo: "Monitor",
@@ -367,6 +368,7 @@ const Activos = () => {
       puertos: normalize(row["Puertos"]),
       puerto_ftp: normalize(row["Puertos FTP"]),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
+      empresa: normalize(row["Empresa"]),
     };
   }
 
@@ -393,6 +395,7 @@ const Activos = () => {
       serie: normalize(row["Serie"]),
       mac: normalize(row["MAC"]),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
+      empresa: normalize(row["Empresa"]),
     };
   }
 
@@ -419,6 +422,7 @@ const Activos = () => {
       lampara: normalize(row["Lámpara"]),
       categoria: normalize(row["Categoria"]),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
+      empresa: normalize(row["Empresa"]),
     };
   }
 
@@ -893,6 +897,7 @@ const Activos = () => {
               anio_compra,
               fecha_ultimo_cambio,
               observacion,
+              empresa,
               mouse_marca,
               mouse_modelo,
               mouse_serie,
@@ -928,6 +933,7 @@ const Activos = () => {
                 fecha_ultimo_cambio
               ).toLocaleString(),
               observacion,
+              empresa,
               mouse_marca: mouse_marca || "",
               mouse_modelo: mouse_modelo || "",
               mouse_serie: mouse_serie || "",
@@ -962,6 +968,7 @@ const Activos = () => {
               nombre_equipo,
               fecha_ultimo_cambio,
               observacion,
+              empresa,
             }) => ({
               tipo: "Switch",
               inventario,
@@ -979,6 +986,7 @@ const Activos = () => {
                 fecha_ultimo_cambio
               ).toLocaleString(),
               observacion,
+              empresa,
             })
           )
         );
@@ -999,6 +1007,7 @@ const Activos = () => {
               nombre_equipo,
               fecha_ultimo_cambio,
               observacion,
+              empresa,
             }) => ({
               tipo: "AccessPoint",
               inventario,
@@ -1014,6 +1023,7 @@ const Activos = () => {
                 fecha_ultimo_cambio
               ).toLocaleString(),
               observacion,
+              empresa,
             })
           )
         );
@@ -1033,6 +1043,7 @@ const Activos = () => {
               lampara,
               fecha_ultimo_cambio,
               observacion,
+              empresa,
             }) => ({
               tipo: "Proyector",
               inventario,
@@ -1047,6 +1058,7 @@ const Activos = () => {
                 fecha_ultimo_cambio
               ).toLocaleString(),
               observacion,
+              empresa,
             })
           )
         );
