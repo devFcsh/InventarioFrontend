@@ -108,10 +108,20 @@ const EditarActivoSimple = ({
       setSelectedInventarioAnio(equipoSimpleActivo.anio_compra);
       setCurrentImagePath(equipoSimpleActivo.imagenRuta);
       setNewObservation(equipoSimpleActivo.observacion ?? "");
-      equipoSimpleActivo.inventario.length === 10 ||
-      equipoSimpleActivo.inventario.length === 12
-        ? setEmpresa("EspolTech")
-        : setEmpresa("Espol");
+      
+      // Normalizar empresa a minúsculas para comparación y ajustar formato
+      const empresaNormalizada = equipoSimpleActivo.empresa?.toLowerCase();
+      if (empresaNormalizada === "espol") {
+        setEmpresa("Espol");
+      } else if (empresaNormalizada === "espoltech") {
+        setEmpresa("EspolTech");
+      } else {
+        // Fallback al método anterior solo si no hay empresa
+        equipoSimpleActivo.inventario.length === 10 ||
+        equipoSimpleActivo.inventario.length === 12
+          ? setEmpresa("EspolTech")
+          : setEmpresa("Espol");
+      }
     }
   }, [equipoSimpleActivo]);
 
@@ -250,6 +260,7 @@ const EditarActivoSimple = ({
       id_computadora: selectedComputadora ? String(selectedComputadora.id_equipo) : undefined,
       observacion: observationValue,
       id_lampara: selectedLampara?.id_lampara ?? "",
+      empresa: empresa ?? "",
       editor: user?.email ?? undefined,
     };
     try {
@@ -287,7 +298,6 @@ const EditarActivoSimple = ({
     setEmpresa(newEmpresa);
     if (newEmpresa === null) {
       setErrorEmpresa(true);
-      setSelectedInventarioInv("");
       setErrorInventario(true);
     } else {
       setErrorEmpresa(false);

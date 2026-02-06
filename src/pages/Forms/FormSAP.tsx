@@ -202,6 +202,7 @@ export const FormSAP = () => {
       puerto_ftp: selectedPeriferico?.nombre==="AccessPoint"?"":informacionGeneralDataSAPForm.puertoFTP,
       idLampara:0,
       nombreEquipo: informacionGeneralDataSAPForm.nombreEquipo || "",
+      empresa: inventoryDataSAPForm.empresa || "",
       autor: user?.email ?? undefined,
     };
 

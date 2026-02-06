@@ -331,9 +331,19 @@ const EditarComputadoraActivo = ({
       setDireccionIP(equipo.direccion_ip);
       setProtocolo(equipo.direccion_ip ? "0" : "1");
       setNewObservation(equipo.observacion);
-      equipo.inventario.length === 10 || equipo.inventario.length === 12
-        ? setEmpresa("EspolTech")
-        : setEmpresa("Espol");
+      
+      // Normalizar empresa a minúsculas para comparación y ajustar formato
+      const empresaNormalizada = equipo.empresa?.toLowerCase();
+      if (empresaNormalizada === "espol") {
+        setEmpresa("Espol");
+      } else if (empresaNormalizada === "espoltech") {
+        setEmpresa("EspolTech");
+      } else {
+        // Fallback al método anterior solo si no hay empresa
+        equipo.inventario.length === 10 || equipo.inventario.length === 12
+          ? setEmpresa("EspolTech")
+          : setEmpresa("Espol");
+      }
     }
   }, [equipo]);
 
@@ -434,6 +444,7 @@ const EditarComputadoraActivo = ({
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
       imagenRuta: image ? nuevaImagen : "",
       observacion: observationValue,
+      empresa: empresa ?? "",
       editor: user?.email ?? undefined,
     };
     try {
@@ -577,7 +588,6 @@ const EditarComputadoraActivo = ({
     setEmpresa(newEmpresa);
     if (newEmpresa === null) {
       setErrorEmpresa(true);
-      setSelectedInventarioInv("");
       setErrorInventario(true);
     } else {
       setErrorEmpresa(false);
@@ -592,10 +602,6 @@ const EditarComputadoraActivo = ({
     setEmpresaNuevoComponente(newEmpresaNuevoComponente);
     if (newEmpresaNuevoComponente === null) {
       setErrorEmpresaNuevoComponente(true);
-      setNuevoComponente({
-        ...nuevoComponente,
-        inventario: "",
-      });
       setErrorNuevoComponenteInventario(true);
     } else {
       setErrorEmpresaNuevoComponente(false);

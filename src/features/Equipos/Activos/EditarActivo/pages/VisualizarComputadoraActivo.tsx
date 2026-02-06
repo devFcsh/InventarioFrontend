@@ -235,9 +235,19 @@ const VisualizarComputadoraActivo = ({
       setDireccionIP(equipo.direccion_ip);
       setProtocolo(equipo.direccion_ip ? "0" : "1");
       setNewObservation(equipo.observacion);
-      equipo.inventario.length === 10 || equipo.inventario.length === 12
-        ? setEmpresa("EspolTech")
-        : setEmpresa("Espol");
+      
+      // Normalizar empresa a minúsculas para comparación y ajustar formato
+      const empresaNormalizada = equipo.empresa?.toLowerCase();
+      if (empresaNormalizada === "espol") {
+        setEmpresa("Espol");
+      } else if (empresaNormalizada === "espoltech") {
+        setEmpresa("EspolTech");
+      } else {
+        // Fallback al método anterior solo si no hay empresa
+        equipo.inventario.length === 10 || equipo.inventario.length === 12
+          ? setEmpresa("EspolTech")
+          : setEmpresa("Espol");
+      }
     }
   }, [equipo]);
 
