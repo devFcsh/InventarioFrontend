@@ -22,6 +22,7 @@ export type ActivoComputadoraEdit = {
     direccion_ip: string;
     id_serie: string;
     observacion: string;
+    empresa: string;
   };
 
   export type ActivoComputadoraEditSend = {
@@ -44,6 +45,7 @@ export type ActivoComputadoraEdit = {
     modeloId: string;
     serie: string;
     observacion: string;
+    empresa: string;
     editor?: string;
   };
 
@@ -62,6 +64,7 @@ export type ActivoComputadoraEdit = {
     id_serie: string;
     observacion: string;
     id_lampara: string;
+    empresa: string;
     isComponente?: boolean;
     id_computadora?: string | number;
     id_serie_computadora?: string | number;
@@ -85,7 +88,8 @@ export type ActivoRedEdit = {
   mac: string;
   puertos: string;
   puerto_ftp: string;
-  nombre_equipo: string
+  nombre_equipo: string;
+  empresa: string;
 };
 
   export type ActivoSimpleEditSend = {
@@ -101,6 +105,7 @@ export type ActivoRedEdit = {
     id_lampara: string;
     id_computadora?: string;
     observacion: string;
+    empresa: string;
     editor?: string;
   };
 
@@ -119,6 +124,7 @@ export type ActivoRedEdit = {
     puertos: string;
     puerto_ftp: string;
     nombre_equipo: string;
+    empresa: string;
     editor?: string;
   };
 
@@ -142,6 +148,7 @@ export type ActivoComputadoraData = {
     idUsuario: number;
     imagenRuta: string;
     observacion: string;
+    empresa: string;
     autor?: string;
   };
   
@@ -157,6 +164,7 @@ export type ActivoComputadoraData = {
     idUsuario: number;
     imagenRuta: string;
     observacion: string;
+    empresa: string;
     autor?: string;
   };
 
@@ -175,6 +183,7 @@ export type ActivoComputadoraData = {
     puertos: string;
     puerto_ftp: string;
     nombreEquipo: string;
+    empresa: string;
     autor?: string;
   };
 

@@ -61,9 +61,19 @@ const VisualizarActivoRed = ({
       setSelectedPuertos(equipoRedActivo.puertos);
       setSelectedPuertoFTP(equipoRedActivo.puerto_ftp);
       setNombreEquipo(equipoRedActivo.nombre_equipo ?? "");
-      (equipoRedActivo.inventario.length === 10 || equipoRedActivo.inventario.length === 12)
-        ? setEmpresa("EspolTech")
-        : setEmpresa("Espol");
+      
+      // Normalizar empresa a minúsculas para comparación y ajustar formato
+      const empresaNormalizada = equipoRedActivo.empresa?.toLowerCase();
+      if (empresaNormalizada === "espol") {
+        setEmpresa("Espol");
+      } else if (empresaNormalizada === "espoltech") {
+        setEmpresa("EspolTech");
+      } else {
+        // Fallback al método anterior solo si no hay empresa
+        (equipoRedActivo.inventario.length === 10 || equipoRedActivo.inventario.length === 12)
+          ? setEmpresa("EspolTech")
+          : setEmpresa("Espol");
+      }
     }
   }, [equipoRedActivo]);
 

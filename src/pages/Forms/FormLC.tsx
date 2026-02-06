@@ -256,6 +256,7 @@ export const FormLC = () => {
       idUsuario: parseInt(inventoryDataForm.usuarioId || "", 10),
       imagenRuta: imageData.imagePath,
       observacion: observationValue,
+      empresa: inventoryDataForm.empresa || "",
       autor: user?.email ?? undefined
     };
 

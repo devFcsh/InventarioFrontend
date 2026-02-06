@@ -220,6 +220,7 @@ export const FormPMTM = () => {
       imagenRuta: imageData.imagePath,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,
       observacion: observationValue,
+      empresa: inventoryDataForm.empresa || "",
       autor: user?.email ?? undefined,
     };
     try {

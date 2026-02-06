@@ -107,10 +107,20 @@ const EditarActivoRed = ({
       setSelectedPuertos(equipoRedActivo.puertos);
       setSelectedPuertoFTP(equipoRedActivo.puerto_ftp);
       setNombreEquipo(equipoRedActivo.nombre_equipo ?? "");
-      equipoRedActivo.inventario.length === 10 ||
-      equipoRedActivo.inventario.length === 12
-        ? setEmpresa("EspolTech")
-        : setEmpresa("Espol");
+      
+      // Normalizar empresa a minúsculas para comparación y ajustar formato
+      const empresaNormalizada = equipoRedActivo.empresa?.toLowerCase();
+      if (empresaNormalizada === "espol") {
+        setEmpresa("Espol");
+      } else if (empresaNormalizada === "espoltech") {
+        setEmpresa("EspolTech");
+      } else {
+        // Fallback al método anterior solo si no hay empresa
+        equipoRedActivo.inventario.length === 10 ||
+        equipoRedActivo.inventario.length === 12
+          ? setEmpresa("EspolTech")
+          : setEmpresa("Espol");
+      }
     }
   }, [equipoRedActivo]);
 
@@ -203,6 +213,7 @@ const EditarActivoRed = ({
       puertos: selectedPuertos ?? "",
       puerto_ftp: selectedPuertoFTP ?? "",
       nombre_equipo: nombreEquipo,
+      empresa: empresa ?? "",
       editor: user?.email ?? undefined,
     };
     try {
@@ -239,7 +250,6 @@ const EditarActivoRed = ({
     setEmpresa(newEmpresa);
     if (newEmpresa === null) {
       setErrorEmpresa(true);
-      setSelectedInventarioInv("");
       setErrorInventario(true);
     } else {
       setErrorEmpresa(false);
