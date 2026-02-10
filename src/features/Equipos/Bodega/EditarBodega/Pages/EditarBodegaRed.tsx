@@ -440,7 +440,7 @@ const EditarBodegaRed = ({
           size="small"
           value={selectedMAC}
           error={!!errorMAC}
-          helperText={errorMAC ? "Por favor escribir un inventario válido" : ""}
+          helperText={errorMAC ? "Por favor escribir una MAC válida" : ""}
           onChange={(e) => {
             const value = e.target.value;
             if (value !== null && value.length > 1) {

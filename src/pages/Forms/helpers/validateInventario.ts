@@ -5,7 +5,7 @@ export const validateInventario = (value: any, empresa: string) => {
     return true;
   }
   
-  const regexPattern = /^[\d-]*$/;
+  const regexPattern = /^[\d\s-]*$/;
   
   if (regexPattern.test(value)) {
     if (empresa === "Espol" && (value.length === 6 || value.length === 8)) {
