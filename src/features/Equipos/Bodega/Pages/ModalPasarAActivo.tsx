@@ -13,9 +13,10 @@ interface ModalPasarAActivoProps {
   equipoId: string | null;
   open: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-const ModalPasarAActivo: React.FC<ModalPasarAActivoProps> = ({ equipoId, open, onClose }) => {
+const ModalPasarAActivo: React.FC<ModalPasarAActivoProps> = ({ equipoId, open, onClose, onSuccess }) => {
   const { pasarBodegaAActivo } = usePasarBodegaAActivo();
   const { uploadImage } = useSubirImagen();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -64,6 +65,9 @@ const ModalPasarAActivo: React.FC<ModalPasarAActivoProps> = ({ equipoId, open, o
     try {
       await pasarBodegaAActivo(equipoId ? equipoId : "", selectedUsuarioId, selectedUbicacion.id_ubicacion, imagePath);
       showMessage("Equipo activado exitosamente", "success");
+      if (onSuccess) {
+        onSuccess();
+      }
       onClose();
     } catch (error) {
       showMessage("Error: No se puede pasar a activo un componente ligado a una computadora", "error");

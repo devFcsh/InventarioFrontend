@@ -291,6 +291,7 @@ const Activos = () => {
     const ubicacion = row["Oficina"] !== "" ? row["Oficina"] : row["No. Aula"];
     return {
       tipo: normalize(row["Tipo"]),
+      tipo_inventario: "activo",
       inventario: String(row["Inventario CPU"] ?? ""),
       anio_compra:
         row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
@@ -353,6 +354,7 @@ const Activos = () => {
 
     return {
       tipo: "Switch",
+      tipo_inventario: "activo",
       nombre: normalize(row["Nombre"]),
       inventario: String(row["Inventario"] ?? ""),
       anio_compra:
@@ -382,6 +384,7 @@ const Activos = () => {
 
     return {
       tipo: "AccessPoint",
+      tipo_inventario: "activo",
       nombre: normalize(row["Nombre"]),
       inventario: String(row["Inventario"] ?? ""),
       anio_compra:
@@ -409,6 +412,7 @@ const Activos = () => {
 
     return {
       tipo: "Proyector",
+      tipo_inventario: "activo",
       inventario: String(row["Inventario"] ?? ""),
       anio_compra:
         row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined

@@ -17,6 +17,7 @@ import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
 import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
 import useLamparas from "@hooks/useLamparas";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../../../../data";
 
 interface VisualizarActivoSimpleProps {
   equipoSimpleActivo: ActivoSimpleEdit;
@@ -290,7 +291,7 @@ const VisualizarActivoSimple = ({
         <div className="flex flex-col items-center gap-4">
           {equipoSimpleActivo.imagenRuta ? (
             <img
-              src={`http://localhost:5000${equipoSimpleActivo.imagenRuta}`}
+              src={`${API_BASE_URL}${equipoSimpleActivo.imagenRuta}`}
               alt="Imagen del equipo"
               className="w-full max-w-sm h-48 object-cover border"
             />

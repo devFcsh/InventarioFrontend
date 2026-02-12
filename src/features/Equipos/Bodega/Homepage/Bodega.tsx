@@ -1,6 +1,6 @@
 import { Autocomplete, TextField, Tooltip } from "@mui/material";
 import { Icon } from "@iconify/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import * as XLSX from "xlsx";
 import { Link } from "react-router-dom";
 import ModalConfirmation from "../../../../components/ModalConfirmation";
@@ -26,6 +26,7 @@ import {
 import { useSnackbar } from "@context/SnackbarContext";
 import { useUser } from "@context/userContext";
 import Loader from "@pages/Loader";
+import { useImportarEquipoBodega } from "../hooks/useImportarEquipoBodega";
 
 const Bodega = () => {
   const [inputPeriferico, setInputPeriferico] = useState(() => {
@@ -88,8 +89,10 @@ const Bodega = () => {
 
   const { darDeBajaEquipo } = useDarDeBajaEquipo();
   const { fetchTodosEquipos } = useExportarEquiposBodega();
+  const { importarEquiposBodega, loading: importLoading } = useImportarEquipoBodega();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { rol } = useUser();
+  const { rol, user } = useUser();
   const unableAction = rol !== "administrador" && rol !== "editor";
   const unableActionEditor = rol !== "administrador";
 
@@ -158,6 +161,7 @@ const Bodega = () => {
 
       if (result.success) {
         showMessage(result.message, "success");
+        setShouldFetch(true);
       } else {
         showMessage(result.message, "error");
       }
@@ -176,6 +180,10 @@ const Bodega = () => {
   const handleCloseModalPasarAActivo = () => {
     setOpenModalPasarAActivo(false);
     setSelectedEquipoId(null);
+  };
+
+  const handlePasarAActivoSuccess = () => {
+    setShouldFetch(true);
   };
 
   const deleteEquipo = async (
@@ -342,6 +350,226 @@ const Bodega = () => {
   const handleBuscar = () => {
     setCurrentPage(1);
     setShouldFetch(true);
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  function transformarFilaExcel(row: any) {
+    const normalize = (val: any) =>
+      val === undefined || val === null
+        ? "S/N"
+        : String(val).trim() === "S/N"
+        ? "S/N"
+        : String(val).trim();
+
+    return {
+      tipo: normalize(row["Tipo"]),
+      tipo_inventario: "bodega",
+      inventario: String(row["Inventario CPU"] ?? ""),
+      anio_compra:
+        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
+          ? String(parseInt(row["Año Adq"]))
+          : "S/N",
+      serie: normalize(row["Serie CPU"]),
+      modelo: normalize(row["Modelo Case"]),
+      marca: normalize(row["Marca Case"]),
+      nombreEquipo: normalize(row["Nombre de equipo"]),
+      direccionIp: normalize(row["IP"]).toLowerCase().replace("dhcp", ""),
+      versionso: normalize(row["__EMPTY"]),
+      ram: normalize(String(row["Capacidad Memoria"]).split(" ")[0]),
+      tipo_ram: normalize(
+        String(row["Capacidad Memoria"]).split(" ").slice(1).join(" ")
+      ),
+      disco: normalize(
+        String(row["Capacidad HDD"]) + (row["Tipo Disco"] ?? "")
+      ),
+      procesador: normalize(row["Procesador"]),
+      dominio: normalize(row["Dominio"]),
+      observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
+      empresa: normalize(row["Empresa"]),
+      componentes: [
+        {
+          tipo: "Monitor",
+          modelo: normalize(row["Modelo monitor"]),
+          serie: normalize(row["Serie monitor"]),
+          marca: normalize(row["Marca monitor"]),
+          inventario: String(row["Inventario Monitor"] ?? ""),
+        },
+        {
+          tipo: "Teclado",
+          modelo: normalize(row["Modelo teclado"]),
+          serie: normalize(row["Serie teclado"]),
+          marca: normalize(row["Marca teclado"]),
+          inventario: String(row["Inventario Teclado"] ?? ""),
+        },
+        {
+          tipo: "Mouse",
+          modelo: normalize(row["Modelo mouse"]),
+          serie: normalize(row["Serie mouse"]),
+          marca: normalize(row["Marca mouse"]),
+          inventario: String(row["Inventario Mouse"] ?? ""),
+        },
+      ],
+    };
+  }
+
+  function transformarFilaSwitch(row: any) {
+    const normalize = (val: any) =>
+      val === undefined || val === null
+        ? "S/N"
+        : String(val).trim() === "S/N"
+        ? "S/N"
+        : String(val).trim();
+
+    return {
+      tipo: "Switch",
+      tipo_inventario: "bodega",
+      nombre: normalize(row["Nombre"]),
+      inventario: String(row["Inventario"] ?? ""),
+      anio_compra:
+        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
+          ? String(parseInt(row["Año Adq"]))
+          : "S/N",
+      marca: normalize(row["Marca"]),
+      modelo: normalize(row["Modelo"]),
+      serie: normalize(row["Serie"]),
+      mac: normalize(row["MAC"]),
+      puertos: normalize(row["Puertos"]),
+      puerto_ftp: normalize(row["Puertos FTP"]),
+      observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
+      empresa: normalize(row["Empresa"]),
+    };
+  }
+
+  function transformarFilaAccessPoint(row: any) {
+    const normalize = (val: any) =>
+      val === undefined || val === null
+        ? "S/N"
+        : String(val).trim() === "S/N"
+        ? "S/N"
+        : String(val).trim();
+
+    return {
+      tipo: "AccessPoint",
+      tipo_inventario: "bodega",
+      nombre: normalize(row["Nombre"]),
+      inventario: String(row["Inventario"] ?? ""),
+      anio_compra:
+        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
+          ? String(parseInt(row["Año Adq"]))
+          : "S/N",
+      marca: normalize(row["Marca"]),
+      modelo: normalize(row["Modelo"]),
+      serie: normalize(row["Serie"]),
+      mac: normalize(row["MAC"]),
+      observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
+      empresa: normalize(row["Empresa"]),
+    };
+  }
+
+  function transformarFilaProyector(row: any) {
+    const normalize = (val: any) =>
+      val === undefined || val === null
+        ? "S/N"
+        : String(val).trim() === "S/N"
+        ? "S/N"
+        : String(val).trim();
+
+    return {
+      tipo: "Proyector",
+      tipo_inventario: "bodega",
+      inventario: String(row["Inventario"] ?? ""),
+      anio_compra:
+        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
+          ? String(parseInt(row["Año Adq"]))
+          : "S/N",
+      marca: normalize(row["Marca"]),
+      modelo: normalize(row["Modelo"]),
+      serie: normalize(row["Serie"]),
+      lampara: normalize(row["Lámpara"]),
+      categoria: normalize(row["Categoria"]),
+      observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
+      empresa: normalize(row["Empresa"]),
+    };
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      const data = evt.target?.result;
+      if (!data) return;
+      const workbook = XLSX.read(data, { type: "binary" });
+      
+      const equiposImportTodos: any[] = [];
+
+      if (workbook.SheetNames.includes("Computadora")) {
+        const worksheet = workbook.Sheets["Computadora"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        if (jsonData && jsonData.length > 0) {
+          const equiposComputadora = jsonData.map(transformarFilaExcel);
+          equiposImportTodos.push(...equiposComputadora);
+        }
+      }
+
+      if (workbook.SheetNames.includes("Switch")) {
+        const worksheet = workbook.Sheets["Switch"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        if (jsonData && jsonData.length > 0) {
+          const equiposSwitch = jsonData.map(transformarFilaSwitch);
+          equiposImportTodos.push(...equiposSwitch);
+        }
+      }
+
+      if (workbook.SheetNames.includes("AccessPoint")) {
+        const worksheet = workbook.Sheets["AccessPoint"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        if (jsonData && jsonData.length > 0) {
+          const equiposAP = jsonData.map(transformarFilaAccessPoint);
+          equiposImportTodos.push(...equiposAP);
+        }
+      }
+
+      if (workbook.SheetNames.includes("Proyector")) {
+        const worksheet = workbook.Sheets["Proyector"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        if (jsonData && jsonData.length > 0) {
+          const equiposProyector = jsonData.map(transformarFilaProyector);
+          equiposImportTodos.push(...equiposProyector);
+        }
+      }
+
+      if (equiposImportTodos.length === 0) {
+        showMessage(
+          "El archivo no contiene ninguna hoja válida (Computadora, Switch, AccessPoint, Proyector).",
+          "warning"
+        );
+        return;
+      }
+
+      try {
+        const resultado = await importarEquiposBodega(equiposImportTodos, user?.email);
+
+        if (
+          resultado?.resumen &&
+          typeof resultado.resumen.registrados === "number" &&
+          resultado.resumen.registrados > 0
+        ) {
+          showMessage(`Importación completada.`, "success");
+        } else {
+          showMessage("No se encontraron equipos nuevos para agregar.", "info");
+        }
+
+        setShouldFetch(true);
+      } catch {
+        showMessage("Error al importar equipos", "error");
+      }
+    };
+    reader.readAsBinaryString(file);
   };
 
   const handleCheckboxChange = (id: string) => {
@@ -1080,72 +1308,120 @@ const Bodega = () => {
                 ))}
               </tbody>
             </table>
-            <nav
-              className="flex flex-col md:flex-row justify-between items-center p-4"
-              aria-label="Table navigation"
-            >
-              <span className="text-sm font-normal text-gray-500"></span>
-              <div className="flex flex-col md:flex-row items-center gap-2">
-                <ul className="inline-flex items-center -space-x-px">
-                  <li>
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-                    >
-                      <Tooltip title="Página Anterior">
-                        <span>
-                          <Icon
-                            icon="iconamoon:arrow-left-2"
-                            width="20"
-                            height="20"
-                          />
-                        </span>
-                      </Tooltip>
-                    </button>
-                  </li>
-                  <li>
-                    <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
-                      Página {currentPage} de {totalPages}
-                    </div>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-                    >
-                      <Tooltip title="Siguiente Página">
-                        <span>
-                          <Icon
-                            icon="iconamoon:arrow-right-2"
-                            width="20"
-                            height="20"
-                          />
-                        </span>
-                      </Tooltip>
-                    </button>
-                  </li>
-                </ul>
-                <Tooltip title="Exportar a Excel">
-                  <button
-                    onClick={exportToExcel}
-                    className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-                  >
-                    <span>
-                      <Icon icon="ph:export" width="20" height="20" />
-                    </span>
-                  </button>
-                </Tooltip>
-              </div>
-            </nav>
           </>
+        )}
+        
+        <nav
+          className="flex flex-col md:flex-row justify-between items-center p-4"
+          aria-label="Table navigation"
+        >
+          <div className="flex items-center gap-2">
+            <Tooltip title="Importar desde Excel">
+              <span>
+                <button
+                  onClick={handleImportClick}
+                  className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+                  disabled={importLoading}
+                  type="button"
+                >
+                  <Icon icon="mdi:import" width="20" height="20" />
+                  <input
+                    type="file"
+                    accept=".xlsx, .xls"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                  />
+                </button>
+              </span>
+            </Tooltip>
+
+            <Tooltip title="Descargar formato">
+              <a
+                href="/formato_importar_bodega.xlsx"
+                download="formato_bodega.xlsx"
+                className="flex items-center"
+              >
+                <button
+                  type="button"
+                  className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+                >
+                  <Icon icon="mdi:file-download" width="20" height="20" />
+                </button>
+              </a>
+            </Tooltip>
+          </div>
+          {!loading && !error && equiposBodega.length > 0 && (
+          <div className="flex flex-col md:flex-row items-center gap-2">
+            <ul className="inline-flex items-center -space-x-px">
+              <li>
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                >
+                  <Tooltip title="Página Anterior">
+                    <span>
+                      <Icon
+                        icon="iconamoon:arrow-left-2"
+                        width="20"
+                        height="20"
+                      />
+                    </span>
+                  </Tooltip>
+                </button>
+              </li>
+              <li>
+                <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
+                  Página {currentPage} de {totalPages}
+                </div>
+              </li>
+              <li>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                >
+                  <Tooltip title="Siguiente Página">
+                    <span>
+                      <Icon
+                        icon="iconamoon:arrow-right-2"
+                        width="20"
+                        height="20"
+                      />
+                    </span>
+                  </Tooltip>
+                </button>
+              </li>
+            </ul>
+            <Tooltip title="Exportar a Excel">
+              <button
+                onClick={exportToExcel}
+                className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
+              >
+                <span>
+                  <Icon icon="ph:export" width="20" height="20" />
+                </span>
+              </button>
+            </Tooltip>
+          </div>
+          )}
+        </nav>
+        
+        {importLoading && (
+          <div className="flex justify-center items-center my-8">
+            <Loader />
+            <span className="ml-4 text-lg font-semibold text-blue-700">
+              Importando equipos, por favor espere...
+            </span>
+          </div>
         )}
       </div>
       <ModalPasarAActivo
         equipoId={selectedEquipoId}
         open={openModalPasarAActivo}
         onClose={handleCloseModalPasarAActivo}
+        onSuccess={handlePasarAActivoSuccess}
       />
       <ModalConfirmation
         open={openModal}
