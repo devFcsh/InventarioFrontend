@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario";
 import { useSnackbar } from "@context/SnackbarContext";
 import { useExisteInventario } from "../../../../../hooks/useExisteInventario";
+import { API_BASE_URL } from "../../../../../data";
 import { useExisteSerie } from "../../../../../hooks/useExisteSerie";
 import useComputadorasPorPeriferico, { ComputadoraSimple } from "../../../../../hooks/useComputadorasPorPeriferico";
 import { useUser } from "@context/userContext.tsx";
@@ -695,7 +696,7 @@ const EditarActivoSimple = ({
               />
             ) : equipoSimpleActivo.imagenRuta ? (
               <img
-                src={`http://localhost:5000${equipoSimpleActivo.imagenRuta}`}
+                src={`${API_BASE_URL}${equipoSimpleActivo.imagenRuta}`}
                 alt="Imagen del equipo"
                 className="w-full h-full object-cover"
               />

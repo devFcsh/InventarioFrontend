@@ -26,7 +26,7 @@ import useVersionesSO from "../../../../../hooks/useVersionesSO";
 import useVersionesOffice from "../../../../../hooks/useVersionesOffice";
 import useEdificios from "../../../../../hooks/useEdificios";
 import useUbicaciones from "../../../../../hooks/useUbicaciones";
-import { antivirus, protocolos } from "../../../../../data";
+import { antivirus, protocolos, API_BASE_URL } from "../../../../../data";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
 import { useNavigate } from "react-router-dom";
@@ -580,7 +580,7 @@ const VisualizarComputadoraActivo = ({
                 />
               ) : equipo.imagenRuta ? (
                 <img
-                  src={`http://localhost:5000${equipo.imagenRuta}`}
+                  src={`${API_BASE_URL}${equipo.imagenRuta}`}
                   alt="Imagen del equipo"
                   className="w-full h-full object-cover"
                 />

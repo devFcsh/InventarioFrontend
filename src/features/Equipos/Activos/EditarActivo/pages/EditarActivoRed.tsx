@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario";
 import useEditarActivoRed from "../hooks/useEditarActivoRed";
 import { validateMAC } from "@pages/Forms/StepsSAP/helpers/validateMAC";
+import { API_BASE_URL } from "../../../../../data";
 import { useSnackbar } from "@context/SnackbarContext";
 import { useExisteInventario } from "../../../../../hooks/useExisteInventario";
 import { useExisteSerie } from "../../../../../hooks/useExisteSerie";
@@ -682,7 +683,7 @@ const EditarActivoRed = ({
               />
             ) : equipoRedActivo.imagenRuta ? (
               <img
-                src={`http://localhost:5000${equipoRedActivo.imagenRuta}`}
+                src={`${API_BASE_URL}${equipoRedActivo.imagenRuta}`}
                 alt="Imagen del equipo"
                 className="w-full h-full object-cover"
               />

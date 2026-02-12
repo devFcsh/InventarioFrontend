@@ -291,6 +291,7 @@ const Activos = () => {
     const ubicacion = row["Oficina"] !== "" ? row["Oficina"] : row["No. Aula"];
     return {
       tipo: normalize(row["Tipo"]),
+      tipo_inventario: "activo",
       inventario: String(row["Inventario CPU"] ?? ""),
       anio_compra:
         row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
@@ -353,6 +354,7 @@ const Activos = () => {
 
     return {
       tipo: "Switch",
+      tipo_inventario: "activo",
       nombre: normalize(row["Nombre"]),
       inventario: String(row["Inventario"] ?? ""),
       anio_compra:
@@ -382,6 +384,7 @@ const Activos = () => {
 
     return {
       tipo: "AccessPoint",
+      tipo_inventario: "activo",
       nombre: normalize(row["Nombre"]),
       inventario: String(row["Inventario"] ?? ""),
       anio_compra:
@@ -409,6 +412,7 @@ const Activos = () => {
 
     return {
       tipo: "Proyector",
+      tipo_inventario: "activo",
       inventario: String(row["Inventario"] ?? ""),
       anio_compra:
         row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
@@ -867,229 +871,218 @@ const Activos = () => {
         return;
       }
 
-      const addIDColumn = (equipos: any[]) => {
-        return equipos.map((equipo, index) => ({
-          id: index + 1,
-          ...equipo,
-        }));
+      const fillEmpty = (value: any) => {
+        return value === undefined || value === null || value === "" ? "S/N" : value;
       };
 
       const formatComputadora = (equipos: ExportarComputadora[]) => {
-        return addIDColumn(
-          equipos.map(
-            ({
-              edificio,
-              ubicacion,
-              uso,
-              usuario,
-              direccion_ip,
-              nombre_equipo,
-              dominio,
-              sistema_operativo,
-              procesador,
-              tipo_ram,
-              capacidad_ram,
-              capacidad_disco,
-              marca,
-              modelo,
-              serie,
-              inventario,
-              anio_compra,
-              fecha_ultimo_cambio,
-              observacion,
-              empresa,
-              mouse_marca,
-              mouse_modelo,
-              mouse_serie,
-              mouse_inventario,
-              teclado_marca,
-              teclado_modelo,
-              teclado_serie,
-              teclado_inventario,
-              monitor_marca,
-              monitor_modelo,
-              monitor_serie,
-              monitor_inventario,
-            }) => ({
-              tipo: "Computadora",
-              edificio,
-              ubicacion,
-              uso,
-              usuario,
-              direccion_ip,
-              nombre_equipo,
-              dominio,
-              sistema_operativo,
-              procesador,
-              tipo_ram,
-              capacidad_ram,
-              capacidad_disco,
-              marca,
-              modelo,
-              serie,
-              inventario,
-              anio_compra,
-              fecha_ultimo_cambio: new Date(
-                fecha_ultimo_cambio
-              ).toLocaleString(),
-              observacion,
-              empresa,
-              mouse_marca: mouse_marca || "",
-              mouse_modelo: mouse_modelo || "",
-              mouse_serie: mouse_serie || "",
-              mouse_inventario: mouse_inventario || "",
-              teclado_marca: teclado_marca || "",
-              teclado_modelo: teclado_modelo || "",
-              teclado_serie: teclado_serie || "",
-              teclado_inventario: teclado_inventario || "",
-              monitor_marca: monitor_marca || "",
-              monitor_modelo: monitor_modelo || "",
-              monitor_serie: monitor_serie || "",
-              monitor_inventario: monitor_inventario || "",
-            })
-          )
-        );
+        return equipos.map((equipo, index) => {
+          const {
+            edificio,
+            ubicacion,
+            uso,
+            usuario,
+            direccion_ip,
+            nombre_equipo,
+            dominio,
+            sistema_operativo,
+            version_sistema_operativo,
+            procesador,
+            tipo_ram,
+            capacidad_ram,
+            capacidad_disco,
+            marca,
+            modelo,
+            serie,
+            inventario,
+            anio_compra,
+            observacion,
+            empresa,
+            mouse_marca,
+            mouse_modelo,
+            mouse_serie,
+            mouse_inventario,
+            teclado_marca,
+            teclado_modelo,
+            teclado_serie,
+            teclado_inventario,
+            monitor_marca,
+            monitor_modelo,
+            monitor_serie,
+            monitor_inventario,
+          } = equipo;
+
+          // Determinar si es aula u oficina basado en el formato de ubicación
+          const esAula = ubicacion && /^\d+$/.test(ubicacion.toString());
+          
+          return {
+            "Id": index + 1,
+            "Edificio": fillEmpty(edificio),
+            "No. Aula": esAula ? fillEmpty(ubicacion) : "S/N",
+            "Oficina": !esAula && ubicacion ? fillEmpty(ubicacion) : "S/N",
+            "Usuario": fillEmpty(usuario),
+            "Uso": fillEmpty(uso),
+            "Tipo": "Computadora",
+            "Empresa": fillEmpty(empresa),
+            "Año Adq": fillEmpty(anio_compra),
+            "IP": fillEmpty(direccion_ip),
+            "Nombre de equipo": fillEmpty(nombre_equipo),
+            "Dominio": fillEmpty(dominio),
+            "Sistema Operativo": fillEmpty(sistema_operativo),
+            "Versión": fillEmpty(version_sistema_operativo),
+            "Procesador": fillEmpty(procesador),
+            "Capacidad Memoria": (capacidad_ram && tipo_ram) ? `${capacidad_ram} ${tipo_ram}` : fillEmpty(capacidad_ram || tipo_ram),
+            "Capacidad HDD": fillEmpty(capacidad_disco),
+            "Tipo Disco": "S/N",
+            "Marca Case": fillEmpty(marca),
+            "Modelo Case": fillEmpty(modelo),
+            "Serie CPU": fillEmpty(serie),
+            "Marca monitor": fillEmpty(monitor_marca),
+            "Modelo monitor": fillEmpty(monitor_modelo),
+            "Serie monitor": fillEmpty(monitor_serie),
+            "Marca teclado": fillEmpty(teclado_marca),
+            "Modelo teclado": fillEmpty(teclado_modelo),
+            "Serie teclado": fillEmpty(teclado_serie),
+            "Marca mouse": fillEmpty(mouse_marca),
+            "Modelo mouse": fillEmpty(mouse_modelo),
+            "Serie mouse": fillEmpty(mouse_serie),
+            "Inventario CPU": fillEmpty(inventario),
+            "Inventario Monitor": fillEmpty(monitor_inventario),
+            "Inventario Teclado": fillEmpty(teclado_inventario),
+            "Inventario Mouse": fillEmpty(mouse_inventario),
+            "Observación": fillEmpty(observacion),
+          };
+        });
       };
 
       const formatSwitch = (equipos: ExportarSwitch[]) => {
-        return addIDColumn(
-          equipos.map(
-            ({
-              inventario,
-              anio_compra,
-              edificio,
-              ubicacion,
-              marca,
-              modelo,
-              serie,
-              mac,
-              puertos,
-              puerto_ftp,
-              nombre_equipo,
-              fecha_ultimo_cambio,
-              observacion,
-              empresa,
-            }) => ({
-              tipo: "Switch",
-              inventario,
-              anio_compra,
-              edificio,
-              ubicacion,
-              marca,
-              modelo,
-              serie,
-              mac,
-              puertos,
-              puerto_ftp,
-              nombre_equipo,
-              fecha_ultimo_cambio: new Date(
-                fecha_ultimo_cambio
-              ).toLocaleString(),
-              observacion,
-              empresa,
-            })
-          )
-        );
+        return equipos.map((equipo, index) => {
+          const {
+            inventario,
+            anio_compra,
+            edificio,
+            ubicacion,
+            marca,
+            modelo,
+            serie,
+            mac,
+            puertos,
+            puerto_ftp,
+            nombre_equipo,
+            observacion,
+            empresa,
+          } = equipo;
+          
+          return {
+            "N°": index + 1,
+            "Año Adq": fillEmpty(anio_compra),
+            "Empresa": fillEmpty(empresa),
+            "Nombre": fillEmpty(nombre_equipo),
+            "Inventario": fillEmpty(inventario),
+            "Bloque": fillEmpty(edificio),
+            "Ubicación": fillEmpty(ubicacion),
+            "Marca": fillEmpty(marca),
+            "Modelo": fillEmpty(modelo),
+            "Serie": fillEmpty(serie),
+            "MAC": fillEmpty(mac),
+            "Puertos": fillEmpty(puertos),
+            "Puertos FTP": fillEmpty(puerto_ftp),
+            "Estado": "S/N",
+            "Observación": fillEmpty(observacion),
+          };
+        });
       };
 
       const formatAP = (equipos: ExportarAP[]) => {
-        return addIDColumn(
-          equipos.map(
-            ({
-              inventario,
-              anio_compra,
-              edificio,
-              ubicacion,
-              marca,
-              modelo,
-              serie,
-              mac,
-              nombre_equipo,
-              fecha_ultimo_cambio,
-              observacion,
-              empresa,
-            }) => ({
-              tipo: "AccessPoint",
-              inventario,
-              anio_compra,
-              edificio,
-              ubicacion,
-              marca,
-              modelo,
-              serie,
-              mac,
-              nombre_equipo,
-              fecha_ultimo_cambio: new Date(
-                fecha_ultimo_cambio
-              ).toLocaleString(),
-              observacion,
-              empresa,
-            })
-          )
-        );
+        return equipos.map((equipo, index) => {
+          const {
+            inventario,
+            anio_compra,
+            edificio,
+            ubicacion,
+            marca,
+            modelo,
+            serie,
+            mac,
+            nombre_equipo,
+            observacion,
+            empresa,
+          } = equipo;
+          
+          return {
+            "N°": index + 1,
+            "Año Adq": fillEmpty(anio_compra),
+            "Empresa": fillEmpty(empresa),
+            "Nombre": fillEmpty(nombre_equipo),
+            "Inventario": fillEmpty(inventario),
+            "Bloque": fillEmpty(edificio),
+            "Ubicación": fillEmpty(ubicacion),
+            "Marca": fillEmpty(marca),
+            "Modelo": fillEmpty(modelo),
+            "Serie": fillEmpty(serie),
+            "MAC": fillEmpty(mac),
+            "Estado": "S/N",
+            "Observación": fillEmpty(observacion),
+          };
+        });
       };
 
       const formatProyector = (equipos: ExportarProyector[]) => {
-        return addIDColumn(
-          equipos.map(
-            ({
-              inventario,
-              anio_compra,
-              edificio,
-              ubicacion,
-              marca,
-              modelo,
-              serie,
-              lampara,
-              fecha_ultimo_cambio,
-              observacion,
-              empresa,
-            }) => ({
-              tipo: "Proyector",
-              inventario,
-              anio_compra,
-              edificio,
-              ubicacion,
-              marca,
-              modelo,
-              serie,
-              lampara,
-              fecha_ultimo_cambio: new Date(
-                fecha_ultimo_cambio
-              ).toLocaleString(),
-              observacion,
-              empresa,
-            })
-          )
-        );
+        return equipos.map((equipo, index) => {
+          const {
+            inventario,
+            anio_compra,
+            edificio,
+            ubicacion,
+            marca,
+            modelo,
+            serie,
+            lampara,
+            observacion,
+            empresa,
+          } = equipo;
+          
+          return {
+            "N°": index + 1,
+            "Año Adq": fillEmpty(anio_compra),
+            "Empresa": fillEmpty(empresa),
+            "Inventario": fillEmpty(inventario),
+            "Bloque": fillEmpty(edificio),
+            "Ubicación": fillEmpty(ubicacion),
+            "Marca": fillEmpty(marca),
+            "Modelo": fillEmpty(modelo),
+            "Serie": fillEmpty(serie),
+            "Categoría": "S/N",
+            "Lámpara": fillEmpty(lampara),
+            "Estado": "S/N",
+            "Observación": fillEmpty(observacion),
+          };
+        });
       };
 
       const formatEquiposSimples = (equipos: ExportarSimples[]) => {
-        return addIDColumn(
-          equipos.map(
-            ({
-              periferico,
-              edificio,
-              ubicacion,
-              uso,
-              usuario,
-              anio_compra,
-              fecha_ultimo_cambio,
-              observacion,
-            }) => ({
-              tipo: periferico,
-              edificio,
-              ubicacion,
-              uso,
-              usuario,
-              anio_compra,
-              fecha_ultimo_cambio: new Date(
-                fecha_ultimo_cambio
-              ).toLocaleString(),
-              observacion,
-            })
-          )
-        );
+        return equipos.map((equipo, index) => {
+          const {
+            periferico,
+            edificio,
+            ubicacion,
+            uso,
+            usuario,
+            anio_compra,
+            observacion,
+          } = equipo;
+          
+          return {
+            "N°": index + 1,
+            "Tipo": fillEmpty(periferico),
+            "Edificio": fillEmpty(edificio),
+            "Ubicación": fillEmpty(ubicacion),
+            "Uso": fillEmpty(uso),
+            "Usuario": fillEmpty(usuario),
+            "Año Adq": fillEmpty(anio_compra),
+            "Observación": fillEmpty(observacion),
+          };
+        });
       };
 
       const wsComputadoras = XLSX.utils.json_to_sheet(
@@ -1107,7 +1100,7 @@ const Activos = () => {
       );
 
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, wsComputadoras, "Computadoras");
+      XLSX.utils.book_append_sheet(wb, wsComputadoras, "Computadora");
       XLSX.utils.book_append_sheet(wb, wsAP, "AccessPoint");
       XLSX.utils.book_append_sheet(wb, wsSwitch, "Switch");
       XLSX.utils.book_append_sheet(wb, wsProyector, "Proyector");
