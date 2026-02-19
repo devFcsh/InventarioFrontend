@@ -365,6 +365,7 @@ const EditarComputadoraBodega = ({
       id_dominio: selectedDominio?.id_dominio ?? "",
       serie: selectedInventarioSerie ?? "",
       perifericoId: equipo.id_periferico,
+      marcaId: selectedInventarioMarca?.id_marca ?? "",
       inventario: selectedInventarioInv,
       anio_compra: selectedInventarioAnio,
       nombre_equipo: nombreEquipo,
@@ -385,6 +386,7 @@ const EditarComputadoraBodega = ({
             perifericoId: Number(comp.periferico?.id_periferico) ?? 0,
             serie: comp.serie,
             modeloId: Number(comp.modelo?.id_modelo) ?? 0,
+            marcaId: Number(comp.marca?.id_marca) ?? 0,
           })),
           editor: user?.email ?? undefined,
         });

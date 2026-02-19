@@ -33,6 +33,7 @@ export type BodegaComputadoraEditSend = {
   direccion_ip: string;
   serie: string;
   perifericoId: string;
+  marcaId: string;
   id_procesador: string
   observacion: string;
   editor?: string;
@@ -71,6 +72,7 @@ export type BodegaSimpleEditSend = {
   anio_compra: string;
   serie: string;
   perifericoId: string;
+  marcaId: string;
   id_lampara: string;
   observacion: string;
   editor?: string;
@@ -82,6 +84,7 @@ export type BodegaRedEditSend = {
   anio_compra: string;
   serie: string;
   perifericoId: string;
+  marcaId: string;
   observacion: string;
   mac: string;
   puertos: string;
@@ -96,6 +99,7 @@ export type BodegaComputadoraData = {
     anio_compra: string;
     perifericoId: number;
     serie: string;
+    marcaId: number;
     modeloId: number;
     nombreEquipo?: string; 
     direccionIp?: string; 
@@ -116,6 +120,7 @@ export type BodegaComputadoraData = {
     anio_compra: string;
     perifericoId: number;
     serie: string;
+    marcaId: number;
     modeloId: number;
     idLampara: number;
     observacion: string;
@@ -128,6 +133,7 @@ export type BodegaComputadoraData = {
     anio_compra: string;
     perifericoId: number;
     serie: string;
+    marcaId: number;
     modeloId: number;
     observacion: string;
     mac: string;

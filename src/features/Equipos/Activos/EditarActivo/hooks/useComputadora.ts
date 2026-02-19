@@ -24,7 +24,15 @@ export const useObtenerComputadora = (id: string | null | undefined) => {
     const obtenerComputadora = async () => {
       try {
         const response = await clienteAxios.get(`/equipos/computadora/${id}`);
-        setEquipo(response.data.equipo);
+        const equipoData = response.data.equipo;
+        
+        // Mapear p_id_periferico a id_periferico si existe
+        const equipoMapeado: ActivoComputadoraEdit = {
+          ...equipoData,
+          id_periferico: equipoData.p_id_periferico || equipoData.id_periferico,
+        };
+        
+        setEquipo(equipoMapeado);
         setComponentes(response.data.componentes.map((comp: Componente) => ({
           periferico: { nombre: comp.periferico },
           marca: { nombre: comp.marca },

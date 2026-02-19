@@ -42,6 +42,7 @@ export type ActivoComputadoraEdit = {
     nombre_equipo: string;
     direccion_ip: string;
     perifericoId: string;
+    marcaId: string;
     modeloId: string;
     serie: string;
     observacion: string;
@@ -101,6 +102,7 @@ export type ActivoRedEdit = {
     id_ubicacion: string;
     serie: string;
     perifericoId: string;
+    marcaId: string;
     modeloId: string;
     id_lampara: string;
     id_computadora?: string;
@@ -117,6 +119,7 @@ export type ActivoRedEdit = {
     imagenRuta: string | null;
     id_ubicacion: string;
     perifericoId: string;
+    marcaId: string;
     modeloId: string;
     serie: string;
     observacion: string;
@@ -134,6 +137,7 @@ export type ActivoComputadoraData = {
     anio_compra: string;
     perifericoId: number;
     serie: string;
+    marcaId: number;
     modeloId: number;     
     nombreEquipo?: string; 
     direccionIp?: string; 
@@ -158,6 +162,7 @@ export type ActivoComputadoraData = {
     anio_compra: string;
     perifericoId: number;
     serie: string;
+    marcaId: number;
     modeloId: number;     
     idLampara: number;
     idUbicacion: number;
@@ -174,6 +179,7 @@ export type ActivoComputadoraData = {
     anio_compra: string;
     perifericoId: number;
     serie: string;
+    marcaId: number;
     modeloId: number;          
     idUbicacion: number;
     idUsuario: number;

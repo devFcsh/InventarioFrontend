@@ -17,6 +17,7 @@ export const useObtenerComputadoraActivo = (id: string) => {
         if (equipo) {
           const merged = {
             ...equipo,
+            id_periferico: equipo.p_id_periferico || equipo.id_periferico,
             isComponente: response.data.isComponente ?? equipo.isComponente,
             id_computadora: response.data.id_computadora ?? equipo.id_computadora,
             id_serie_computadora: response.data.id_serie_computadora ?? equipo.id_serie_computadora,

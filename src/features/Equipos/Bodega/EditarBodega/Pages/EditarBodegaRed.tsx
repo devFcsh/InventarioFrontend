@@ -136,6 +136,7 @@ const EditarBodegaRed = ({
       anio_compra: selectedInventarioAnio,
       serie: selectedInventarioSerie ?? "",
       perifericoId: equipoRedBodega.id_periferico,
+      marcaId: selectedInventarioMarca?.id_marca ?? "",
       observacion: observationValue ?? "",
       mac: selectedMAC ?? "",
       puertos: selectedPuertos ?? "",

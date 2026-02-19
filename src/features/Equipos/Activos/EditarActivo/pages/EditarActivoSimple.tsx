@@ -257,6 +257,7 @@ const EditarActivoSimple = ({
       id_ubicacion: selectedUbicacion?.id_ubicacion ?? "",
       serie: serieNombre,
       perifericoId: equipoSimpleActivo?.id_periferico,
+      marcaId: selectedInventarioMarca?.id_marca ?? "",
       modeloId: selectedInventarioModelo?.id_modelo ?? "",
       id_computadora: selectedComputadora ? String(selectedComputadora.id_equipo) : undefined,
       observacion: observationValue,
