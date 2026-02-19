@@ -211,6 +211,7 @@ export const FormPMTM = () => {
       anio_compra: inventoryDataForm.anio_compra,
       perifericoId: Number(selectedPeriferico?.id_periferico) ?? 0,
       serie: inventoryDataForm.serie || "",
+      marcaId: Number(inventoryDataForm.marca?.id_marca) ?? 0,
       modeloId: Number(inventoryDataForm.modelo?.id_modelo) ?? 0,
       idUbicacion: Number(inventoryDataForm.ubicacion?.id_ubicacion) ?? 0,
       idUsuario:
@@ -245,6 +246,7 @@ export const FormPMTM = () => {
       anio_compra: inventoryDataForm.anio_compra,
       perifericoId: Number(selectedPeriferico?.id_periferico) ?? 0,
       serie: inventoryDataForm.serie || "",
+      marcaId: Number(inventoryDataForm.marca?.id_marca) ?? 0,
       modeloId: Number(inventoryDataForm.modelo?.id_modelo) ?? 0,
       observacion: observationValue,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,
@@ -271,6 +273,7 @@ export const FormPMTM = () => {
       anio_compra: inventoryDataForm.anio_compra,
       perifericoId: Number(selectedPeriferico?.id_periferico),
       serie: inventoryDataForm.serie || "",
+      marcaId: Number(inventoryDataForm.marca?.id_marca) ?? 0,
       modeloId: Number(inventoryDataForm.modelo?.id_modelo) ?? 0,
       observacion: observationValue,
       idLampara: Number(inventoryDataForm.lampara?.id_lampara) ?? 0,

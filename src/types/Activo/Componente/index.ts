@@ -16,7 +16,9 @@ export type ComponenteData = {
       inventario: string;
       serie: string;
       perifericoId: number;
+      marcaId: number;
       modeloId: number;
+      id_componente?: string;
     }[];
     ubicacionId: number;
     usuarioId: number;

@@ -13,7 +13,15 @@ export const useObtenerEquipoSimpleBodega = (id: string) => {
     const obtenerEquipoSimpleBodega = async () => {
       try {
         const response = await clienteAxios.get(`/equipos/equipoSimple/${id}`);
-        setEquipoSimpleBodega(response.data.equipo);
+        const equipoData = response.data.equipo;
+        
+        // Mapear p_id_periferico a id_periferico si existe
+        const equipoMapeado: BodegaSimpleEdit = {
+          ...equipoData,
+          id_periferico: equipoData.p_id_periferico || equipoData.id_periferico,
+        };
+        
+        setEquipoSimpleBodega(equipoMapeado);
       } catch (err) {
         setError("Error al obtener equipo" + err);
       } finally {

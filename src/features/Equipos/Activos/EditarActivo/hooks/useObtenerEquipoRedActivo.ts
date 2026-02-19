@@ -13,7 +13,15 @@ export const useObtenerRedActivo = (id: string) => {
     const obtenerEquipoRedActivo = async () => {
       try {
         const response = await clienteAxios.get(`/equipos/equipoRedActivo/${id}`);
-        setEquipoRedActivo(response.data.equipo);
+        const equipoData = response.data.equipo;
+        
+        // Mapear p_id_periferico a id_periferico si existe
+        const equipoMapeado: ActivoRedEdit = {
+          ...equipoData,
+          id_periferico: equipoData.p_id_periferico || equipoData.id_periferico,
+        };
+        
+        setEquipoRedActivo(equipoMapeado);
       } catch (err) {
         setError("Error al obtener equipo" + err);
       } finally {

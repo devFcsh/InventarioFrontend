@@ -182,6 +182,7 @@ const EditarBodegaSimple = ({
       anio_compra: selectedInventarioAnio,
       serie: selectedInventarioSerie ?? "",
       perifericoId: selectedPeriferico?.id_periferico ?? equipoSimpleBodega.id_periferico,
+      marcaId: selectedInventarioMarca?.id_marca ?? "",
       id_computadora: selectedComputadora ? String(selectedComputadora.id_equipo) : null,
       observacion: observationValue,
       id_lampara: selectedLampara?.id_lampara ?? "",

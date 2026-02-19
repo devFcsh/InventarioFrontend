@@ -23,6 +23,7 @@ export type BajaComputadoraData = {
     inventario: string;
     perifericoId: number;
     serie: string;
+    marcaId: number;
     modeloId: number;
     nombreEquipo?: string; 
     direccionIp?: string; 
@@ -41,6 +42,7 @@ export type BajaSimpleData = {
     inventario: string;
     perifericoId: number;
     serie: string;
+    marcaId: number;
     modeloId: number;
     idLampara: number;
     observacion: string;
@@ -52,6 +54,7 @@ export type BajaSimpleData = {
     inventario: string;
     perifericoId: number;
     serie: string;
+    marcaId: number;
     modeloId: number;
     observacion: string;
     mac: string;

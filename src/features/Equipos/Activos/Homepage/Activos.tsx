@@ -257,6 +257,22 @@ const Activos = () => {
           "Empresa"
         ];
         break;
+      case "EquiposSimples":
+        requiredColumns = [
+          "Tipo",
+          "Inventario",
+          "Año Adq",
+          "Serie",
+          "Modelo",
+          "Marca",
+          "Uso",
+          "Usuario",
+          "Edificio",
+          "Observación",
+          "Empresa",
+          "Serie Equipo Principal"
+        ];
+        break;
       default:
         return [];
     }
@@ -430,6 +446,36 @@ const Activos = () => {
     };
   }
 
+  function transformarFilaEquiposSimples(row: any) {
+    const ubicacion = row["Oficina"] !== "" ? row["Oficina"] : row["No. Aula"];
+    const normalize = (val: any) =>
+      val === undefined || val === null
+        ? "S/N"
+        : String(val).trim() === "S/N"
+        ? "S/N"
+        : String(val).trim();
+
+    return {
+      tipo: normalize(row["Tipo"]),
+      tipo_inventario: "activo",
+      inventario: String(row["Inventario"] ?? ""),
+      anio_compra:
+        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
+          ? String(parseInt(row["Año Adq"]))
+          : "S/N",
+      serie: normalize(row["Serie"]),
+      modelo: normalize(row["Modelo"]),
+      marca: normalize(row["Marca"]),
+      uso: normalize(row["Uso"]),
+      usuario: normalize(row["Usuario"]),
+      edificio: normalize(row["Edificio"]),
+      ubicacion: normalize(ubicacion),
+      observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
+      empresa: normalize(row["Empresa"]),
+      serie_equipo_principal: normalize(row["Serie Equipo Principal"]),
+    };
+  }
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -503,9 +549,24 @@ const Activos = () => {
         }
       }
 
+      if (workbook.SheetNames.includes("Equipos Simples")) {
+        const worksheet = workbook.Sheets["Equipos Simples"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        if (jsonData && jsonData.length > 0) {
+          const faltantes = columnasFaltantesExcel(jsonData, "EquiposSimples");
+          if (faltantes.length > 0) {
+            errores.push(`Equipos Simples - Faltan columnas: ${faltantes.join(", ")}`);
+          } else {
+            const equiposSimples = jsonData.map(transformarFilaEquiposSimples);
+            equiposImportTodos.push(...equiposSimples);
+          }
+        }
+      }
+
       if (equiposImportTodos.length === 0 && errores.length === 0) {
         showMessage(
-          "El archivo no contiene ninguna hoja válida (Computadora, Switch, AccessPoint, Proyector).",
+          "El archivo no contiene ninguna hoja válida (Computadora, Switch, AccessPoint, Proyector, Equipos Simples).",
           "warning"
         );
         return;
