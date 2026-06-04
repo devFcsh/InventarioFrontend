@@ -14,7 +14,7 @@ import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPor
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
 import { Autocomplete, TextField, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { API_BASE_URL } from "../../../../../data";
+import { IMAGE_BASE_URL } from "../../../../../data";
 
 interface VisualizarActivoRedProps {
   equipoRedActivo: ActivoRedEdit;
@@ -266,7 +266,7 @@ const VisualizarActivoRed = ({
         <div className="flex flex-col items-center gap-4">
           {equipoRedActivo.imagenRuta ? (
             <img
-              src={`${API_BASE_URL}${equipoRedActivo.imagenRuta}`}
+              src={`${IMAGE_BASE_URL.replace(/\/$/, "")}/${equipoRedActivo.imagenRuta.replace(/^\//, "")}`}
               alt="Imagen del equipo"
               className="w-full max-w-sm h-48 object-cover border"
             />
