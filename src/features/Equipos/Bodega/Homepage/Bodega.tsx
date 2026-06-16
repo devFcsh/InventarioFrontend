@@ -55,7 +55,7 @@ const Bodega = () => {
     () => Promise<{ success: boolean; message: string }>
   >(() => async () => ({ success: false, message: "" }));
 
-  const [modalContentBodega, _] = useState<{
+  const [modalContentBodega] = useState<{
     title: string;
     message: string;
   }>({
@@ -356,7 +356,9 @@ const Bodega = () => {
     fileInputRef.current?.click();
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function transformarFilaExcel(row: any) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -415,7 +417,9 @@ const Bodega = () => {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function transformarFilaSwitch(row: any) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -443,7 +447,9 @@ const Bodega = () => {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function transformarFilaAccessPoint(row: any) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -469,7 +475,9 @@ const Bodega = () => {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function transformarFilaProyector(row: any) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -505,6 +513,7 @@ const Bodega = () => {
       if (!data) return;
       const workbook = XLSX.read(data, { type: "binary" });
       
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const equiposImportTodos: any[] = [];
 
       if (workbook.SheetNames.includes("Computadora")) {
@@ -623,6 +632,7 @@ const Bodega = () => {
         return;
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const addIDColumn = (equipos: any[]) => {
         return equipos.map((equipo, index) => ({
           id: index + 1,

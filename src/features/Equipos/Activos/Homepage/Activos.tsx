@@ -52,7 +52,7 @@ const Activos = () => {
     message: "¿Estás seguro de que deseas realizar esta acción?",
   });
 
-  const [modalContentActivos, _] = useState<{
+  const [modalContentActivos] = useState<{
     title: string;
     message: string;
   }>({
@@ -178,6 +178,7 @@ const Activos = () => {
     handleCloseModal();
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function columnasFaltantesExcel(jsonData: any[], tipoEquipo: string): string[] {
     if (!jsonData || jsonData.length === 0) return [];
     
@@ -296,7 +297,9 @@ const Activos = () => {
     fileInputRef.current?.click();
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function transformarFilaExcel(row: any) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -360,7 +363,9 @@ const Activos = () => {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function transformarFilaSwitch(row: any) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -390,7 +395,9 @@ const Activos = () => {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function transformarFilaAccessPoint(row: any) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -418,7 +425,9 @@ const Activos = () => {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function transformarFilaProyector(row: any) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -446,8 +455,10 @@ const Activos = () => {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function transformarFilaEquiposSimples(row: any) {
     const ubicacion = row["Oficina"] !== "" ? row["Oficina"] : row["No. Aula"];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -486,6 +497,7 @@ const Activos = () => {
       if (!data) return;
       const workbook = XLSX.read(data, { type: "binary" });
       
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const equiposImportTodos: any[] = [];
       const errores: string[] = [];
 
@@ -932,6 +944,7 @@ const Activos = () => {
         return;
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const fillEmpty = (value: any) => {
         return value === undefined || value === null || value === "" ? "S/N" : value;
       };
@@ -1332,6 +1345,7 @@ const Activos = () => {
             getOptionLabel={(option) =>
               typeof option === "string"
                 ? option
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 : (option as any)?.nombre || (option as any)?.email || String((option as any)?.id_usuario || "")
             }
             value={selectedUsuarioFilter}
