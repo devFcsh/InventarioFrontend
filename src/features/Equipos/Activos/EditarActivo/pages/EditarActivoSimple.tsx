@@ -269,6 +269,7 @@ const EditarActivoSimple = ({
       await editarActivoSimple(equipoSimpleActivo.id_equipo, payload);
       showMessage("Equipo editado correctamente", "success");
       navigate("/activos");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       const errorMessage = error?.message || "Error al editar el equipo";
       showMessage(errorMessage, "error");
