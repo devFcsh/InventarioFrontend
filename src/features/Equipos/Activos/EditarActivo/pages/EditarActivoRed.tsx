@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario";
 import useEditarActivoRed from "../hooks/useEditarActivoRed";
 import { validateMAC } from "@pages/Forms/StepsSAP/helpers/validateMAC";
-import { API_BASE_URL } from "../../../../../data";
+import { IMAGE_BASE_URL } from "../../../../../data";
 import { useSnackbar } from "@context/SnackbarContext";
 import { useExisteInventario } from "../../../../../hooks/useExisteInventario";
 import { useExisteSerie } from "../../../../../hooks/useExisteSerie";
@@ -684,7 +684,7 @@ const EditarActivoRed = ({
               />
             ) : equipoRedActivo.imagenRuta ? (
               <img
-                src={`${API_BASE_URL}${equipoRedActivo.imagenRuta}`}
+                src={`${IMAGE_BASE_URL.replace(/\/$/, "")}/${equipoRedActivo.imagenRuta.replace(/^\//, "")}`}
                 alt="Imagen del equipo"
                 className="w-full h-full object-cover"
               />
@@ -692,6 +692,37 @@ const EditarActivoRed = ({
               <p className="text-gray-500">Haz clic para cargar una imagen</p>
             )}
           </div>
+          {(image || equipoRedActivo.imagenRuta) ? (
+            <>
+              <div className="w-[300px] h-[300px] rounded-lg overflow-hidden flex items-center justify-center bg-gray-100 shadow-sm border border-gray-200">
+                {image ? (
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt="Vista previa"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={`${IMAGE_BASE_URL}${equipoRedActivo.imagenRuta}`}
+                    alt="Imagen del equipo"
+                    className="w-full h-full object-cover"
+                  />
+                )}
+              </div>
+              <Button variant="outlined" onClick={handleImageClick}>
+                Reemplazar imagen actual
+              </Button>
+            </>
+          ) : (
+            <>
+              <div className="w-[300px] h-[300px] rounded-lg flex items-center justify-center bg-gray-200 shadow-sm border border-gray-300">
+                <span className="text-gray-500 font-medium text-center">Sin Imagen</span>
+              </div>
+              <Button variant="outlined" onClick={handleImageClick}>
+                Subir imagen del equipo
+              </Button>
+            </>
+          )}
         </div>
       </div>
 

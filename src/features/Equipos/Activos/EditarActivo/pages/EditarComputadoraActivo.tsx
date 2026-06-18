@@ -32,7 +32,7 @@ import useVersionesSO from "../../../../../hooks/useVersionesSO";
 import useVersionesOffice from "../../../../../hooks/useVersionesOffice";
 import useEdificios from "../../../../../hooks/useEdificios";
 import useUbicaciones from "../../../../../hooks/useUbicaciones";
-import { antivirus, protocolos, API_BASE_URL } from "../../../../../data";
+import { antivirus, protocolos, IMAGE_BASE_URL } from "../../../../../data";
 import { Icon } from "@iconify/react";
 import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPorMarcaPeriferico";
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
@@ -1103,26 +1103,37 @@ const EditarComputadoraActivo = ({
             ref={fileInputRef}
             style={{ display: "none" }}
           />
-          <div
-            onClick={handleImageClick}
-            className="w-full max-w-sm h-48 border border-dashed border-gray-300 flex items-center justify-center cursor-pointer"
-          >
-            {image ? (
-              <img
-                src={URL.createObjectURL(image)}
-                alt="Vista previa"
-                className="w-full h-full object-cover"
-              />
-            ) : equipo.imagenRuta ? (
-              <img
-                src={`${API_BASE_URL}${equipo.imagenRuta}`}
-                alt="Imagen del equipo"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <p className="text-gray-500">Haz clic para cargar una imagen</p>
-            )}
-          </div>
+          {(image || equipo.imagenRuta) ? (
+            <>
+              <div className="w-[300px] h-[300px] rounded-lg overflow-hidden flex items-center justify-center bg-gray-100 shadow-sm border border-gray-200">
+                {image ? (
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt="Vista previa"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={`${IMAGE_BASE_URL.replace(/\/$/, '')}/${equipo.imagenRuta.replace(/^\//, '')}`}
+                    alt="Imagen del equipo"
+                    className="w-full h-full object-cover"
+                  />
+                )}
+              </div>
+              <Button variant="outlined" onClick={handleImageClick}>
+                Reemplazar imagen actual
+              </Button>
+            </>
+          ) : (
+            <>
+              <div className="w-[300px] h-[300px] rounded-lg flex items-center justify-center bg-gray-200 shadow-sm border border-gray-300">
+                <span className="text-gray-500 font-medium text-center">Sin Imagen</span>
+              </div>
+              <Button variant="outlined" onClick={handleImageClick}>
+                Subir imagen del equipo
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
