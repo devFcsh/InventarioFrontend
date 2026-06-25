@@ -37,7 +37,7 @@ export const useImportarEquipoBodega = () => {
     setResultado(null);
 
     try {
-      const payload = autor ? { equipos: equiposData, autor } : equiposData;
+      const payload = { equipos: equiposData, autor: autor ?? "" };
       const { data } = await clienteAxios.post<ImportarEquiposResultado>("/equipos/importarEquiposActivos", payload);
       setResultado(data);
       return data;

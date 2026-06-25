@@ -30,8 +30,13 @@ import {
 import { useSnackbar } from "@context/SnackbarContext.tsx";
 import { useUser } from "@context/userContext.tsx";
 import Loader from "@pages/Loader.tsx";
-import { useImportarEquipoActivo } from "../hooks/useImportarEquipoActivo.ts";
+import {
+  ImportarEquiposResultado,
+  useImportarEquipoActivo,
+} from "../hooks/useImportarEquipoActivo.ts";
 import { MantenimientoActivo } from "../MantenimientoActivo/Homepage/MantenimientoActivo.tsx";
+import ImportResultDialog from "../../shared/ImportResultDialog.tsx";
+import { transformComputadoraRow } from "../../shared/excelImport.ts";
 
 const Activos = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -40,6 +45,8 @@ const Activos = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [openModalActivos, setOpenModalActivos] = useState<boolean>(false);
   const [openModalMantenimientos, setOpenModalMantenimientos] = useState(false);
+  const [openImportResult, setOpenImportResult] = useState(false);
+  const [importResult, setImportResult] = useState<ImportarEquiposResultado | null>(null);
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
@@ -278,6 +285,18 @@ const Activos = () => {
         return [];
     }
     
+    if (tipoEquipo === "Computadora") {
+      requiredColumns.push(
+        "Marca Case",
+        "No. Aula",
+        "Oficina",
+        "Año Adq",
+        "Sistema Operativo",
+        "Versión",
+        "Observación"
+      );
+    }
+
     const normalizar = (str: string) => 
       str.toLowerCase()
         .normalize("NFD")
@@ -298,7 +317,7 @@ const Activos = () => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function transformarFilaExcel(row: any) {
+  function transformarFilaExcel(row: any, filaExcel: number) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
@@ -306,6 +325,9 @@ const Activos = () => {
         : String(val).trim() === "S/N"
         ? "S/N"
         : String(val).trim();
+
+    void normalize;
+    return transformComputadoraRow(row, "activo", filaExcel);
 
     const ubicacion = row["Oficina"] !== "" ? row["Oficina"] : row["No. Aula"];
     return {
@@ -364,7 +386,7 @@ const Activos = () => {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function transformarFilaSwitch(row: any) {
+  function transformarFilaSwitch(row: any, filaExcel: number) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
@@ -374,6 +396,8 @@ const Activos = () => {
         : String(val).trim();
 
     return {
+      hojaExcel: "Switch",
+      filaExcel,
       tipo: "Switch",
       tipo_inventario: "activo",
       nombre: normalize(row["Nombre"]),
@@ -396,7 +420,7 @@ const Activos = () => {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function transformarFilaAccessPoint(row: any) {
+  function transformarFilaAccessPoint(row: any, filaExcel: number) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
@@ -406,6 +430,8 @@ const Activos = () => {
         : String(val).trim();
 
     return {
+      hojaExcel: "AccessPoint",
+      filaExcel,
       tipo: "AccessPoint",
       tipo_inventario: "activo",
       nombre: normalize(row["Nombre"]),
@@ -426,7 +452,7 @@ const Activos = () => {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function transformarFilaProyector(row: any) {
+  function transformarFilaProyector(row: any, filaExcel: number) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
@@ -436,6 +462,8 @@ const Activos = () => {
         : String(val).trim();
 
     return {
+      hojaExcel: "Proyector",
+      filaExcel,
       tipo: "Proyector",
       tipo_inventario: "activo",
       inventario: String(row["Inventario"] ?? ""),
@@ -456,7 +484,7 @@ const Activos = () => {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function transformarFilaEquiposSimples(row: any) {
+  function transformarFilaEquiposSimples(row: any, filaExcel: number) {
     const ubicacion = row["Oficina"] !== "" ? row["Oficina"] : row["No. Aula"];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
@@ -467,6 +495,8 @@ const Activos = () => {
         : String(val).trim();
 
     return {
+      hojaExcel: "Equipos Simples",
+      filaExcel,
       tipo: normalize(row["Tipo"]),
       tipo_inventario: "activo",
       inventario: String(row["Inventario"] ?? ""),
@@ -503,14 +533,16 @@ const Activos = () => {
 
       if (workbook.SheetNames.includes("Computadora")) {
         const worksheet = workbook.Sheets["Computadora"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
         if (jsonData && jsonData.length > 0) {
           const faltantes = columnasFaltantesExcel(jsonData, "Computadora");
           if (faltantes.length > 0) {
             errores.push(`Computadora - Faltan columnas: ${faltantes.join(", ")}`);
           } else {
-            const equiposComputadora = jsonData.map(transformarFilaExcel);
+            const equiposComputadora = jsonData.map((row, index) =>
+              transformarFilaExcel(row, index + 2)
+            );
             equiposImportTodos.push(...equiposComputadora);
           }
         }
@@ -518,14 +550,16 @@ const Activos = () => {
 
       if (workbook.SheetNames.includes("Switch")) {
         const worksheet = workbook.Sheets["Switch"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
         if (jsonData && jsonData.length > 0) {
           const faltantes = columnasFaltantesExcel(jsonData, "Switch");
           if (faltantes.length > 0) {
             errores.push(`Switch - Faltan columnas: ${faltantes.join(", ")}`);
           } else {
-            const equiposSwitch = jsonData.map(transformarFilaSwitch);
+            const equiposSwitch = jsonData.map((row, index) =>
+              transformarFilaSwitch(row, index + 2)
+            );
             equiposImportTodos.push(...equiposSwitch);
           }
         }
@@ -533,14 +567,16 @@ const Activos = () => {
 
       if (workbook.SheetNames.includes("AccessPoint")) {
         const worksheet = workbook.Sheets["AccessPoint"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
         if (jsonData && jsonData.length > 0) {
           const faltantes = columnasFaltantesExcel(jsonData, "AccessPoint");
           if (faltantes.length > 0) {
             errores.push(`AccessPoint - Faltan columnas: ${faltantes.join(", ")}`);
           } else {
-            const equiposAP = jsonData.map(transformarFilaAccessPoint);
+            const equiposAP = jsonData.map((row, index) =>
+              transformarFilaAccessPoint(row, index + 2)
+            );
             equiposImportTodos.push(...equiposAP);
           }
         }
@@ -548,14 +584,16 @@ const Activos = () => {
 
       if (workbook.SheetNames.includes("Proyector")) {
         const worksheet = workbook.Sheets["Proyector"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
         if (jsonData && jsonData.length > 0) {
           const faltantes = columnasFaltantesExcel(jsonData, "Proyector");
           if (faltantes.length > 0) {
             errores.push(`Proyector - Faltan columnas: ${faltantes.join(", ")}`);
           } else {
-            const equiposProyector = jsonData.map(transformarFilaProyector);
+            const equiposProyector = jsonData.map((row, index) =>
+              transformarFilaProyector(row, index + 2)
+            );
             equiposImportTodos.push(...equiposProyector);
           }
         }
@@ -563,14 +601,16 @@ const Activos = () => {
 
       if (workbook.SheetNames.includes("Equipos Simples")) {
         const worksheet = workbook.Sheets["Equipos Simples"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
         if (jsonData && jsonData.length > 0) {
           const faltantes = columnasFaltantesExcel(jsonData, "EquiposSimples");
           if (faltantes.length > 0) {
             errores.push(`Equipos Simples - Faltan columnas: ${faltantes.join(", ")}`);
           } else {
-            const equiposSimples = jsonData.map(transformarFilaEquiposSimples);
+            const equiposSimples = jsonData.map((row, index) =>
+              transformarFilaEquiposSimples(row, index + 2)
+            );
             equiposImportTodos.push(...equiposSimples);
           }
         }
@@ -594,6 +634,8 @@ const Activos = () => {
 
       try {
         const resultado = await importarEquiposActivos(equiposImportTodos, user?.email);
+        setImportResult(resultado);
+        setOpenImportResult(true);
 
         if (
           resultado?.resumen &&
@@ -1933,6 +1975,12 @@ const Activos = () => {
         onConfirm={handleConfirm}
         title={modalContent.title}
         message={modalContent.message}
+      />
+      <ImportResultDialog
+        open={openImportResult}
+        onClose={() => setOpenImportResult(false)}
+        result={importResult}
+        title="Resultado de importación de activos"
       />
      <MantenimientoActivo
   open={openModalMantenimientos}

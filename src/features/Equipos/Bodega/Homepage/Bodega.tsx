@@ -26,7 +26,12 @@ import {
 import { useSnackbar } from "@context/SnackbarContext";
 import { useUser } from "@context/userContext";
 import Loader from "@pages/Loader";
-import { useImportarEquipoBodega } from "../hooks/useImportarEquipoBodega";
+import {
+  ImportarEquiposResultado,
+  useImportarEquipoBodega,
+} from "../hooks/useImportarEquipoBodega";
+import ImportResultDialog from "../../shared/ImportResultDialog.tsx";
+import { transformComputadoraRow } from "../../shared/excelImport.ts";
 
 const Bodega = () => {
   const [inputPeriferico, setInputPeriferico] = useState(() => {
@@ -75,6 +80,8 @@ const Bodega = () => {
   const [openModalPasarAActivo, setOpenModalPasarAActivo] =
     useState<boolean>(false);
   const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null);
+  const [openImportResult, setOpenImportResult] = useState(false);
+  const [importResult, setImportResult] = useState<ImportarEquiposResultado | null>(null);
 
   const { showMessage } = useSnackbar();
   const [shouldFetch, setShouldFetch] = useState<boolean>(true);
@@ -357,7 +364,7 @@ const Bodega = () => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function transformarFilaExcel(row: any) {
+  function transformarFilaExcel(row: any, filaExcel: number) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
@@ -365,6 +372,9 @@ const Bodega = () => {
         : String(val).trim() === "S/N"
         ? "S/N"
         : String(val).trim();
+
+    void normalize;
+    return transformComputadoraRow(row, "bodega", filaExcel);
 
     return {
       tipo: normalize(row["Tipo"]),
@@ -418,7 +428,7 @@ const Bodega = () => {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function transformarFilaSwitch(row: any) {
+  function transformarFilaSwitch(row: any, filaExcel: number) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
@@ -428,6 +438,8 @@ const Bodega = () => {
         : String(val).trim();
 
     return {
+      hojaExcel: "Switch",
+      filaExcel,
       tipo: "Switch",
       tipo_inventario: "bodega",
       nombre: normalize(row["Nombre"]),
@@ -448,7 +460,7 @@ const Bodega = () => {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function transformarFilaAccessPoint(row: any) {
+  function transformarFilaAccessPoint(row: any, filaExcel: number) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
@@ -458,6 +470,8 @@ const Bodega = () => {
         : String(val).trim();
 
     return {
+      hojaExcel: "AccessPoint",
+      filaExcel,
       tipo: "AccessPoint",
       tipo_inventario: "bodega",
       nombre: normalize(row["Nombre"]),
@@ -476,7 +490,7 @@ const Bodega = () => {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function transformarFilaProyector(row: any) {
+  function transformarFilaProyector(row: any, filaExcel: number) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
@@ -486,6 +500,8 @@ const Bodega = () => {
         : String(val).trim();
 
     return {
+      hojaExcel: "Proyector",
+      filaExcel,
       tipo: "Proyector",
       tipo_inventario: "bodega",
       inventario: String(row["Inventario"] ?? ""),
@@ -518,36 +534,44 @@ const Bodega = () => {
 
       if (workbook.SheetNames.includes("Computadora")) {
         const worksheet = workbook.Sheets["Computadora"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
         if (jsonData && jsonData.length > 0) {
-          const equiposComputadora = jsonData.map(transformarFilaExcel);
+          const equiposComputadora = jsonData.map((row, index) =>
+            transformarFilaExcel(row, index + 2)
+          );
           equiposImportTodos.push(...equiposComputadora);
         }
       }
 
       if (workbook.SheetNames.includes("Switch")) {
         const worksheet = workbook.Sheets["Switch"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
         if (jsonData && jsonData.length > 0) {
-          const equiposSwitch = jsonData.map(transformarFilaSwitch);
+          const equiposSwitch = jsonData.map((row, index) =>
+            transformarFilaSwitch(row, index + 2)
+          );
           equiposImportTodos.push(...equiposSwitch);
         }
       }
 
       if (workbook.SheetNames.includes("AccessPoint")) {
         const worksheet = workbook.Sheets["AccessPoint"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
         if (jsonData && jsonData.length > 0) {
-          const equiposAP = jsonData.map(transformarFilaAccessPoint);
+          const equiposAP = jsonData.map((row, index) =>
+            transformarFilaAccessPoint(row, index + 2)
+          );
           equiposImportTodos.push(...equiposAP);
         }
       }
 
       if (workbook.SheetNames.includes("Proyector")) {
         const worksheet = workbook.Sheets["Proyector"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
         if (jsonData && jsonData.length > 0) {
-          const equiposProyector = jsonData.map(transformarFilaProyector);
+          const equiposProyector = jsonData.map((row, index) =>
+            transformarFilaProyector(row, index + 2)
+          );
           equiposImportTodos.push(...equiposProyector);
         }
       }
@@ -562,6 +586,8 @@ const Bodega = () => {
 
       try {
         const resultado = await importarEquiposBodega(equiposImportTodos, user?.email);
+        setImportResult(resultado);
+        setOpenImportResult(true);
 
         if (
           resultado?.resumen &&
@@ -1441,6 +1467,12 @@ const Bodega = () => {
         onConfirm={handleConfirm}
         title={modalContent.title}
         message={modalContent.message}
+      />
+      <ImportResultDialog
+        open={openImportResult}
+        onClose={() => setOpenImportResult(false)}
+        result={importResult}
+        title="Resultado de importación de bodega"
       />
     </div>
   );

@@ -194,18 +194,28 @@ export type ActivoComputadoraData = {
   };
 
 export type ActivoComputadoraImport = {
+  hojaExcel?: string;
+  filaExcel?: number;
   tipo: string;
+  tipo_inventario?: string;
   inventario: string;
   anio_compra: number | string;
   serie: string;
   modelo: string;
+  marca?: string;
   usuario: string;
+  uso?: string;
+  edificio?: string;
   ubicacion: string;
+  empresa?: string;
   nombreEquipo: string;
   direccionIp?: string;
+  sistemaOperativo?: string;
+  versionSO?: string;
   versionso?: string;
   versionoffice?: string;
   ram?: string;
+  tipo_ram?: string;
   disco?: string;
   procesador?: string;
   antivirus?: string;
@@ -217,6 +227,7 @@ export type ActivoComputadoraImport = {
     serie: string;
     tipo?: string;
     anio_compra?: number | string;
+    marca?: string;
     modelo?: string;
     imagenRuta?: string;
     observacion?: string;
