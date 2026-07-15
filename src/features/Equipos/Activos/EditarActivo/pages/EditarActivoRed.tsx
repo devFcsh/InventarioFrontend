@@ -703,7 +703,7 @@ const EditarActivoRed = ({
                   />
                 ) : (
                   <img
-                    src={`${IMAGE_BASE_URL}${equipoRedActivo.imagenRuta}`}
+                    src={`${IMAGE_BASE_URL.replace(/\/$/, "")}/${equipoRedActivo.imagenRuta.replace(/^\//, "")}`}
                     alt="Imagen del equipo"
                     className="w-full h-full object-cover"
                   />

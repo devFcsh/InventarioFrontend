@@ -18,7 +18,7 @@ const antivirus = [
 
 // URL base de la API
 export const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-export const IMAGE_BASE_URL = import.meta.env.VITE_IMAGE_BASE_URL;
+export const IMAGE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, '');
   
 export {
     filas,
