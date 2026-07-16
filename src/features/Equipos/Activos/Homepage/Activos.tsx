@@ -36,7 +36,10 @@ import {
 } from "../hooks/useImportarEquipoActivo.ts";
 import { MantenimientoActivo } from "../MantenimientoActivo/Homepage/MantenimientoActivo.tsx";
 import ImportResultDialog from "../../shared/ImportResultDialog.tsx";
-import { transformComputadoraRow } from "../../shared/excelImport.ts";
+import {
+  formatAnioCompra,
+  transformComputadoraRow,
+} from "../../shared/excelImport.ts";
 
 const Activos = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -334,10 +337,7 @@ const Activos = () => {
       tipo: normalize(row["Tipo"]),
       tipo_inventario: "activo",
       inventario: String(row["Inventario CPU"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       serie: normalize(row["Serie CPU"]),
       modelo: normalize(row["Modelo Case"]),
       marca: normalize(row["Marca Case"]),
@@ -402,10 +402,7 @@ const Activos = () => {
       tipo_inventario: "activo",
       nombre: normalize(row["Nombre"]),
       inventario: String(row["Inventario"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       edificio: normalize(row["Bloque"]),
       ubicacion: normalize(row["Ubicación"]),
       marca: normalize(row["Marca"]),
@@ -436,10 +433,7 @@ const Activos = () => {
       tipo_inventario: "activo",
       nombre: normalize(row["Nombre"]),
       inventario: String(row["Inventario"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       edificio: normalize(row["Bloque"]),
       ubicacion: normalize(row["Ubicación"]),
       marca: normalize(row["Marca"]),
@@ -467,10 +461,7 @@ const Activos = () => {
       tipo: "Proyector",
       tipo_inventario: "activo",
       inventario: String(row["Inventario"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       edificio: normalize(row["Bloque"]),
       ubicacion: normalize(row["Ubicación"]),
       marca: normalize(row["Marca"]),
@@ -500,10 +491,7 @@ const Activos = () => {
       tipo: normalize(row["Tipo"]),
       tipo_inventario: "activo",
       inventario: String(row["Inventario"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       serie: normalize(row["Serie"]),
       modelo: normalize(row["Modelo"]),
       marca: normalize(row["Marca"]),

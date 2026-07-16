@@ -30,7 +30,7 @@ const normalizeOptionalValue = (value: unknown) => {
   return String(value).trim();
 };
 
-const formatAnioCompra = (value: unknown) => {
+export const formatAnioCompra = (value: unknown) => {
   if (!hasRealExcelValue(value)) {
     return "S/N";
   }

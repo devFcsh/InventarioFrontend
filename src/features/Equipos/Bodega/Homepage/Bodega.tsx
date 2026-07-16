@@ -31,7 +31,10 @@ import {
   useImportarEquipoBodega,
 } from "../hooks/useImportarEquipoBodega";
 import ImportResultDialog from "../../shared/ImportResultDialog.tsx";
-import { transformComputadoraRow } from "../../shared/excelImport.ts";
+import {
+  formatAnioCompra,
+  transformComputadoraRow,
+} from "../../shared/excelImport.ts";
 
 const Bodega = () => {
   const [inputPeriferico, setInputPeriferico] = useState(() => {
@@ -380,10 +383,7 @@ const Bodega = () => {
       tipo: normalize(row["Tipo"]),
       tipo_inventario: "bodega",
       inventario: String(row["Inventario CPU"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       serie: normalize(row["Serie CPU"]),
       modelo: normalize(row["Modelo Case"]),
       marca: normalize(row["Marca Case"]),
@@ -444,10 +444,7 @@ const Bodega = () => {
       tipo_inventario: "bodega",
       nombre: normalize(row["Nombre"]),
       inventario: String(row["Inventario"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       marca: normalize(row["Marca"]),
       modelo: normalize(row["Modelo"]),
       serie: normalize(row["Serie"]),
@@ -476,10 +473,7 @@ const Bodega = () => {
       tipo_inventario: "bodega",
       nombre: normalize(row["Nombre"]),
       inventario: String(row["Inventario"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       marca: normalize(row["Marca"]),
       modelo: normalize(row["Modelo"]),
       serie: normalize(row["Serie"]),
@@ -505,10 +499,7 @@ const Bodega = () => {
       tipo: "Proyector",
       tipo_inventario: "bodega",
       inventario: String(row["Inventario"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       marca: normalize(row["Marca"]),
       modelo: normalize(row["Modelo"]),
       serie: normalize(row["Serie"]),
