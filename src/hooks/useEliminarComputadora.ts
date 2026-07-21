@@ -19,6 +19,20 @@ export const useEliminarComputadora = () => {
         return false;
       }
     } catch (err) {
+      const errorResponse = (err as {
+        response?: { status?: number; data?: { error?: string } };
+      }).response;
+
+      // Una computadora puede haber eliminado sus componentes en cascada
+      // antes de que la eliminación masiva procese sus IDs seleccionados.
+      if (
+        errorResponse?.status === 400 &&
+        errorResponse.data?.error === "El equipo no existe."
+      ) {
+        setSuccess(true);
+        return true;
+      }
+
       setError("Error al eliminar el equipo");
       setSuccess(false);
       return false;

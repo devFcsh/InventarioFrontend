@@ -663,6 +663,13 @@ const EditarComputadoraActivo = ({
   // Inventario original
   const inventarioOriginal = equipo.inventario;
 
+  const tieneImagenGuardadaValida =
+    typeof equipo.imagenRuta === "string" &&
+    equipo.imagenRuta.trim() !== "" &&
+    equipo.imagenRuta.trim().toLowerCase() !== "s/n" &&
+    equipo.imagenRuta.trim().toLowerCase() !== "null";
+  const tieneImagenValida = Boolean(image) || tieneImagenGuardadaValida;
+
   return (
     <div>
       <ModalConfirmation
@@ -1103,7 +1110,7 @@ const EditarComputadoraActivo = ({
             ref={fileInputRef}
             style={{ display: "none" }}
           />
-          {(image || equipo.imagenRuta) ? (
+          {tieneImagenValida ? (
             <>
               <div className="w-[300px] h-[300px] rounded-lg overflow-hidden flex items-center justify-center bg-gray-100 shadow-sm border border-gray-200">
                 {image ? (

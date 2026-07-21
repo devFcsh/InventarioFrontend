@@ -11,6 +11,7 @@ import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../../../../data";
 import { useDarDeBajaEquipo } from "../hooks/useDarDeBajaEquipo";
 import { useEliminarComputadora } from "@hooks/useEliminarComputadora.ts";
+import { useEliminarEquipoSimple } from "@hooks/useEliminarEquipoSimple.ts";
 import useEdificios from "@hooks/useEdificios.ts";
 import useUsos from "@hooks/useUsos.ts";
 import useMarcas from "@hooks/useMarcas.ts";
@@ -123,6 +124,7 @@ const Activos = () => {
   };
 
   const { eliminarEquipo } = useEliminarComputadora();
+  const { eliminarEquipoSimple } = useEliminarEquipoSimple();
   const { darDeBajaEquipo } = useDarDeBajaEquipo();
   const { equipos, totalCount, loading, error } = useEquiposFiltrados(
     filtros,
@@ -643,13 +645,24 @@ const Activos = () => {
     reader.readAsBinaryString(file);
   };
 
+  const esComputadora = (equipo?: Equipo) => {
+    const periferico = equipo?.periferico?.trim().toLowerCase();
+    return periferico === "computadora" || periferico === "laptop";
+  };
+
+  const eliminarEquipoPorTipo = async (equipo?: Equipo) => {
+    if (!equipo?.id_equipo) return false;
+    return esComputadora(equipo)
+      ? eliminarEquipo(equipo.id_equipo)
+      : eliminarEquipoSimple(equipo.id_equipo);
+  };
+
   const deleteEquipo = async (equipoId: string) => {
     if (equipoId) {
-      const inventario = equipos.filter(
-        (equipo) => equipoId === equipo.id_equipo
-      )[0].inventario;
+      const equipo = equipos.find((item) => equipoId === item.id_equipo);
+      const inventario = equipo?.inventario ?? equipoId;
       try {
-        const result = await eliminarEquipo(equipoId);
+        const result = await eliminarEquipoPorTipo(equipo);
         if (result) {
           setShouldFetch(true);
           showMessage(
@@ -658,7 +671,7 @@ const Activos = () => {
           );
         } else {
           showMessage(
-            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`,
+            `No se puede eliminar el equipo con inventario ${inventario} porque está vinculado como componente de una computadora`,
             "error"
           );
         }
@@ -673,12 +686,11 @@ const Activos = () => {
 
   const deleteEquipos = async (equipoIds: string[]) => {
     try {
-      const errorsInventarios = [];
+      const errorsInventarios: string[] = [];
       for (const id of equipoIds) {
-        const result = await eliminarEquipo(id);
-        const inventario = equipos.filter(
-          (equipo) => id === equipo.id_equipo
-        )[0].inventario;
+        const equipo = equipos.find((item) => id === item.id_equipo);
+        const result = await eliminarEquipoPorTipo(equipo);
+        const inventario = equipo?.inventario ?? id;
         if (!result) {
           errorsInventarios.push(inventario);
         }
@@ -690,7 +702,7 @@ const Activos = () => {
         showMessage(
           `No se pudieron eliminar los equipos: ${errorsInventarios.join(
             ", "
-          )} ya que están relacionados a una computadora`,
+          )}. Verifique si están vinculados como componentes de una computadora.`,
           "error"
         );
       }

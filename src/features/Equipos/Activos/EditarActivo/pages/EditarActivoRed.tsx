@@ -331,6 +331,13 @@ const EditarActivoRed = ({
 
   const serieOriginal = series.find((serie) => serie?.id_serie === equipoRedActivo.id_serie)?.nombre || "";
 
+  const tieneImagenGuardadaValida =
+    typeof equipoRedActivo.imagenRuta === "string" &&
+    equipoRedActivo.imagenRuta.trim() !== "" &&
+    equipoRedActivo.imagenRuta.trim().toLowerCase() !== "s/n" &&
+    equipoRedActivo.imagenRuta.trim().toLowerCase() !== "null";
+  const tieneImagenValida = Boolean(image) || tieneImagenGuardadaValida;
+
   return (
     <div>
       <ModalConfirmation
@@ -672,27 +679,7 @@ const EditarActivoRed = ({
             ref={fileInputRef}
             style={{ display: "none" }}
           />
-          <div
-            onClick={handleImageClick}
-            className="w-full max-w-sm h-48 border border-dashed border-gray-300 flex items-center justify-center cursor-pointer"
-          >
-            {image ? (
-              <img
-                src={URL.createObjectURL(image)}
-                alt="Vista previa"
-                className="w-full h-full object-cover"
-              />
-            ) : equipoRedActivo.imagenRuta ? (
-              <img
-                src={`${IMAGE_BASE_URL.replace(/\/$/, "")}/${equipoRedActivo.imagenRuta.replace(/^\//, "")}`}
-                alt="Imagen del equipo"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <p className="text-gray-500">Haz clic para cargar una imagen</p>
-            )}
-          </div>
-          {(image || equipoRedActivo.imagenRuta) ? (
+          {tieneImagenValida ? (
             <>
               <div className="w-[300px] h-[300px] rounded-lg overflow-hidden flex items-center justify-center bg-gray-100 shadow-sm border border-gray-200">
                 {image ? (

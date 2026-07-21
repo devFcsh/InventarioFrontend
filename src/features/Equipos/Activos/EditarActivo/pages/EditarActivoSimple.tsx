@@ -363,6 +363,13 @@ const EditarActivoSimple = ({
 
   const inventarioOriginal = equipoSimpleActivo.inventario;
 
+  const tieneImagenGuardadaValida =
+    typeof equipoSimpleActivo.imagenRuta === "string" &&
+    equipoSimpleActivo.imagenRuta.trim() !== "" &&
+    equipoSimpleActivo.imagenRuta.trim().toLowerCase() !== "s/n" &&
+    equipoSimpleActivo.imagenRuta.trim().toLowerCase() !== "null";
+  const tieneImagenValida = Boolean(image) || tieneImagenGuardadaValida;
+
   return (
     <div>
       <ModalConfirmation
@@ -686,7 +693,7 @@ const EditarActivoSimple = ({
             ref={fileInputRef}
             style={{ display: "none" }}
           />
-          {(image || equipoSimpleActivo.imagenRuta) ? (
+          {tieneImagenValida ? (
             <>
               <div className="w-[300px] h-[300px] rounded-lg overflow-hidden flex items-center justify-center bg-gray-100 shadow-sm border border-gray-200">
                 {image ? (
