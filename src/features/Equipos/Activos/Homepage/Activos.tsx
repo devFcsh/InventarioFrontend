@@ -40,6 +40,9 @@ import ImportResultDialog from "../../shared/ImportResultDialog.tsx";
 import {
   downloadImportTemplate,
   formatAnioCompra,
+  isValidPrinterImportType,
+  pickExcelLocation,
+  transformImpresoraRow,
   transformUpsRow,
   transformComputadoraRow,
 } from "../../shared/excelImport.ts";
@@ -336,6 +339,27 @@ const Activos = () => {
     fileInputRef.current?.click();
   };
 
+  const esFormatoImpresoras = (jsonData: unknown[]) => {
+    if (!jsonData.length || typeof jsonData[0] !== "object" || !jsonData[0]) {
+      return false;
+    }
+
+    const normalizarColumna = (valor: string) =>
+      valor
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    const columnas = Object.keys(jsonData[0] as Record<string, unknown>).map(
+      normalizarColumna
+    );
+
+    return ["bloque", "ubicacion referencia", "nombre etiqueta", "n serie"].every(
+      (columna) => columnas.includes(columna)
+    );
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function transformarFilaExcel(row: any, filaExcel: number) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -493,7 +517,7 @@ const Activos = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function transformarFilaEquiposSimples(row: any, filaExcel: number) {
-    const ubicacion = row["Oficina"] !== "" ? row["Oficina"] : row["No. Aula"];
+    const ubicacion = pickExcelLocation(row["Oficina"], row["No. Aula"]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
@@ -621,19 +645,54 @@ const Activos = () => {
         }
       }
 
+      if (workbook.SheetNames.includes("Impresora")) {
+        const worksheet = workbook.Sheets["Impresora"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        if (jsonData && jsonData.length > 0) {
+          const filasInvalidas = jsonData
+            .map((row, index) => (!isValidPrinterImportType(row as Record<string, unknown>) ? index + 2 : null))
+            .filter((fila): fila is number => fila !== null);
+
+          if (filasInvalidas.length > 0) {
+            errores.push(`Impresora - La columna Tipo debe contener únicamente "Impresora". Filas: ${filasInvalidas.join(", ")}`);
+          } else {
+            const impresoras = jsonData.map((row, index) =>
+              transformImpresoraRow(row as Record<string, unknown>, "activo", index + 2)
+            );
+            equiposImportTodos.push(...impresoras);
+          }
+        }
+      }
+
       if (workbook.SheetNames.includes("Equipos Simples")) {
         const worksheet = workbook.Sheets["Equipos Simples"];
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
         if (jsonData && jsonData.length > 0) {
-          const faltantes = columnasFaltantesExcel(jsonData, "EquiposSimples");
-          if (faltantes.length > 0) {
-            errores.push(`Equipos Simples - Faltan columnas: ${faltantes.join(", ")}`);
+          if (esFormatoImpresoras(jsonData)) {
+            const filasInvalidas = jsonData
+              .map((row, index) => (!isValidPrinterImportType(row as Record<string, unknown>) ? index + 2 : null))
+              .filter((fila): fila is number => fila !== null);
+
+            if (filasInvalidas.length > 0) {
+              errores.push(`Impresora - La columna Tipo debe contener únicamente "Impresora". Filas: ${filasInvalidas.join(", ")}`);
+            } else {
+              const impresoras = jsonData.map((row, index) =>
+                transformImpresoraRow(row as Record<string, unknown>, "activo", index + 2)
+              );
+              equiposImportTodos.push(...impresoras);
+            }
           } else {
-            const equiposSimples = jsonData.map((row, index) =>
-              transformarFilaEquiposSimples(row, index + 2)
-            );
-            equiposImportTodos.push(...equiposSimples);
+            const faltantes = columnasFaltantesExcel(jsonData, "EquiposSimples");
+            if (faltantes.length > 0) {
+              errores.push(`Equipos Simples - Faltan columnas: ${faltantes.join(", ")}`);
+            } else {
+              const equiposSimples = jsonData.map((row, index) =>
+                transformarFilaEquiposSimples(row, index + 2)
+              );
+              equiposImportTodos.push(...equiposSimples);
+            }
           }
         }
       }

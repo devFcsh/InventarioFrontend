@@ -60,6 +60,9 @@ export const getImportRowValue = (
   return undefined;
 };
 
+export const isValidPrinterImportType = (row: ExcelRow) =>
+  compactValue(getImportRowValue(row, "Tipo")) === "IMPRESORA";
+
 const normalizeOptionalValue = (value: unknown) => {
   if (!hasRealExcelValue(value)) {
     return "";
@@ -260,6 +263,50 @@ export const transformUpsRow = (
   ),
 });
 
+export const transformImpresoraRow = (
+  row: ExcelRow,
+  tipoInventario: TipoInventario,
+  filaExcel: number
+): ActivoComputadoraImport => {
+  const ip = normalizeOptionalValue(getImportRowValue(row, "IP"));
+  const observacion = normalizeOptionalValue(
+    getImportRowValue(row, "Observación", "Observacion", "ObservaciÃ³n")
+  );
+  const detalles = [
+    ip && ip.toUpperCase() !== "S/N" ? `IP: ${ip}` : "",
+    observacion,
+  ].filter(Boolean);
+
+  return {
+    hojaExcel: "Impresora",
+    filaExcel,
+    tipo: "Impresora",
+    tipo_inventario: tipoInventario,
+    inventario: normalizeImportValue(getImportRowValue(row, "Inventario")),
+    anio_compra: formatAnioCompra(
+      getImportRowValue(row, "Año Adq", "AÃ±o Adq")
+    ),
+    serie: normalizeImportValue(
+      getImportRowValue(row, "Nº Serie", "N° Serie", "Serie")
+    ),
+    modelo: normalizeImportValue(getImportRowValue(row, "Modelo")),
+    marca: normalizeImportValue(getImportRowValue(row, "Marca")),
+    usuario: "Por Asignar",
+    uso: "Por Asignar",
+    edificio: normalizeImportValue(
+      getImportRowValue(row, "Bloque", "Edificio")
+    ),
+    ubicacion: normalizeImportValue(
+      getImportRowValue(row, "Ubicación-Referencia", "Ubicacion-Referencia", "Referencia")
+    ),
+    empresa: normalizeImportValue(getImportRowValue(row, "Empresa")),
+    nombreEquipo: normalizeImportValue(
+      getImportRowValue(row, "Nombre-Etiqueta", "Nombre")
+    ),
+    observacion: detalles.join(" | "),
+  };
+};
+
 export const downloadImportTemplate = (
   tipoInventario: Extract<TipoInventario, "activo" | "bodega">
 ) => {
@@ -276,6 +323,7 @@ export const downloadImportTemplate = (
           AccessPoint: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Bloque", "Ubicación", "Marca", "Modelo", "Serie", "MAC", "Estado", "Observación"],
           Switch: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Bloque", "Ubicación", "Marca", "Modelo", "Serie", "MAC", "Puertos", "Puertos FTP", "Estado", "Observación"],
           "Equipos Simples": ["Id", "Edificio", "No. Aula", "Oficina", "Usuario", "Uso", "Tipo", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Serie Equipo Principal", "Observación"],
+          Impresora: ["Id", "Tipo", "Edificio", "Referencia", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Observación"],
         }
       : {
           Computadora: [
@@ -286,6 +334,7 @@ export const downloadImportTemplate = (
           Proyector: ["N°", "Año Adq", "Empresa", "Inventario", "Marca", "Modelo", "Serie", "Categoría", "Lámpara", "Estado", "Observación"],
           AccessPoint: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Marca", "Modelo", "Serie", "MAC", "Estado", "Observación"],
           Switch: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Marca", "Modelo", "Serie", "MAC", "Puertos", "Puertos FTP", "Estado", "Observación"],
+          Impresora: ["Id", "Tipo", "Edificio", "Referencia", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Observación"],
         };
 
   sheets.UPS = [

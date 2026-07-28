@@ -34,6 +34,8 @@ import ImportResultDialog from "../../shared/ImportResultDialog.tsx";
 import {
   downloadImportTemplate,
   formatAnioCompra,
+  isValidPrinterImportType,
+  transformImpresoraRow,
   transformUpsRow,
   transformComputadoraRow,
 } from "../../shared/excelImport.ts";
@@ -368,6 +370,27 @@ const Bodega = () => {
     fileInputRef.current?.click();
   };
 
+  const esFormatoImpresoras = (jsonData: unknown[]) => {
+    if (!jsonData.length || typeof jsonData[0] !== "object" || !jsonData[0]) {
+      return false;
+    }
+
+    const normalizarColumna = (valor: string) =>
+      valor
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    const columnas = Object.keys(jsonData[0] as Record<string, unknown>).map(
+      normalizarColumna
+    );
+
+    return ["bloque", "ubicacion referencia", "nombre etiqueta", "n serie"].every(
+      (columna) => columnas.includes(columna)
+    );
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function transformarFilaExcel(row: any, filaExcel: number) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -578,6 +601,46 @@ const Bodega = () => {
             transformUpsRow(row as Record<string, unknown>, "bodega", index + 2)
           );
           equiposImportTodos.push(...equiposUps);
+        }
+      }
+
+      if (workbook.SheetNames.includes("Impresora")) {
+        const worksheet = workbook.Sheets["Impresora"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        if (jsonData && jsonData.length > 0) {
+          const filasInvalidas = jsonData
+            .map((row, index) => (!isValidPrinterImportType(row as Record<string, unknown>) ? index + 2 : null))
+            .filter((fila): fila is number => fila !== null);
+
+          if (filasInvalidas.length > 0) {
+            showMessage(`Impresora - La columna Tipo debe contener únicamente "Impresora". Filas: ${filasInvalidas.join(", ")}`, "error");
+          } else {
+            const impresoras = jsonData.map((row, index) =>
+              transformImpresoraRow(row as Record<string, unknown>, "bodega", index + 2)
+            );
+            equiposImportTodos.push(...impresoras);
+          }
+        }
+      }
+
+      if (workbook.SheetNames.includes("Equipos Simples")) {
+        const worksheet = workbook.Sheets["Equipos Simples"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        if (jsonData && esFormatoImpresoras(jsonData)) {
+          const filasInvalidas = jsonData
+            .map((row, index) => (!isValidPrinterImportType(row as Record<string, unknown>) ? index + 2 : null))
+            .filter((fila): fila is number => fila !== null);
+
+          if (filasInvalidas.length > 0) {
+            showMessage(`Impresora - La columna Tipo debe contener únicamente "Impresora". Filas: ${filasInvalidas.join(", ")}`, "error");
+          } else {
+            const impresoras = jsonData.map((row, index) =>
+              transformImpresoraRow(row as Record<string, unknown>, "bodega", index + 2)
+            );
+            equiposImportTodos.push(...impresoras);
+          }
         }
       }
 
