@@ -323,7 +323,6 @@ export const downloadImportTemplate = (
           AccessPoint: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Bloque", "Ubicación", "Marca", "Modelo", "Serie", "MAC", "Estado", "Observación"],
           Switch: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Bloque", "Ubicación", "Marca", "Modelo", "Serie", "MAC", "Puertos", "Puertos FTP", "Estado", "Observación"],
           "Equipos Simples": ["Id", "Edificio", "No. Aula", "Oficina", "Usuario", "Uso", "Tipo", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Serie Equipo Principal", "Observación"],
-          Impresora: ["Id", "Tipo", "Edificio", "Referencia", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Observación"],
         }
       : {
           Computadora: [
@@ -334,12 +333,7 @@ export const downloadImportTemplate = (
           Proyector: ["N°", "Año Adq", "Empresa", "Inventario", "Marca", "Modelo", "Serie", "Categoría", "Lámpara", "Estado", "Observación"],
           AccessPoint: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Marca", "Modelo", "Serie", "MAC", "Estado", "Observación"],
           Switch: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Marca", "Modelo", "Serie", "MAC", "Puertos", "Puertos FTP", "Estado", "Observación"],
-          Impresora: ["Id", "Tipo", "Edificio", "Referencia", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Observación"],
         };
-
-  sheets.UPS = [
-    "Id", "Edificio", "Referencia", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Observación",
-  ];
 
   const workbook = XLSX.utils.book_new();
   Object.entries(sheets).forEach(([sheetName, headers]) => {
