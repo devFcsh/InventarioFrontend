@@ -1,6 +1,9 @@
 import { ActivoComputadoraImport } from "../../../types/Activo";
+import * as XLSX from "xlsx";
 
 type TipoInventario = "activo" | "bodega" | "baja";
+
+type ExcelRow = Record<string, unknown>;
 
 const SN_COMPACT = new Set(["", "S/N", "SN", "N/A", "NA"]);
 
@@ -20,6 +23,41 @@ export const normalizeImportValue = (value: unknown) => {
   }
 
   return String(value).trim();
+};
+
+const normalizeExcelHeader = (value: unknown) =>
+  String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+/** Obtiene una columna tolerando diferencias de mayúsculas y acentos. */
+export const getImportRowValue = (
+  row: ExcelRow,
+  ...columnNames: string[]
+) => {
+  for (const columnName of columnNames) {
+    if (Object.prototype.hasOwnProperty.call(row, columnName)) {
+      return row[columnName];
+    }
+  }
+
+  const normalizedColumns = Object.keys(row).map((column) => ({
+    column,
+    normalized: normalizeExcelHeader(column),
+  }));
+
+  for (const columnName of columnNames) {
+    const match = normalizedColumns.find(
+      ({ normalized }) => normalized === normalizeExcelHeader(columnName)
+    );
+    if (match) {
+      return row[match.column];
+    }
+  }
+
+  return undefined;
 };
 
 const normalizeOptionalValue = (value: unknown) => {
@@ -191,4 +229,75 @@ export const transformComputadoraRow = (
     observacion: normalizeOptionalValue(row["Observación"]),
     componentes,
   };
+};
+
+export const transformUpsRow = (
+  row: ExcelRow,
+  tipoInventario: TipoInventario,
+  filaExcel: number
+): ActivoComputadoraImport => ({
+  hojaExcel: "UPS",
+  filaExcel,
+  tipo: "UPS",
+  tipo_inventario: tipoInventario,
+  inventario: normalizeImportValue(
+    getImportRowValue(row, "Inventario")
+  ),
+  anio_compra: formatAnioCompra(
+    getImportRowValue(row, "Año Adq", "AÃ±o Adq")
+  ),
+  serie: normalizeImportValue(getImportRowValue(row, "Serie")),
+  modelo: normalizeImportValue(getImportRowValue(row, "Modelo")),
+  marca: normalizeImportValue(getImportRowValue(row, "Marca")),
+  usuario: "Por Asignar",
+  uso: "Por Asignar",
+  edificio: normalizeImportValue(getImportRowValue(row, "Edificio")),
+  ubicacion: normalizeImportValue(getImportRowValue(row, "Referencia")),
+  empresa: normalizeImportValue(getImportRowValue(row, "Empresa")),
+  nombreEquipo: "S/N",
+  observacion: normalizeOptionalValue(
+    getImportRowValue(row, "Observación", "ObservaciÃ³n")
+  ),
+});
+
+export const downloadImportTemplate = (
+  tipoInventario: Extract<TipoInventario, "activo" | "bodega">
+) => {
+  const sheets: Record<string, string[]> =
+    tipoInventario === "activo"
+      ? {
+          Computadora: [
+            "Id", "Edificio", "No. Aula", "Oficina", "Usuario", "Uso", "Tipo", "Empresa", "Año Adq", "IP",
+            "Nombre de equipo", "Dominio", "Sistema Operativo", "Versión", "Procesador", "Capacidad Memoria", "Capacidad HDD", "Tipo Disco",
+            "Marca Case", "Modelo Case", "Serie CPU", "Marca monitor", "Modelo monitor", "Serie monitor", "Marca teclado", "Modelo teclado", "Serie teclado",
+            "Marca mouse", "Modelo mouse", "Serie mouse", "Inventario CPU", "Inventario Monitor", "Inventario Teclado", "Inventario Mouse", "Observación",
+          ],
+          Proyector: ["N°", "Año Adq", "Empresa", "Inventario", "Bloque", "Ubicación", "Marca", "Modelo", "Serie", "Categoría", "Lámpara", "Estado", "Observación"],
+          AccessPoint: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Bloque", "Ubicación", "Marca", "Modelo", "Serie", "MAC", "Estado", "Observación"],
+          Switch: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Bloque", "Ubicación", "Marca", "Modelo", "Serie", "MAC", "Puertos", "Puertos FTP", "Estado", "Observación"],
+          "Equipos Simples": ["Id", "Edificio", "No. Aula", "Oficina", "Usuario", "Uso", "Tipo", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Serie Equipo Principal", "Observación"],
+        }
+      : {
+          Computadora: [
+            "Id", "Tipo", "Empresa", "Año Adq", "IP", "Nombre de equipo", "Dominio", "Sistema Operativo", "Versión", "Procesador", "Capacidad Memoria", "Capacidad HDD", "Tipo Disco",
+            "Marca Case", "Modelo Case", "Serie CPU", "Marca monitor", "Modelo monitor", "Serie monitor", "Marca teclado", "Modelo teclado", "Serie teclado", "Marca mouse", "Modelo mouse", "Serie mouse",
+            "Inventario CPU", "Inventario Monitor", "Inventario Teclado", "Inventario Mouse", "Observación",
+          ],
+          Proyector: ["N°", "Año Adq", "Empresa", "Inventario", "Marca", "Modelo", "Serie", "Categoría", "Lámpara", "Estado", "Observación"],
+          AccessPoint: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Marca", "Modelo", "Serie", "MAC", "Estado", "Observación"],
+          Switch: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Marca", "Modelo", "Serie", "MAC", "Puertos", "Puertos FTP", "Estado", "Observación"],
+        };
+
+  sheets.UPS = [
+    "Id", "Edificio", "Referencia", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Observación",
+  ];
+
+  const workbook = XLSX.utils.book_new();
+  Object.entries(sheets).forEach(([sheetName, headers]) => {
+    const emptyRow = headers.map(() => "");
+    const worksheet = XLSX.utils.aoa_to_sheet([headers, emptyRow]);
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+  });
+
+  XLSX.writeFile(workbook, `formato_${tipoInventario}.xlsx`);
 };

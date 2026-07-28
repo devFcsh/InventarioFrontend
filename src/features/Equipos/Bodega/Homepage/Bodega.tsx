@@ -32,7 +32,9 @@ import {
 } from "../hooks/useImportarEquipoBodega";
 import ImportResultDialog from "../../shared/ImportResultDialog.tsx";
 import {
+  downloadImportTemplate,
   formatAnioCompra,
+  transformUpsRow,
   transformComputadoraRow,
 } from "../../shared/excelImport.ts";
 
@@ -564,6 +566,18 @@ const Bodega = () => {
             transformarFilaProyector(row, index + 2)
           );
           equiposImportTodos.push(...equiposProyector);
+        }
+      }
+
+      if (workbook.SheetNames.includes("UPS")) {
+        const worksheet = workbook.Sheets["UPS"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        if (jsonData && jsonData.length > 0) {
+          const equiposUps = jsonData.map((row, index) =>
+            transformUpsRow(row as Record<string, unknown>, "bodega", index + 2)
+          );
+          equiposImportTodos.push(...equiposUps);
         }
       }
 
@@ -1366,18 +1380,13 @@ const Bodega = () => {
             </Tooltip>
 
             <Tooltip title="Descargar formato">
-              <a
-                href="/formato_importar_bodega.xlsx"
-                download="formato_bodega.xlsx"
-                className="flex items-center"
+              <button
+                type="button"
+                onClick={() => downloadImportTemplate("bodega")}
+                className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
               >
-                <button
-                  type="button"
-                  className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-                >
-                  <Icon icon="mdi:file-download" width="20" height="20" />
-                </button>
-              </a>
+                <Icon icon="mdi:file-download" width="20" height="20" />
+              </button>
             </Tooltip>
           </div>
           {!loading && !error && equiposBodega.length > 0 && (

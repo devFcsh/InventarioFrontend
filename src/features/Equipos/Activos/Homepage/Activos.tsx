@@ -38,7 +38,9 @@ import {
 import { MantenimientoActivo } from "../MantenimientoActivo/Homepage/MantenimientoActivo.tsx";
 import ImportResultDialog from "../../shared/ImportResultDialog.tsx";
 import {
+  downloadImportTemplate,
   formatAnioCompra,
+  transformUpsRow,
   transformComputadoraRow,
 } from "../../shared/excelImport.ts";
 
@@ -284,6 +286,19 @@ const Activos = () => {
           "Observación",
           "Empresa",
           "Serie Equipo Principal"
+        ];
+        break;
+      case "UPS":
+        requiredColumns = [
+          "Edificio",
+          "Referencia",
+          "Empresa",
+          "Año Adq",
+          "Marca",
+          "Modelo",
+          "Serie",
+          "Inventario",
+          "Observación"
         ];
         break;
       default:
@@ -585,6 +600,23 @@ const Activos = () => {
               transformarFilaProyector(row, index + 2)
             );
             equiposImportTodos.push(...equiposProyector);
+          }
+        }
+      }
+
+      if (workbook.SheetNames.includes("UPS")) {
+        const worksheet = workbook.Sheets["UPS"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        if (jsonData && jsonData.length > 0) {
+          const faltantes = columnasFaltantesExcel(jsonData, "UPS");
+          if (faltantes.length > 0) {
+            errores.push(`UPS - Faltan columnas: ${faltantes.join(", ")}`);
+          } else {
+            const equiposUps = jsonData.map((row, index) =>
+              transformUpsRow(row as Record<string, unknown>, "activo", index + 2)
+            );
+            equiposImportTodos.push(...equiposUps);
           }
         }
       }
@@ -1890,18 +1922,13 @@ const Activos = () => {
             </Tooltip>
 
             <Tooltip title="Descargar formato">
-              <a
-                href="/formato_importar_activo.xlsx"
-                download="formato_activo.xlsx"
-                className="flex items-center"
+              <button
+                type="button"
+                onClick={() => downloadImportTemplate("activo")}
+                className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
               >
-                <button
-                  type="button"
-                  className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-                >
-                  <Icon icon="mdi:file-download" width="20" height="20" />
-                </button>
-              </a>
+                <Icon icon="mdi:file-download" width="20" height="20" />
+              </button>
             </Tooltip>
           </div>
           {!loading && !error && equipos.length > 0 && (
