@@ -571,7 +571,7 @@ const VisualizarComputadoraActivo = ({
               style={{ display: "none" }}
               disabled
             />
-            <div className="w-full max-w-sm h-48 border border-dashed border-gray-300 flex items-center justify-center">
+            <div className="w-[300px] h-[300px] rounded-lg overflow-hidden flex items-center justify-center bg-gray-100 shadow-sm border border-gray-200">
               {image ? (
                 <img
                   src={URL.createObjectURL(image)}
@@ -585,7 +585,7 @@ const VisualizarComputadoraActivo = ({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <p className="text-gray-500">Sin imagen</p>
+                <span className="text-gray-500 font-medium text-center">Sin Imagen</span>
               )}
             </div>
           </div>

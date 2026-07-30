@@ -265,13 +265,17 @@ const VisualizarActivoRed = ({
         <h2 className="text-xl font-semibold mb-5">Imagen</h2>
         <div className="flex flex-col items-center gap-4">
           {equipoRedActivo.imagenRuta ? (
-            <img
-              src={`${IMAGE_BASE_URL.replace(/\/$/, "")}/${equipoRedActivo.imagenRuta.replace(/^\//, "")}`}
-              alt="Imagen del equipo"
-              className="w-full max-w-sm h-48 object-cover border"
-            />
+            <div className="w-[300px] h-[300px] rounded-lg overflow-hidden flex items-center justify-center bg-gray-100 shadow-sm border border-gray-200">
+              <img
+                src={`${IMAGE_BASE_URL.replace(/\/$/, "")}/${equipoRedActivo.imagenRuta.replace(/^\//, "")}`}
+                alt="Imagen del equipo"
+                className="w-full h-full object-cover"
+              />
+            </div>
           ) : (
-            <p className="text-gray-500">Sin imagen</p>
+            <div className="w-[300px] h-[300px] rounded-lg flex items-center justify-center bg-gray-200 shadow-sm border border-gray-300">
+              <span className="text-gray-500 font-medium text-center">Sin Imagen</span>
+            </div>
           )}
         </div>
       </div>

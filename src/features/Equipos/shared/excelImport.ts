@@ -268,14 +268,9 @@ export const transformImpresoraRow = (
   tipoInventario: TipoInventario,
   filaExcel: number
 ): ActivoComputadoraImport => {
-  const ip = normalizeOptionalValue(getImportRowValue(row, "IP"));
   const observacion = normalizeOptionalValue(
     getImportRowValue(row, "Observación", "Observacion", "ObservaciÃ³n")
   );
-  const detalles = [
-    ip && ip.toUpperCase() !== "S/N" ? `IP: ${ip}` : "",
-    observacion,
-  ].filter(Boolean);
 
   return {
     hojaExcel: "Impresora",
@@ -303,7 +298,7 @@ export const transformImpresoraRow = (
     nombreEquipo: normalizeImportValue(
       getImportRowValue(row, "Nombre-Etiqueta", "Nombre")
     ),
-    observacion: detalles.join(" | "),
+    observacion,
   };
 };
 
