@@ -61,7 +61,7 @@ const EditarActivoRed = ({
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
   const [errorAnio, setErrorAnio] = useState<boolean>(false);
   const [errorMAC, setErrorMAC] = useState<boolean>(false);
-  //const [errorNombreEquipo, setErrorNombreEquipo] = useState<boolean>(false);
+  const [errorNombreEquipo, setErrorNombreEquipo] = useState<boolean>(false);
   const [errorPuertos, setErrorPuertos] = useState<boolean>(false);
   const [errorPuertoFTP, setErrorPuertoFTP] = useState<boolean>(false);
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(
@@ -314,8 +314,7 @@ const EditarActivoRed = ({
     if (
       !selectedInventarioInv ||
       errorInventario ||
-      !selectedInventarioAnio ||
-      errorAnio ||
+      (Boolean(selectedInventarioAnio) && errorAnio) ||
       !selectedInventarioSerie ||
       !selectedUbicacion ||
       !selectedMAC ||
@@ -325,6 +324,12 @@ const EditarActivoRed = ({
       setErrorMensajeEquipo("Por favor verificar todos los campos del equipo.");
       return false;
     }
+    if (!nombreEquipo) {
+      setErrorNombreEquipo(true);
+      setErrorMensajeEquipo("El campo Nombre Equipo es obligatorio.");
+      return false;
+    }
+    setErrorNombreEquipo(false);
     setErrorMensajeEquipo(null);
     return true;
   };
@@ -510,7 +515,7 @@ const EditarActivoRed = ({
             </label>
           </Box>
           <TextField
-            label="Año de Compra"
+            label="Año de Compra (opcional)"
             placeholder="Año de Compra"
             variant="outlined"
             fullWidth
@@ -605,9 +610,9 @@ const EditarActivoRed = ({
           fullWidth
           size="small"
           value={nombreEquipo}
-          error={!!errorMensajeEquipo}
+          error={errorNombreEquipo}
           helperText={
-            errorMensajeEquipo ? "Por favor escribir un nombre del equipo" : ""
+            errorNombreEquipo ? "El campo Nombre Equipo es obligatorio." : ""
           }
           onChange={(e) => {
             let value = e.target.value;
@@ -615,6 +620,7 @@ const EditarActivoRed = ({
               value = value.slice(0, 14);
             }
             setNombreEquipo(value);
+            setErrorNombreEquipo(!value.trim());
           }}
         />
         {perifericoName === "Switch" ? (

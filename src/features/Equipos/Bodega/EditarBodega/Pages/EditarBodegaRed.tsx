@@ -221,7 +221,7 @@ const EditarBodegaRed = ({
     if (
       !selectedInventarioInv ||
       !selectedInventarioSerie ||
-      !selectedInventarioAnio ||
+      (Boolean(selectedInventarioAnio) && errorAnio) ||
       !selectedMAC ||
       (perifericoName === "AccessPoint" ? false : !selectedPuertos) ||
       (perifericoName === "AccessPoint" ? false : !selectedPuertoFTP)
@@ -400,7 +400,7 @@ const EditarBodegaRed = ({
             </Box>
           </Box>
           <TextField
-            label="Año de Compra"
+            label="Año de Compra (opcional)"
             placeholder="Año de Compra"
             variant="outlined"
             fullWidth

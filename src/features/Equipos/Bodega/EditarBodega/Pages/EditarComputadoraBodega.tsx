@@ -420,7 +420,7 @@ const EditarComputadoraBodega = ({
   const validarCamposEquipo = () => {
     if (
       !selectedInventarioInv ||
-      !selectedInventarioAnio ||
+      (Boolean(selectedInventarioAnio) && errorAnio) ||
       !selectedInventarioSerie ||
       !nombreEquipo ||
       !selectedVersionSO ||
@@ -701,7 +701,7 @@ const EditarComputadoraBodega = ({
             </Box>
           </Box>
           <TextField
-            label="Año de Compra"
+            label="Año de Compra (opcional)"
             placeholder="Año de Compra"
             variant="outlined"
             fullWidth
