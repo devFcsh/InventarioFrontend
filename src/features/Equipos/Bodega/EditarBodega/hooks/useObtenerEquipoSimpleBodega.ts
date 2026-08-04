@@ -19,6 +19,10 @@ export const useObtenerEquipoSimpleBodega = (id: string) => {
         const equipoMapeado: BodegaSimpleEdit = {
           ...equipoData,
           id_periferico: equipoData.p_id_periferico || equipoData.id_periferico,
+          isComponente: response.data.isComponente ?? equipoData.isComponente,
+          id_computadora: response.data.id_computadora ?? equipoData.id_computadora,
+          id_serie_computadora: response.data.id_serie_computadora ?? equipoData.id_serie_computadora,
+          id_periferico_computadora: response.data.id_periferico_computadora ?? equipoData.id_periferico_computadora,
         };
         
         setEquipoSimpleBodega(equipoMapeado);

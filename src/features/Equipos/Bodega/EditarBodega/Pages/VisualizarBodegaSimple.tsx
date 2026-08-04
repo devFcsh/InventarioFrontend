@@ -7,6 +7,8 @@ import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPor
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
 import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
 import useLamparas from "@hooks/useLamparas";
+import useComputadorasPorPeriferico from "@hooks/useComputadorasPorPeriferico";
+import usePerifericos from "@hooks/usePerifericos";
 import { useNavigate } from "react-router-dom";
 
 interface VisualizarBodegaSimpleProps {
@@ -26,6 +28,8 @@ const VisualizarBodegaSimple = ({
   const [selectedInventarioAnio, setSelectedInventarioAnio] = useState<string>("");
   const [empresa, setEmpresa] = useState<string | null>("");
   const [observacion, setObservacion] = useState<string>("");
+  const [equipoPrincipal, setEquipoPrincipal] = useState<string>("S/N");
+  const [tipoEquipoPrincipal, setTipoEquipoPrincipal] = useState<string>("S/N");
 
   const { marcas } = useMarcasPorPeriferico(equipoSimpleBodega?.id_periferico ?? "");
   const { modelos } = useModelosPorMarcaPeriferico(
@@ -43,7 +47,30 @@ const VisualizarBodegaSimple = ({
     selectedInventarioModelo?.id_modelo ?? ""
   );
   const { lamparasTotales } = useLamparas();
+  const { computadoras } = useComputadorasPorPeriferico(
+    equipoSimpleBodega?.id_periferico_computadora ?? "",
+    "bodega"
+  );
+  const { perifericos } = usePerifericos();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!equipoSimpleBodega?.isComponente || !equipoSimpleBodega.id_computadora) {
+      setEquipoPrincipal("S/N");
+      setTipoEquipoPrincipal("S/N");
+      return;
+    }
+
+    const computadora = computadoras.find(
+      (item) => String(item.id_equipo) === String(equipoSimpleBodega.id_computadora)
+    );
+    setEquipoPrincipal(computadora?.serie?.trim() || "S/N");
+
+    const perifericoPrincipal = perifericos.find(
+      (item) => String(item?.id_periferico) === String(equipoSimpleBodega.id_periferico_computadora)
+    );
+    setTipoEquipoPrincipal(perifericoPrincipal?.nombre?.trim() || "S/N");
+  }, [equipoSimpleBodega, computadoras, perifericos]);
 
   useEffect(() => {
     if (equipoSimpleBodega) {
@@ -92,6 +119,26 @@ const VisualizarBodegaSimple = ({
     <div>
       <h2 className="text-xl font-semibold mb-5">Información de Inventario</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
+        {perifericoName !== "Proyector" && (
+          <>
+            <TextField
+              label="Tipo Equipo Principal"
+              variant="outlined"
+              fullWidth
+              size="small"
+              value={tipoEquipoPrincipal}
+              disabled
+            />
+            <TextField
+              label="Serie de Equipo Principal"
+              variant="outlined"
+              fullWidth
+              size="small"
+              value={equipoPrincipal}
+              disabled
+            />
+          </>
+        )}
         <Autocomplete
           size="small"
           disablePortal

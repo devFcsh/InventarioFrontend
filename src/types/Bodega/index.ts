@@ -49,6 +49,10 @@ export type BodegaSimpleEdit = {
   id_serie: string;
   id_lampara: string;
   observacion: string;
+  isComponente?: boolean;
+  id_computadora?: string | number;
+  id_serie_computadora?: string | number;
+  id_periferico_computadora?: string | number;
 };
 
 export type BodegaRedEdit = {
