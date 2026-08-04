@@ -16,6 +16,7 @@ import { useSnackbar } from "@context/SnackbarContext";
 import { useSacarEquipoDeBaja } from "../hooks/useSacarEquipoDeBaja";
 import { useUser } from "@context/userContext";
 import Loader from "@pages/Loader";
+import { sortOptions } from "../../../../utils/sortOptions.ts";
 
 const Bajas = () => {
   const [inputPeriferico, setInputPeriferico] = useState(() => {
@@ -73,6 +74,11 @@ const Bajas = () => {
   const { modelos } = useModelos();
   const { series } = useSeries();
   const { inventarios } = useInventario();
+  const perifericosOrdenados = sortOptions(perifericos, (option) => option?.nombre);
+  const marcasOrdenadas = sortOptions(marcas, (option) => option?.nombre);
+  const modelosOrdenados = sortOptions(modelos, (option) => option?.nombre);
+  const seriesOrdenadas = sortOptions(series, (option) => option?.nombre);
+  const inventariosOrdenados = sortOptions(inventarios, (option) => option?.inventario);
   const { useSacarEquipoDeBaja: sacarEquipoDeBaja } = useSacarEquipoDeBaja();
   const { rol } = useUser();
   const unableActionEditor = rol !== "administrador";
@@ -386,7 +392,7 @@ const Bajas = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={perifericos}
+            options={perifericosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -410,7 +416,7 @@ const Bajas = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={marcas}
+            options={marcasOrdenadas}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -432,7 +438,7 @@ const Bajas = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={modelos}
+            options={modelosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -454,7 +460,7 @@ const Bajas = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={series}
+            options={seriesOrdenadas}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -476,7 +482,7 @@ const Bajas = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={inventarios}
+            options={inventariosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option.inventario || ""
             }

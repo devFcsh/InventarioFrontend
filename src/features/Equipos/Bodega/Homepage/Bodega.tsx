@@ -44,6 +44,7 @@ import {
   transformUpsRow,
   transformComputadoraRow,
 } from "../../shared/excelImport.ts";
+import { sortOptions } from "../../../../utils/sortOptions.ts";
 
 const Bodega = () => {
   const [inputPeriferico, setInputPeriferico] = useState(() => {
@@ -107,6 +108,11 @@ const Bodega = () => {
   const { modelos } = useModelos();
   const { series } = useSeries();
   const { inventarios } = useInventario();
+  const perifericosOrdenados = sortOptions(perifericos, (option) => option?.nombre);
+  const marcasOrdenadas = sortOptions(marcas, (option) => option?.nombre);
+  const modelosOrdenados = sortOptions(modelos, (option) => option?.nombre);
+  const seriesOrdenadas = sortOptions(series, (option) => option?.nombre);
+  const inventariosOrdenados = sortOptions(inventarios, (option) => option?.inventario);
 
   const { darDeBajaEquipo } = useDarDeBajaEquipo();
   const { fetchTodosEquipos } = useExportarEquiposBodega();
@@ -1058,7 +1064,7 @@ const Bodega = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={perifericos}
+            options={perifericosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -1082,7 +1088,7 @@ const Bodega = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={marcas}
+            options={marcasOrdenadas}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -1104,7 +1110,7 @@ const Bodega = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={modelos}
+            options={modelosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -1126,7 +1132,7 @@ const Bodega = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={series}
+            options={seriesOrdenadas}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -1148,7 +1154,7 @@ const Bodega = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={inventarios}
+            options={inventariosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option.inventario || ""
             }

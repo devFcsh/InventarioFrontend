@@ -51,6 +51,7 @@ import {
   transformUpsRow,
   transformComputadoraRow,
 } from "../../shared/excelImport.ts";
+import { sortOptions } from "../../../../utils/sortOptions.ts";
 
 const Activos = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -123,6 +124,19 @@ const Activos = () => {
   const { modelos } = useModelos();
   const { series } = useSeries();
   const { inventarios } = useInventario();
+  const perifericosOrdenados = sortOptions(perifericos, (option) => option?.nombre);
+  const marcasOrdenadas = sortOptions(marcas, (option) => option?.nombre);
+  const modelosOrdenados = sortOptions(modelos, (option) => option?.nombre);
+  const seriesOrdenadas = sortOptions(series, (option) => option?.nombre);
+  const inventariosOrdenados = sortOptions(inventarios, (option) => option?.inventario);
+  const usuariosOrdenados = sortOptions(usuarios || [], (option) => {
+    const usuario = option as {
+      nombre?: unknown;
+      email?: unknown;
+      id_usuario?: unknown;
+    } | null;
+    return usuario?.nombre || usuario?.email || usuario?.id_usuario;
+  });
   const { pasarActivoABodega } = usePasarActivoABodega();
   const { fetchTodosEquipos } = useExportarEquiposActivos();
 
@@ -1420,7 +1434,7 @@ const Activos = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={perifericos}
+            options={perifericosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -1444,7 +1458,7 @@ const Activos = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={marcas}
+            options={marcasOrdenadas}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -1466,7 +1480,7 @@ const Activos = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={modelos}
+            options={modelosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -1488,7 +1502,7 @@ const Activos = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={series}
+            options={seriesOrdenadas}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -1510,7 +1524,7 @@ const Activos = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={inventarios}
+            options={inventariosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option.inventario || ""
             }
@@ -1533,7 +1547,7 @@ const Activos = () => {
 
           <Autocomplete
             size="small"
-            options={usuarios || []}
+            options={usuariosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string"
                 ? option
