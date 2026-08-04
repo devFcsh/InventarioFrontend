@@ -31,6 +31,9 @@ import {
   useImportarEquipoBodega,
 } from "../hooks/useImportarEquipoBodega";
 import ImportResultDialog from "../../shared/ImportResultDialog.tsx";
+import ImportPreviewDialog, {
+  ImportPreviewData,
+} from "../../shared/ImportPreviewDialog.tsx";
 import {
   downloadImportTemplate,
   formatAnioCompra,
@@ -91,6 +94,8 @@ const Bodega = () => {
   const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null);
   const [openImportResult, setOpenImportResult] = useState(false);
   const [importResult, setImportResult] = useState<ImportarEquiposResultado | null>(null);
+  const [openImportPreview, setOpenImportPreview] = useState(false);
+  const [importPreview, setImportPreview] = useState<ImportPreviewData | null>(null);
 
   const { showMessage } = useSnackbar();
   const [shouldFetch, setShouldFetch] = useState<boolean>(true);
@@ -557,6 +562,7 @@ const Bodega = () => {
       
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const equiposImportTodos: any[] = [];
+      const errores: string[] = [];
 
       if (workbook.SheetNames.includes("Computadora")) {
         const worksheet = workbook.Sheets["Computadora"];
@@ -622,7 +628,7 @@ const Bodega = () => {
             .map((row, index) => (!isValidCameraImportType(row as Record<string, unknown>) ? index + 2 : null))
             .filter((fila): fila is number => fila !== null);
           if (filasInvalidas.length > 0) {
-            showMessage(`Cámara - La columna Tipo debe contener únicamente "Cámara". Filas: ${filasInvalidas.join(", ")}`, "error");
+            errores.push(`Cámara - La columna Tipo debe contener únicamente "Cámara". Filas: ${filasInvalidas.join(", ")}`);
           } else {
             equiposImportTodos.push(...jsonData.map((row, index) =>
               transformCamaraRow(row as Record<string, unknown>, "bodega", index + 2)
@@ -641,7 +647,7 @@ const Bodega = () => {
             .filter((fila): fila is number => fila !== null);
 
           if (filasInvalidas.length > 0) {
-            showMessage(`Impresora - La columna Tipo debe contener únicamente "Impresora". Filas: ${filasInvalidas.join(", ")}`, "error");
+            errores.push(`Impresora - La columna Tipo debe contener únicamente "Impresora". Filas: ${filasInvalidas.join(", ")}`);
           } else {
             const impresoras = jsonData.map((row, index) =>
               transformImpresoraRow(row as Record<string, unknown>, "bodega", index + 2)
@@ -661,7 +667,7 @@ const Bodega = () => {
             .filter((fila): fila is number => fila !== null);
 
           if (filasInvalidas.length > 0) {
-            showMessage(`Impresora - La columna Tipo debe contener únicamente "Impresora". Filas: ${filasInvalidas.join(", ")}`, "error");
+            errores.push(`Impresora - La columna Tipo debe contener únicamente "Impresora". Filas: ${filasInvalidas.join(", ")}`);
           } else {
             const impresoras = jsonData.map((row, index) =>
               transformImpresoraRow(row as Record<string, unknown>, "bodega", index + 2)
@@ -675,7 +681,7 @@ const Bodega = () => {
         }
       }
 
-      if (equiposImportTodos.length === 0) {
+      if (equiposImportTodos.length === 0 && errores.length === 0) {
         showMessage(
           "El archivo no contiene ninguna hoja válida (Computadora, Proyector, AccessPoint, Switch, Cámara, Impresora, UPS o Equipos Simples).",
           "warning"
@@ -683,27 +689,49 @@ const Bodega = () => {
         return;
       }
 
-      try {
-        const resultado = await importarEquiposBodega(equiposImportTodos, user?.email);
-        setImportResult(resultado);
-        setOpenImportResult(true);
-
-        if (
-          resultado?.resumen &&
-          typeof resultado.resumen.registrados === "number" &&
-          resultado.resumen.registrados > 0
-        ) {
-          showMessage(`Importación completada.`, "success");
-        } else {
-          showMessage("No se encontraron equipos nuevos para agregar.", "info");
-        }
-
-        setShouldFetch(true);
-      } catch {
-        showMessage("Error al importar equipos", "error");
-      }
+      setImportPreview({
+        fileName: file.name,
+        sheets: workbook.SheetNames,
+        equipment: equiposImportTodos,
+        errors: errores,
+      });
+      setOpenImportPreview(true);
     };
     reader.readAsBinaryString(file);
+  };
+
+  const cancelarImportacion = () => {
+    setOpenImportPreview(false);
+    setImportPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const confirmarImportacion = async () => {
+    if (!importPreview || importLoading) return;
+
+    setOpenImportPreview(false);
+    try {
+      const resultado = await importarEquiposBodega(importPreview.equipment, user?.email);
+      setImportResult(resultado);
+      setOpenImportResult(true);
+
+      if (
+        resultado?.resumen &&
+        typeof resultado.resumen.registrados === "number" &&
+        resultado.resumen.registrados > 0
+      ) {
+        showMessage(`Importación completada.`, "success");
+      } else {
+        showMessage("No se encontraron equipos nuevos para agregar.", "info");
+      }
+
+      setShouldFetch(true);
+    } catch {
+      showMessage("Error al importar equipos", "error");
+    } finally {
+      setImportPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   const handleCheckboxChange = (id: string) => {
@@ -1567,6 +1595,13 @@ const Bodega = () => {
         onClose={() => setOpenImportResult(false)}
         result={importResult}
         title="Resultado de importación de bodega"
+      />
+      <ImportPreviewDialog
+        open={openImportPreview}
+        preview={importPreview}
+        loading={importLoading}
+        onCancel={cancelarImportacion}
+        onConfirm={confirmarImportacion}
       />
     </div>
   );

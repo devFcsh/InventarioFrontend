@@ -37,6 +37,9 @@ import {
 } from "../hooks/useImportarEquipoActivo.ts";
 import { MantenimientoActivo } from "../MantenimientoActivo/Homepage/MantenimientoActivo.tsx";
 import ImportResultDialog from "../../shared/ImportResultDialog.tsx";
+import ImportPreviewDialog, {
+  ImportPreviewData,
+} from "../../shared/ImportPreviewDialog.tsx";
 import {
   downloadImportTemplate,
   formatAnioCompra,
@@ -58,6 +61,8 @@ const Activos = () => {
   const [openModalMantenimientos, setOpenModalMantenimientos] = useState(false);
   const [openImportResult, setOpenImportResult] = useState(false);
   const [importResult, setImportResult] = useState<ImportarEquiposResultado | null>(null);
+  const [openImportPreview, setOpenImportPreview] = useState(false);
+  const [importPreview, setImportPreview] = useState<ImportPreviewData | null>(null);
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
@@ -745,35 +750,49 @@ const Activos = () => {
         return;
       }
 
-      if (errores.length > 0) {
-        showMessage(
-          `Error en formato: ${errores.join(" | ")}`,
-          "error"
-        );
-        return;
-      }
-
-      try {
-        const resultado = await importarEquiposActivos(equiposImportTodos, user?.email);
-        setImportResult(resultado);
-        setOpenImportResult(true);
-
-        if (
-          resultado?.resumen &&
-          typeof resultado.resumen.registrados === "number" &&
-          resultado.resumen.registrados > 0
-        ) {
-          showMessage(`Importación completada.`, "success");
-        } else {
-          showMessage("No se encontraron equipos nuevos para agregar.", "info");
-        }
-
-        setShouldFetch(true);
-      } catch {
-        showMessage("Error al importar equipos", "error");
-      }
+      setImportPreview({
+        fileName: file.name,
+        sheets: workbook.SheetNames,
+        equipment: equiposImportTodos,
+        errors: errores,
+      });
+      setOpenImportPreview(true);
     };
     reader.readAsBinaryString(file);
+  };
+
+  const cancelarImportacion = () => {
+    setOpenImportPreview(false);
+    setImportPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const confirmarImportacion = async () => {
+    if (!importPreview || importLoading) return;
+
+    setOpenImportPreview(false);
+    try {
+      const resultado = await importarEquiposActivos(importPreview.equipment, user?.email);
+      setImportResult(resultado);
+      setOpenImportResult(true);
+
+      if (
+        resultado?.resumen &&
+        typeof resultado.resumen.registrados === "number" &&
+        resultado.resumen.registrados > 0
+      ) {
+        showMessage(`Importación completada.`, "success");
+      } else {
+        showMessage("No se encontraron equipos nuevos para agregar.", "info");
+      }
+
+      setShouldFetch(true);
+    } catch {
+      showMessage("Error al importar equipos", "error");
+    } finally {
+      setImportPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   const esComputadora = (equipo?: Equipo) => {
@@ -2107,6 +2126,13 @@ const Activos = () => {
         onClose={() => setOpenImportResult(false)}
         result={importResult}
         title="Resultado de importación de activos"
+      />
+      <ImportPreviewDialog
+        open={openImportPreview}
+        preview={importPreview}
+        loading={importLoading}
+        onCancel={cancelarImportacion}
+        onConfirm={confirmarImportacion}
       />
      <MantenimientoActivo
   open={openModalMantenimientos}
