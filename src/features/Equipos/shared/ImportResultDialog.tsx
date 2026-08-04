@@ -32,6 +32,7 @@ type ImportResult = {
     seInsertaronNuevos: boolean;
   };
   noRegistrados?: ImportResultItem[];
+  advertencias?: ImportResultItem[];
 };
 
 interface ImportResultDialogProps {
@@ -52,13 +53,14 @@ const ImportResultDialog = ({
   }
 
   const hasErrors = (result.noRegistrados?.length ?? 0) > 0;
+  const hasWarnings = (result.advertencias?.length ?? 0) > 0;
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>{title}</DialogTitle>
       <DialogContent dividers>
         {result.message ? (
-          <Alert severity={hasErrors ? "warning" : "success"} sx={{ mb: 2 }}>
+          <Alert severity={hasErrors || hasWarnings ? "warning" : "success"} sx={{ mb: 2 }}>
             {result.message}
           </Alert>
         ) : null}
@@ -106,6 +108,25 @@ const ImportResultDialog = ({
                   </ListItem>
                 );
               })}
+            </List>
+          </>
+        ) : null}
+
+        {hasWarnings ? (
+          <>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+              Advertencias de asociación
+            </Typography>
+            <List dense sx={{ maxHeight: 240, overflowY: "auto" }}>
+              {result.advertencias?.map((item, index) => (
+                <ListItem key={`${item.inventario ?? "sin-inventario"}-warning-${index}`} disableGutters>
+                  <ListItemText
+                    primary={item.inventario ? `Inventario: ${item.inventario}` : `Registro ${index + 1}`}
+                    secondary={item.motivo}
+                  />
+                </ListItem>
+              ))}
             </List>
           </>
         ) : null}

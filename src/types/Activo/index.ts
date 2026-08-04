@@ -210,6 +210,8 @@ export type ActivoComputadoraImport = {
   empresa?: string;
   nombreEquipo: string;
   direccionIp?: string;
+  serie_equipo_principal?: string;
+  inventario_equipo_principal?: string;
   sistemaOperativo?: string;
   versionSO?: string;
   versionso?: string;

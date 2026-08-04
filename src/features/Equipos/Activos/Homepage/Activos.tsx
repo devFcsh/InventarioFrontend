@@ -40,9 +40,11 @@ import ImportResultDialog from "../../shared/ImportResultDialog.tsx";
 import {
   downloadImportTemplate,
   formatAnioCompra,
+  isValidCameraImportType,
   isValidPrinterImportType,
   pickExcelLocation,
   transformImpresoraRow,
+  transformCamaraRow,
   transformUpsRow,
   transformComputadoraRow,
 } from "../../shared/excelImport.ts";
@@ -304,6 +306,12 @@ const Activos = () => {
           "Observación"
         ];
         break;
+      case "Cámara":
+        requiredColumns = [
+          "Tipo", "Inventario", "Serie", "Modelo", "Marca", "Uso", "Usuario",
+          "Edificio", "Año Adq", "Empresa", "Serie Equipo Principal", "Inventario Equipo Principal"
+        ];
+        break;
       default:
         return [];
     }
@@ -358,6 +366,14 @@ const Activos = () => {
     return ["bloque", "ubicacion referencia", "nombre etiqueta", "n serie"].every(
       (columna) => columnas.includes(columna)
     );
+  };
+
+  const esFormatoCamaras = (jsonData: unknown[]) => {
+    if (!jsonData.length || typeof jsonData[0] !== "object" || !jsonData[0]) return false;
+    const columnas = Object.keys(jsonData[0] as Record<string, unknown>).map((columna) =>
+      columna.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    );
+    return columnas.includes("serie equipo principal") && columnas.includes("inventario equipo principal");
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -645,6 +661,26 @@ const Activos = () => {
         }
       }
 
+      if (workbook.SheetNames.includes("Cámara")) {
+        const worksheet = workbook.Sheets["Cámara"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+        if (jsonData && jsonData.length > 0) {
+          const filasInvalidas = jsonData
+            .map((row, index) => (!isValidCameraImportType(row as Record<string, unknown>) ? index + 2 : null))
+            .filter((fila): fila is number => fila !== null);
+          const faltantes = columnasFaltantesExcel(jsonData, "Cámara");
+          if (filasInvalidas.length > 0) {
+            errores.push(`Cámara - La columna Tipo debe contener únicamente "Cámara". Filas: ${filasInvalidas.join(", ")}`);
+          } else if (faltantes.length > 0) {
+            errores.push(`Cámara - Faltan columnas: ${faltantes.join(", ")}`);
+          } else {
+            equiposImportTodos.push(...jsonData.map((row, index) =>
+              transformCamaraRow(row as Record<string, unknown>, "activo", index + 2)
+            ));
+          }
+        }
+      }
+
       if (workbook.SheetNames.includes("Impresora")) {
         const worksheet = workbook.Sheets["Impresora"];
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
@@ -683,6 +719,10 @@ const Activos = () => {
               );
               equiposImportTodos.push(...impresoras);
             }
+          } else if (esFormatoCamaras(jsonData)) {
+            equiposImportTodos.push(...jsonData.map((row, index) =>
+              transformCamaraRow(row as Record<string, unknown>, "activo", index + 2)
+            ));
           } else {
             const faltantes = columnasFaltantesExcel(jsonData, "EquiposSimples");
             if (faltantes.length > 0) {
@@ -699,7 +739,7 @@ const Activos = () => {
 
       if (equiposImportTodos.length === 0 && errores.length === 0) {
         showMessage(
-          "El archivo no contiene ninguna hoja válida (Computadora, Switch, AccessPoint, Proyector, Equipos Simples).",
+          "El archivo no contiene ninguna hoja válida (Computadora, Proyector, AccessPoint, Switch, Cámara, Impresora, UPS o Equipos Simples).",
           "warning"
         );
         return;

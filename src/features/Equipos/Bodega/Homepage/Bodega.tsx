@@ -35,7 +35,9 @@ import {
   downloadImportTemplate,
   formatAnioCompra,
   isValidPrinterImportType,
+  isValidCameraImportType,
   transformImpresoraRow,
+  transformCamaraRow,
   transformUpsRow,
   transformComputadoraRow,
 } from "../../shared/excelImport.ts";
@@ -391,6 +393,14 @@ const Bodega = () => {
     );
   };
 
+  const esFormatoCamaras = (jsonData: unknown[]) => {
+    if (!jsonData.length || typeof jsonData[0] !== "object" || !jsonData[0]) return false;
+    const columnas = Object.keys(jsonData[0] as Record<string, unknown>).map((columna) =>
+      columna.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    );
+    return columnas.includes("serie equipo principal") && columnas.includes("inventario equipo principal");
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function transformarFilaExcel(row: any, filaExcel: number) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -604,6 +614,23 @@ const Bodega = () => {
         }
       }
 
+      if (workbook.SheetNames.includes("Cámara")) {
+        const worksheet = workbook.Sheets["Cámara"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+        if (jsonData && jsonData.length > 0) {
+          const filasInvalidas = jsonData
+            .map((row, index) => (!isValidCameraImportType(row as Record<string, unknown>) ? index + 2 : null))
+            .filter((fila): fila is number => fila !== null);
+          if (filasInvalidas.length > 0) {
+            showMessage(`Cámara - La columna Tipo debe contener únicamente "Cámara". Filas: ${filasInvalidas.join(", ")}`, "error");
+          } else {
+            equiposImportTodos.push(...jsonData.map((row, index) =>
+              transformCamaraRow(row as Record<string, unknown>, "bodega", index + 2)
+            ));
+          }
+        }
+      }
+
       if (workbook.SheetNames.includes("Impresora")) {
         const worksheet = workbook.Sheets["Impresora"];
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
@@ -641,12 +668,16 @@ const Bodega = () => {
             );
             equiposImportTodos.push(...impresoras);
           }
+        } else if (jsonData && esFormatoCamaras(jsonData)) {
+          equiposImportTodos.push(...jsonData.map((row, index) =>
+            transformCamaraRow(row as Record<string, unknown>, "bodega", index + 2)
+          ));
         }
       }
 
       if (equiposImportTodos.length === 0) {
         showMessage(
-          "El archivo no contiene ninguna hoja válida (Computadora, Switch, AccessPoint, Proyector).",
+          "El archivo no contiene ninguna hoja válida (Computadora, Proyector, AccessPoint, Switch, Cámara, Impresora, UPS o Equipos Simples).",
           "warning"
         );
         return;

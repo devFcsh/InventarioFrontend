@@ -60,8 +60,15 @@ export const getImportRowValue = (
   return undefined;
 };
 
-export const isValidPrinterImportType = (row: ExcelRow) =>
-  compactValue(getImportRowValue(row, "Tipo")) === "IMPRESORA";
+export const isValidPrinterImportType = (row: ExcelRow) => {
+  const value = getImportRowValue(row, "Tipo");
+  return value === undefined || compactValue(value) === "IMPRESORA";
+};
+
+export const isValidCameraImportType = (row: ExcelRow) => {
+  const value = getImportRowValue(row, "Tipo");
+  return value === undefined || compactValue(value) === "CAMARA";
+};
 
 const normalizeOptionalValue = (value: unknown) => {
   if (!hasRealExcelValue(value)) {
@@ -298,9 +305,46 @@ export const transformImpresoraRow = (
     nombreEquipo: normalizeImportValue(
       getImportRowValue(row, "Nombre-Etiqueta", "Nombre")
     ),
+    direccionIp: normalizeIpValue(
+      getImportRowValue(row, "IP", "Dirección IP", "Direccion IP")
+    ),
     observacion,
   };
 };
+
+export const transformCamaraRow = (
+  row: ExcelRow,
+  tipoInventario: TipoInventario,
+  filaExcel: number
+): ActivoComputadoraImport => ({
+  hojaExcel: "Cámara",
+  filaExcel,
+  tipo: "Cámara",
+  tipo_inventario: tipoInventario,
+  inventario: normalizeImportValue(getImportRowValue(row, "Inventario")),
+  anio_compra: formatAnioCompra(getImportRowValue(row, "Año Adq", "AÃ±o Adq")),
+  serie: normalizeImportValue(getImportRowValue(row, "Serie")),
+  modelo: normalizeImportValue(getImportRowValue(row, "Modelo")),
+  marca: normalizeImportValue(getImportRowValue(row, "Marca")),
+  usuario: normalizeImportValue(getImportRowValue(row, "Usuario")),
+  uso: normalizeImportValue(getImportRowValue(row, "Uso")),
+  edificio: normalizeImportValue(getImportRowValue(row, "Edificio")),
+  ubicacion: pickExcelLocation(
+    getImportRowValue(row, "Oficina"),
+    getImportRowValue(row, "No. Aula")
+  ),
+  empresa: normalizeImportValue(getImportRowValue(row, "Empresa")),
+  nombreEquipo: "S/N",
+  serie_equipo_principal: normalizeImportValue(
+    getImportRowValue(row, "Serie Equipo Principal")
+  ),
+  inventario_equipo_principal: normalizeImportValue(
+    getImportRowValue(row, "Inventario Equipo Principal")
+  ),
+  observacion: normalizeOptionalValue(
+    getImportRowValue(row, "Observación", "Observacion", "ObservaciÃ³n")
+  ),
+});
 
 export const downloadImportTemplate = (
   tipoInventario: Extract<TipoInventario, "activo" | "bodega">
@@ -316,8 +360,11 @@ export const downloadImportTemplate = (
           ],
           Proyector: ["N°", "Año Adq", "Empresa", "Inventario", "Bloque", "Ubicación", "Marca", "Modelo", "Serie", "Categoría", "Lámpara", "Estado", "Observación"],
           AccessPoint: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Bloque", "Ubicación", "Marca", "Modelo", "Serie", "MAC", "Estado", "Observación"],
-          Switch: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Bloque", "Ubicación", "Marca", "Modelo", "Serie", "MAC", "Puertos", "Puertos FTP", "Estado", "Observación"],
+          Switch: ["Año Adq", "Empresa", "Nombre", "Inventario", "Bloque", "Ubicación", "Marca", "Modelo", "Serie", "MAC", "Puertos", "Puertos FTP", "Observación"],
           "Equipos Simples": ["Id", "Edificio", "No. Aula", "Oficina", "Usuario", "Uso", "Tipo", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Serie Equipo Principal", "Observación"],
+          "Cámara": ["Tipo", "Edificio", "No. Aula", "Oficina", "Usuario", "Uso", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Serie Equipo Principal", "Inventario Equipo Principal", "Observación"],
+          Impresora: ["Tipo", "Empresa", "Inventario", "Bloque", "Ubicación-Referencia", "Nombre-Etiqueta", "Año Adq", "Marca", "Modelo", "Nº Serie", "IP", "Observación"],
+          UPS: ["Tipo", "Edificio", "Referencia", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Observación"],
         }
       : {
           Computadora: [
@@ -327,7 +374,10 @@ export const downloadImportTemplate = (
           ],
           Proyector: ["N°", "Año Adq", "Empresa", "Inventario", "Marca", "Modelo", "Serie", "Categoría", "Lámpara", "Estado", "Observación"],
           AccessPoint: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Marca", "Modelo", "Serie", "MAC", "Estado", "Observación"],
-          Switch: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Marca", "Modelo", "Serie", "MAC", "Puertos", "Puertos FTP", "Estado", "Observación"],
+          Switch: ["Año Adq", "Empresa", "Nombre", "Inventario", "Marca", "Modelo", "Serie", "MAC", "Puertos", "Puertos FTP", "Observación"],
+          "Cámara": ["Tipo", "Empresa", "Edificio", "No. Aula", "Oficina", "Usuario", "Uso", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Serie Equipo Principal", "Inventario Equipo Principal", "Observación"],
+          Impresora: ["Tipo", "Empresa", "Inventario", "Bloque", "Ubicación-Referencia", "Nombre-Etiqueta", "Año Adq", "Marca", "Modelo", "Nº Serie", "IP", "Observación"],
+          UPS: ["Tipo", "Empresa", "Edificio", "Referencia", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Observación"],
         };
 
   const workbook = XLSX.utils.book_new();

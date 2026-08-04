@@ -23,6 +23,11 @@ export type ImportarEquiposResultado = {
     motivo: string;
     datos: ActivoComputadoraImport;
   }>;
+  advertencias?: Array<{
+    inventario?: string;
+    motivo: string;
+    datos?: ActivoComputadoraImport;
+  }>;
   error?: string;
 };
 
