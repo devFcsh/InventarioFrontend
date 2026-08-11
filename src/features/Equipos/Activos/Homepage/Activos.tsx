@@ -52,6 +52,7 @@ import {
   transformComputadoraRow,
 } from "../../shared/excelImport.ts";
 import { sortOptions } from "../../../../utils/sortOptions.ts";
+import { useEquiposFilterOptions } from "../../../../hooks/useEquiposFilterOptions.ts";
 
 const Activos = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -124,12 +125,33 @@ const Activos = () => {
   const { modelos } = useModelos();
   const { series } = useSeries();
   const { inventarios } = useInventario();
-  const perifericosOrdenados = sortOptions(perifericos, (option) => option?.nombre);
-  const marcasOrdenadas = sortOptions(marcas, (option) => option?.nombre);
-  const modelosOrdenados = sortOptions(modelos, (option) => option?.nombre);
-  const seriesOrdenadas = sortOptions(series, (option) => option?.nombre);
+  const {
+    perifericosDisponibles,
+    marcasDisponibles,
+    modelosDisponibles,
+    seriesDisponibles,
+    usuariosDisponibles,
+  } = useEquiposFilterOptions({
+    perifericos,
+    marcas,
+    modelos,
+    series,
+    usuarios,
+    perifericoNombre: inputPeriferico,
+    marcaNombre: inputMarca,
+    modeloNombre: inputModelo,
+    serieNombre: inputSerie,
+    usuarioId: selectedUsuarioFilter
+      ? String(selectedUsuarioFilter.id_usuario ?? selectedUsuarioFilter.id ?? "")
+      : "",
+    estado: "activo",
+  });
+  const perifericosOrdenados = sortOptions(perifericosDisponibles, (option) => option?.nombre);
+  const marcasOrdenadas = sortOptions(marcasDisponibles, (option) => option?.nombre);
+  const modelosOrdenados = sortOptions(modelosDisponibles, (option) => option?.nombre);
+  const seriesOrdenadas = sortOptions(seriesDisponibles, (option) => option?.nombre);
   const inventariosOrdenados = sortOptions(inventarios, (option) => option?.inventario);
-  const usuariosOrdenados = sortOptions(usuarios || [], (option) => {
+  const usuariosOrdenados = sortOptions(usuariosDisponibles || [], (option) => {
     const usuario = option as {
       nombre?: unknown;
       email?: unknown;
@@ -1439,9 +1461,7 @@ const Activos = () => {
               typeof option === "string" ? option : option?.nombre || ""
             }
             inputValue={inputPeriferico}
-            onInputChange={(_, newInputValue) => {
-              setInputPeriferico(newInputValue);
-            }}
+            onInputChange={(_, newInputValue) => setInputPeriferico(newInputValue)}
             onChange={(_, newValue) => {
               if (typeof newValue === "string") {
                 setInputPeriferico(newValue);

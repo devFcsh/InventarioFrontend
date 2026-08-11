@@ -12,11 +12,13 @@ import useMarcas from "@hooks/useMarcas";
 import useModelos from "@hooks/useModelos";
 import useSeries from "@hooks/useSeries";
 import { useInventario } from "@hooks/useInventario";
+import useUsuarios from "@hooks/useUsuarios";
 import { useSnackbar } from "@context/SnackbarContext";
 import { useSacarEquipoDeBaja } from "../hooks/useSacarEquipoDeBaja";
 import { useUser } from "@context/userContext";
 import Loader from "@pages/Loader";
 import { sortOptions } from "../../../../utils/sortOptions.ts";
+import { useEquiposFilterOptions } from "../../../../hooks/useEquiposFilterOptions.ts";
 
 const Bajas = () => {
   const [inputPeriferico, setInputPeriferico] = useState(() => {
@@ -33,6 +35,10 @@ const Bajas = () => {
   });
   const [inputInventario, setInputInventario] = useState(() => {
     return sessionStorage.getItem("bajas_filter_inventario") || "";
+  });
+  const [selectedUsuarioFilter, setSelectedUsuarioFilter] = useState<Record<string, unknown> | null>(() => {
+    const saved = sessionStorage.getItem("bajas_filter_usuario");
+    return saved ? JSON.parse(saved) : null;
   });
   const [openModalBajas, setOpenModalBajas] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -74,11 +80,41 @@ const Bajas = () => {
   const { modelos } = useModelos();
   const { series } = useSeries();
   const { inventarios } = useInventario();
-  const perifericosOrdenados = sortOptions(perifericos, (option) => option?.nombre);
-  const marcasOrdenadas = sortOptions(marcas, (option) => option?.nombre);
-  const modelosOrdenados = sortOptions(modelos, (option) => option?.nombre);
-  const seriesOrdenadas = sortOptions(series, (option) => option?.nombre);
+  const { usuarios } = useUsuarios();
+  const {
+    perifericosDisponibles,
+    marcasDisponibles,
+    modelosDisponibles,
+    seriesDisponibles,
+    usuariosDisponibles,
+  } = useEquiposFilterOptions({
+    perifericos,
+    marcas,
+    modelos,
+    series,
+    usuarios,
+    perifericoNombre: inputPeriferico,
+    marcaNombre: inputMarca,
+    modeloNombre: inputModelo,
+    serieNombre: inputSerie,
+    usuarioId: selectedUsuarioFilter
+      ? String(selectedUsuarioFilter.id_usuario ?? selectedUsuarioFilter.id ?? "")
+      : "",
+    estado: "baja",
+  });
+  const perifericosOrdenados = sortOptions(perifericosDisponibles, (option) => option?.nombre);
+  const marcasOrdenadas = sortOptions(marcasDisponibles, (option) => option?.nombre);
+  const modelosOrdenados = sortOptions(modelosDisponibles, (option) => option?.nombre);
+  const seriesOrdenadas = sortOptions(seriesDisponibles, (option) => option?.nombre);
   const inventariosOrdenados = sortOptions(inventarios, (option) => option?.inventario);
+  const usuariosOrdenados = sortOptions(usuariosDisponibles || [], (option) => {
+    const usuario = option as {
+      nombre?: unknown;
+      email?: unknown;
+      id_usuario?: unknown;
+    } | null;
+    return usuario?.nombre || usuario?.email || usuario?.id_usuario;
+  });
   const { useSacarEquipoDeBaja: sacarEquipoDeBaja } = useSacarEquipoDeBaja();
   const { rol } = useUser();
   const unableActionEditor = rol !== "administrador";
@@ -89,6 +125,9 @@ const Bajas = () => {
     modeloId: inputModelo || "",
     serieId: inputSerie || "",
     inventario: inputInventario || "",
+    usuarioId: selectedUsuarioFilter
+      ? String(selectedUsuarioFilter.id_usuario ?? selectedUsuarioFilter.id ?? "")
+      : "",
   };
   const { equiposBaja, totalCount, loading, error } = useEquiposBajaFiltrados(
     filtros,
@@ -143,6 +182,14 @@ const Bajas = () => {
   useEffect(() => {
     sessionStorage.setItem("bajas_filter_inventario", inputInventario);
   }, [inputInventario]);
+
+  useEffect(() => {
+    if (selectedUsuarioFilter) {
+      sessionStorage.setItem("bajas_filter_usuario", JSON.stringify(selectedUsuarioFilter));
+    } else {
+      sessionStorage.removeItem("bajas_filter_usuario");
+    }
+  }, [selectedUsuarioFilter]);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -397,9 +444,7 @@ const Bajas = () => {
               typeof option === "string" ? option : option?.nombre || ""
             }
             inputValue={inputPeriferico}
-            onInputChange={(_, newInputValue) => {
-              setInputPeriferico(newInputValue);
-            }}
+            onInputChange={(_, newInputValue) => setInputPeriferico(newInputValue)}
             onChange={(_, newValue) => {
               if (typeof newValue === "string") {
                 setInputPeriferico(newValue);
@@ -499,6 +544,28 @@ const Bajas = () => {
             }}
             renderInput={(params) => (
               <TextField {...params} label="Inventario" variant="outlined" />
+            )}
+            className="w-full"
+          />
+
+          <Autocomplete
+            size="small"
+            options={usuariosOrdenados}
+            getOptionLabel={(option) => {
+              if (typeof option === "string") return option;
+              const usuario = option as {
+                nombre?: unknown;
+                email?: unknown;
+                id_usuario?: unknown;
+              } | null;
+              return String(usuario?.nombre || usuario?.email || usuario?.id_usuario || "");
+            }}
+            value={selectedUsuarioFilter}
+            onChange={(_, newValue) =>
+              setSelectedUsuarioFilter(newValue as Record<string, unknown> | null)
+            }
+            renderInput={(params) => (
+              <TextField {...params} label="Usuario" variant="outlined" />
             )}
             className="w-full"
           />
