@@ -65,6 +65,7 @@ const Activos = () => {
   const [importResult, setImportResult] = useState<ImportarEquiposResultado | null>(null);
   const [openImportPreview, setOpenImportPreview] = useState(false);
   const [importPreview, setImportPreview] = useState<ImportPreviewData | null>(null);
+  const [importPreviewLoading, setImportPreviewLoading] = useState(false);
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
@@ -113,7 +114,11 @@ const Activos = () => {
   const { rol, user } = useUser();
   const unableAction = rol !== "administrador" && rol !== "editor";
   const unableActionEditor = rol !== "administrador";
-  const { importarEquiposActivos, loading: importLoading } =
+  const {
+    importarEquiposActivos,
+    previsualizarImportacion,
+    loading: importLoading,
+  } =
     useImportarEquipoActivo();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -791,8 +796,23 @@ const Activos = () => {
         sheets: workbook.SheetNames,
         equipment: equiposImportTodos,
         errors: errores,
+        mode: "solo_nuevos",
+        actualizables: [],
+        nuevos: equiposImportTodos,
+        conflictos: [],
       });
       setOpenImportPreview(true);
+      setImportPreviewLoading(true);
+      try {
+        const coincidencias = await previsualizarImportacion(equiposImportTodos);
+        setImportPreview((prev) =>
+          prev ? { ...prev, ...coincidencias } : prev
+        );
+      } catch {
+        showMessage("No se pudo consultar qué equipos ya existen", "warning");
+      } finally {
+        setImportPreviewLoading(false);
+      }
     };
     reader.readAsBinaryString(file);
   };
@@ -800,15 +820,20 @@ const Activos = () => {
   const cancelarImportacion = () => {
     setOpenImportPreview(false);
     setImportPreview(null);
+    setImportPreviewLoading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const confirmarImportacion = async () => {
-    if (!importPreview || importLoading) return;
+    if (!importPreview || importLoading || importPreviewLoading) return;
 
     setOpenImportPreview(false);
     try {
-      const resultado = await importarEquiposActivos(importPreview.equipment, user?.email);
+      const resultado = await importarEquiposActivos(
+        importPreview.equipment,
+        user?.email,
+        importPreview.mode
+      );
       setImportResult(resultado);
       setOpenImportResult(true);
 
@@ -2164,9 +2189,12 @@ const Activos = () => {
       <ImportPreviewDialog
         open={openImportPreview}
         preview={importPreview}
-        loading={importLoading}
+        loading={importLoading || importPreviewLoading}
         onCancel={cancelarImportacion}
         onConfirm={confirmarImportacion}
+        onModeChange={(mode) =>
+          setImportPreview((prev) => (prev ? { ...prev, mode } : prev))
+        }
       />
      <MantenimientoActivo
   open={openModalMantenimientos}

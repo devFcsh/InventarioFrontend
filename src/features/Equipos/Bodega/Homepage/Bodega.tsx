@@ -98,6 +98,7 @@ const Bodega = () => {
   const [importResult, setImportResult] = useState<ImportarEquiposResultado | null>(null);
   const [openImportPreview, setOpenImportPreview] = useState(false);
   const [importPreview, setImportPreview] = useState<ImportPreviewData | null>(null);
+  const [importPreviewLoading, setImportPreviewLoading] = useState(false);
 
   const { showMessage } = useSnackbar();
   const [shouldFetch, setShouldFetch] = useState<boolean>(true);
@@ -132,7 +133,11 @@ const Bodega = () => {
 
   const { darDeBajaEquipo } = useDarDeBajaEquipo();
   const { fetchTodosEquipos } = useExportarEquiposBodega();
-  const { importarEquiposBodega, loading: importLoading } = useImportarEquipoBodega();
+  const {
+    importarEquiposBodega,
+    previsualizarImportacion,
+    loading: importLoading,
+  } = useImportarEquipoBodega();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { rol, user } = useUser();
@@ -716,8 +721,23 @@ const Bodega = () => {
         sheets: workbook.SheetNames,
         equipment: equiposImportTodos,
         errors: errores,
+        mode: "solo_nuevos",
+        actualizables: [],
+        nuevos: equiposImportTodos,
+        conflictos: [],
       });
       setOpenImportPreview(true);
+      setImportPreviewLoading(true);
+      try {
+        const coincidencias = await previsualizarImportacion(equiposImportTodos);
+        setImportPreview((prev) =>
+          prev ? { ...prev, ...coincidencias } : prev
+        );
+      } catch {
+        showMessage("No se pudo consultar qué equipos ya existen", "warning");
+      } finally {
+        setImportPreviewLoading(false);
+      }
     };
     reader.readAsBinaryString(file);
   };
@@ -725,15 +745,20 @@ const Bodega = () => {
   const cancelarImportacion = () => {
     setOpenImportPreview(false);
     setImportPreview(null);
+    setImportPreviewLoading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const confirmarImportacion = async () => {
-    if (!importPreview || importLoading) return;
+    if (!importPreview || importLoading || importPreviewLoading) return;
 
     setOpenImportPreview(false);
     try {
-      const resultado = await importarEquiposBodega(importPreview.equipment, user?.email);
+      const resultado = await importarEquiposBodega(
+        importPreview.equipment,
+        user?.email,
+        importPreview.mode
+      );
       setImportResult(resultado);
       setOpenImportResult(true);
 
@@ -1619,9 +1644,12 @@ const Bodega = () => {
       <ImportPreviewDialog
         open={openImportPreview}
         preview={importPreview}
-        loading={importLoading}
+        loading={importLoading || importPreviewLoading}
         onCancel={cancelarImportacion}
         onConfirm={confirmarImportacion}
+        onModeChange={(mode) =>
+          setImportPreview((prev) => (prev ? { ...prev, mode } : prev))
+        }
       />
     </div>
   );

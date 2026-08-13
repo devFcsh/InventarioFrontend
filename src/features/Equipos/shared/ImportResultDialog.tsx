@@ -11,11 +11,14 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
+import DownloadIcon from "@mui/icons-material/Download";
+import * as XLSX from "xlsx";
 
 type ImportResultItem = {
   inventario?: string;
+  equipoId?: number | string;
   motivo: string;
-  datos?: {
+  datos?: Record<string, unknown> & {
     filaExcel?: number | string;
     hojaExcel?: string;
     serie?: string;
@@ -27,11 +30,13 @@ type ImportResult = {
   resumen?: {
     totalProcesados: number;
     registrados: number;
+    actualizados: number;
     noRegistrados: number;
     equiposAgregados: number;
     seInsertaronNuevos: boolean;
   };
   noRegistrados?: ImportResultItem[];
+  actualizados?: ImportResultItem[];
   advertencias?: ImportResultItem[];
 };
 
@@ -55,6 +60,46 @@ const ImportResultDialog = ({
   const hasErrors = (result.noRegistrados?.length ?? 0) > 0;
   const hasWarnings = (result.advertencias?.length ?? 0) > 0;
 
+  const descargarReporte = () => {
+    const errores = (result.noRegistrados ?? []).map((item) => ({
+      "Tipo de problema": "No importado",
+      Inventario: item.inventario ?? "",
+      Serie: item.datos?.serie ?? "",
+      "Hoja Excel": item.datos?.hojaExcel ?? "",
+      "Fila Excel": item.datos?.filaExcel ?? "",
+      Motivo: item.motivo,
+      "Datos del registro": JSON.stringify(item.datos ?? {}, null, 2),
+    }));
+
+    const advertencias = (result.advertencias ?? []).map((item) => ({
+      "Tipo de problema": "Advertencia",
+      Inventario: item.inventario ?? "",
+      Serie: item.datos?.serie ?? "",
+      "Hoja Excel": item.datos?.hojaExcel ?? "",
+      "Fila Excel": item.datos?.filaExcel ?? "",
+      Motivo: item.motivo,
+      "Datos del registro": JSON.stringify(item.datos ?? {}, null, 2),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet([...errores, ...advertencias]);
+    worksheet["!cols"] = [
+      { wch: 20 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 12 },
+      { wch: 55 },
+      { wch: 80 },
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte");
+    XLSX.writeFile(
+      workbook,
+      `reporte_importacion_${new Date().toISOString().slice(0, 10)}.xlsx`
+    );
+  };
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>{title}</DialogTitle>
@@ -77,11 +122,24 @@ const ImportResultDialog = ({
               Registrados: {result.resumen.registrados}
             </Typography>
             <Typography variant="body2">
+              Actualizados: {result.resumen.actualizados}
+            </Typography>
+            <Typography variant="body2">
               No registrados: {result.resumen.noRegistrados}
             </Typography>
             <Typography variant="body2" sx={{ mb: 2 }}>
               Equipos agregados: {result.resumen.equiposAgregados}
             </Typography>
+            {hasErrors || hasWarnings ? (
+              <Button
+                variant="outlined"
+                startIcon={<DownloadIcon />}
+                onClick={descargarReporte}
+                sx={{ mb: 1 }}
+              >
+                Descargar reporte de errores
+              </Button>
+            ) : null}
           </>
         ) : null}
 
@@ -127,6 +185,30 @@ const ImportResultDialog = ({
                   />
                 </ListItem>
               ))}
+            </List>
+          </>
+        ) : null}
+
+        {(result.actualizados?.length ?? 0) > 0 ? (
+          <>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+              Equipos actualizados
+            </Typography>
+            <List dense sx={{ maxHeight: 280, overflowY: "auto" }}>
+              {result.actualizados?.map((item, index) => {
+                const fila = item.datos?.filaExcel;
+                const hoja = item.datos?.hojaExcel;
+                const origen = fila || hoja ? ` | ${hoja ?? "Hoja desconocida"}, fila ${fila ?? "?"}` : "";
+                return (
+                  <ListItem key={`${item.equipoId ?? item.inventario ?? "actualizado"}-${index}`} disableGutters>
+                    <ListItemText
+                      primary={`Inventario: ${item.inventario || "S/N"} | ID: ${item.equipoId ?? "desconocido"}${origen}`}
+                      secondary={item.motivo}
+                    />
+                  </ListItem>
+                );
+              })}
             </List>
           </>
         ) : null}

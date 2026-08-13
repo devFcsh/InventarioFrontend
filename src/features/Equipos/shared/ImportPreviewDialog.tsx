@@ -6,18 +6,27 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
+  FormControl,
+  InputLabel,
   List,
   ListItem,
   ListItemText,
+  MenuItem,
+  Select,
   Typography,
 } from "@mui/material";
 import type { ActivoComputadoraImport } from "../../../types/Activo/index.ts";
+import type { ImportMatchItem, ImportMode } from "./importTypes.ts";
 
 export type ImportPreviewData = {
   fileName: string;
   sheets: string[];
   equipment: ActivoComputadoraImport[];
   errors: string[];
+  mode: ImportMode;
+  actualizables: ImportMatchItem[];
+  nuevos: ActivoComputadoraImport[];
+  conflictos: ImportMatchItem[];
 };
 
 interface ImportPreviewDialogProps {
@@ -26,6 +35,7 @@ interface ImportPreviewDialogProps {
   loading?: boolean;
   onCancel: () => void;
   onConfirm: () => void;
+  onModeChange: (mode: ImportMode) => void;
 }
 
 const ImportPreviewDialog = ({
@@ -34,6 +44,7 @@ const ImportPreviewDialog = ({
   loading = false,
   onCancel,
   onConfirm,
+  onModeChange,
 }: ImportPreviewDialogProps) => {
   if (!preview) return null;
 
@@ -47,6 +58,12 @@ const ImportPreviewDialog = ({
   );
 
   const hasErrors = preview.errors.length > 0;
+  const modeLabel =
+    preview.mode === "solo_nuevos"
+      ? "Solo insertar nuevos"
+      : preview.mode === "solo_actualizar"
+      ? "Solo actualizar existentes"
+      : "Insertar nuevos y actualizar existentes";
 
   return (
     <Dialog open={open} onClose={loading ? undefined : onCancel} fullWidth maxWidth="sm">
@@ -61,6 +78,61 @@ const ImportPreviewDialog = ({
         <Typography variant="body2" sx={{ mb: 2 }}>
           Registros listos para importar: <strong>{preview.equipment.length}</strong>
         </Typography>
+
+        <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+          <InputLabel id="import-mode-label">Modo de importación</InputLabel>
+          <Select
+            labelId="import-mode-label"
+            value={preview.mode}
+            label="Modo de importación"
+            onChange={(event) => onModeChange(event.target.value as ImportMode)}
+            disabled={loading}
+          >
+            <MenuItem value="solo_nuevos">Solo insertar nuevos</MenuItem>
+            <MenuItem value="solo_actualizar">Solo actualizar existentes</MenuItem>
+            <MenuItem value="nuevos_y_actualizar">
+              Insertar nuevos y actualizar existentes
+            </MenuItem>
+          </Select>
+        </FormControl>
+
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Modo seleccionado: <strong>{modeLabel}</strong>
+        </Alert>
+
+        {preview.actualizables.length > 0 ? (
+          <>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+              Equipos que coinciden y podrían actualizarse: {preview.actualizables.length}
+            </Typography>
+            <List dense sx={{ maxHeight: 180, overflowY: "auto" }}>
+              {preview.actualizables.map((item, index) => (
+                <ListItem key={`${item.equipoId ?? item.inventario}-${index}`} disableGutters>
+                  <ListItemText
+                    primary={`Inventario: ${item.inventario || "S/N"} | Serie: ${item.serie || "S/N"}`}
+                    secondary={`ID actual: ${item.equipoId ?? "desconocido"}`}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </>
+        ) : null}
+
+        {preview.nuevos.length > 0 ? (
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            Sin coincidencia en la base de datos: <strong>{preview.nuevos.length}</strong>
+            {preview.mode === "solo_actualizar"
+              ? " (no se actualizarán en este modo)."
+              : " (se pueden insertar como nuevos)."}
+          </Typography>
+        ) : null}
+
+        {preview.conflictos.length > 0 ? (
+          <Alert severity="warning" sx={{ mt: 2 }}>
+            Hay {preview.conflictos.length} conflicto(s) de inventario/serie. No se actualizarán
+            automáticamente.
+          </Alert>
+        ) : null}
 
         {hasErrors ? (
           <Alert severity="error" sx={{ mb: 2 }}>
