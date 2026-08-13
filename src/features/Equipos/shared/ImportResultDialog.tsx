@@ -17,7 +17,7 @@ import * as XLSX from "xlsx";
 type ImportResultItem = {
   inventario?: string;
   equipoId?: number | string;
-  motivo: string;
+  motivo?: string;
   datos?: Record<string, unknown> & {
     filaExcel?: number | string;
     hojaExcel?: string;
@@ -35,6 +35,7 @@ type ImportResult = {
     equiposAgregados: number;
     seInsertaronNuevos: boolean;
   };
+  registrados?: ImportResultItem[];
   noRegistrados?: ImportResultItem[];
   actualizados?: ImportResultItem[];
   advertencias?: ImportResultItem[];
@@ -59,41 +60,62 @@ const ImportResultDialog = ({
 
   const hasErrors = (result.noRegistrados?.length ?? 0) > 0;
   const hasWarnings = (result.advertencias?.length ?? 0) > 0;
+  const hasNewRecords = (result.registrados?.length ?? 0) > 0;
+  const hasUpdatedRecords = (result.actualizados?.length ?? 0) > 0;
+  const hasReportData = hasNewRecords || hasUpdatedRecords || hasErrors || hasWarnings;
 
   const descargarReporte = () => {
-    const errores = (result.noRegistrados ?? []).map((item) => ({
-      "Tipo de problema": "No importado",
-      Inventario: item.inventario ?? "",
-      Serie: item.datos?.serie ?? "",
-      "Hoja Excel": item.datos?.hojaExcel ?? "",
-      "Fila Excel": item.datos?.filaExcel ?? "",
-      Motivo: item.motivo,
-      "Datos del registro": JSON.stringify(item.datos ?? {}, null, 2),
-    }));
-
-    const advertencias = (result.advertencias ?? []).map((item) => ({
-      "Tipo de problema": "Advertencia",
-      Inventario: item.inventario ?? "",
-      Serie: item.datos?.serie ?? "",
-      "Hoja Excel": item.datos?.hojaExcel ?? "",
-      "Fila Excel": item.datos?.filaExcel ?? "",
-      Motivo: item.motivo,
-      "Datos del registro": JSON.stringify(item.datos ?? {}, null, 2),
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet([...errores, ...advertencias]);
-    worksheet["!cols"] = [
-      { wch: 20 },
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 18 },
-      { wch: 12 },
-      { wch: 55 },
-      { wch: 80 },
+    const headers = [
+      "Estado",
+      "Inventario",
+      "Serie",
+      "Tipo",
+      "Equipo ID",
+      "Hoja Excel",
+      "Fila Excel",
+      "Motivo",
+      "Datos del registro",
     ];
-
+    const toRow = (estado: string, item: ImportResultItem) => [
+      estado,
+      item.inventario ?? "",
+      item.datos?.serie ?? "",
+      String(item.datos?.tipo ?? ""),
+      String(item.equipoId ?? ""),
+      String(item.datos?.hojaExcel ?? ""),
+      String(item.datos?.filaExcel ?? ""),
+      item.motivo ?? "",
+      JSON.stringify(item.datos ?? {}, null, 2),
+    ];
+    const nuevos = (result.registrados ?? []).map((item) =>
+      toRow("Agregado nuevo", item)
+    );
+    const actualizados = (result.actualizados ?? []).map((item) =>
+      toRow("Actualizado", item)
+    );
+    const errores = [
+      ...(result.noRegistrados ?? []).map((item) => toRow("Error", item)),
+      ...(result.advertencias ?? []).map((item) => toRow("Advertencia", item)),
+    ];
+    const crearHoja = (rows: string[][]) => {
+      const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+      worksheet["!cols"] = [
+        { wch: 18 },
+        { wch: 18 },
+        { wch: 18 },
+        { wch: 20 },
+        { wch: 12 },
+        { wch: 18 },
+        { wch: 12 },
+        { wch: 55 },
+        { wch: 80 },
+      ];
+      return worksheet;
+    };
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte");
+    XLSX.utils.book_append_sheet(workbook, crearHoja(nuevos), "Agregados nuevos");
+    XLSX.utils.book_append_sheet(workbook, crearHoja(actualizados), "Actualizados");
+    XLSX.utils.book_append_sheet(workbook, crearHoja(errores), "Errores");
     XLSX.writeFile(
       workbook,
       `reporte_importacion_${new Date().toISOString().slice(0, 10)}.xlsx`
@@ -130,14 +152,14 @@ const ImportResultDialog = ({
             <Typography variant="body2" sx={{ mb: 2 }}>
               Equipos agregados: {result.resumen.equiposAgregados}
             </Typography>
-            {hasErrors || hasWarnings ? (
+            {hasReportData ? (
               <Button
                 variant="outlined"
                 startIcon={<DownloadIcon />}
                 onClick={descargarReporte}
                 sx={{ mb: 1 }}
               >
-                Descargar reporte de errores
+                Descargar reporte de importación
               </Button>
             ) : null}
           </>
