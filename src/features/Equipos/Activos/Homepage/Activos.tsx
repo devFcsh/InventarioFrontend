@@ -422,6 +422,19 @@ const Activos = () => {
     return columnas.includes("serie equipo principal") && columnas.includes("inventario equipo principal");
   };
 
+  const esFilaExcelVacia = (row: unknown) =>
+    Object.values((row ?? {}) as Record<string, unknown>).every(
+      (value) => String(value ?? "").trim() === ""
+    );
+
+  const normalizarAsignacionImportacion = (value: unknown, fallback: string) => {
+    const text = String(value ?? "").trim();
+    const compact = text.replace(/\s+/g, "").toUpperCase();
+    return !text || compact === "S/N" || compact === "SN" || compact === "N/A" || compact === "NA"
+      ? fallback
+      : text;
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function transformarFilaExcel(row: any, filaExcel: number) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -514,6 +527,8 @@ const Activos = () => {
       mac: normalize(row["MAC"]),
       puertos: normalize(row["Puertos"]),
       puerto_ftp: normalize(row["Puertos FTP"]),
+      usuario: normalizarAsignacionImportacion(row["Usuario"], "Por Asignar"),
+      uso: normalizarAsignacionImportacion(row["Uso"], "Por Asignar"),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
       empresa: normalize(row["Empresa"]),
     };
@@ -543,6 +558,8 @@ const Activos = () => {
       modelo: normalize(row["Modelo"]),
       serie: normalize(row["Serie"]),
       mac: normalize(row["MAC"]),
+      usuario: normalizarAsignacionImportacion(row["Usuario"], "Por Asignar"),
+      uso: normalizarAsignacionImportacion(row["Uso"], "Por Asignar"),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
       empresa: normalize(row["Empresa"]),
     };
@@ -572,6 +589,8 @@ const Activos = () => {
       serie: normalize(row["Serie"]),
       lampara: normalize(row["Lámpara"]),
       categoria: normalize(row["Categoria"]),
+      usuario: normalizarAsignacionImportacion(row["Usuario"], "Por Asignar"),
+      uso: normalizarAsignacionImportacion(row["Uso"], "Por Asignar"),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
       empresa: normalize(row["Empresa"]),
     };
@@ -598,8 +617,8 @@ const Activos = () => {
       serie: normalize(row["Serie"]),
       modelo: normalize(row["Modelo"]),
       marca: normalize(row["Marca"]),
-      uso: normalize(row["Uso"]),
-      usuario: normalize(row["Usuario"]),
+      uso: normalizarAsignacionImportacion(row["Uso"], "Por Asignar"),
+      usuario: normalizarAsignacionImportacion(row["Usuario"], "Por Asignar"),
       edificio: normalize(row["Edificio"]),
       ubicacion: normalize(ubicacion),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
@@ -749,7 +768,9 @@ const Activos = () => {
 
       if (workbook.SheetNames.includes("Equipos Simples")) {
         const worksheet = workbook.Sheets["Equipos Simples"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+        const jsonData = XLSX.utils
+          .sheet_to_json(worksheet, { defval: "" })
+          .filter((row) => !esFilaExcelVacia(row));
 
         if (jsonData && jsonData.length > 0) {
           if (esFormatoImpresoras(jsonData)) {

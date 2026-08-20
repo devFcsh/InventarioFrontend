@@ -27,6 +27,14 @@ export const normalizeImportValue = (value: unknown) => {
   return String(value).trim();
 };
 
+export const normalizeAssignmentValue = (value: unknown) => {
+  if (!hasRealExcelValue(value)) {
+    return "Por Asignar";
+  }
+
+  return String(value).trim();
+};
+
 const normalizeExcelHeader = (value: unknown) =>
   String(value ?? "")
     .trim()
@@ -224,8 +232,8 @@ export const transformComputadoraRow = (
     serie: normalizeImportValue(row["Serie CPU"]),
     modelo: normalizeImportValue(row["Modelo Case"]),
     marca: normalizeImportValue(row["Marca Case"]),
-    usuario: normalizeImportValue(row["Usuario"]),
-    uso: normalizeImportValue(row["Uso"]),
+    usuario: normalizeAssignmentValue(row["Usuario"]),
+    uso: normalizeAssignmentValue(row["Uso"]),
     edificio: normalizeImportValue(row["Edificio"]),
     ubicacion,
     empresa: normalizeImportValue(row["Empresa"]),
@@ -262,8 +270,8 @@ export const transformUpsRow = (
   serie: normalizeImportValue(getImportRowValue(row, "Serie")),
   modelo: normalizeImportValue(getImportRowValue(row, "Modelo")),
   marca: normalizeImportValue(getImportRowValue(row, "Marca")),
-  usuario: "Por Asignar",
-  uso: "Por Asignar",
+  usuario: normalizeAssignmentValue(getImportRowValue(row, "Usuario")),
+  uso: normalizeAssignmentValue(getImportRowValue(row, "Uso")),
   edificio: normalizeImportValue(getImportRowValue(row, "Edificio")),
   ubicacion: normalizeImportValue(getImportRowValue(row, "Referencia")),
   empresa: normalizeImportValue(getImportRowValue(row, "Empresa")),
@@ -296,8 +304,8 @@ export const transformImpresoraRow = (
     ),
     modelo: normalizeImportValue(getImportRowValue(row, "Modelo")),
     marca: normalizeImportValue(getImportRowValue(row, "Marca")),
-    usuario: "Por Asignar",
-    uso: "Por Asignar",
+    usuario: normalizeAssignmentValue(getImportRowValue(row, "Usuario")),
+    uso: normalizeAssignmentValue(getImportRowValue(row, "Uso")),
     edificio: normalizeImportValue(
       getImportRowValue(row, "Bloque", "Edificio")
     ),
@@ -329,8 +337,8 @@ export const transformCamaraRow = (
   serie: normalizeImportValue(getImportRowValue(row, "Serie")),
   modelo: normalizeImportValue(getImportRowValue(row, "Modelo")),
   marca: normalizeImportValue(getImportRowValue(row, "Marca")),
-  usuario: normalizeImportValue(getImportRowValue(row, "Usuario")),
-  uso: normalizeImportValue(getImportRowValue(row, "Uso")),
+  usuario: normalizeAssignmentValue(getImportRowValue(row, "Usuario")),
+  uso: normalizeAssignmentValue(getImportRowValue(row, "Uso")),
   edificio: normalizeImportValue(getImportRowValue(row, "Edificio")),
   ubicacion: pickExcelLocation(
     getImportRowValue(row, "Oficina"),
@@ -361,13 +369,13 @@ export const downloadImportTemplate = (
             "Marca Case", "Modelo Case", "Serie CPU", "Marca monitor", "Modelo monitor", "Serie monitor", "Marca teclado", "Modelo teclado", "Serie teclado",
             "Marca mouse", "Modelo mouse", "Serie mouse", "Inventario CPU", "Inventario Monitor", "Inventario Teclado", "Inventario Mouse", "Observación",
           ],
-          Proyector: ["N°", "Año Adq", "Empresa", "Inventario", "Bloque", "Ubicación", "Marca", "Modelo", "Serie", "Categoría", "Lámpara", "Estado", "Observación"],
-          AccessPoint: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Bloque", "Ubicación", "Marca", "Modelo", "Serie", "MAC", "Estado", "Observación"],
-          Switch: ["Año Adq", "Empresa", "Nombre", "Inventario", "Bloque", "Ubicación", "Marca", "Modelo", "Serie", "MAC", "Puertos", "Puertos FTP", "Observación"],
+          Proyector: ["N°", "Año Adq", "Empresa", "Inventario", "Bloque", "Ubicación", "Usuario", "Uso", "Marca", "Modelo", "Serie", "Categoría", "Lámpara", "Estado", "Observación"],
+          AccessPoint: ["N°", "Año Adq", "Empresa", "Nombre", "Inventario", "Bloque", "Ubicación", "Usuario", "Uso", "Marca", "Modelo", "Serie", "MAC", "Estado", "Observación"],
+          Switch: ["Año Adq", "Empresa", "Nombre", "Inventario", "Bloque", "Ubicación", "Usuario", "Uso", "Marca", "Modelo", "Serie", "MAC", "Puertos", "Puertos FTP", "Observación"],
           "Equipos Simples": ["Id", "Edificio", "No. Aula", "Oficina", "Usuario", "Uso", "Tipo", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Serie Equipo Principal", "Observación"],
           "Cámara": ["Tipo", "Edificio", "No. Aula", "Oficina", "Usuario", "Uso", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Serie Equipo Principal", "Inventario Equipo Principal", "Observación"],
-          Impresora: ["Tipo", "Empresa", "Inventario", "Bloque", "Ubicación-Referencia", "Nombre-Etiqueta", "Año Adq", "Marca", "Modelo", "Nº Serie", "IP", "Observación"],
-          UPS: ["Tipo", "Edificio", "Referencia", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Observación"],
+          Impresora: ["Tipo", "Empresa", "Inventario", "Bloque", "Ubicación-Referencia", "Usuario", "Uso", "Nombre-Etiqueta", "Año Adq", "Marca", "Modelo", "Nº Serie", "IP", "Observación"],
+          UPS: ["Tipo", "Edificio", "Referencia", "Usuario", "Uso", "Empresa", "Año Adq", "Marca", "Modelo", "Serie", "Inventario", "Observación"],
         }
       : {
           Computadora: [
