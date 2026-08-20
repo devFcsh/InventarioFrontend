@@ -11,6 +11,8 @@ const compactValue = (value: unknown) =>
   String(value ?? "")
     .trim()
     .replace(/\s+/g, "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toUpperCase();
 
 export const hasRealExcelValue = (value: unknown) => {
@@ -62,7 +64,8 @@ export const getImportRowValue = (
 
 export const isValidPrinterImportType = (row: ExcelRow) => {
   const value = getImportRowValue(row, "Tipo");
-  return value === undefined || compactValue(value) === "IMPRESORA";
+  const tipo = compactValue(value);
+  return value === undefined || tipo === "IMPRESORA" || tipo === "IMPRESORAS";
 };
 
 export const isValidCameraImportType = (row: ExcelRow) => {
