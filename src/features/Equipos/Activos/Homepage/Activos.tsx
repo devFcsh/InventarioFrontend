@@ -1461,11 +1461,13 @@ const Activos = () => {
     }
   };
 
+  const checkboxColumnWidth = selectedItems.length > 0 ? "6rem" : "4rem";
+
   return (
-    <div className="flex flex-col p-4">
+    <div className="flex min-w-0 w-full max-w-full flex-col p-2 sm:p-4">
       <div className="mb-4">
-        <div className="flex gap-2 items-center">
-          <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <h1 className="my-4 text-xl font-bold sm:my-5 sm:text-2xl">Consulta de Activos</h1>
           {unableAction ? (
             <span>
               <Icon
@@ -1498,7 +1500,7 @@ const Activos = () => {
             steps={[]}
           />
         </div>
-        <div className="grid gap-4 my-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="my-6 grid min-w-0 grid-cols-1 gap-4 sm:my-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           <Autocomplete
             size="small"
             freeSolo
@@ -1518,7 +1520,7 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Periférico" variant="outlined" />
             )}
-            className="w-full"
+            className="w-full min-w-0"
           />
 
           <Autocomplete
@@ -1540,7 +1542,7 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Marca" variant="outlined" />
             )}
-            className="w-full"
+            className="w-full min-w-0"
           />
 
           <Autocomplete
@@ -1562,7 +1564,7 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Modelo" variant="outlined" />
             )}
-            className="w-full"
+            className="w-full min-w-0"
           />
 
           <Autocomplete
@@ -1584,7 +1586,7 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Serie" variant="outlined" />
             )}
-            className="w-full"
+            className="w-full min-w-0"
           />
 
           <Autocomplete
@@ -1608,7 +1610,7 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Inventario" variant="outlined" />
             )}
-            className="w-full"
+            className="w-full min-w-0"
           />
 
           <Autocomplete
@@ -1625,9 +1627,9 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Usuario" variant="outlined" />
             )}
-            className="w-full"
+            className="w-full min-w-0"
           />
-            <div className="flex items-end gap-2">
+            <div className="flex w-full min-w-0 flex-col items-stretch gap-2 sm:flex-row sm:items-end">
               <Autocomplete
                 size="small"
                 disablePortal
@@ -1638,10 +1640,10 @@ const Activos = () => {
                   <TextField {...params} label="Filas" variant="outlined" />
                 )}
                 value={filas.find((option) => option.id === rowsPerPage)}
-                className="w-1/2"
+                className="w-full min-w-0 sm:w-1/2"
               />
               <button
-                className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-1/2"
+                className="w-full rounded bg-blue-600 p-2 text-white hover:bg-blue-700 sm:w-1/2"
                 onClick={handleBuscar}
               >
                 Buscar
@@ -1649,7 +1651,7 @@ const Activos = () => {
             </div>
         </div>
       </div>
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <div className="relative min-w-0 w-full max-w-full overflow-x-auto shadow-md sm:rounded-lg">
         {loading ? (
           <Loader />
         ) : error ? (
@@ -1662,11 +1664,18 @@ const Activos = () => {
           </>
         ) : (
           <>
-            <table className="w-full text-left text-sm text-gray-500">
-              <thead className="text-xs uppercase bg-gray-50 text-gray-700">
+            <table className="w-full min-w-[1200px] table-auto text-left text-xs text-gray-500 2xl:min-w-[1500px] 2xl:text-sm">
+              <colgroup>
+                <col style={{ width: checkboxColumnWidth }} />
+              </colgroup>
+              <thead className="bg-gray-50 text-[10px] uppercase text-gray-700 2xl:text-xs">
                 <tr>
-                  <th scope="col" className="px-4 py-3 min-w-16">
-                    <div className="flex items-center gap-2">
+                  <th
+                    scope="col"
+                    className="w-16 max-w-16 min-w-16 px-2 py-3"
+                    style={{ width: checkboxColumnWidth }}
+                  >
+                    <div className="flex items-center gap-1 whitespace-nowrap">
                       <Tooltip title="Seleccionar todos">
                         <input
                           type="checkbox"
@@ -1844,7 +1853,7 @@ const Activos = () => {
                   </th>
                   {rol === "administrador" && (
                     <>
-                      <th scope="col" className="px-4 py-3 w-8">
+                      <th scope="col" className="w-8 px-4 py-3">
                         <button type="button" onClick={() => toggleSort("autor")} className="flex items-center gap-1">
                           Autor {sortBy === "autor" ? (
                             sortDir === "asc" ? (
@@ -1857,7 +1866,7 @@ const Activos = () => {
                           )}
                         </button>
                       </th>
-                      <th scope="col" className="px-4 py-3 w-8">
+                      <th scope="col" className="w-8 px-4 py-3">
                         <button type="button" onClick={() => toggleSort("editor")} className="flex items-center gap-1">
                           Editor {sortBy === "editor" ? (
                             sortDir === "asc" ? (
@@ -1870,7 +1879,7 @@ const Activos = () => {
                           )}
                         </button>
                       </th>
-                      <th scope="col" className="px-4 py-3 w-40">
+                      <th scope="col" className="w-40 px-4 py-3">
                         <button type="button" onClick={() => toggleSort("fecha_creacion")} className="flex items-center gap-1">
                           Fecha Creación {sortBy === "fecha_creacion" ? (
                             sortDir === "asc" ? (
@@ -1896,7 +1905,10 @@ const Activos = () => {
                     key={equipo.id_equipo}
                     className="bg-white border-b hover:bg-gray-50"
                   >
-                    <td className="px-4 py-2">
+                    <td
+                      className="w-16 max-w-16 min-w-16 px-2 py-2"
+                      style={{ width: checkboxColumnWidth }}
+                    >
                       <input
                         type="checkbox"
                         checked={selectedItems.includes(equipo.id_equipo)}
@@ -1914,9 +1926,9 @@ const Activos = () => {
                     <td className="px-4 py-2 w-36">{equipo.edificio}</td>
                     {rol === "administrador" && (
                       <>
-                        <td className="px-4 py-2 w-8">{equipo.autor || "-"}</td>
-                        <td className="px-4 py-2 w-8">{equipo.editor || "-"}</td>
-                        <td className="px-4 py-2 w-40">
+                        <td className="w-8 px-4 py-2">{equipo.autor || "-"}</td>
+                        <td className="w-8 px-4 py-2">{equipo.editor || "-"}</td>
+                        <td className="w-40 px-4 py-2">
                           {equipo.fecha_creacion 
                             ? new Date(equipo.fecha_creacion).toLocaleString("es-ES", {
                                 year: "numeric",
@@ -2095,7 +2107,7 @@ const Activos = () => {
         )}
         
         <nav
-          className="flex flex-col md:flex-row justify-between items-center p-4"
+          className="flex flex-col items-center justify-between gap-4 p-3 sm:p-4 md:flex-row"
           aria-label="Table navigation"
         >
           <div className="flex items-center gap-2">
@@ -2130,8 +2142,8 @@ const Activos = () => {
             </Tooltip>
           </div>
           {!loading && !error && equipos.length > 0 && (
-            <div className="flex flex-col md:flex-row items-center gap-2">
-              <ul className="inline-flex items-center -space-x-px">
+            <div className="flex max-w-full flex-col items-center gap-2 sm:flex-row">
+              <ul className="inline-flex max-w-full items-center -space-x-px">
                 <li>
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
@@ -2150,7 +2162,7 @@ const Activos = () => {
                   </button>
                 </li>
                 <li>
-                  <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
+                  <div className="flex items-center justify-center whitespace-nowrap border border-gray-300 bg-white px-3 py-2 text-sm leading-tight text-gray-900 sm:px-5">
                     Página {currentPage} de {totalPages}
                   </div>
                 </li>
