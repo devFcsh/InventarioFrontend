@@ -138,11 +138,7 @@ const ImportPreviewDialog = ({
           <Alert severity="error" sx={{ mb: 2 }}>
             El archivo tiene errores de formato. Corrígelos antes de confirmar la importación.
           </Alert>
-        ) : (
-          <Alert severity="info" sx={{ mb: 2 }}>
-            Todavía no se ha guardado ningún registro. Las columnas que no se encuentren en el formato de importación serán ignoradas.
-          </Alert>
-        )}
+        ) : null}
 
         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
           Resumen por tipo
