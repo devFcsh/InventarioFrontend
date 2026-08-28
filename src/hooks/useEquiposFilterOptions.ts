@@ -13,8 +13,24 @@ type EquiposFilterOptionsParams = {
   modeloNombre: string;
   serieNombre: string;
   usuarioId?: string;
-  estado?: "activo" | "baja";
+  estado?: "activo" | "bodega" | "baja";
 };
+
+type RelatedOptions = {
+  perifericos: Periferico[];
+  marcas: Marca[];
+  modelos: Modelo[];
+  series: Serie[];
+  usuarios: Usuario[];
+};
+
+const opcionesVacias = (): RelatedOptions => ({
+  perifericos: [],
+  marcas: [],
+  modelos: [],
+  series: [],
+  usuarios: [],
+});
 
 export const useEquiposFilterOptions = ({
   perifericos,
@@ -25,7 +41,6 @@ export const useEquiposFilterOptions = ({
   marcaNombre,
   modeloNombre,
   serieNombre,
-  usuarios = [],
   usuarioId = "",
   estado,
 }: EquiposFilterOptionsParams) => {
@@ -51,21 +66,11 @@ export const useEquiposFilterOptions = ({
   const modeloId = modeloSeleccionado?.id_modelo || "";
   const serieId = serieSeleccionada?.id_serie || "";
 
-  const [relatedOptions, setRelatedOptions] = useState<{
-    perifericos: Periferico[];
-    marcas: Marca[];
-    modelos: Modelo[];
-    series: Serie[];
-    usuarios: Usuario[];
-  } | null>(null);
+  const [relatedOptions, setRelatedOptions] = useState<RelatedOptions>(opcionesVacias);
 
   useEffect(() => {
-    if (!perifericoId && !marcaId && !modeloId && !serieId && !usuarioId) {
-      setRelatedOptions(null);
-      return;
-    }
-
     let cancelled = false;
+    setRelatedOptions(opcionesVacias());
 
     const fetchRelatedOptions = async () => {
       try {
@@ -90,7 +95,7 @@ export const useEquiposFilterOptions = ({
           });
         }
       } catch {
-        if (!cancelled) setRelatedOptions(null);
+        if (!cancelled) setRelatedOptions(opcionesVacias());
       }
     };
 
@@ -102,10 +107,10 @@ export const useEquiposFilterOptions = ({
   }, [perifericoId, marcaId, modeloId, serieId, usuarioId, estado]);
 
   return {
-    perifericosDisponibles: relatedOptions?.perifericos ?? perifericos,
-    marcasDisponibles: relatedOptions?.marcas ?? marcas,
-    modelosDisponibles: relatedOptions?.modelos ?? modelos,
-    seriesDisponibles: relatedOptions?.series ?? series,
-    usuariosDisponibles: relatedOptions?.usuarios ?? usuarios,
+    perifericosDisponibles: relatedOptions.perifericos,
+    marcasDisponibles: relatedOptions.marcas,
+    modelosDisponibles: relatedOptions.modelos,
+    seriesDisponibles: relatedOptions.series,
+    usuariosDisponibles: relatedOptions.usuarios,
   };
 };

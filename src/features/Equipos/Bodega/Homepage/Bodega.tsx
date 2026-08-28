@@ -124,6 +124,7 @@ const Bodega = () => {
     marcaNombre: inputMarca,
     modeloNombre: inputModelo,
     serieNombre: inputSerie,
+    estado: "bodega",
   });
   const perifericosOrdenados = sortOptions(perifericosDisponibles, (option) => option?.nombre);
   const marcasOrdenadas = sortOptions(marcasDisponibles, (option) => option?.nombre);
