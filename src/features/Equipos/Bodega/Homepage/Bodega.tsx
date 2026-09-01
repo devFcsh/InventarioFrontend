@@ -26,7 +26,26 @@ import {
 import { useSnackbar } from "@context/SnackbarContext";
 import { useUser } from "@context/userContext";
 import Loader from "@pages/Loader";
-import { useImportarEquipoBodega } from "../hooks/useImportarEquipoBodega";
+import {
+  ImportarEquiposResultado,
+  useImportarEquipoBodega,
+} from "../hooks/useImportarEquipoBodega";
+import ImportResultDialog from "../../shared/ImportResultDialog.tsx";
+import ImportPreviewDialog, {
+  ImportPreviewData,
+} from "../../shared/ImportPreviewDialog.tsx";
+import {
+  downloadImportTemplate,
+  formatAnioCompra,
+  isValidPrinterImportType,
+  isValidCameraImportType,
+  transformImpresoraRow,
+  transformCamaraRow,
+  transformUpsRow,
+  transformComputadoraRow,
+} from "../../shared/excelImport.ts";
+import { sortOptions } from "../../../../utils/sortOptions.ts";
+import { useEquiposFilterOptions } from "../../../../hooks/useEquiposFilterOptions.ts";
 
 const Bodega = () => {
   const [inputPeriferico, setInputPeriferico] = useState(() => {
@@ -55,7 +74,7 @@ const Bodega = () => {
     () => Promise<{ success: boolean; message: string }>
   >(() => async () => ({ success: false, message: "" }));
 
-  const [modalContentBodega, _] = useState<{
+  const [modalContentBodega] = useState<{
     title: string;
     message: string;
   }>({
@@ -75,6 +94,11 @@ const Bodega = () => {
   const [openModalPasarAActivo, setOpenModalPasarAActivo] =
     useState<boolean>(false);
   const [selectedEquipoId, setSelectedEquipoId] = useState<string | null>(null);
+  const [openImportResult, setOpenImportResult] = useState(false);
+  const [importResult, setImportResult] = useState<ImportarEquiposResultado | null>(null);
+  const [openImportPreview, setOpenImportPreview] = useState(false);
+  const [importPreview, setImportPreview] = useState<ImportPreviewData | null>(null);
+  const [importPreviewLoading, setImportPreviewLoading] = useState(false);
 
   const { showMessage } = useSnackbar();
   const [shouldFetch, setShouldFetch] = useState<boolean>(true);
@@ -86,10 +110,35 @@ const Bodega = () => {
   const { modelos } = useModelos();
   const { series } = useSeries();
   const { inventarios } = useInventario();
+  const {
+    perifericosDisponibles,
+    marcasDisponibles,
+    modelosDisponibles,
+    seriesDisponibles,
+  } = useEquiposFilterOptions({
+    perifericos,
+    marcas,
+    modelos,
+    series,
+    perifericoNombre: inputPeriferico,
+    marcaNombre: inputMarca,
+    modeloNombre: inputModelo,
+    serieNombre: inputSerie,
+    estado: "bodega",
+  });
+  const perifericosOrdenados = sortOptions(perifericosDisponibles, (option) => option?.nombre);
+  const marcasOrdenadas = sortOptions(marcasDisponibles, (option) => option?.nombre);
+  const modelosOrdenados = sortOptions(modelosDisponibles, (option) => option?.nombre);
+  const seriesOrdenadas = sortOptions(seriesDisponibles, (option) => option?.nombre);
+  const inventariosOrdenados = sortOptions(inventarios, (option) => option?.inventario);
 
   const { darDeBajaEquipo } = useDarDeBajaEquipo();
   const { fetchTodosEquipos } = useExportarEquiposBodega();
-  const { importarEquiposBodega, loading: importLoading } = useImportarEquipoBodega();
+  const {
+    importarEquiposBodega,
+    previsualizarImportacion,
+    loading: importLoading,
+  } = useImportarEquipoBodega();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { rol, user } = useUser();
@@ -356,7 +405,38 @@ const Bodega = () => {
     fileInputRef.current?.click();
   };
 
-  function transformarFilaExcel(row: any) {
+  const esFormatoImpresoras = (jsonData: unknown[]) => {
+    if (!jsonData.length || typeof jsonData[0] !== "object" || !jsonData[0]) {
+      return false;
+    }
+
+    const normalizarColumna = (valor: string) =>
+      valor
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    const columnas = Object.keys(jsonData[0] as Record<string, unknown>).map(
+      normalizarColumna
+    );
+
+    return ["bloque", "ubicacion referencia", "nombre etiqueta", "n serie"].every(
+      (columna) => columnas.includes(columna)
+    );
+  };
+
+  const esFormatoCamaras = (jsonData: unknown[]) => {
+    if (!jsonData.length || typeof jsonData[0] !== "object" || !jsonData[0]) return false;
+    const columnas = Object.keys(jsonData[0] as Record<string, unknown>).map((columna) =>
+      columna.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    );
+    return columnas.includes("serie equipo principal") && columnas.includes("inventario equipo principal");
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function transformarFilaExcel(row: any, filaExcel: number) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -364,14 +444,14 @@ const Bodega = () => {
         ? "S/N"
         : String(val).trim();
 
+    void normalize;
+    return transformComputadoraRow(row, "bodega", filaExcel);
+
     return {
       tipo: normalize(row["Tipo"]),
       tipo_inventario: "bodega",
       inventario: String(row["Inventario CPU"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       serie: normalize(row["Serie CPU"]),
       modelo: normalize(row["Modelo Case"]),
       marca: normalize(row["Marca Case"]),
@@ -415,7 +495,9 @@ const Bodega = () => {
     };
   }
 
-  function transformarFilaSwitch(row: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function transformarFilaSwitch(row: any, filaExcel: number) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -424,14 +506,13 @@ const Bodega = () => {
         : String(val).trim();
 
     return {
+      hojaExcel: "Switch",
+      filaExcel,
       tipo: "Switch",
       tipo_inventario: "bodega",
       nombre: normalize(row["Nombre"]),
       inventario: String(row["Inventario"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       marca: normalize(row["Marca"]),
       modelo: normalize(row["Modelo"]),
       serie: normalize(row["Serie"]),
@@ -443,7 +524,9 @@ const Bodega = () => {
     };
   }
 
-  function transformarFilaAccessPoint(row: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function transformarFilaAccessPoint(row: any, filaExcel: number) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -452,14 +535,13 @@ const Bodega = () => {
         : String(val).trim();
 
     return {
+      hojaExcel: "AccessPoint",
+      filaExcel,
       tipo: "AccessPoint",
       tipo_inventario: "bodega",
       nombre: normalize(row["Nombre"]),
       inventario: String(row["Inventario"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       marca: normalize(row["Marca"]),
       modelo: normalize(row["Modelo"]),
       serie: normalize(row["Serie"]),
@@ -469,7 +551,9 @@ const Bodega = () => {
     };
   }
 
-  function transformarFilaProyector(row: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function transformarFilaProyector(row: any, filaExcel: number) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -478,13 +562,12 @@ const Bodega = () => {
         : String(val).trim();
 
     return {
+      hojaExcel: "Proyector",
+      filaExcel,
       tipo: "Proyector",
       tipo_inventario: "bodega",
       inventario: String(row["Inventario"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       marca: normalize(row["Marca"]),
       modelo: normalize(row["Modelo"]),
       serie: normalize(row["Serie"]),
@@ -505,71 +588,198 @@ const Bodega = () => {
       if (!data) return;
       const workbook = XLSX.read(data, { type: "binary" });
       
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const equiposImportTodos: any[] = [];
+      const errores: string[] = [];
 
       if (workbook.SheetNames.includes("Computadora")) {
         const worksheet = workbook.Sheets["Computadora"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
         if (jsonData && jsonData.length > 0) {
-          const equiposComputadora = jsonData.map(transformarFilaExcel);
+          const equiposComputadora = jsonData.map((row, index) =>
+            transformarFilaExcel(row, index + 2)
+          );
           equiposImportTodos.push(...equiposComputadora);
         }
       }
 
       if (workbook.SheetNames.includes("Switch")) {
         const worksheet = workbook.Sheets["Switch"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
         if (jsonData && jsonData.length > 0) {
-          const equiposSwitch = jsonData.map(transformarFilaSwitch);
+          const equiposSwitch = jsonData.map((row, index) =>
+            transformarFilaSwitch(row, index + 2)
+          );
           equiposImportTodos.push(...equiposSwitch);
         }
       }
 
       if (workbook.SheetNames.includes("AccessPoint")) {
         const worksheet = workbook.Sheets["AccessPoint"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
         if (jsonData && jsonData.length > 0) {
-          const equiposAP = jsonData.map(transformarFilaAccessPoint);
+          const equiposAP = jsonData.map((row, index) =>
+            transformarFilaAccessPoint(row, index + 2)
+          );
           equiposImportTodos.push(...equiposAP);
         }
       }
 
       if (workbook.SheetNames.includes("Proyector")) {
         const worksheet = workbook.Sheets["Proyector"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
         if (jsonData && jsonData.length > 0) {
-          const equiposProyector = jsonData.map(transformarFilaProyector);
+          const equiposProyector = jsonData.map((row, index) =>
+            transformarFilaProyector(row, index + 2)
+          );
           equiposImportTodos.push(...equiposProyector);
         }
       }
 
-      if (equiposImportTodos.length === 0) {
+      if (workbook.SheetNames.includes("UPS")) {
+        const worksheet = workbook.Sheets["UPS"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        if (jsonData && jsonData.length > 0) {
+          const equiposUps = jsonData.map((row, index) =>
+            transformUpsRow(row as Record<string, unknown>, "bodega", index + 2)
+          );
+          equiposImportTodos.push(...equiposUps);
+        }
+      }
+
+      if (workbook.SheetNames.includes("Cámara")) {
+        const worksheet = workbook.Sheets["Cámara"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+        if (jsonData && jsonData.length > 0) {
+          const filasInvalidas = jsonData
+            .map((row, index) => (!isValidCameraImportType(row as Record<string, unknown>) ? index + 2 : null))
+            .filter((fila): fila is number => fila !== null);
+          if (filasInvalidas.length > 0) {
+            errores.push(`Cámara - La columna Tipo debe contener únicamente "Cámara". Filas: ${filasInvalidas.join(", ")}`);
+          } else {
+            equiposImportTodos.push(...jsonData.map((row, index) =>
+              transformCamaraRow(row as Record<string, unknown>, "bodega", index + 2)
+            ));
+          }
+        }
+      }
+
+      if (workbook.SheetNames.includes("Impresora")) {
+        const worksheet = workbook.Sheets["Impresora"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        if (jsonData && jsonData.length > 0) {
+          const filasInvalidas = jsonData
+            .map((row, index) => (!isValidPrinterImportType(row as Record<string, unknown>) ? index + 2 : null))
+            .filter((fila): fila is number => fila !== null);
+
+          if (filasInvalidas.length > 0) {
+            errores.push(`Impresora - La columna Tipo debe contener únicamente "Impresora". Filas: ${filasInvalidas.join(", ")}`);
+          } else {
+            const impresoras = jsonData.map((row, index) =>
+              transformImpresoraRow(row as Record<string, unknown>, "bodega", index + 2)
+            );
+            equiposImportTodos.push(...impresoras);
+          }
+        }
+      }
+
+      if (workbook.SheetNames.includes("Equipos Simples")) {
+        const worksheet = workbook.Sheets["Equipos Simples"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        if (jsonData && esFormatoImpresoras(jsonData)) {
+          const filasInvalidas = jsonData
+            .map((row, index) => (!isValidPrinterImportType(row as Record<string, unknown>) ? index + 2 : null))
+            .filter((fila): fila is number => fila !== null);
+
+          if (filasInvalidas.length > 0) {
+            errores.push(`Impresora - La columna Tipo debe contener únicamente "Impresora". Filas: ${filasInvalidas.join(", ")}`);
+          } else {
+            const impresoras = jsonData.map((row, index) =>
+              transformImpresoraRow(row as Record<string, unknown>, "bodega", index + 2)
+            );
+            equiposImportTodos.push(...impresoras);
+          }
+        } else if (jsonData && esFormatoCamaras(jsonData)) {
+          equiposImportTodos.push(...jsonData.map((row, index) =>
+            transformCamaraRow(row as Record<string, unknown>, "bodega", index + 2)
+          ));
+        }
+      }
+
+      if (equiposImportTodos.length === 0 && errores.length === 0) {
         showMessage(
-          "El archivo no contiene ninguna hoja válida (Computadora, Switch, AccessPoint, Proyector).",
+          "El archivo no contiene ninguna hoja válida (Computadora, Proyector, AccessPoint, Switch, Cámara, Impresora, UPS o Equipos Simples).",
           "warning"
         );
         return;
       }
 
+      setImportPreview({
+        fileName: file.name,
+        sheets: workbook.SheetNames,
+        equipment: equiposImportTodos,
+        errors: errores,
+        mode: "solo_nuevos",
+        actualizables: [],
+        nuevos: equiposImportTodos,
+        conflictos: [],
+      });
+      setOpenImportPreview(true);
+      setImportPreviewLoading(true);
       try {
-        const resultado = await importarEquiposBodega(equiposImportTodos, user?.email);
-
-        if (
-          resultado?.resumen &&
-          typeof resultado.resumen.registrados === "number" &&
-          resultado.resumen.registrados > 0
-        ) {
-          showMessage(`Importación completada.`, "success");
-        } else {
-          showMessage("No se encontraron equipos nuevos para agregar.", "info");
-        }
-
-        setShouldFetch(true);
+        const coincidencias = await previsualizarImportacion(equiposImportTodos);
+        setImportPreview((prev) =>
+          prev ? { ...prev, ...coincidencias } : prev
+        );
       } catch {
-        showMessage("Error al importar equipos", "error");
+        showMessage("No se pudo consultar qué equipos ya existen", "warning");
+      } finally {
+        setImportPreviewLoading(false);
       }
     };
     reader.readAsBinaryString(file);
+  };
+
+  const cancelarImportacion = () => {
+    setOpenImportPreview(false);
+    setImportPreview(null);
+    setImportPreviewLoading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const confirmarImportacion = async () => {
+    if (!importPreview || importLoading || importPreviewLoading) return;
+
+    setOpenImportPreview(false);
+    try {
+      const resultado = await importarEquiposBodega(
+        importPreview.equipment,
+        user?.email,
+        importPreview.mode
+      );
+      setImportResult(resultado);
+      setOpenImportResult(true);
+
+      if (
+        resultado?.resumen &&
+        typeof resultado.resumen.registrados === "number" &&
+        resultado.resumen.registrados > 0
+      ) {
+        showMessage(`Importación completada.`, "success");
+      } else {
+        showMessage("No se encontraron equipos nuevos para agregar.", "info");
+      }
+
+      setShouldFetch(true);
+    } catch {
+      showMessage("Error al importar equipos", "error");
+    } finally {
+      setImportPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   const handleCheckboxChange = (id: string) => {
@@ -623,6 +833,7 @@ const Bodega = () => {
         return;
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const addIDColumn = (equipos: any[]) => {
         return equipos.map((equipo, index) => ({
           id: index + 1,
@@ -641,7 +852,8 @@ const Bodega = () => {
               procesador,
               tipo_ram,
               capacidad_ram,
-              capacidad_disco,
+              "Capacidad HDD": capacidad_hdd,
+              "Tipo disco": tipo_disco,
               marca,
               modelo,
               serie,
@@ -670,7 +882,8 @@ const Bodega = () => {
               procesador,
               tipo_ram,
               capacidad_ram,
-              capacidad_disco,
+              "Capacidad HDD": capacidad_hdd,
+              "Tipo Disco": tipo_disco,
               marca,
               modelo,
               serie,
@@ -893,14 +1106,12 @@ const Bodega = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={perifericos}
+            options={perifericosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
             inputValue={inputPeriferico}
-            onInputChange={(_, newInputValue) => {
-              setInputPeriferico(newInputValue);
-            }}
+            onInputChange={(_, newInputValue) => setInputPeriferico(newInputValue)}
             onChange={(_, newValue) => {
               if (typeof newValue === "string") {
                 setInputPeriferico(newValue);
@@ -917,7 +1128,7 @@ const Bodega = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={marcas}
+            options={marcasOrdenadas}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -939,7 +1150,7 @@ const Bodega = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={modelos}
+            options={modelosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -961,7 +1172,7 @@ const Bodega = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={series}
+            options={seriesOrdenadas}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -983,7 +1194,7 @@ const Bodega = () => {
           <Autocomplete
             size="small"
             freeSolo
-            options={inventarios}
+            options={inventariosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option.inventario || ""
             }
@@ -1337,18 +1548,13 @@ const Bodega = () => {
             </Tooltip>
 
             <Tooltip title="Descargar formato">
-              <a
-                href="/formato_importar_bodega.xlsx"
-                download="formato_bodega.xlsx"
-                className="flex items-center"
+              <button
+                type="button"
+                onClick={() => downloadImportTemplate("bodega")}
+                className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
               >
-                <button
-                  type="button"
-                  className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-                >
-                  <Icon icon="mdi:file-download" width="20" height="20" />
-                </button>
-              </a>
+                <Icon icon="mdi:file-download" width="20" height="20" />
+              </button>
             </Tooltip>
           </div>
           {!loading && !error && equiposBodega.length > 0 && (
@@ -1429,6 +1635,22 @@ const Bodega = () => {
         onConfirm={handleConfirm}
         title={modalContent.title}
         message={modalContent.message}
+      />
+      <ImportResultDialog
+        open={openImportResult}
+        onClose={() => setOpenImportResult(false)}
+        result={importResult}
+        title="Resultado de importación de bodega"
+      />
+      <ImportPreviewDialog
+        open={openImportPreview}
+        preview={importPreview}
+        loading={importLoading || importPreviewLoading}
+        onCancel={cancelarImportacion}
+        onConfirm={confirmarImportacion}
+        onModeChange={(mode) =>
+          setImportPreview((prev) => (prev ? { ...prev, mode } : prev))
+        }
       />
     </div>
   );

@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario";
 import useEditarActivoRed from "../hooks/useEditarActivoRed";
 import { validateMAC } from "@pages/Forms/StepsSAP/helpers/validateMAC";
-import { API_BASE_URL } from "../../../../../data";
+import { IMAGE_BASE_URL } from "../../../../../data";
 import { useSnackbar } from "@context/SnackbarContext";
 import { useExisteInventario } from "../../../../../hooks/useExisteInventario";
 import { useExisteSerie } from "../../../../../hooks/useExisteSerie";
@@ -61,7 +61,7 @@ const EditarActivoRed = ({
   const [errorInventario, setErrorInventario] = useState<boolean>(false);
   const [errorAnio, setErrorAnio] = useState<boolean>(false);
   const [errorMAC, setErrorMAC] = useState<boolean>(false);
-  //const [errorNombreEquipo, setErrorNombreEquipo] = useState<boolean>(false);
+  const [errorNombreEquipo, setErrorNombreEquipo] = useState<boolean>(false);
   const [errorPuertos, setErrorPuertos] = useState<boolean>(false);
   const [errorPuertoFTP, setErrorPuertoFTP] = useState<boolean>(false);
   const [errorMensajeEquipo, setErrorMensajeEquipo] = useState<string | null>(
@@ -314,8 +314,7 @@ const EditarActivoRed = ({
     if (
       !selectedInventarioInv ||
       errorInventario ||
-      !selectedInventarioAnio ||
-      errorAnio ||
+      (Boolean(selectedInventarioAnio) && errorAnio) ||
       !selectedInventarioSerie ||
       !selectedUbicacion ||
       !selectedMAC ||
@@ -325,11 +324,24 @@ const EditarActivoRed = ({
       setErrorMensajeEquipo("Por favor verificar todos los campos del equipo.");
       return false;
     }
+    if (!nombreEquipo) {
+      setErrorNombreEquipo(true);
+      setErrorMensajeEquipo("El campo Nombre Equipo es obligatorio.");
+      return false;
+    }
+    setErrorNombreEquipo(false);
     setErrorMensajeEquipo(null);
     return true;
   };
 
   const serieOriginal = series.find((serie) => serie?.id_serie === equipoRedActivo.id_serie)?.nombre || "";
+
+  const tieneImagenGuardadaValida =
+    typeof equipoRedActivo.imagenRuta === "string" &&
+    equipoRedActivo.imagenRuta.trim() !== "" &&
+    equipoRedActivo.imagenRuta.trim().toLowerCase() !== "s/n" &&
+    equipoRedActivo.imagenRuta.trim().toLowerCase() !== "null";
+  const tieneImagenValida = Boolean(image) || tieneImagenGuardadaValida;
 
   return (
     <div>
@@ -503,7 +515,7 @@ const EditarActivoRed = ({
             </label>
           </Box>
           <TextField
-            label="Año de Compra"
+            label="Año de Compra (opcional)"
             placeholder="Año de Compra"
             variant="outlined"
             fullWidth
@@ -598,9 +610,9 @@ const EditarActivoRed = ({
           fullWidth
           size="small"
           value={nombreEquipo}
-          error={!!errorMensajeEquipo}
+          error={errorNombreEquipo}
           helperText={
-            errorMensajeEquipo ? "Por favor escribir un nombre del equipo" : ""
+            errorNombreEquipo ? "El campo Nombre Equipo es obligatorio." : ""
           }
           onChange={(e) => {
             let value = e.target.value;
@@ -608,6 +620,7 @@ const EditarActivoRed = ({
               value = value.slice(0, 14);
             }
             setNombreEquipo(value);
+            setErrorNombreEquipo(!value.trim());
           }}
         />
         {perifericoName === "Switch" ? (
@@ -672,26 +685,37 @@ const EditarActivoRed = ({
             ref={fileInputRef}
             style={{ display: "none" }}
           />
-          <div
-            onClick={handleImageClick}
-            className="w-full max-w-sm h-48 border border-dashed border-gray-300 flex items-center justify-center cursor-pointer"
-          >
-            {image ? (
-              <img
-                src={URL.createObjectURL(image)}
-                alt="Vista previa"
-                className="w-full h-full object-cover"
-              />
-            ) : equipoRedActivo.imagenRuta ? (
-              <img
-                src={`${API_BASE_URL}${equipoRedActivo.imagenRuta}`}
-                alt="Imagen del equipo"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <p className="text-gray-500">Haz clic para cargar una imagen</p>
-            )}
-          </div>
+          {tieneImagenValida ? (
+            <>
+              <div className="w-[300px] h-[300px] rounded-lg overflow-hidden flex items-center justify-center bg-gray-100 shadow-sm border border-gray-200">
+                {image ? (
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt="Vista previa"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={`${IMAGE_BASE_URL.replace(/\/$/, "")}/${equipoRedActivo.imagenRuta.replace(/^\//, "")}`}
+                    alt="Imagen del equipo"
+                    className="w-full h-full object-cover"
+                  />
+                )}
+              </div>
+              <Button variant="outlined" onClick={handleImageClick}>
+                Reemplazar imagen actual
+              </Button>
+            </>
+          ) : (
+            <>
+              <div className="w-[300px] h-[300px] rounded-lg flex items-center justify-center bg-gray-200 shadow-sm border border-gray-300">
+                <span className="text-gray-500 font-medium text-center">Sin Imagen</span>
+              </div>
+              <Button variant="outlined" onClick={handleImageClick}>
+                Subir imagen del equipo
+              </Button>
+            </>
+          )}
         </div>
       </div>
 

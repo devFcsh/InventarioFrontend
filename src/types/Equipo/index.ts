@@ -28,7 +28,8 @@ export type ExportarComputadora = {
     procesador: string;
     tipo_ram: string;
     capacidad_ram: string;
-    capacidad_disco: string;
+    "Capacidad HDD": string;
+    "Tipo disco": string;
     marca: string;
     modelo: string;
     serie: string;

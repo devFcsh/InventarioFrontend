@@ -16,8 +16,10 @@ import { useModelosPorMarcaPeriferico } from "../../../../../hooks/useModelosPor
 import { useSeriesPorModelo } from "../../../../../hooks/useSeriesPorModelo";
 import { useLamparasPorModelo } from "@hooks/useLamparasPorModelo";
 import useLamparas from "@hooks/useLamparas";
+import useComputadorasPorPeriferico from "@hooks/useComputadorasPorPeriferico";
+import usePerifericos from "@hooks/usePerifericos";
 import { useNavigate } from "react-router-dom";
-import { API_BASE_URL } from "../../../../../data";
+import { IMAGE_BASE_URL } from "../../../../../data";
 
 interface VisualizarActivoSimpleProps {
   equipoSimpleActivo: ActivoSimpleEdit;
@@ -46,6 +48,8 @@ const VisualizarActivoSimple = ({
   const [selectedUbicacion, setSelectedUbicacion] = useState<Ubicacion | null>(
     null
   );
+  const [equipoPrincipal, setEquipoPrincipal] = useState<string>("S/N");
+  const [tipoEquipoPrincipal, setTipoEquipoPrincipal] = useState<string>("S/N");
 
   const { marcas } = useMarcasPorPeriferico(
     equipoSimpleActivo?.id_periferico ?? ""
@@ -67,7 +71,29 @@ const VisualizarActivoSimple = ({
   const { edificios } = useEdificios();
   const { lamparasTotales } = useLamparas();
   const { ubicaciones } = useUbicaciones(selectedEdificio?.id_edificio ?? "");
+  const { computadoras } = useComputadorasPorPeriferico(
+    equipoSimpleActivo?.id_periferico_computadora ?? "",
+    "activo"
+  );
+  const { perifericos } = usePerifericos();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!equipoSimpleActivo?.isComponente || !equipoSimpleActivo.id_computadora) {
+      setEquipoPrincipal("S/N");
+      setTipoEquipoPrincipal("S/N");
+      return;
+    }
+
+    const computadora = computadoras.find(
+      (item) => String(item.id_equipo) === String(equipoSimpleActivo.id_computadora)
+    );
+    setEquipoPrincipal(computadora?.serie?.trim() || "S/N");
+    const perifericoPrincipal = perifericos.find(
+      (item) => String(item?.id_periferico) === String(equipoSimpleActivo.id_periferico_computadora)
+    );
+    setTipoEquipoPrincipal(perifericoPrincipal?.nombre?.trim() || "S/N");
+  }, [equipoSimpleActivo, computadoras, perifericos]);
 
   useEffect(() => {
     if (equipoSimpleActivo) {
@@ -252,6 +278,26 @@ const VisualizarActivoSimple = ({
 
       <h2 className="text-xl font-semibold mb-5">Información General</h2>
       <div className="grid grid-cols-2 gap-4 mb-4">
+        {perifericoName !== "Proyector" && (
+          <>
+            <TextField
+              label="Tipo Equipo Principal"
+              variant="outlined"
+              fullWidth
+              size="small"
+              value={tipoEquipoPrincipal}
+              disabled
+            />
+            <TextField
+              label="Serie de Equipo Principal"
+              variant="outlined"
+              fullWidth
+              size="small"
+              value={equipoPrincipal}
+              disabled
+            />
+          </>
+        )}
         <Autocomplete
           size="small"
           disablePortal
@@ -288,17 +334,21 @@ const VisualizarActivoSimple = ({
 
       <div className="mb-4">
         <h2 className="text-xl font-semibold mb-5">Imagen</h2>
-        <div className="flex flex-col items-center gap-4">
-          {equipoSimpleActivo.imagenRuta ? (
-            <img
-              src={`${API_BASE_URL}${equipoSimpleActivo.imagenRuta}`}
-              alt="Imagen del equipo"
-              className="w-full max-w-sm h-48 object-cover border"
-            />
-          ) : (
-            <p className="text-gray-500">Sin imagen</p>
-          )}
-        </div>
+          <div className="flex flex-col items-center gap-4">
+            {equipoSimpleActivo.imagenRuta ? (
+              <div className="w-[300px] h-[300px] rounded-lg overflow-hidden flex items-center justify-center bg-gray-100 shadow-sm border border-gray-200">
+                <img
+                  src={`${IMAGE_BASE_URL.replace(/\/$/, "")}/${equipoSimpleActivo.imagenRuta.replace(/^\//, "")}`}
+                  alt="Imagen del equipo"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="w-[300px] h-[300px] rounded-lg flex items-center justify-center bg-gray-200 shadow-sm border border-gray-300">
+                <span className="text-gray-500 font-medium text-center">Sin Imagen</span>
+              </div>
+            )}
+          </div>
       </div>
       <div>
         <h2 className="text-xl font-semibold mb-10">Observación</h2>

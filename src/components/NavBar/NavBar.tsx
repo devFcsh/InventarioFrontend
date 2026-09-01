@@ -56,24 +56,24 @@ export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSectio
 
   return (
     <div>
-      <nav className="bg-yellow-500 w-full h-14 flex justify-between items-center px-4">
-        <div className="flex items-center gap-4">
+      <nav className="flex min-h-14 w-full flex-wrap items-center justify-between gap-2 bg-yellow-500 px-2 sm:flex-nowrap sm:px-4">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
           <IconButton onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
             <MenuIcon />
           </IconButton>
-          <div className="w-60 h-auto overflow-hidden">
+          <div className="h-auto w-36 max-w-full overflow-hidden sm:w-60">
             <Link to={"/activos"}>
-              <img className="w-full h-full object-cover" src={logoFCSH} alt="LogoFCSH" />
+              <img className="h-full w-full object-contain" src={logoFCSH} alt="LogoFCSH" />
             </Link>
           </div>
         </div>
-        <div className="flex items-center gap-8 text-sm font-medium text-black">
-          <div className="flex items-center gap-1">
+        <div className="flex shrink-0 items-center gap-2 text-xs font-medium text-black sm:gap-8 sm:text-sm">
+          <div className="flex shrink-0 items-center gap-1">
             <PersonIcon />
-            <p>{user ? user.displayName : ""}</p>
+            <p className="hidden truncate sm:block">{user ? user.displayName : ""}</p>
           </div>
           <div 
-            className={`flex items-center gap-1 cursor-pointer ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : 'hover:text-gray-700'}`}
+            className={`flex shrink-0 items-center gap-1 whitespace-nowrap cursor-pointer ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : 'hover:text-gray-700'}`}
             onClick={handleLogout}
           >
             <LogoutIcon />

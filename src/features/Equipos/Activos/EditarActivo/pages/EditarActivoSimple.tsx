@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { validateInventario } from "@pages/Forms/helpers/validateInventario";
 import { useSnackbar } from "@context/SnackbarContext";
 import { useExisteInventario } from "../../../../../hooks/useExisteInventario";
-import { API_BASE_URL } from "../../../../../data";
+import { IMAGE_BASE_URL } from "../../../../../data";
 import { useExisteSerie } from "../../../../../hooks/useExisteSerie";
 import useComputadorasPorPeriferico, { ComputadoraSimple } from "../../../../../hooks/useComputadorasPorPeriferico";
 import { useUser } from "@context/userContext.tsx";
@@ -269,6 +269,7 @@ const EditarActivoSimple = ({
       await editarActivoSimple(equipoSimpleActivo.id_equipo, payload);
       showMessage("Equipo editado correctamente", "success");
       navigate("/activos");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       const errorMessage = error?.message || "Error al editar el equipo";
       showMessage(errorMessage, "error");
@@ -361,6 +362,13 @@ const EditarActivoSimple = ({
   const serieOriginal = serieNombre;
 
   const inventarioOriginal = equipoSimpleActivo.inventario;
+
+  const tieneImagenGuardadaValida =
+    typeof equipoSimpleActivo.imagenRuta === "string" &&
+    equipoSimpleActivo.imagenRuta.trim() !== "" &&
+    equipoSimpleActivo.imagenRuta.trim().toLowerCase() !== "s/n" &&
+    equipoSimpleActivo.imagenRuta.trim().toLowerCase() !== "null";
+  const tieneImagenValida = Boolean(image) || tieneImagenGuardadaValida;
 
   return (
     <div>
@@ -685,26 +693,37 @@ const EditarActivoSimple = ({
             ref={fileInputRef}
             style={{ display: "none" }}
           />
-          <div
-            onClick={handleImageClick}
-            className="w-full max-w-sm h-48 border border-dashed border-gray-300 flex items-center justify-center cursor-pointer"
-          >
-            {image ? (
-              <img
-                src={URL.createObjectURL(image)}
-                alt="Vista previa"
-                className="w-full h-full object-cover"
-              />
-            ) : equipoSimpleActivo.imagenRuta ? (
-              <img
-                src={`${API_BASE_URL}${equipoSimpleActivo.imagenRuta}`}
-                alt="Imagen del equipo"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <p className="text-gray-500">Haz clic para cargar una imagen</p>
-            )}
-          </div>
+          {tieneImagenValida ? (
+            <>
+              <div className="w-[300px] h-[300px] rounded-lg overflow-hidden flex items-center justify-center bg-gray-100 shadow-sm border border-gray-200">
+                {image ? (
+                  <img
+                    src={URL.createObjectURL(image)}
+                    alt="Vista previa"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={`${IMAGE_BASE_URL.replace(/\/$/, "")}/${equipoSimpleActivo.imagenRuta.replace(/^\//, "")}`}
+                    alt="Imagen del equipo"
+                    className="w-full h-full object-cover"
+                  />
+                )}
+              </div>
+              <Button variant="outlined" onClick={handleImageClick}>
+                Reemplazar imagen actual
+              </Button>
+            </>
+          ) : (
+            <>
+              <div className="w-[300px] h-[300px] rounded-lg flex items-center justify-center bg-gray-200 shadow-sm border border-gray-300">
+                <span className="text-gray-500 font-medium text-center">Sin Imagen</span>
+              </div>
+              <Button variant="outlined" onClick={handleImageClick}>
+                Subir imagen del equipo
+              </Button>
+            </>
+          )}
         </div>
       </div>
       <div>

@@ -11,6 +11,7 @@ import { useEquiposFiltrados } from "../hooks/useEquiposFiltrados";
 import { filas } from "../../../../data";
 import { useDarDeBajaEquipo } from "../hooks/useDarDeBajaEquipo";
 import { useEliminarComputadora } from "@hooks/useEliminarComputadora.ts";
+import { useEliminarEquipoSimple } from "@hooks/useEliminarEquipoSimple.ts";
 import useEdificios from "@hooks/useEdificios.ts";
 import useUsos from "@hooks/useUsos.ts";
 import useMarcas from "@hooks/useMarcas.ts";
@@ -30,8 +31,28 @@ import {
 import { useSnackbar } from "@context/SnackbarContext.tsx";
 import { useUser } from "@context/userContext.tsx";
 import Loader from "@pages/Loader.tsx";
-import { useImportarEquipoActivo } from "../hooks/useImportarEquipoActivo.ts";
+import {
+  ImportarEquiposResultado,
+  useImportarEquipoActivo,
+} from "../hooks/useImportarEquipoActivo.ts";
 import { MantenimientoActivo } from "../MantenimientoActivo/Homepage/MantenimientoActivo.tsx";
+import ImportResultDialog from "../../shared/ImportResultDialog.tsx";
+import ImportPreviewDialog, {
+  ImportPreviewData,
+} from "../../shared/ImportPreviewDialog.tsx";
+import {
+  downloadImportTemplate,
+  formatAnioCompra,
+  isValidCameraImportType,
+  isValidPrinterImportType,
+  pickExcelLocation,
+  transformImpresoraRow,
+  transformCamaraRow,
+  transformUpsRow,
+  transformComputadoraRow,
+} from "../../shared/excelImport.ts";
+import { sortOptions } from "../../../../utils/sortOptions.ts";
+import { useEquiposFilterOptions } from "../../../../hooks/useEquiposFilterOptions.ts";
 
 const Activos = () => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -40,6 +61,11 @@ const Activos = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [openModalActivos, setOpenModalActivos] = useState<boolean>(false);
   const [openModalMantenimientos, setOpenModalMantenimientos] = useState(false);
+  const [openImportResult, setOpenImportResult] = useState(false);
+  const [importResult, setImportResult] = useState<ImportarEquiposResultado | null>(null);
+  const [openImportPreview, setOpenImportPreview] = useState(false);
+  const [importPreview, setImportPreview] = useState<ImportPreviewData | null>(null);
+  const [importPreviewLoading, setImportPreviewLoading] = useState(false);
   const [confirmAction, setConfirmAction] = useState<() => void>(
     () => () => {}
   );
@@ -52,7 +78,7 @@ const Activos = () => {
     message: "¿Estás seguro de que deseas realizar esta acción?",
   });
 
-  const [modalContentActivos, _] = useState<{
+  const [modalContentActivos] = useState<{
     title: string;
     message: string;
   }>({
@@ -88,7 +114,11 @@ const Activos = () => {
   const { rol, user } = useUser();
   const unableAction = rol !== "administrador" && rol !== "editor";
   const unableActionEditor = rol !== "administrador";
-  const { importarEquiposActivos, loading: importLoading } =
+  const {
+    importarEquiposActivos,
+    previsualizarImportacion,
+    loading: importLoading,
+  } =
     useImportarEquipoActivo();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -100,6 +130,40 @@ const Activos = () => {
   const { modelos } = useModelos();
   const { series } = useSeries();
   const { inventarios } = useInventario();
+  const {
+    perifericosDisponibles,
+    marcasDisponibles,
+    modelosDisponibles,
+    seriesDisponibles,
+    usuariosDisponibles,
+  } = useEquiposFilterOptions({
+    perifericos,
+    marcas,
+    modelos,
+    series,
+    usuarios,
+    perifericoNombre: inputPeriferico,
+    marcaNombre: inputMarca,
+    modeloNombre: inputModelo,
+    serieNombre: inputSerie,
+    usuarioId: selectedUsuarioFilter
+      ? String(selectedUsuarioFilter.id_usuario ?? selectedUsuarioFilter.id ?? "")
+      : "",
+    estado: "activo",
+  });
+  const perifericosOrdenados = sortOptions(perifericosDisponibles, (option) => option?.nombre);
+  const marcasOrdenadas = sortOptions(marcasDisponibles, (option) => option?.nombre);
+  const modelosOrdenados = sortOptions(modelosDisponibles, (option) => option?.nombre);
+  const seriesOrdenadas = sortOptions(seriesDisponibles, (option) => option?.nombre);
+  const inventariosOrdenados = sortOptions(inventarios, (option) => option?.inventario);
+  const usuariosOrdenados = sortOptions(usuariosDisponibles || [], (option) => {
+    const usuario = option as {
+      nombre?: unknown;
+      email?: unknown;
+      id_usuario?: unknown;
+    } | null;
+    return usuario?.nombre || usuario?.email || usuario?.id_usuario;
+  });
   const { pasarActivoABodega } = usePasarActivoABodega();
   const { fetchTodosEquipos } = useExportarEquiposActivos();
 
@@ -113,6 +177,7 @@ const Activos = () => {
   };
 
   const { eliminarEquipo } = useEliminarComputadora();
+  const { eliminarEquipoSimple } = useEliminarEquipoSimple();
   const { darDeBajaEquipo } = useDarDeBajaEquipo();
   const { equipos, totalCount, loading, error } = useEquiposFiltrados(
     filtros,
@@ -178,6 +243,7 @@ const Activos = () => {
     handleCloseModal();
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function columnasFaltantesExcel(jsonData: any[], tipoEquipo: string): string[] {
     if (!jsonData || jsonData.length === 0) return [];
     
@@ -273,10 +339,41 @@ const Activos = () => {
           "Serie Equipo Principal"
         ];
         break;
+      case "UPS":
+        requiredColumns = [
+          "Edificio",
+          "Referencia",
+          "Empresa",
+          "Año Adq",
+          "Marca",
+          "Modelo",
+          "Serie",
+          "Inventario",
+          "Observación"
+        ];
+        break;
+      case "Cámara":
+        requiredColumns = [
+          "Tipo", "Inventario", "Serie", "Modelo", "Marca", "Uso", "Usuario",
+          "Edificio", "Año Adq", "Empresa", "Serie Equipo Principal", "Inventario Equipo Principal"
+        ];
+        break;
       default:
         return [];
     }
     
+    if (tipoEquipo === "Computadora") {
+      requiredColumns.push(
+        "Marca Case",
+        "No. Aula",
+        "Oficina",
+        "Año Adq",
+        "Sistema Operativo",
+        "Versión",
+        "Observación"
+      );
+    }
+
     const normalizar = (str: string) => 
       str.toLowerCase()
         .normalize("NFD")
@@ -296,7 +393,51 @@ const Activos = () => {
     fileInputRef.current?.click();
   };
 
-  function transformarFilaExcel(row: any) {
+  const esFormatoImpresoras = (jsonData: unknown[]) => {
+    if (!jsonData.length || typeof jsonData[0] !== "object" || !jsonData[0]) {
+      return false;
+    }
+
+    const normalizarColumna = (valor: string) =>
+      valor
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+    const columnas = Object.keys(jsonData[0] as Record<string, unknown>).map(
+      normalizarColumna
+    );
+
+    return ["bloque", "ubicacion referencia", "nombre etiqueta", "n serie"].every(
+      (columna) => columnas.includes(columna)
+    );
+  };
+
+  const esFormatoCamaras = (jsonData: unknown[]) => {
+    if (!jsonData.length || typeof jsonData[0] !== "object" || !jsonData[0]) return false;
+    const columnas = Object.keys(jsonData[0] as Record<string, unknown>).map((columna) =>
+      columna.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    );
+    return columnas.includes("serie equipo principal") && columnas.includes("inventario equipo principal");
+  };
+
+  const esFilaExcelVacia = (row: unknown) =>
+    Object.values((row ?? {}) as Record<string, unknown>).every(
+      (value) => String(value ?? "").trim() === ""
+    );
+
+  const normalizarAsignacionImportacion = (value: unknown, fallback: string) => {
+    const text = String(value ?? "").trim();
+    const compact = text.replace(/\s+/g, "").toUpperCase();
+    return !text || compact === "S/N" || compact === "SN" || compact === "N/A" || compact === "NA"
+      ? fallback
+      : text;
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function transformarFilaExcel(row: any, filaExcel: number) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -304,15 +445,15 @@ const Activos = () => {
         ? "S/N"
         : String(val).trim();
 
+    void normalize;
+    return transformComputadoraRow(row, "activo", filaExcel);
+
     const ubicacion = row["Oficina"] !== "" ? row["Oficina"] : row["No. Aula"];
     return {
       tipo: normalize(row["Tipo"]),
       tipo_inventario: "activo",
       inventario: String(row["Inventario CPU"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       serie: normalize(row["Serie CPU"]),
       modelo: normalize(row["Modelo Case"]),
       marca: normalize(row["Marca Case"]),
@@ -360,7 +501,9 @@ const Activos = () => {
     };
   }
 
-  function transformarFilaSwitch(row: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function transformarFilaSwitch(row: any, filaExcel: number) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -369,14 +512,13 @@ const Activos = () => {
         : String(val).trim();
 
     return {
+      hojaExcel: "Switch",
+      filaExcel,
       tipo: "Switch",
       tipo_inventario: "activo",
       nombre: normalize(row["Nombre"]),
       inventario: String(row["Inventario"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       edificio: normalize(row["Bloque"]),
       ubicacion: normalize(row["Ubicación"]),
       marca: normalize(row["Marca"]),
@@ -385,12 +527,16 @@ const Activos = () => {
       mac: normalize(row["MAC"]),
       puertos: normalize(row["Puertos"]),
       puerto_ftp: normalize(row["Puertos FTP"]),
+      usuario: normalizarAsignacionImportacion(row["Usuario"], "Por Asignar"),
+      uso: normalizarAsignacionImportacion(row["Uso"], "Por Asignar"),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
       empresa: normalize(row["Empresa"]),
     };
   }
 
-  function transformarFilaAccessPoint(row: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function transformarFilaAccessPoint(row: any, filaExcel: number) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -399,26 +545,29 @@ const Activos = () => {
         : String(val).trim();
 
     return {
+      hojaExcel: "AccessPoint",
+      filaExcel,
       tipo: "AccessPoint",
       tipo_inventario: "activo",
       nombre: normalize(row["Nombre"]),
       inventario: String(row["Inventario"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       edificio: normalize(row["Bloque"]),
       ubicacion: normalize(row["Ubicación"]),
       marca: normalize(row["Marca"]),
       modelo: normalize(row["Modelo"]),
       serie: normalize(row["Serie"]),
       mac: normalize(row["MAC"]),
+      usuario: normalizarAsignacionImportacion(row["Usuario"], "Por Asignar"),
+      uso: normalizarAsignacionImportacion(row["Uso"], "Por Asignar"),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
       empresa: normalize(row["Empresa"]),
     };
   }
 
-  function transformarFilaProyector(row: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function transformarFilaProyector(row: any, filaExcel: number) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -427,13 +576,12 @@ const Activos = () => {
         : String(val).trim();
 
     return {
+      hojaExcel: "Proyector",
+      filaExcel,
       tipo: "Proyector",
       tipo_inventario: "activo",
       inventario: String(row["Inventario"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       edificio: normalize(row["Bloque"]),
       ubicacion: normalize(row["Ubicación"]),
       marca: normalize(row["Marca"]),
@@ -441,13 +589,17 @@ const Activos = () => {
       serie: normalize(row["Serie"]),
       lampara: normalize(row["Lámpara"]),
       categoria: normalize(row["Categoria"]),
+      usuario: normalizarAsignacionImportacion(row["Usuario"], "Por Asignar"),
+      uso: normalizarAsignacionImportacion(row["Uso"], "Por Asignar"),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
       empresa: normalize(row["Empresa"]),
     };
   }
 
-  function transformarFilaEquiposSimples(row: any) {
-    const ubicacion = row["Oficina"] !== "" ? row["Oficina"] : row["No. Aula"];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function transformarFilaEquiposSimples(row: any, filaExcel: number) {
+    const ubicacion = pickExcelLocation(row["Oficina"], row["No. Aula"]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const normalize = (val: any) =>
       val === undefined || val === null
         ? "S/N"
@@ -456,18 +608,17 @@ const Activos = () => {
         : String(val).trim();
 
     return {
+      hojaExcel: "Equipos Simples",
+      filaExcel,
       tipo: normalize(row["Tipo"]),
       tipo_inventario: "activo",
       inventario: String(row["Inventario"] ?? ""),
-      anio_compra:
-        row["Año Adq"] !== "S/N" && row["Año Adq"] !== undefined
-          ? String(parseInt(row["Año Adq"]))
-          : "S/N",
+      anio_compra: formatAnioCompra(row["Año Adq"]),
       serie: normalize(row["Serie"]),
       modelo: normalize(row["Modelo"]),
       marca: normalize(row["Marca"]),
-      uso: normalize(row["Uso"]),
-      usuario: normalize(row["Usuario"]),
+      uso: normalizarAsignacionImportacion(row["Uso"], "Por Asignar"),
+      usuario: normalizarAsignacionImportacion(row["Usuario"], "Por Asignar"),
       edificio: normalize(row["Edificio"]),
       ubicacion: normalize(ubicacion),
       observacion: row["Observación"] !== "S/N" ? row["Observación"] : "",
@@ -486,19 +637,22 @@ const Activos = () => {
       if (!data) return;
       const workbook = XLSX.read(data, { type: "binary" });
       
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const equiposImportTodos: any[] = [];
       const errores: string[] = [];
 
       if (workbook.SheetNames.includes("Computadora")) {
         const worksheet = workbook.Sheets["Computadora"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
         if (jsonData && jsonData.length > 0) {
           const faltantes = columnasFaltantesExcel(jsonData, "Computadora");
           if (faltantes.length > 0) {
             errores.push(`Computadora - Faltan columnas: ${faltantes.join(", ")}`);
           } else {
-            const equiposComputadora = jsonData.map(transformarFilaExcel);
+            const equiposComputadora = jsonData.map((row, index) =>
+              transformarFilaExcel(row, index + 2)
+            );
             equiposImportTodos.push(...equiposComputadora);
           }
         }
@@ -506,14 +660,16 @@ const Activos = () => {
 
       if (workbook.SheetNames.includes("Switch")) {
         const worksheet = workbook.Sheets["Switch"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
         if (jsonData && jsonData.length > 0) {
           const faltantes = columnasFaltantesExcel(jsonData, "Switch");
           if (faltantes.length > 0) {
             errores.push(`Switch - Faltan columnas: ${faltantes.join(", ")}`);
           } else {
-            const equiposSwitch = jsonData.map(transformarFilaSwitch);
+            const equiposSwitch = jsonData.map((row, index) =>
+              transformarFilaSwitch(row, index + 2)
+            );
             equiposImportTodos.push(...equiposSwitch);
           }
         }
@@ -521,14 +677,16 @@ const Activos = () => {
 
       if (workbook.SheetNames.includes("AccessPoint")) {
         const worksheet = workbook.Sheets["AccessPoint"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
         if (jsonData && jsonData.length > 0) {
           const faltantes = columnasFaltantesExcel(jsonData, "AccessPoint");
           if (faltantes.length > 0) {
             errores.push(`AccessPoint - Faltan columnas: ${faltantes.join(", ")}`);
           } else {
-            const equiposAP = jsonData.map(transformarFilaAccessPoint);
+            const equiposAP = jsonData.map((row, index) =>
+              transformarFilaAccessPoint(row, index + 2)
+            );
             equiposImportTodos.push(...equiposAP);
           }
         }
@@ -536,78 +694,207 @@ const Activos = () => {
 
       if (workbook.SheetNames.includes("Proyector")) {
         const worksheet = workbook.Sheets["Proyector"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
         if (jsonData && jsonData.length > 0) {
           const faltantes = columnasFaltantesExcel(jsonData, "Proyector");
           if (faltantes.length > 0) {
             errores.push(`Proyector - Faltan columnas: ${faltantes.join(", ")}`);
           } else {
-            const equiposProyector = jsonData.map(transformarFilaProyector);
+            const equiposProyector = jsonData.map((row, index) =>
+              transformarFilaProyector(row, index + 2)
+            );
             equiposImportTodos.push(...equiposProyector);
+          }
+        }
+      }
+
+      if (workbook.SheetNames.includes("UPS")) {
+        const worksheet = workbook.Sheets["UPS"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        if (jsonData && jsonData.length > 0) {
+          const faltantes = columnasFaltantesExcel(jsonData, "UPS");
+          if (faltantes.length > 0) {
+            errores.push(`UPS - Faltan columnas: ${faltantes.join(", ")}`);
+          } else {
+            const equiposUps = jsonData.map((row, index) =>
+              transformUpsRow(row as Record<string, unknown>, "activo", index + 2)
+            );
+            equiposImportTodos.push(...equiposUps);
+          }
+        }
+      }
+
+      if (workbook.SheetNames.includes("Cámara")) {
+        const worksheet = workbook.Sheets["Cámara"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+        if (jsonData && jsonData.length > 0) {
+          const filasInvalidas = jsonData
+            .map((row, index) => (!isValidCameraImportType(row as Record<string, unknown>) ? index + 2 : null))
+            .filter((fila): fila is number => fila !== null);
+          const faltantes = columnasFaltantesExcel(jsonData, "Cámara");
+          if (filasInvalidas.length > 0) {
+            errores.push(`Cámara - La columna Tipo debe contener únicamente "Cámara". Filas: ${filasInvalidas.join(", ")}`);
+          } else if (faltantes.length > 0) {
+            errores.push(`Cámara - Faltan columnas: ${faltantes.join(", ")}`);
+          } else {
+            equiposImportTodos.push(...jsonData.map((row, index) =>
+              transformCamaraRow(row as Record<string, unknown>, "activo", index + 2)
+            ));
+          }
+        }
+      }
+
+      if (workbook.SheetNames.includes("Impresora")) {
+        const worksheet = workbook.Sheets["Impresora"];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+        if (jsonData && jsonData.length > 0) {
+          const filasInvalidas = jsonData
+            .map((row, index) => (!isValidPrinterImportType(row as Record<string, unknown>) ? index + 2 : null))
+            .filter((fila): fila is number => fila !== null);
+
+          if (filasInvalidas.length > 0) {
+            errores.push(`Impresora - La columna Tipo debe contener únicamente "Impresora". Filas: ${filasInvalidas.join(", ")}`);
+          } else {
+            const impresoras = jsonData.map((row, index) =>
+              transformImpresoraRow(row as Record<string, unknown>, "activo", index + 2)
+            );
+            equiposImportTodos.push(...impresoras);
           }
         }
       }
 
       if (workbook.SheetNames.includes("Equipos Simples")) {
         const worksheet = workbook.Sheets["Equipos Simples"];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils
+          .sheet_to_json(worksheet, { defval: "" })
+          .filter((row) => !esFilaExcelVacia(row));
 
         if (jsonData && jsonData.length > 0) {
-          const faltantes = columnasFaltantesExcel(jsonData, "EquiposSimples");
-          if (faltantes.length > 0) {
-            errores.push(`Equipos Simples - Faltan columnas: ${faltantes.join(", ")}`);
+          if (esFormatoImpresoras(jsonData)) {
+            const filasInvalidas = jsonData
+              .map((row, index) => (!isValidPrinterImportType(row as Record<string, unknown>) ? index + 2 : null))
+              .filter((fila): fila is number => fila !== null);
+
+            if (filasInvalidas.length > 0) {
+              errores.push(`Impresora - La columna Tipo debe contener únicamente "Impresora". Filas: ${filasInvalidas.join(", ")}`);
+            } else {
+              const impresoras = jsonData.map((row, index) =>
+                transformImpresoraRow(row as Record<string, unknown>, "activo", index + 2)
+              );
+              equiposImportTodos.push(...impresoras);
+            }
+          } else if (esFormatoCamaras(jsonData)) {
+            equiposImportTodos.push(...jsonData.map((row, index) =>
+              transformCamaraRow(row as Record<string, unknown>, "activo", index + 2)
+            ));
           } else {
-            const equiposSimples = jsonData.map(transformarFilaEquiposSimples);
-            equiposImportTodos.push(...equiposSimples);
+            const faltantes = columnasFaltantesExcel(jsonData, "EquiposSimples");
+            if (faltantes.length > 0) {
+              errores.push(`Equipos Simples - Faltan columnas: ${faltantes.join(", ")}`);
+            } else {
+              const equiposSimples = jsonData.map((row, index) =>
+                transformarFilaEquiposSimples(row, index + 2)
+              );
+              equiposImportTodos.push(...equiposSimples);
+            }
           }
         }
       }
 
       if (equiposImportTodos.length === 0 && errores.length === 0) {
         showMessage(
-          "El archivo no contiene ninguna hoja válida (Computadora, Switch, AccessPoint, Proyector, Equipos Simples).",
+          "El archivo no contiene ninguna hoja válida (Computadora, Proyector, AccessPoint, Switch, Cámara, Impresora, UPS o Equipos Simples).",
           "warning"
         );
         return;
       }
 
-      if (errores.length > 0) {
-        showMessage(
-          `Error en formato: ${errores.join(" | ")}`,
-          "error"
-        );
-        return;
-      }
-
+      setImportPreview({
+        fileName: file.name,
+        sheets: workbook.SheetNames,
+        equipment: equiposImportTodos,
+        errors: errores,
+        mode: "solo_nuevos",
+        actualizables: [],
+        nuevos: equiposImportTodos,
+        conflictos: [],
+      });
+      setOpenImportPreview(true);
+      setImportPreviewLoading(true);
       try {
-        const resultado = await importarEquiposActivos(equiposImportTodos, user?.email);
-
-        if (
-          resultado?.resumen &&
-          typeof resultado.resumen.registrados === "number" &&
-          resultado.resumen.registrados > 0
-        ) {
-          showMessage(`Importación completada.`, "success");
-        } else {
-          showMessage("No se encontraron equipos nuevos para agregar.", "info");
-        }
-
-        setShouldFetch(true);
+        const coincidencias = await previsualizarImportacion(equiposImportTodos);
+        setImportPreview((prev) =>
+          prev ? { ...prev, ...coincidencias } : prev
+        );
       } catch {
-        showMessage("Error al importar equipos", "error");
+        showMessage("No se pudo consultar qué equipos ya existen", "warning");
+      } finally {
+        setImportPreviewLoading(false);
       }
     };
     reader.readAsBinaryString(file);
   };
 
+  const cancelarImportacion = () => {
+    setOpenImportPreview(false);
+    setImportPreview(null);
+    setImportPreviewLoading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const confirmarImportacion = async () => {
+    if (!importPreview || importLoading || importPreviewLoading) return;
+
+    setOpenImportPreview(false);
+    try {
+      const resultado = await importarEquiposActivos(
+        importPreview.equipment,
+        user?.email,
+        importPreview.mode
+      );
+      setImportResult(resultado);
+      setOpenImportResult(true);
+
+      if (
+        resultado?.resumen &&
+        typeof resultado.resumen.registrados === "number" &&
+        resultado.resumen.registrados > 0
+      ) {
+        showMessage(`Importación completada.`, "success");
+      } else {
+        showMessage("No se encontraron equipos nuevos para agregar.", "info");
+      }
+
+      setShouldFetch(true);
+    } catch {
+      showMessage("Error al importar equipos", "error");
+    } finally {
+      setImportPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const esComputadora = (equipo?: Equipo) => {
+    const periferico = equipo?.periferico?.trim().toLowerCase();
+    return periferico === "computadora" || periferico === "laptop";
+  };
+
+  const eliminarEquipoPorTipo = async (equipo?: Equipo) => {
+    if (!equipo?.id_equipo) return false;
+    return esComputadora(equipo)
+      ? eliminarEquipo(equipo.id_equipo)
+      : eliminarEquipoSimple(equipo.id_equipo);
+  };
+
   const deleteEquipo = async (equipoId: string) => {
     if (equipoId) {
-      const inventario = equipos.filter(
-        (equipo) => equipoId === equipo.id_equipo
-      )[0].inventario;
+      const equipo = equipos.find((item) => equipoId === item.id_equipo);
+      const inventario = equipo?.inventario ?? equipoId;
       try {
-        const result = await eliminarEquipo(equipoId);
+        const result = await eliminarEquipoPorTipo(equipo);
         if (result) {
           setShouldFetch(true);
           showMessage(
@@ -616,7 +903,7 @@ const Activos = () => {
           );
         } else {
           showMessage(
-            `No se puede eliminar el equipo con inventario ${inventario} porque está asociado a una computadora`,
+            `No se puede eliminar el equipo con inventario ${inventario} porque está vinculado como componente de una computadora`,
             "error"
           );
         }
@@ -631,12 +918,11 @@ const Activos = () => {
 
   const deleteEquipos = async (equipoIds: string[]) => {
     try {
-      const errorsInventarios = [];
+      const errorsInventarios: string[] = [];
       for (const id of equipoIds) {
-        const result = await eliminarEquipo(id);
-        const inventario = equipos.filter(
-          (equipo) => id === equipo.id_equipo
-        )[0].inventario;
+        const equipo = equipos.find((item) => id === item.id_equipo);
+        const result = await eliminarEquipoPorTipo(equipo);
+        const inventario = equipo?.inventario ?? id;
         if (!result) {
           errorsInventarios.push(inventario);
         }
@@ -648,7 +934,7 @@ const Activos = () => {
         showMessage(
           `No se pudieron eliminar los equipos: ${errorsInventarios.join(
             ", "
-          )} ya que están relacionados a una computadora`,
+          )}. Verifique si están vinculados como componentes de una computadora.`,
           "error"
         );
       }
@@ -932,6 +1218,7 @@ const Activos = () => {
         return;
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const fillEmpty = (value: any) => {
         return value === undefined || value === null || value === "" ? "S/N" : value;
       };
@@ -951,7 +1238,8 @@ const Activos = () => {
             procesador,
             tipo_ram,
             capacidad_ram,
-            capacidad_disco,
+            "Capacidad HDD": capacidad_hdd,
+            "Tipo disco": tipo_disco,
             marca,
             modelo,
             serie,
@@ -993,8 +1281,8 @@ const Activos = () => {
             "Versión": fillEmpty(version_sistema_operativo),
             "Procesador": fillEmpty(procesador),
             "Capacidad Memoria": (capacidad_ram && tipo_ram) ? `${capacidad_ram} ${tipo_ram}` : fillEmpty(capacidad_ram || tipo_ram),
-            "Capacidad HDD": fillEmpty(capacidad_disco),
-            "Tipo Disco": "S/N",
+            "Capacidad HDD": fillEmpty(capacidad_hdd),
+            "Tipo Disco": fillEmpty(tipo_disco),
             "Marca Case": fillEmpty(marca),
             "Modelo Case": fillEmpty(modelo),
             "Serie CPU": fillEmpty(serie),
@@ -1173,11 +1461,13 @@ const Activos = () => {
     }
   };
 
+  const checkboxColumnWidth = selectedItems.length > 0 ? "6rem" : "4rem";
+
   return (
-    <div className="flex flex-col p-4">
+    <div className="flex min-w-0 w-full max-w-full flex-col p-2 sm:p-4">
       <div className="mb-4">
-        <div className="flex gap-2 items-center">
-          <h1 className="text-2xl font-bold my-5">Consulta de Activos</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <h1 className="my-4 text-xl font-bold sm:my-5 sm:text-2xl">Consulta de Activos</h1>
           {unableAction ? (
             <span>
               <Icon
@@ -1210,18 +1500,16 @@ const Activos = () => {
             steps={[]}
           />
         </div>
-        <div className="grid gap-4 my-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="my-6 grid min-w-0 grid-cols-1 gap-4 sm:my-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           <Autocomplete
             size="small"
             freeSolo
-            options={perifericos}
+            options={perifericosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
             inputValue={inputPeriferico}
-            onInputChange={(_, newInputValue) => {
-              setInputPeriferico(newInputValue);
-            }}
+            onInputChange={(_, newInputValue) => setInputPeriferico(newInputValue)}
             onChange={(_, newValue) => {
               if (typeof newValue === "string") {
                 setInputPeriferico(newValue);
@@ -1232,13 +1520,13 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Periférico" variant="outlined" />
             )}
-            className="w-full"
+            className="w-full min-w-0"
           />
 
           <Autocomplete
             size="small"
             freeSolo
-            options={marcas}
+            options={marcasOrdenadas}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -1254,13 +1542,13 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Marca" variant="outlined" />
             )}
-            className="w-full"
+            className="w-full min-w-0"
           />
 
           <Autocomplete
             size="small"
             freeSolo
-            options={modelos}
+            options={modelosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -1276,13 +1564,13 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Modelo" variant="outlined" />
             )}
-            className="w-full"
+            className="w-full min-w-0"
           />
 
           <Autocomplete
             size="small"
             freeSolo
-            options={series}
+            options={seriesOrdenadas}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option?.nombre || ""
             }
@@ -1298,13 +1586,13 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Serie" variant="outlined" />
             )}
-            className="w-full"
+            className="w-full min-w-0"
           />
 
           <Autocomplete
             size="small"
             freeSolo
-            options={inventarios}
+            options={inventariosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string" ? option : option.inventario || ""
             }
@@ -1322,15 +1610,16 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Inventario" variant="outlined" />
             )}
-            className="w-full"
+            className="w-full min-w-0"
           />
 
           <Autocomplete
             size="small"
-            options={usuarios || []}
+            options={usuariosOrdenados}
             getOptionLabel={(option) =>
               typeof option === "string"
                 ? option
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 : (option as any)?.nombre || (option as any)?.email || String((option as any)?.id_usuario || "")
             }
             value={selectedUsuarioFilter}
@@ -1338,9 +1627,9 @@ const Activos = () => {
             renderInput={(params) => (
               <TextField {...params} label="Usuario" variant="outlined" />
             )}
-            className="w-full"
+            className="w-full min-w-0"
           />
-            <div className="flex items-end gap-2">
+            <div className="flex w-full min-w-0 flex-col items-stretch gap-2 sm:flex-row sm:items-end">
               <Autocomplete
                 size="small"
                 disablePortal
@@ -1351,10 +1640,10 @@ const Activos = () => {
                   <TextField {...params} label="Filas" variant="outlined" />
                 )}
                 value={filas.find((option) => option.id === rowsPerPage)}
-                className="w-1/2"
+                className="w-full min-w-0 sm:w-1/2"
               />
               <button
-                className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-1/2"
+                className="w-full rounded bg-blue-600 p-2 text-white hover:bg-blue-700 sm:w-1/2"
                 onClick={handleBuscar}
               >
                 Buscar
@@ -1362,7 +1651,7 @@ const Activos = () => {
             </div>
         </div>
       </div>
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <div className="relative min-w-0 w-full max-w-full overflow-x-auto shadow-md sm:rounded-lg">
         {loading ? (
           <Loader />
         ) : error ? (
@@ -1375,11 +1664,18 @@ const Activos = () => {
           </>
         ) : (
           <>
-            <table className="w-full text-left text-sm text-gray-500">
-              <thead className="text-xs uppercase bg-gray-50 text-gray-700">
+            <table className="w-full min-w-[1200px] table-auto text-left text-xs text-gray-500 2xl:min-w-[1500px] 2xl:text-sm">
+              <colgroup>
+                <col style={{ width: checkboxColumnWidth }} />
+              </colgroup>
+              <thead className="bg-gray-50 text-[10px] uppercase text-gray-700 2xl:text-xs">
                 <tr>
-                  <th scope="col" className="px-4 py-3 min-w-16">
-                    <div className="flex items-center gap-2">
+                  <th
+                    scope="col"
+                    className="w-16 max-w-16 min-w-16 px-2 py-3"
+                    style={{ width: checkboxColumnWidth }}
+                  >
+                    <div className="flex items-center gap-1 whitespace-nowrap">
                       <Tooltip title="Seleccionar todos">
                         <input
                           type="checkbox"
@@ -1557,7 +1853,7 @@ const Activos = () => {
                   </th>
                   {rol === "administrador" && (
                     <>
-                      <th scope="col" className="px-4 py-3 w-8">
+                      <th scope="col" className="w-8 px-4 py-3">
                         <button type="button" onClick={() => toggleSort("autor")} className="flex items-center gap-1">
                           Autor {sortBy === "autor" ? (
                             sortDir === "asc" ? (
@@ -1570,7 +1866,7 @@ const Activos = () => {
                           )}
                         </button>
                       </th>
-                      <th scope="col" className="px-4 py-3 w-8">
+                      <th scope="col" className="w-8 px-4 py-3">
                         <button type="button" onClick={() => toggleSort("editor")} className="flex items-center gap-1">
                           Editor {sortBy === "editor" ? (
                             sortDir === "asc" ? (
@@ -1583,7 +1879,7 @@ const Activos = () => {
                           )}
                         </button>
                       </th>
-                      <th scope="col" className="px-4 py-3 w-40">
+                      <th scope="col" className="w-40 px-4 py-3">
                         <button type="button" onClick={() => toggleSort("fecha_creacion")} className="flex items-center gap-1">
                           Fecha Creación {sortBy === "fecha_creacion" ? (
                             sortDir === "asc" ? (
@@ -1609,7 +1905,10 @@ const Activos = () => {
                     key={equipo.id_equipo}
                     className="bg-white border-b hover:bg-gray-50"
                   >
-                    <td className="px-4 py-2">
+                    <td
+                      className="w-16 max-w-16 min-w-16 px-2 py-2"
+                      style={{ width: checkboxColumnWidth }}
+                    >
                       <input
                         type="checkbox"
                         checked={selectedItems.includes(equipo.id_equipo)}
@@ -1627,9 +1926,9 @@ const Activos = () => {
                     <td className="px-4 py-2 w-36">{equipo.edificio}</td>
                     {rol === "administrador" && (
                       <>
-                        <td className="px-4 py-2 w-8">{equipo.autor || "-"}</td>
-                        <td className="px-4 py-2 w-8">{equipo.editor || "-"}</td>
-                        <td className="px-4 py-2 w-40">
+                        <td className="w-8 px-4 py-2">{equipo.autor || "-"}</td>
+                        <td className="w-8 px-4 py-2">{equipo.editor || "-"}</td>
+                        <td className="w-40 px-4 py-2">
                           {equipo.fecha_creacion 
                             ? new Date(equipo.fecha_creacion).toLocaleString("es-ES", {
                                 year: "numeric",
@@ -1808,7 +2107,7 @@ const Activos = () => {
         )}
         
         <nav
-          className="flex flex-col md:flex-row justify-between items-center p-4"
+          className="flex flex-col items-center justify-between gap-4 p-3 sm:p-4 md:flex-row"
           aria-label="Table navigation"
         >
           <div className="flex items-center gap-2">
@@ -1833,23 +2132,18 @@ const Activos = () => {
             </Tooltip>
 
             <Tooltip title="Descargar formato">
-              <a
-                href="/formato_importar_activo.xlsx"
-                download="formato_activo.xlsx"
-                className="flex items-center"
+              <button
+                type="button"
+                onClick={() => downloadImportTemplate("activo")}
+                className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
               >
-                <button
-                  type="button"
-                  className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-darkgray bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-black"
-                >
-                  <Icon icon="mdi:file-download" width="20" height="20" />
-                </button>
-              </a>
+                <Icon icon="mdi:file-download" width="20" height="20" />
+              </button>
             </Tooltip>
           </div>
           {!loading && !error && equipos.length > 0 && (
-            <div className="flex flex-col md:flex-row items-center gap-2">
-              <ul className="inline-flex items-center -space-x-px">
+            <div className="flex max-w-full flex-col items-center gap-2 sm:flex-row">
+              <ul className="inline-flex max-w-full items-center -space-x-px">
                 <li>
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
@@ -1868,7 +2162,7 @@ const Activos = () => {
                   </button>
                 </li>
                 <li>
-                  <div className="flex items-center justify-center text-sm py-2 px-5 leading-tight border border-gray-300 text-gray-900 bg-white">
+                  <div className="flex items-center justify-center whitespace-nowrap border border-gray-300 bg-white px-3 py-2 text-sm leading-tight text-gray-900 sm:px-5">
                     Página {currentPage} de {totalPages}
                   </div>
                 </li>
@@ -1918,6 +2212,22 @@ const Activos = () => {
         onConfirm={handleConfirm}
         title={modalContent.title}
         message={modalContent.message}
+      />
+      <ImportResultDialog
+        open={openImportResult}
+        onClose={() => setOpenImportResult(false)}
+        result={importResult}
+        title="Resultado de importación de activos"
+      />
+      <ImportPreviewDialog
+        open={openImportPreview}
+        preview={importPreview}
+        loading={importLoading || importPreviewLoading}
+        onCancel={cancelarImportacion}
+        onConfirm={confirmarImportacion}
+        onModeChange={(mode) =>
+          setImportPreview((prev) => (prev ? { ...prev, mode } : prev))
+        }
       />
      <MantenimientoActivo
   open={openModalMantenimientos}
