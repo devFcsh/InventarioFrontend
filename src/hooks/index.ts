@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../data';
 
 const clienteAxios = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL,
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
 

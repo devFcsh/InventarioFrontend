@@ -16,9 +16,16 @@ const antivirus = [
     { id_antivirus: "2", nombre: "Desactivado" },
   ]
 
-// URL base de la API
-export const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-export const IMAGE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, '');
+// VITE_BACKEND_URL puede incluir o no el sufijo /api.
+// Normalizamos las URLs para mantener separadas la API y la autenticaciÃ³n.
+const configuredBackendUrl = (
+    import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'
+).replace(/\/+$/, '');
+
+export const BACKEND_BASE_URL = configuredBackendUrl.replace(/\/api\/?$/, '');
+export const API_BASE_URL = `${BACKEND_BASE_URL}/api`;
+export const AUTH_BASE_URL = BACKEND_BASE_URL;
+export const IMAGE_BASE_URL = BACKEND_BASE_URL;
   
 export {
     filas,

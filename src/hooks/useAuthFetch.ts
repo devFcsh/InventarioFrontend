@@ -1,5 +1,6 @@
 // hooks/useAuthFetch.ts
 import { useState, useCallback } from 'react';
+import { API_BASE_URL } from '../data';
 
 interface FetchOptions extends RequestInit {
   headers?: Record<string, string>;
@@ -14,8 +15,6 @@ interface UseAuthFetchResult {
 const useAuthFetch = (): UseAuthFetchResult => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
-
   const authFetch = useCallback(async (url: string, options: FetchOptions = {}) => {
     setLoading(true);
     setError(null);

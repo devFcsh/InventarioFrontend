@@ -11,11 +11,11 @@ import { NavBarProps } from "../PropsInterface";
 import { Link } from "react-router-dom";
 import { useUser } from "@context/userContext";
 import Loader from "@pages/Loader";
+import { AUTH_BASE_URL } from "../../data";
 
 export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSection }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
   const { user, rol, loading } = useUser();
 
   if(loading) return <Loader/>;
@@ -26,7 +26,7 @@ export const NavBar: React.FC<NavBarProps> = ({ currentSection, setCurrentSectio
     setIsLoggingOut(true);
     
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+      const response = await fetch(`${AUTH_BASE_URL}/auth/logout`, {
         method: "POST",
         credentials: "include",
         headers: {

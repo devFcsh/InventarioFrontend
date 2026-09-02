@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { AUTH_BASE_URL } from "../data";
 
 interface User {
   id: string;
@@ -31,7 +32,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const fetchUser = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/status`, {
+      const res = await fetch(`${AUTH_BASE_URL}/auth/status`, {
         credentials: "include",
       });
       const data = await res.json();

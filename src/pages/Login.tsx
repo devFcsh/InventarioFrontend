@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
+import { AUTH_BASE_URL } from "../data";
 const Login = () => {
-  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
   const [status, setStatus] = useState<"loading" | "redirecting" | "error">(
     "loading"
   );
@@ -13,7 +13,7 @@ const Login = () => {
   const checkAuth = async () => {
     try {
       console.log("🔍 Verificando estado de autenticación...");
-      const response = await fetch(`${API_BASE_URL}/auth/status`, {
+      const response = await fetch(`${AUTH_BASE_URL}/auth/status`, {
         method: "GET",
         credentials: "include", // <— crucial para que viaje la cookie
         headers: {
@@ -36,7 +36,7 @@ const Login = () => {
         console.log("❌ Usuario no autenticado, iniciando login...");
         setStatus("redirecting");
         setTimeout(() => {
-          window.location.href = `${API_BASE_URL}/auth/cas/login`;
+          window.location.href = `${AUTH_BASE_URL}/auth/cas/login`;
         }, 1500);
       }
     } catch (error) {
@@ -123,7 +123,7 @@ const Login = () => {
                   Si no eres redirigido automáticamente,&nbsp;
                   <button
                     onClick={() =>
-                      (window.location.href = `${API_BASE_URL}/auth/cas/login`)
+                      (window.location.href = `${AUTH_BASE_URL}/auth/cas/login`)
                     }
                     className="text-blue-600 hover:text-blue-800 underline ml-1"
                   >

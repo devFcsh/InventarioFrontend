@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { AUTH_BASE_URL } from '../data';
 
 interface User {
   id: string;
@@ -25,15 +26,13 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const API_BASE_URL = import.meta.env.VITE_BACKEND_URL;
-
   const isAuthenticated = !!user;
 
   const checkAuth = async () => {
     try {
       console.log('🔍 Verificando estado de autenticación...');
       
-      const response = await fetch(`${API_BASE_URL}/auth/status`, {
+      const response = await fetch(`${AUTH_BASE_URL}/auth/status`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -61,14 +60,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = () => {
     console.log('🚀 Iniciando proceso de login...');
-    window.location.href = `${API_BASE_URL}/auth/cas/login`;
+    window.location.href = `${AUTH_BASE_URL}/auth/cas/login`;
   };
 
   const logout = async () => {
     try {
       console.log('🚪 Cerrando sesión...');
       
-      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+      const response = await fetch(`${AUTH_BASE_URL}/auth/logout`, {
         method: 'POST',
         credentials: 'include',
         headers: {
